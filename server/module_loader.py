@@ -26,7 +26,6 @@ def load_modules(module_path=None,
                  blacklist=None):
 
 
-    print "\n\n\n\n\n why the heck is this getting called twice? \n\n\n"
  
     module_file_path="%s/func/server/modules/" % distutils.sysconfig.get_python_lib()
     mod_path="%s/func/server/"  % distutils.sysconfig.get_python_lib()
@@ -38,16 +37,16 @@ def load_modules(module_path=None,
     sys.path.insert(0, mod_path)
     mods = {}
 
-    print sys.path
-    print mod_path
-    print module_file_path
+#    print sys.path
+#    print mod_path
+#    print module_file_path
 
     filenames = glob.glob("%s/*.py" % module_file_path)
     filenames = filenames + glob.glob("%s/*.pyc" % module_file_path)
     filesnames = filenames + glob.glob("%s/*.pyo" % module_file_path)
 
 
-    print "filenames", filenames
+#    print "filenames", filenames
     for fn in filenames:
         basename = os.path.basename(fn)
         if basename == "__init__.py":

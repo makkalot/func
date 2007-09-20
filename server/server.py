@@ -62,9 +62,7 @@ class XmlRpcInterface(object):
         FIXME: eventually calling most functions should go from here through getattr.
         """
         self.handlers = {}
-        print "ffffffffffff", self.modules.keys()
         for x in self.modules.keys():
-            print "x", x
             try:
                 self.modules[x].register_rpc(self.handlers)
                 self.logger.debug("adding %s" % x)
@@ -185,7 +183,6 @@ def main(argv):
             module_path="modules/"
             mod_path="server/"
 
-    print "module_path_foo", module_path
     modules = module_loader.load_modules(module_path=module_path)
     print "modules", modules
 
