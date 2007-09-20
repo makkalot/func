@@ -4,6 +4,5 @@
 *.pyo
 *.swp
 MANIFEST
-po
 rpm-build
 dist

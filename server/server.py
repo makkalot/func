@@ -132,6 +132,7 @@ def serve(websvc):
      """
 
      server =FuncXMLRPCServer(('', 51234))
+     server.logRequests = 0 # don't print stuff to console
      server.register_instance(websvc)
      server.serve_forever()
 
@@ -155,7 +156,11 @@ def main(argv):
     modules = module_loader.load_modules()
     print "modules", modules
 
-    websvc = XmlRpcInterface(modules=modules)
+    try:
+        websvc = XmlRpcInterface(modules=modules)
+    except FuncException, e:
+        print >> sys.stderr, 'error: %s' % e
+        sys.exit(1)
 
     if "daemon" in sys.argv or "--daemon" in sys.argv:
         utils.daemonize("/var/run/vf_server.pid")

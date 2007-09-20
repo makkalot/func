@@ -35,7 +35,7 @@ class Config:
     def read(self):
 
         if not os.path.exists(CONFIG_FILE):
-            raise FuncException(comment="Missing %s" % CONFIG_FILE)
+            raise FuncException("Missing %s" % CONFIG_FILE)
 
         cp = ConfigParser.ConfigParser()
 
