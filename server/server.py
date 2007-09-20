@@ -130,6 +130,7 @@ def serve(websvc):
      """
 
      server =FuncXMLRPCServer(('', 51234))
+     server.logRequests = 0 # don't print stuff to console
      server.register_instance(websvc)
      server.serve_forever()
 
