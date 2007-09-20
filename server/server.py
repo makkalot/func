@@ -1,11 +1,10 @@
 #!/usr/bin/python
-"""
-Virt-factory backend code.
 
-Copyright 2006, Red Hat, Inc
-Michael DeHaan <mdehaan@redhat.com>
-Scott Seago <sseago@redhat.com>
-Adrian Likins <alikins@redhat.com>
+"""
+func
+
+Copyright 2007, Red Hat, Inc
+see AUTHORS
 
 This software may be freely redistributed under the terms of the GNU
 general public license.

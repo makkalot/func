@@ -41,8 +41,6 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 
 %dir %{python_sitelib}/func/server/modules
 %{python_sitelib}/func/server/modules/*.py*
-%dir %{python_sitelib}/func/server/yaml
-%{python_sitelib}/func/server/yaml/*.py*
 %dir /var/log/func
 
 %post

@@ -45,14 +45,12 @@ if __name__ == "__main__":
                 package_dir = {"%s" % NAME: "",
 			       "%s/server" % NAME: "server",
 			       "%s/server/modules" % NAME: "modules/",
-			       "%s/client" % NAME: "client",
-			       "%s/server/yaml" % NAME: "server/yaml/",
+			       "%s/client" % NAME: "client"
                 },
 		packages = ["%s" % NAME,
 	        	    "%s/server" % NAME,
 			    "%s/client" % NAME,
-	        	    "%s/server/modules" % NAME,
-	 	            "%s/server/yaml" % NAME,
+	        	    "%s/server/modules" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (etcpath, ["settings",]),

@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 
+# FIXME: should import the client lib, not XMLRPC lib, when we are done
+
 import xmlrpclib
 
 s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
