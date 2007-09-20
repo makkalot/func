@@ -1,10 +1,22 @@
 #!/bin/sh
 #
-# funcd    func api provider
-#
+# funcd    Fedora Unified Network Control
+###################################
+
+# LSB header
+
+### BEGIN INIT INFO
+# Provides: funcd
+# Required-Start: network, xinetd, httpd
+# Default-Start: 3 4 5
+# Short-Description: Fedora Unified Network Control
+# Description: Crazy simple, secure remote management.
+### END INIT INFO
+
+# chkconfig header
+
 # chkconfig: 345 99 99 
-# description:  Server to expose config, monitoring, and management apis to func
-#               See https://hosted.fedoraproject.org/projects/func/
+# description:  Crazy simple, secure remote management.
 #
 # processname: /usr/bin/funcd
 
@@ -14,70 +26,48 @@
 # Source function library.
 . /etc/rc.d/init.d/functions
 
+SERVICE=funcd
+PROCESS=funcd
+CONFIG_ARGS=" "
+
 RETVAL=0
 
 start() {
-    echo -n $"Starting the funcd  : "
-    if test -f /var/lock/subsys/funcd ; then
-        echo_failure
-        echo
-        return 1
-    fi
-    /usr/bin/funcd --daemon
+    echo -n $"Starting func daemon: "
+    daemon --check $SERVICE $PROCESS --daemon $CONFIG_ARGS
     RETVAL=$?
-    echo_success
     echo
-    touch /var/lock/subsys/funcd
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
     return $RETVAL
 }
-
 
 stop() {
-    echo -n $"Stopping funcd daemon: "
-    if ! test -f /var/lock/subsys/funcd ; then
-        echo_failure
-        echo
-        return 1
-    fi
-    pkill funcd
+    echo -n $"Stopping func daemon: "
+    killproc $PROCESS
     RETVAL=$?
-    rm /var/lock/subsys/funcd
-    echo_success
     echo
-    return $RETVAL
+    if [ $RETVAL -eq 0 ]; then
+	rm -f /var/lock/subsys/$SERVICE
+        rm -f /var/run/$SERVICE.pid
+    fi
 }
 
-mystatus() {
-    if test -f /var/lock/subsys/funcd ; then
-        echo "the funcd is alive..."
-        return 0
-    fi
-    echo "we have lost the funcd"
-    echo
-    return 0
+restart() {
+   stop
+   start
 }
 
 # See how we were called.
 case "$1" in
-    start)
-        start
-        ;;
-    stop)
-        stop
+    start|stop|restart)
+        $1
         ;;
     status)
-        mystatus
+        status $PROCESS
         RETVAL=$?
         ;;
-    restart)
-        stop
-        start
-        ;;
     condrestart)
-        if [ -f /var/lock/subsys/vf_server ]; then
-            stop
-            start
-        fi
+        [ -f /var/lock/subsys/$SERVICE ] && restart || :
         ;;
     reload)
         echo "can't reload configuration, you have to restart it"
@@ -85,6 +75,7 @@ case "$1" in
         ;;
     *)
         echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+        exit 1
         ;;
 esac
 exit $RETVAL
