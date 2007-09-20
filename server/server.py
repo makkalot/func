@@ -16,14 +16,16 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # standard modules
 import SimpleXMLRPCServer
-import os
-import subprocess
+import string
 import socket
+import sys
+import traceback
+
 from rhpl.translate import _, N_, textdomain, utf8
 I18N_DOMAIN = "vf_server"
 
 # our modules
-from codes import *
+import codes
 import config_data
 import logger
 import module_loader
@@ -57,7 +59,7 @@ class XmlRpcInterface(object):
                 self.modules[x].register_rpc(self.handlers)
                 self.logger.debug("adding %s" % x)
             except AttributeError, e:
-                self.logger.warning("module %s not loaded, missing register_rpc method" % modules[x])
+                self.logger.warning("module %s not loaded, missing register_rpc method" % self.modules[x])
 
 
     def get_dispatch_method(self, method):
@@ -67,7 +69,7 @@ class XmlRpcInterface(object):
       
         else:
             self.logger.info("Unhandled method call for method: %s " % method)
-            raise InvalidMethodException
+            raise codes.InvalidMethodException
 
     def _dispatch(self, method, params):
 
@@ -109,7 +111,7 @@ class FuncApiMethod:
 
         try:
             rc = self.__method(*args)
-        except FuncException, e:
+        except codes.FuncException, e:
             self.__log_exc()
             rc = e
         except:

@@ -22,4 +22,7 @@ import traceback
 class FuncException(exceptions.Exception):
    pass
 
+class InvalidMethodException(FuncException):
+   pass
+
 # FIXME: more sub-exceptions maybe
