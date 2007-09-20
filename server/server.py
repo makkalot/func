@@ -22,7 +22,7 @@ import sys
 import traceback
 
 from rhpl.translate import _, N_, textdomain, utf8
-I18N_DOMAIN = "vf_server"
+I18N_DOMAIN = "func"
 
 # our modules
 import codes
