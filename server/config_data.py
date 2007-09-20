@@ -27,6 +27,7 @@ class Config:
 
     def __init__(self):
         self.__dict__ = self.__shared_state
+        self.ds = {}
         if not self.has_read:
             self.read()
             Config.has_read = True
@@ -38,9 +39,11 @@ class Config:
 
         cp = ConfigParser.ConfigParser()
 
+        cp.read([CONFIG_FILE])
+        
         self.ds["is_master"] = int(cp.get("general","is_master"))
         self.ds["is_minion"] = int(cp.get("general","is_minion"))
-        self.ds["master_server"] = cp.get("general","master")
+        self.ds["master_server"] = cp.get("general","master_server")
 
     def get(self):
         return self.ds
