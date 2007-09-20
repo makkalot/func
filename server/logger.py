@@ -1,10 +1,9 @@
 #!/usr/bin/python
 
-## Virt-factory backend code.
+## func
 ##
-## Copyright 2006, Red Hat, Inc
-## Michael DeHaan <mdehaan@redhat.com
-## Adrian Likins <alikins@redhat.com
+## Copyright 2007, Red Hat, Inc
+## See AUTHORS
 ##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
@@ -29,13 +28,15 @@ class Singleton(object):
 
 # logging is weird, we don't want to setup multiple handlers
 # so make sure we do that mess only once
+
 class Logger(Singleton):
     __no_handlers = True
-    def __init__(self, logfilepath ="/var/log/virt-factory/svclog"):
+
+    def __init__(self, logfilepath ="/var/log/func/func.log"):
 
         self.config = config_data.Config().get()     
-        if self.config.has_key("loglevel"):
-           self.loglevel = logging._levelNames[self.config["loglevel"]]
+        if self.config.has_key("log_level"):
+           self.loglevel = logging._levelNames[self.config["log_level"]]
         else:
            self.loglevel = logging.INFO   
         self.__setup_logging()
@@ -45,7 +46,7 @@ class Logger(Singleton):
     def __setup_logging(self):
         self.logger = logging.getLogger("svc")
 
-    def __setup_handlers(self, logfilepath="/var/log/virt-factory/svclog"):
+    def __setup_handlers(self, logfilepath="/var/log/func/func.log"):
         handler = logging.FileHandler(logfilepath, "a")
         self.logger.setLevel(self.loglevel)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")

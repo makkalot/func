@@ -1,6 +1,6 @@
 #!/usr/bin/python
 """
-Virt-factory backend code.
+func
 
 Copyright 2007, Red Hat, Inc
 See AUTHORS
