@@ -15,7 +15,6 @@
 
 from codes import *
 
-import baseobj
 from server import config_data
 from server import logger
 
