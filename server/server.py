@@ -166,8 +166,6 @@ def main(argv):
     """
 
 
-    module_path=None
-    
     for arg in sys.argv:
         if arg == "import" or arg == "--import":
             prov_obj = provisioning.Provisioning()
@@ -177,13 +175,8 @@ def main(argv):
             prov_obj = provisioning.Provisioning()
             prov_obj.sync(None, {}) # just for testing
             return
-        elif arg in ["debug", "--debug", "-d"]:
-            # basically, run from the src tree instead of
-            # using the installed modules
-            module_path="modules/"
-            mod_path="server/"
 
-    modules = module_loader.load_modules(module_path=module_path)
+    modules = module_loader.load_modules()
     print "modules", modules
 
 
