@@ -32,11 +32,6 @@ import module_loader
 import utils
 
 
-MODULE_PATH="modules/"
-modules = module_loader.load_modules(MODULE_PATH)
-print "modules", modules
-
-
 #from busrpc.services import RPCDispatcher
 #from busrpc.config import DeploymentConfig
 
@@ -44,16 +39,9 @@ from rhpl.translate import _, N_, textdomain, utf8
 I18N_DOMAIN = "vf_server"
 
 
-class Singleton(object):
-    def __new__(type, *args, **kwargs):
-        if not '_the_instance' in type.__dict__:
-            type._the_instance = object.__new__(type, *args, **kwargs)
-            type._the_instance.init(*args, **kwargs)
-        return type._the_instance
+class XmlRpcInterface(object):
 
-class XmlRpcInterface(Singleton):
-
-    def init(self):
+    def __init__(self, modules={}):
         """
         Constructor sets up SQLAlchemy (database ORM) and logging.
         """
@@ -62,6 +50,8 @@ class XmlRpcInterface(Singleton):
        
         self.tables = {}
         self.tokens = []
+
+        self.modules = modules
 
         self.logger = logger.Logger().logger
         
@@ -73,11 +63,11 @@ class XmlRpcInterface(Singleton):
         FIXME: eventually calling most functions should go from here through getattr.
         """
         self.handlers = {}
-        print "ffffffffffff", modules.keys()
-        for x in modules.keys():
+        print "ffffffffffff", self.modules.keys()
+        for x in self.modules.keys():
             print "x", x
             try:
-                modules[x].register_rpc(self.handlers)
+                self.modules[x].register_rpc(self.handlers)
                 self.logger.debug("adding %s" % x)
             except AttributeError, e:
                 self.logger.warning("module %s could not be loaded, it did not have a register_rpc method" % modules[x])
@@ -178,8 +168,9 @@ def main(argv):
     Start things up.
     """
 
-    websvc = XmlRpcInterface()
 
+    module_path=None
+    
     for arg in sys.argv:
         if arg == "import" or arg == "--import":
             prov_obj = provisioning.Provisioning()
@@ -189,6 +180,19 @@ def main(argv):
             prov_obj = provisioning.Provisioning()
             prov_obj.sync(None, {}) # just for testing
             return
+        elif arg in ["debug", "--debug", "-d"]:
+            # basically, run from the src tree instead of
+            # using the installed modules
+            module_path="modules/"
+            mod_path="server/"
+
+    print "module_path_foo", module_path
+    modules = module_loader.load_modules(module_path=module_path)
+    print "modules", modules
+
+
+    websvc = XmlRpcInterface(modules=modules)
+
     if "qpid" in sys.argv or "--qpid" in sys.argv:
         if "daemon" in sys.argv or "--daemon" in sys.argv:
             utils.daemonize("/var/run/vf_server_qpid.pid")
