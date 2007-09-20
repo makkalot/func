@@ -1,0 +1,91 @@
+#!/bin/sh
+#
+# funcd    func api provider
+#
+# chkconfig: 345 99 99 
+# description:  Server to expose config, monitoring, and management apis to func
+#               See https://hosted.fedoraproject.org/projects/func/
+#
+# processname: /usr/bin/funcd
+
+# Sanity checks.
+[ -x /usr/bin/funcd ] || exit 0
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting the funcd  : "
+    if test -f /var/lock/subsys/funcd ; then
+        echo_failure
+        echo
+        return 1
+    fi
+    /usr/bin/funcd --daemon
+    RETVAL=$?
+    echo_success
+    echo
+    touch /var/lock/subsys/funcd
+    return $RETVAL
+}
+
+
+stop() {
+    echo -n $"Stopping funcd daemon: "
+    if ! test -f /var/lock/subsys/funcd ; then
+        echo_failure
+        echo
+        return 1
+    fi
+    pkill funcd
+    RETVAL=$?
+    rm /var/lock/subsys/funcd
+    echo_success
+    echo
+    return $RETVAL
+}
+
+mystatus() {
+    if test -f /var/lock/subsys/funcd ; then
+        echo "the funcd is alive..."
+        return 0
+    fi
+    echo "we have lost the funcd"
+    echo
+    return 0
+}
+
+# See how we were called.
+case "$1" in
+    start)
+        start
+        ;;
+    stop)
+        stop
+        ;;
+    status)
+        mystatus
+        RETVAL=$?
+        ;;
+    restart)
+        stop
+        start
+        ;;
+    condrestart)
+        if [ -f /var/lock/subsys/vf_server ]; then
+            stop
+            start
+        fi
+        ;;
+    reload)
+        echo "can't reload configuration, you have to restart it"
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+        ;;
+esac
+exit $RETVAL
+
