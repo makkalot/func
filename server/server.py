@@ -153,7 +153,11 @@ def main(argv):
     modules = module_loader.load_modules()
     print "modules", modules
 
-    websvc = XmlRpcInterface(modules=modules)
+    try:
+        websvc = XmlRpcInterface(modules=modules)
+    except FuncException, e:
+        print >> sys.stderr, 'error: %s' % e
+        sys.exit(1)
 
     if "daemon" in sys.argv or "--daemon" in sys.argv:
         utils.daemonize("/var/run/vf_server.pid")
