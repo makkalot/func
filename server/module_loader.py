@@ -47,7 +47,7 @@ def load_modules(blacklist=None):
         try:
             blip =  __import__("modules.%s" % ( modname), globals(), locals(), [modname])
             if not hasattr(blip, "register_rpc"):
-		errmsg = _("%(module_path)s/%(modname)s module not a proper module")
+		errmsg = _("%(module_path)s%(modname)s module not a proper module")
                 print errmsg % {'module_path': module_file_path, 'modname':modname} 
                 continue
             mods[modname] = blip

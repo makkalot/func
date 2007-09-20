@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: func 0.11-2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-09-20 18:36-0400\n"
+"POT-Creation-Date: 2007-09-20 18:42-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,5 +18,5 @@ msgstr ""
 
 #: server/module_loader.py:50
 #, python-format
-msgid "%(module_path)s/%(modname)s module not a proper module"
+msgid "%(module_path)s%(modname)s module not a proper module"
 msgstr ""
