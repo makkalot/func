@@ -1,0 +1,7 @@
+*~
+\#*\#
+*.pyc
+*.pyo
+*.swp
+po
+rpm-build
