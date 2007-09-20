@@ -1,13 +1,13 @@
 
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
-Summary: func remote config, monitoring, and management api
+Summary: Remote config, monitoring, and management api
 Name: func
 Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
 Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 Source0: %{name}-%{version}.tar.gz
-License: GPL
+License: GPL+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: rhpl
@@ -19,8 +19,10 @@ Url: https://hosted.fedoraproject.org/projects/func/
 %description
 
 func is a remote api for mangement, configation, and monitoring of systems.
+
 %prep
 %setup -q
+
 %build
 %{__python} setup.py build
 
@@ -28,10 +30,12 @@ func is a remote api for mangement, configation, and monitoring of systems.
 test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install --root=$RPM_BUILD_ROOT
 
+%clean
+rm -fr $RPM_BUILD_ROOT
+
 %files
 %{_bindir}/funcd
 /etc/init.d/funcd
-#%dir /var/lib/virt-factory
 %config(noreplace) /etc/func/settings
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/server
@@ -55,5 +59,8 @@ fi
 
 
 %changelog
+* Thu Sep 20 2007 James Bowes <jbowes@redhat.com> - 0.0.11-2
+- Clean up some speclint warnings
+
 * Thu Sep 20 2007 Adrian Likins <alikins@redhat.com> - 0.0.11-1
 - initial release (this one goes to .11)
