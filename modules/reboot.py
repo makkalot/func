@@ -9,7 +9,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from modules import web_svc
+from modules import func_module
 
 import subprocess
 
@@ -19,7 +19,7 @@ class Reboot(web_svc.WebSvc):
         self.methods = {
                 "reboot_reboot" : self.reboot
         }
-        web_svc.WebSvc.__init__(self)
+        func_module.FuncModule.__init__(self)
 
     def reboot(self, when='now', message=''):
         return subprocess.call(["/sbin/shutdown", '-r', when, message])
