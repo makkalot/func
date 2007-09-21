@@ -5,6 +5,7 @@
 
 import xmlrpclib
 
+TEST_PROCESS = True
 TEST_VIRT = False
 TEST_SERVICES = True
 TEST_HARDWARE = True
@@ -14,6 +15,9 @@ s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
 
 # here's the basic test...
 print s.test.add(1, 2)
+
+if TEST_PROCESS:
+    print s.process.info()
 
 # here's the service module testing
 if TEST_SERVICES:
