@@ -27,7 +27,7 @@ import libvirt
 
 # our modules
 import codes
-import web_svc
+import func_module
 
 VIRT_STATE_NAME_MAP = {
    0 : "running",
@@ -121,7 +121,7 @@ class FuncLibvirtConnection():
 
 
 
-class Virt(web_svc.WebSvc):
+class Virt(func_module.FuncModule):
     
     
     def __init__(self):
@@ -142,7 +142,7 @@ class Virt(web_svc.WebSvc):
             "virt_list_vms" : self.list_vms,
         }
         
-        web_svc.WebSvc.__init__(self)
+        func_module.FuncModule.__init__(self)
 
     def get_conn(self):
 	self.conn = FuncLibvirtConnection()
