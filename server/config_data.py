@@ -1,11 +1,9 @@
 #!/usr/bin/python
 
-# Virt-factory backend code.
+# func
 #
 # Copyright 2006, Red Hat, Inc
-# Michael DeHaan <mdehaan@redhat.com>
-# Scott Seago <sseago@redhat.com>
-# Adrian Likins <alikins@redhat.com>
+# see AUTHORS
 #
 # This software may be freely redistributed under the terms of the GNU
 # general public license.
@@ -16,19 +14,10 @@
 
 
 from codes import *
-
 import os
-import yaml
+import ConfigParser
 
-CONFIG_FILE = "/etc/virt-factory/settings"
-
-# from the comments in http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531
-#class Singleton(object):
-#    def __new__(type):
-#        if not '_the_instance' in type.__dict__:
-#            type._the_instance = object.__new__(type)
-#        return type._the_instance
-
+CONFIG_FILE = "/etc/func/settings"
 
 class Config:
 
@@ -38,18 +27,23 @@ class Config:
 
     def __init__(self):
         self.__dict__ = self.__shared_state
+        self.ds = {}
         if not self.has_read:
             self.read()
-            print "***** CONFIG RELOAD *****"
             Config.has_read = True
 
     def read(self):
+
         if not os.path.exists(CONFIG_FILE):
-            raise MisconfiguredException(comment="Missing %s" % CONFIG_FILE)
-        config_file = open(CONFIG_FILE)
-        data = config_file.read()
-        self.ds = yaml.load(data).next()
-   
+            raise FuncException("Missing %s" % CONFIG_FILE)
+
+        cp = ConfigParser.ConfigParser()
+
+        cp.read([CONFIG_FILE])
+        
+        self.ds["is_master"] = int(cp.get("general","is_master"))
+        self.ds["is_minion"] = int(cp.get("general","is_minion"))
+        self.ds["master_server"] = cp.get("general","master_server")
 
     def get(self):
         return self.ds
