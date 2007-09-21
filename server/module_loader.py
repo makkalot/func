@@ -22,6 +22,22 @@ import glob
 from rhpl.translate import _, N_, textdomain, utf8
 
 
+def module_walker(topdir):
+    module_files = []
+    for root, dirs, files in os.walk(topdir):
+        # we should get here for each subdir
+        for filename in files:
+            # ASSUMPTION: all module files will end with .py, .pyc, .pyo
+            if filename[-3:] == ".py" or filename[-4:] == ".pyc" or filename[-4:] == ".pyo":
+                # we don't really care about __init__ files, though we do requure them
+                if filename[:8] == "__init__":
+                    continue
+                # the normpath is important, since we 
+                module_files.append(os.path.normpath("%s/%s" % (root, filename)))
+
+                
+    return module_files
+
 def load_modules(blacklist=None):
 
     module_file_path="%s/func/server/modules/" % distutils.sysconfig.get_python_lib()
@@ -30,12 +46,14 @@ def load_modules(blacklist=None):
     sys.path.insert(0, mod_path)
     mods = {}
 
-    filenames = glob.glob("%s/*.py" % module_file_path)
-    filenames = filenames + glob.glob("%s/*.pyc" % module_file_path)
-    filesnames = filenames + glob.glob("%s/*.pyo" % module_file_path)
+    filenames = module_walker(module_file_path)
 
+    # FIXME: this is probably more complicated than it needs to be -akl
     for fn in filenames:
-        basename = os.path.basename(fn)
+        # aka, everything after the module_file_path
+        module_name_part = fn[len(module_file_path):]
+        dirname, basename = os.path.split(module_name_part)
+        
         if basename == "__init__.py":
             continue
         if basename[-3:] == ".py":
@@ -43,14 +61,19 @@ def load_modules(blacklist=None):
         elif basename[-4:] in [".pyc", ".pyo"]:
             modname = basename[:-4]
 
-        
+        pathname = modname
+        if dirname != "":
+            pathname = "%s/%s" % (dirname, modname)
+            
+        mod_imp_name = pathname.replace("/", ".")
+
         try:
-            blip =  __import__("modules.%s" % ( modname), globals(), locals(), [modname])
+            blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
             if not hasattr(blip, "register_rpc"):
 		errmsg = _("%(module_path)s%(modname)s module not a proper module")
-                print errmsg % {'module_path': module_file_path, 'modname':modname} 
+                print errmsg % {'module_path': module_file_path, 'modname':mod_imp_name} 
                 continue
-            mods[modname] = blip
+            mods[mod_imp_name] = blip
         except ImportError, e:
             # shouldn't this be fatal?
             print e
@@ -59,5 +82,17 @@ def load_modules(blacklist=None):
     return mods
 
 
+if __name__ == "__main__":
 
-    
+    module_file_path = "/usr/lib/python2.5/site-packages/func/server/modules/"
+    bar = module_walker(module_file_path)
+    print bar
+    for f in bar:
+        print f
+        print os.path.basename(f)
+        print os.path.split(f)
+        g = f[len(module_file_path):]
+        print g
+        print os.path.split(g)
+
+    print load_modules()

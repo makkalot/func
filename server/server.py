@@ -56,7 +56,7 @@ class XmlRpcInterface(object):
         self.handlers = {}
         for x in self.modules.keys():
             try:
-                self.modules[x].register_rpc(self.handlers)
+                self.modules[x].register_rpc(self.handlers, x)
                 self.logger.debug("adding %s" % x)
             except AttributeError, e:
                 self.logger.warning("module %s not loaded, missing register_rpc method" % self.modules[x])
@@ -174,7 +174,7 @@ def main(argv):
 
     try:
         websvc = XmlRpcInterface(modules=modules)
-    except FuncException, e:
+    except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
         sys.exit(1)
 
