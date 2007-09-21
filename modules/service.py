@@ -45,7 +45,7 @@ class Service(func_module.FuncModule):
         return self.__command(service_name, "start")
 
     def stop(self, service_name):
-        return self.__command(service_name, "start")
+        return self.__command(service_name, "stop")
 
     def restart(self, service_name):
         return self.__command(service_name, "restart")
