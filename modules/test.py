@@ -1,14 +1,14 @@
 #!/usr/bin/python
 
 from codes import *
-from modules import web_svc
+from modules import func_module
 
-class Test(web_svc.WebSvc):
+class Test(func_module.FuncModule):
     def __init__(self):
         self.methods = {
             "test_add": self.add
         }
-        web_svc.WebSvc.__init__(self)
+        func_module.FuncModule.__init__(self)
 
     def add(self, numb1, numb2):
         return numb1 + numb2

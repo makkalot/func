@@ -16,12 +16,12 @@
 
 
 from codes import *
-from modules import web_svc
+from modules import func_module
 
 import subprocess
 import os
 
-class Service(web_svc.WebSvc):
+class Service(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
@@ -31,7 +31,7 @@ class Service(web_svc.WebSvc):
             "service_reload"  : self.reload,
             "service_status"  : self.status
         }
-        web_svc.WebSvc.__init__(self)
+        func_module.FuncModule.__init__(self)
 
     def __command(self, service_name, command):
 

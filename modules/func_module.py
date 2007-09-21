@@ -1,9 +1,8 @@
 #!/usr/bin/python
 
-## Virt-factory backend code.
 ##
-## Copyright 2006, Red Hat, Inc
-## Adrian Likins <alikins@redhat.com
+## Copyright 2007, Red Hat, Inc
+## see AUTHORS
 ##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
@@ -24,7 +23,7 @@ import time
 import traceback
 
 
-class WebSvc(object):
+class FuncModule(object):
     def __init__(self):
 
         config_obj = config_data.Config()
@@ -33,7 +32,6 @@ class WebSvc(object):
         self.__init_log()
         
     def __init_log(self):
-        # lets see what happens when we c&p the stuff from server.py 
         log = logger.Logger()
         self.logger = log.logger
     
@@ -41,12 +39,5 @@ class WebSvc(object):
         for meth in self.methods:
             handlers[meth] = self.methods[meth]
             
-    def offset_and_limit(self, args):
-        return args.get('offset', 0), args.get('limit', 100000)
-
-
-class AuthWebSvc(WebSvc):
-    def __init__(self):
-        WebSvc.__init__(self)
 
 
