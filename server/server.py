@@ -22,7 +22,7 @@ import sys
 import traceback
 
 from rhpl.translate import _, N_, textdomain, utf8
-I18N_DOMAIN = "vf_server"
+I18N_DOMAIN = "func"
 
 # our modules
 import codes
@@ -77,6 +77,10 @@ class XmlRpcInterface(object):
         the SimpleXMLRPCServer class will call _dispatch if it doesn't
         find a handler method 
         """
+
+        # Recognize ipython's tab completion calls
+        if method == 'trait_names' or method == '_getAttributeNames':
+            return self.handlers.keys()
 
         return self.get_dispatch_method(method)(*params)
 
@@ -154,7 +158,19 @@ def main(argv):
     """
 
     modules = module_loader.load_modules()
-    print "modules", modules
+
+    print "\n\n\n\n\n"
+    print " WARNING WARNING WARNING"
+    print "DANGER DANGER DANGER"
+    print "\n\n\n\n"
+    print "THERE IS NO AUTHENTICATION IN THIS VERSION"
+    print "DO NOT RUN ON A MACHINE EXPOSED TO ANYONE YOU DO NOT TRUST"
+    print " THEY CAN DO VERY BAD THINGS"
+    print "\n\n\n\n\n"
+    print "Really, don't do that. It is not at all secure at the moment"
+    print "like, at all."
+    print ""
+    print "Seriously.\n\n"
 
     try:
         websvc = XmlRpcInterface(modules=modules)
