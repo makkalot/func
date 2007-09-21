@@ -6,33 +6,40 @@ import getopt
 import sys
 import xmlrpclib
 
+myname, argv = sys.argv[0], sys.argv[1:]
+
+def usage():
+    return "Usage: %s [ --help ] [ --verbose ] [ --server=http://hostname:port ] method arg1 [ ... ]" % myname
 
 verbose = 0
+server = "http://127.0.0.1:51234"
 
 try:
-    opts, args = getopt.getopt(sys.argv, "hvs:",
+    opts, args = getopt.getopt(argv, "hvs:",
                                ["help",
                                 "verbose",
                                 "server="])
 except getopt.error, e:
     print _("Error parsing list arguments: %s") % e
-    self.print_help()
-    # FIXME: error handling
+    print usage()
+    sys.exit()
     
-
-server = "http://127.0.0.1:51234"
 for (opt, val) in opts:
+    print "opt = %s, val = %s" % (opt, val)
     if opt in ["-h", "--help"]:
-        self.print_help()
+        print usage()
         sys.exit()
     if opt in ["-v", "--verbose"]:
         verbose = verbose + 1
     if opt in ["-s", "--server"]:
         server = val
 
+if len(args) < 1:
+    print usage()
+    sys.exit()
+
 s = xmlrpclib.ServerProxy(server)
 
-args = args[1:]
 method = args[0]
 print "calling %s with args: %s" % (method, args[1:])
 
@@ -40,3 +47,4 @@ print "calling %s with args: %s" % (method, args[1:])
 # we can't call "call" on s, since thats a rpc, so
 # we call gettatr around it. 
 print getattr(s, method)(*args[1:])
+
