@@ -12,11 +12,11 @@ TEST_SERVICES = True
 s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
 
 # here's the basic test...
-print s.test_add(1, 2)
+print s.test.test_add(1, 2)
 
 # here's the service module testing
 if TEST_SERVICES:
-    print s.service_restart("httpd")
+    print s.service.service_restart("httpd")
 
 # this is so I can remember how the virt module works
 if TEST_VIRT:
@@ -25,14 +25,14 @@ if TEST_VIRT:
    #s.virt_install("mdehaan.rdu.redhat.com","profileX")
 
    # wait ...
-   vms = s.virt_list_vms()
+   vms = s.virt.virt_list_vms()
    # example of stopping all stopped virtual machines
    print "list of virtual instances = %s" % vms
    for vm in vms:
-       status = s.virt_status(vm)
+       status = s.virt.virt_status(vm)
        print status
        if status == "shutdown":
-           s.virt_start(vm)
+           s.virt.virt_start(vm)
 
 # add more tests here           
 
