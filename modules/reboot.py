@@ -13,7 +13,7 @@ from modules import func_module
 
 import subprocess
 
-class Reboot(web_svc.WebSvc):
+class Reboot(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
