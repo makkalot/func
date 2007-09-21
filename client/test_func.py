@@ -30,7 +30,8 @@ if TEST_VIRT:
    print "list of virtual instances = %s" % vms
    for vm in vms:
        status = s.virt_status(vm)
-       if status == "stopped":
+       print status
+       if status == "shutdown":
            s.virt_start(vm)
 
 # add more tests here           

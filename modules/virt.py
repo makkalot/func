@@ -81,7 +81,7 @@ class FuncLibvirtConnection():
             return vms
 
         for vm in vms:
-            if vm.name() == needle:
+            if vm.name() == vmid:
                 return vm
 
         raise FuncException(comment="virtual machine %s not found" % needle)
@@ -190,7 +190,7 @@ class Virt(func_module.FuncModule):
 
         rc = subprocess.call(koan_args,shell=False)
         if rc == 0:
-            return success(0)
+            return 0
         else:
             raise FuncException(comment="koan returned %d" % rc)
  
@@ -202,7 +202,7 @@ class Virt(func_module.FuncModule):
         """
         self.get_conn()
         self.conn.shutdown(vmid)
-        return success()        
+        return 0       
 
    
     def pause(self, vmid):
@@ -212,7 +212,7 @@ class Virt(func_module.FuncModule):
         """
         self.get_conn()
         self.conn.suspend(vmid)
-        return success()
+        return 0
 
    
     def unpause(self, vmid):
@@ -223,7 +223,7 @@ class Virt(func_module.FuncModule):
 
         self.get_conn()
         self.conn.resume(vmid)
-        return success()
+        return 0
 
 
     def create(self, vmid):
@@ -233,7 +233,7 @@ class Virt(func_module.FuncModule):
         """
         self.get_conn()
         self.conn.create(vmid)
-        return success()
+        return 0
  
 
     def destroy(self, vmid):
@@ -244,8 +244,7 @@ class Virt(func_module.FuncModule):
         """
         self.get_conn()
         self.conn.destroy(vmid)
-        return success()
-
+        return 0
 
 
     def undefine(self, vmid):
@@ -257,7 +256,7 @@ class Virt(func_module.FuncModule):
 
         self.get_conn()
         self.conn.undefine(vmid)
-        return success()
+        return 0
 
 
     def get_status(self, vmid):
@@ -267,7 +266,7 @@ class Virt(func_module.FuncModule):
         """
         
         self.get_conn()
-        return success("STATE=%s" % self.conn.get_status(vmid))
+        return self.conn.get_status(vmid)
 
 
 methods = Virt()
