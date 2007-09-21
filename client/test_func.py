@@ -18,11 +18,12 @@ print s.test.add(1, 2)
 
 if TEST_PROCESS:
     print s.process.info()
+    print s.process.pkill("thunderbird")
 
 # here's the service module testing
 if TEST_SERVICES:
     print s.service.restart("httpd")
-
+    
 if TEST_HARDWARE:
     print s.hardware.info()
 

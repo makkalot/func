@@ -26,7 +26,9 @@ from modules import func_module
 class ProcessModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
-            "info": self.info
+            "info"    : self.info,
+            "kill"    : self.kill,
+            "pkill"   : self.pkill
         }
         func_module.FuncModule.__init__(self)
 
@@ -49,6 +51,15 @@ class ProcessModule(func_module.FuncModule):
             results.append(tokens)
 
         return results
+
+    def kill(self,pid,level=""):
+        rc = subprocess.call("/bin/kill %s %s" % (pid, level), shell=True)
+        return rc
+
+    def pkill(self,name,level=""):
+        # example killall("thunderbird","-9")
+        rc = subprocess.call("/usr/bin/pkill %s %s" % (name, level), shell=True)
+        return rc
 
 methods = ProcessModule()
 register_rpc = methods.register_rpc
