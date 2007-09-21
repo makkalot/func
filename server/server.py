@@ -78,6 +78,10 @@ class XmlRpcInterface(object):
         find a handler method 
         """
 
+        # Recognize ipython's tab completion calls
+        if method == 'trait_names' or method == '_getAttributeNames':
+            return self.handlers.keys()
+
         return self.get_dispatch_method(method)(*params)
 
 # ======================================================================================
