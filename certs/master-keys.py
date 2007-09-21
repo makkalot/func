@@ -18,28 +18,22 @@
 import sys
 import os
 import os.path
-import func.certs
+import func.certs 
 
-cert_dir = '/etc/pki/func'
-key_file = '%s/slave.pem' % cert_dir
-csr_file = '%s/slave.csr' % cert_dir
 
-def submit_csr_to_master(csrfile, master):
-    # stuff happens here - I can just cram the csr in a POST if need be
-    pass
+cadir = '/etc/pki/func/ca'
+ca_key_file = '%s/funcmaster.key' % cadir
+ca_cert_file = '%s/funcmaster.crt' % cadir
+
 
 def main():
     keypair = None
     try:
-        if not os.path.exists(cert_dir):
-            os.makedirs(cert_dir)
-        if not os.path.exists(key_file):
-            keypair = func.certs.make_cert(dest=key_file)
-        if not os.path.exists(csr_file):
-            if not keypair:
-                keypair = func.certs.retrieve_key_from_file(key_file)
-            csr = func.certs.make_csr(keypair, dest=csr_file)
-    except: # need a little more specificity here
+        if not os.path.exists(cadir):
+            os.makedirs(cadir)
+        if not os.path.exists(ca_key_file):
+            func.certs.create_ca(ca_key_file=ca_key_file, ca_cert_file=ca_cert_file)
+    except:
         return 1
         
     return 0
