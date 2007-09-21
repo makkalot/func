@@ -1,4 +1,19 @@
 #!/usr/bin/python -tt
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Copyright (c) 2007 Red Hat, inc 
+#- Written by Seth Vidal skvidal @ fedoraproject.org
 
 import sys
 import os
@@ -13,7 +28,7 @@ def_local = 'Func-ytown'
 def_org = 'func'
 def_ou = 'slave-key'
 
-cert_dir = '/home/skvidal/tmp/t'
+cert_dir = '/etc/pki/func'
 key_file = '%s/slave.pem' % cert_dir
 csr_file = '%s/slave.csr' % cert_dir
 
@@ -58,6 +73,16 @@ def retrieve_key_from_file(keyfile):
     keypair = crypto.load_privatekey(crypto.FILETYPE_PEM, buf)
     return keypair
     
+def retrieve_csr_from_file(csrfile)
+    fo = open(csrfile, 'r')
+    buf = fo.read()
+    csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, buf)
+    return csrreq
+    
+def submit_csr_to_master(csrfile, master):
+    # stuff happens here - I can just cram the csr in a POST if need be
+    pass
+
 def main():
     keypair = None
     try:
