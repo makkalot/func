@@ -5,8 +5,9 @@
 
 import xmlrpclib
 
-TEST_VIRT = True
+TEST_VIRT = False
 TEST_SERVICES = True
+TEST_HARDWARE = True
 
 # get a connecton (to be replaced by client lib logic)
 s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
@@ -17,6 +18,9 @@ print s.test.add(1, 2)
 # here's the service module testing
 if TEST_SERVICES:
     print s.service.restart("httpd")
+
+if TEST_HARDWARE:
+    print s.hardware.info()
 
 # this is so I can remember how the virt module works
 if TEST_VIRT:
