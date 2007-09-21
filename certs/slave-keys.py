@@ -18,6 +18,8 @@
 import sys
 import os
 import os.path
+from  exceptions import Exception
+
 import func.certs
 
 cert_dir = '/etc/pki/func'
@@ -34,12 +36,13 @@ def main():
         if not os.path.exists(cert_dir):
             os.makedirs(cert_dir)
         if not os.path.exists(key_file):
-            keypair = func.certs.make_cert(dest=key_file)
+            keypair = func.certs.make_keypair(dest=key_file)
         if not os.path.exists(csr_file):
             if not keypair:
                 keypair = func.certs.retrieve_key_from_file(key_file)
             csr = func.certs.make_csr(keypair, dest=csr_file)
-    except: # need a little more specificity here
+    except Exception, e: # need a little more specificity here
+        print e
         return 1
         
     return 0

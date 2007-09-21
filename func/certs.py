@@ -17,7 +17,7 @@
 
 from OpenSSL import crypto
 import socket
-
+import os
 
 def_country = 'UN'
 def_state = 'FC'
@@ -25,7 +25,7 @@ def_local = 'Func-ytown'
 def_org = 'func'
 def_ou = 'slave-key'
 
-def make_cert(dest=None):
+def make_keypair(dest=None):
     pkey = crypto.PKey()
     pkey.generate_key(crypto.TYPE_RSA, 2048)
     if dest:
@@ -77,8 +77,8 @@ def retrieve_cert_from_file(certfile):
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, buf)
     return cert
 
-def create_ca(CN="Func Certificate Authority", ca_key_file=None, ca_cert_file=None)
-    cakey = make_cert(dest=ca_key_file)
+def create_ca(CN="Func Certificate Authority", ca_key_file=None, ca_cert_file=None):
+    cakey = make_keypair(dest=ca_key_file)
     careq = make_csr(cakey, cn=CN)
     cacert = crypto.X509()
     cacert.set_serial_number(0)
@@ -99,20 +99,24 @@ def _get_serial_number(cadir):
     if os.path.exists(serial):
         f = open(serial, 'r').read()
         f = f.replace('\n','')
-        i = int(f)
-        i+=1      
+        try:
+            i = int(f)
+            i+=1      
+        except ValueError, e:
+            i = 1
+            
     _set_serial_number(cadir, i)        
     return i
 
 def _set_serial_number(cadir, last):
     serial = '%s/serial.txt' % cadir
     f = open(serial, 'w')
-    f.write(last)
+    f.write(str(last))
     f.close()
             
         
 
-def create_slave_certificate(csr, cakey, cacert, cadir, slave_cert_file=None)
+def create_slave_certificate(csr, cakey, cacert, cadir, slave_cert_file=None):
     cert = crypto.X509()
     cert.set_serial_number(_get_serial_number(cadir))
     cert.gmtime_adj_notBefore(0)
