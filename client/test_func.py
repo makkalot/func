@@ -22,7 +22,7 @@ if TEST_SERVICES:
 if TEST_VIRT:
 
    # example of using koan to install a virtual machine
-   # s.virt_install("mdehaan.rdu.redhat.com","fc7webserver",False)
+   #s.virt_install("mdehaan.rdu.redhat.com","profileX")
 
    # wait ...
    vms = s.virt_list_vms()
