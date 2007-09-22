@@ -25,11 +25,11 @@ class Service(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
-            "service_start"   : self.start,
-            "service_stop"    : self.stop,
-            "service_restart" : self.restart,
-            "service_reload"  : self.reload,
-            "service_status"  : self.status
+            "start"   : self.start,
+            "stop"    : self.stop,
+            "restart" : self.restart,
+            "reload"  : self.reload,
+            "status"  : self.status
         }
         func_module.FuncModule.__init__(self)
 

@@ -6,7 +6,7 @@ from modules import func_module
 class Test(func_module.FuncModule):
     def __init__(self):
         self.methods = {
-            "test_add": self.add
+            "add": self.add
         }
         func_module.FuncModule.__init__(self)
 
