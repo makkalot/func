@@ -53,7 +53,7 @@ class FuncLibvirtConnection():
             conn = libvirt.open("qemu:///system")
 
         if not conn:
-           raise FuncException(comment="hypervisor connection failure")
+           raise codes.FuncException("hypervisor connection failure")
 
         self.conn = conn
 
@@ -84,7 +84,7 @@ class FuncLibvirtConnection():
             if vm.name() == vmid:
                 return vm
 
-        raise FuncException(comment="virtual machine %s not found" % needle)
+        raise codes.FuncException("virtual machine %s not found" % needle)
 
     def shutdown(self, vmid):
         return self.find_vm(vmid).shutdown()
@@ -131,15 +131,15 @@ class Virt(func_module.FuncModule):
         """
 
         self.methods = {
-            "virt_install"  : self.install,
-            "virt_shutdown" : self.shutdown,
-            "virt_destroy"  : self.destroy,
-            "virt_start"    : self.create,
-            "virt_pause"    : self.pause,
-            "virt_unpause"  : self.unpause,
-            "virt_delete"   : self.undefine,
-            "virt_status"   : self.get_status,
-            "virt_list_vms" : self.list_vms,
+            "install"  : self.install,
+            "shutdown" : self.shutdown,
+            "destroy"  : self.destroy,
+            "start"    : self.create,
+            "pause"    : self.pause,
+            "unpause"  : self.unpause,
+            "delete"   : self.undefine,
+            "status"   : self.get_status,
+            "list_vms" : self.list_vms,
         }
         
         func_module.FuncModule.__init__(self)
@@ -171,10 +171,10 @@ class Virt(func_module.FuncModule):
         conn = self.get_conn()
 
         if conn is None:
-            raise FuncException(comment="no connection")
+            raise codes.FuncException("no connection")
 
         if not os.path.exists("/usr/bin/koan"):
-            raise FuncException(comment="no /usr/bin/koan")
+            raise codes.FuncException("no /usr/bin/koan")
         target = "profile"
         if system:
             target = "system"
@@ -192,7 +192,7 @@ class Virt(func_module.FuncModule):
         if rc == 0:
             return 0
         else:
-            raise FuncException(comment="koan returned %d" % rc)
+            raise codes.FuncException("koan returned %d" % rc)
  
    
     def shutdown(self, vmid):

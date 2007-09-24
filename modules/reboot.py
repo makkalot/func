@@ -17,7 +17,7 @@ class Reboot(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
-                "reboot_reboot" : self.reboot
+                "reboot" : self.reboot
         }
         func_module.FuncModule.__init__(self)
 

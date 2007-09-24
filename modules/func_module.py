@@ -35,9 +35,9 @@ class FuncModule(object):
         log = logger.Logger()
         self.logger = log.logger
     
-    def register_rpc(self, handlers):
+    def register_rpc(self, handlers, module_name):
         for meth in self.methods:
-            handlers[meth] = self.methods[meth]
+            handlers["%s.%s" % (module_name,meth)] = self.methods[meth]
             
 
 

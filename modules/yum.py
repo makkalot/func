@@ -23,7 +23,7 @@ class Yum(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
-                "yum_update" : self.update
+                "update" : self.update
         }
         func_module.FuncModule.__init__(self)
 

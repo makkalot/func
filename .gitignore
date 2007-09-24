@@ -3,6 +3,7 @@
 *.pyc
 *.pyo
 *.swp
+build
 MANIFEST
 rpm-build
 dist
