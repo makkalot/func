@@ -159,13 +159,13 @@ class CertMaster(object):
         return False, '', ''
         
 
+def serve(xmlrpcinstance):
 
+     """
+     Code for starting the XMLRPC service. 
+     """
 
-
-cm = CertMaster('/etc/func/certmaster.conf')
-server = SimpleXMLRPCServer.SimpleXMLRPCServer((cm.cfg.listen_addr, int(cm.cfg.listen_port)))
-server.logRequests = 0
-server.register_instance(cm)
-server.serve_forever()
-
-
+     server =FuncXMLRPCServer((xmlrpcinstance.listen_addr, xmlrpcinstance.list_port))
+     server.logRequests = 0 # don't print stuff to console
+     server.register_instance(xmlrpcinstance)
+     server.serve_forever()
