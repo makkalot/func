@@ -46,8 +46,7 @@ class SmartModule(func_module.FuncModule):
         results = []       
 
         for x in data.split("\n"):
-            tokens = x.split()
-            results.append(tokens)
+            results.append(x)
 
         return (cmd.returncode, results)
 

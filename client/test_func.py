@@ -5,10 +5,11 @@
 
 import xmlrpclib
 
-TEST_PROCESS = True
+TEST_PROCESS = False
 TEST_VIRT = False
-TEST_SERVICES = True
-TEST_HARDWARE = True
+TEST_SERVICES = False
+TEST_HARDWARE =  False
+TEST_SMART = True
 
 # get a connecton (to be replaced by client lib logic)
 s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
@@ -16,9 +17,12 @@ s = xmlrpclib.ServerProxy("http://127.0.0.1:51234")
 # here's the basic test...
 print s.test.add(1, 2)
 
+if TEST_SMART:
+    print s.smart.info()
+
 if TEST_PROCESS:
     print s.process.info()
-    print s.process.pkill("thunderbird")
+    # print s.process.pkill("thunderbird")
 
 # here's the service module testing
 if TEST_SERVICES:
