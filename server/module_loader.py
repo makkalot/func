@@ -75,9 +75,8 @@ def load_modules(blacklist=None):
                 continue
             mods[mod_imp_name] = blip
         except ImportError, e:
-            # shouldn't this be fatal?
+            # A module that raises an ImportError is (for now) simply not loaded.
             print e
-            raise
 
     return mods
 
