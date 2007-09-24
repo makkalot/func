@@ -32,7 +32,7 @@ class ProcessModule(func_module.FuncModule):
         }
         func_module.FuncModule.__init__(self)
 
-    def info(self,flags="-aux"):
+    def info(self,flags="-auxh"):
         """
         Returns a struct of hardware information.  By default, this pulls down
         all of the devices.  If you don't care about them, set with_devices to
