@@ -23,6 +23,7 @@ import os
 import os.path
 import traceback
 from OpenSSL import crypto
+import sha
 
 #from func.server import codes
 import func
@@ -96,30 +97,60 @@ class CertMaster(object):
            returns True, caller_cert, ca_cert
            returns False, '', ''
         """
+       
         try:
             csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, csrbuf)
         except crypto.Error, e:
             #XXX need to raise a fault here and document it - but false is just as good
             return False, '', ''
+            
         requesting_host = csrreq.get_subject().CN
+        certfile = '%s/%s.pem' % (self.certroot, requesting_host)
+        csrfile = '%s/%s.csr' % (self.csrroot, requesting_host)
 
+        # check for old csr on disk
+        # if we have it - compare the two - if they are not the same - raise a fault
+        if os.path.exists(csrfile):
+            oldfo = open(csrfile)
+            oldcsrbuf = oldfo.read()
+            oldsha = sha.new()
+            oldsha.update(oldcsrbuf)
+            olddig = oldsha.hexdigest()
+            newsha = sha.new()
+            newsha.update(csrbuf)
+            newdig = newsha.hexdigest()
+            if not newdig == olddig:
+                # XXX raise a proper fault
+                return False, '', ''
+
+        # look for a cert:
+        # if we have it, then return True, etc, etc
+        if os.path.exists(certfile):
+            slavecert = crypto.load_certificate(crypto.FILETYPE_PEM, certfile)
+                
+            cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
+            cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
+            return True, cert_buf, cacert_buf
+        
+        # if we don't have a cert then:
+        # if we're autosign then sign it, write out the cert and return True, etc, etc
+        # else write out the csr
+        
         if self.autosign:
-            # XXX need to have it check for existing cert instead of making a new one
             slavecert = func.certs.create_slave_certificate(csrreq,
-                          self.cakey, self.cacert, self.cadir)
-            destfile = '%s/%s.pem' % (self.certroot, requesting_host)
-            destfo = open(destfile, 'w')
+                        self.cakey, self.cacert, self.cadir)
+            
+            destfo = open(certfile, 'w')
             destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert))
             destfo.close()
             del destfo
             cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
+        
         else:
-            # check for existing csr first
             # write the csr out to a file to be dealt with by the admin
-            destfile = '%s/%s.csr' % (self.csrroot, requesting_host)
-            destfo = open(destfile, 'w')
+            destfo = open(csrfile, 'w')
             destfo.write(crypto.dump_certificate_request(crypto.FILETYPE_PEM, csrreq))
             destfo.close()
             del destfo
@@ -128,13 +159,13 @@ class CertMaster(object):
         return False, '', ''
         
 
+def serve(xmlrpcinstance):
 
+     """
+     Code for starting the XMLRPC service. 
+     """
 
-
-cm = CertMaster('/etc/func/certmaster.conf')
-server = SimpleXMLRPCServer.SimpleXMLRPCServer((cm.cfg.listen_addr, int(cm.cfg.listen_port)))
-server.logRequests = 0
-server.register_instance(cm)
-server.serve_forever()
-
-
+     server =FuncXMLRPCServer((xmlrpcinstance.listen_addr, xmlrpcinstance.list_port))
+     server.logRequests = 0 # don't print stuff to console
+     server.register_instance(xmlrpcinstance)
+     server.serve_forever()

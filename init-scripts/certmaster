@@ -1,0 +1,82 @@
+#!/bin/sh
+#
+# certmaster    certmaster
+###################################
+
+# LSB header
+
+### BEGIN INIT INFO
+# Provides: certmaster
+# Required-Start: network
+# Default-Start: 3 4 5
+# Short-Description: certificate master for Fedora Unified Network Control 'master server only'
+# Description: certificate master to sign/manage ca/cert infrastructure for func
+### END INIT INFO
+
+# chkconfig header
+
+# chkconfig: 345 98 99 
+# description:  certificate master to sign/manage ca/cert infrastructure for func
+#
+# processname: /usr/bin/certmaster
+
+# Sanity checks.
+[ -x /usr/bin/certmaster ] || exit 0
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+
+SERVICE=certmaster
+PROCESS=certmaster
+CONFIG_ARGS=" "
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting certmaster daemon: "
+    daemon --check $SERVICE $PROCESS --daemon $CONFIG_ARGS
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping certmaster daemon: "
+    killproc $PROCESS
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+	rm -f /var/lock/subsys/$SERVICE
+        rm -f /var/run/$SERVICE.pid
+    fi
+}
+
+restart() {
+   stop
+   start
+}
+
+# See how we were called.
+case "$1" in
+    start|stop|restart)
+        $1
+        ;;
+    status)
+        status $PROCESS
+        RETVAL=$?
+        ;;
+    condrestart)
+        [ -f /var/lock/subsys/$SERVICE ] && restart || :
+        ;;
+    reload)
+        echo "can't reload configuration, you have to restart it"
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+        exit 1
+        ;;
+esac
+exit $RETVAL
+

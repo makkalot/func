@@ -18,7 +18,7 @@
 from codes import *
 from modules import func_module
 
-import subprocess
+import sub_process
 import os
 
 class Service(func_module.FuncModule):
@@ -37,7 +37,7 @@ class Service(func_module.FuncModule):
 
         filename = os.path.join("/etc/rc.d/init.d/",service_name)
         if os.path.exists(filename):
-            return subprocess.call(["/sbin/service", service_name, command])
+            return sub_process.call(["/sbin/service", service_name, command])
         else:
             raise FuncException("Service not installed: %s" % service_name)
 

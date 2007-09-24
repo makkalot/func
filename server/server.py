@@ -35,7 +35,7 @@ import utils
 
 class XmlRpcInterface(object):
 
-    def __init__(self, modules={}):
+    def __init__(self, modules={}, server=None):
 
         """
         Constructor.
@@ -45,7 +45,11 @@ class XmlRpcInterface(object):
         self.config = config_obj.get()
         self.modules = modules
         self.logger = logger.Logger().logger
+        self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
+
+        # need a reference so we can log ip's, certs, etc
+        self.server = server
         
     def __setup_handlers(self):
 
@@ -93,6 +97,10 @@ class XmlRpcInterface(object):
         if method == 'trait_names' or method == '_getAttributeNames':
             return self.handlers.keys()
 
+        # XXX FIXME - need to figure out how to dig into the server base classes
+        # so we can get client ip, and eventually cert id info -akl
+        self.audit_logger.log_call(method, params)
+
         return self.get_dispatch_method(method)(*params)
 
 # ======================================================================================
@@ -139,15 +147,20 @@ class FuncApiMethod:
 
 # ======================================================================================
 
-def serve(websvc):
+def serve():
 
      """
      Code for starting the XMLRPC service. 
      FIXME:  make this HTTPS (see RRS code) and make accompanying Rails changes..
      """
 
+     modules = module_loader.load_modules()
+
      server =FuncXMLRPCServer(('', 51234))
      server.logRequests = 0 # don't print stuff to console
+
+     websvc = XmlRpcInterface(modules=modules,server=server)
+     
      server.register_instance(websvc)
      server.serve_forever()
 
@@ -184,7 +197,7 @@ def main(argv):
     print "Seriously.\n\n"
 
     try:
-        websvc = XmlRpcInterface(modules=modules)
+        serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
         sys.exit(1)
@@ -194,7 +207,6 @@ def main(argv):
     else:
         print "serving...\n"
 
-    serve(websvc)
        
 # ======================================================================================
 
