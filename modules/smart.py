@@ -19,7 +19,6 @@
 import sub_process
 
 # our modules
-from codes import *
 from modules import func_module
 
 # =================================

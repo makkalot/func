@@ -12,18 +12,14 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-from codes import *
 
 from server import config_data
 from server import logger
 
-import os
-import threading
-import time
-import traceback
-
 
 class FuncModule(object):
+
+    # the version is meant to
     version = "0.0.0"
     api_version = "0.0.0"
     description = "No Description provided"
