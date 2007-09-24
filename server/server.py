@@ -62,6 +62,17 @@ class XmlRpcInterface(object):
                 self.logger.warning("module %s not loaded, missing register_rpc method" % self.modules[x])
 
 
+        # internal methods that we do instead of spreading internal goo
+        # all over the modules. For now, at lest -akl
+
+        self.handlers["system.listMethods"] = self.list_methods
+
+    
+    def list_methods(self):
+        return self.handlers.keys()
+
+
+
     def get_dispatch_method(self, method):
 
         if method in self.handlers:

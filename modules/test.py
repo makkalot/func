@@ -4,6 +4,9 @@ from codes import *
 from modules import func_module
 
 class Test(func_module.FuncModule):
+    version = "11.11.11"
+    api_version = "0.0.1"
+    description = "Just a very simple example module"
     def __init__(self):
         self.methods = {
             "add": self.add
