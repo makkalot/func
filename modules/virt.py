@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 # other modules
 import sys
 import os
-import subprocess
+import sub_process
 import libvirt
 
 # our modules
@@ -44,7 +44,7 @@ class FuncLibvirtConnection():
     def __init__(self):
 
 
-        cmd = subprocess.Popen("uname -r", shell=True, stdout=subprocess.PIPE)
+        cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE)
         output = cmd.communicate()[0]
 
         if output.find("xen") != -1:
@@ -188,7 +188,7 @@ class Virt(func_module.FuncModule):
             "--server=%s" % server_name
         ]
 
-        rc = subprocess.call(koan_args,shell=False)
+        rc = sub_process.call(koan_args,shell=False)
         if rc == 0:
             return 0
         else:

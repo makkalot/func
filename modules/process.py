@@ -15,7 +15,7 @@
 ##
 
 # other modules
-import subprocess
+import sub_process
 
 # our modules
 from codes import *
@@ -41,7 +41,7 @@ class ProcessModule(func_module.FuncModule):
 
         flags.replace(";","") # prevent stupidity
 
-        cmd = subprocess.Popen("ps %s" % flags,stdout=subprocess.PIPE,shell=True)
+        cmd = sub_process.Popen("ps %s" % flags,stdout=sub_process.PIPE,shell=True)
         data = cmd.communicate()[0]
 
         results = []       
@@ -53,12 +53,12 @@ class ProcessModule(func_module.FuncModule):
         return results
 
     def kill(self,pid,level=""):
-        rc = subprocess.call("/bin/kill %s %s" % (pid, level), shell=True)
+        rc = sub_process.call("/bin/kill %s %s" % (pid, level), shell=True)
         return rc
 
     def pkill(self,name,level=""):
         # example killall("thunderbird","-9")
-        rc = subprocess.call("/usr/bin/pkill %s %s" % (name, level), shell=True)
+        rc = sub_process.call("/usr/bin/pkill %s %s" % (name, level), shell=True)
         return rc
 
 methods = ProcessModule()
