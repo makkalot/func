@@ -30,7 +30,7 @@ class Singleton(object):
 # so make sure we do that mess only once
 
 class Logger(Singleton):
-    __no_handlers = True
+    _no_handlers = True
 
     def __init__(self, logfilepath ="/var/log/func/func.log"):
 
@@ -39,18 +39,34 @@ class Logger(Singleton):
            self.loglevel = logging._levelNames[self.config["log_level"]]
         else:
            self.loglevel = logging.INFO   
-        self.__setup_logging()
-        if self.__no_handlers:
-            self.__setup_handlers(logfilepath=logfilepath)
+        self._setup_logging()
+        if self._no_handlers:
+            self._setup_handlers(logfilepath=logfilepath)
         
-    def __setup_logging(self):
+    def _setup_logging(self):
         self.logger = logging.getLogger("svc")
 
-    def __setup_handlers(self, logfilepath="/var/log/func/func.log"):
+    def _setup_handlers(self, logfilepath="/var/log/func/func.log"):
         handler = logging.FileHandler(logfilepath, "a")
         self.logger.setLevel(self.loglevel)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
-        self.__no_handlers = False
+        self._no_handlers = False
 
+
+class AuditLogger(Logger):
+    def __init__(self, logfilepath = "/var/log/func/audit.log"):
+        self.loglevel = logging.INFO
+        self._setup_logging()
+        if self._no_handlers:
+             self._setup_handlers(logfilepath=logfilepath)
+
+    def log_call(self, method, params):
+        # square away a good parseable format at some point -akl
+        self.logger.info("%s called with %s" % (method, params))
+
+
+
+
+        

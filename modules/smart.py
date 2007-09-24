@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
 ## 
-## Process lister (control TBA)
+## Grabs status from SMART to see if your hard drives are ok
+## Returns in the format of (return code, [line1, line2, line3,...])
 ##
 ## Copyright 2007, Red Hat, Inc
 ## Michael DeHaan <mdehaan@redhat.com>
@@ -23,16 +24,14 @@ from modules import func_module
 
 # =================================
 
-class ProcessModule(func_module.FuncModule):
+class SmartModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
             "info"    : self.info,
-            "kill"    : self.kill,
-            "pkill"   : self.pkill
         }
         func_module.FuncModule.__init__(self)
 
-    def info(self,flags="-auxh"):
+    def info(self,flags="-q onecheck"):
         """
         Returns a struct of hardware information.  By default, this pulls down
         all of the devices.  If you don't care about them, set with_devices to
@@ -41,27 +40,17 @@ class ProcessModule(func_module.FuncModule):
 
         flags.replace(";","") # prevent stupidity
 
-        cmd = sub_process.Popen("ps %s" % flags,stdout=sub_process.PIPE,shell=True)
+        cmd = sub_process.Popen("/usr/sbin/smartd %s" % flags,stdout=sub_process.PIPE,shell=True)
         data = cmd.communicate()[0]
 
         results = []       
 
         for x in data.split("\n"):
-            tokens = x.split()
-            results.append(tokens)
+            results.append(x)
 
-        return results
+        return (cmd.returncode, results)
 
-    def kill(self,pid,level=""):
-        rc = sub_process.call("/bin/kill %s %s" % (pid, level), shell=True)
-        return rc
-
-    def pkill(self,name,level=""):
-        # example killall("thunderbird","-9")
-        rc = sub_process.call("/usr/bin/pkill %s %s" % (name, level), shell=True)
-        return rc
-
-methods = ProcessModule()
+methods = SmartModule()
 register_rpc = methods.register_rpc
 
 
