@@ -32,7 +32,7 @@ def module_walker(topdir):
                 # we don't really care about __init__ files, though we do requure them
                 if filename[:8] == "__init__":
                     continue
-                # the normpath is important, since we 
+                # the normpath is important, since we (since we what?! -RN)
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
                 
@@ -53,7 +53,7 @@ def load_modules(blacklist=None):
         # aka, everything after the module_file_path
         module_name_part = fn[len(module_file_path):]
         dirname, basename = os.path.split(module_name_part)
-        
+
         if basename == "__init__.py":
             continue
         if basename[-3:] == ".py":
@@ -64,8 +64,12 @@ def load_modules(blacklist=None):
         pathname = modname
         if dirname != "":
             pathname = "%s/%s" % (dirname, modname)
-            
+
         mod_imp_name = pathname.replace("/", ".")
+
+        if mods.has_key(mod_imp_name):
+            # If we've already imported mod_imp_name, don't import it again
+            continue
 
         try:
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
@@ -76,7 +80,10 @@ def load_modules(blacklist=None):
             mods[mod_imp_name] = blip
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
-            print e
+            errmsg = _("Could not load %s module: %s")
+            print errmsg % (mod_imp_name, e)
+
+            continue
 
     return mods
 
