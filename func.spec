@@ -35,14 +35,16 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %{_bindir}/funcd
+%{_bindir}/certmaster
 /etc/init.d/funcd
+/etc/init.d/certmaster
 %config(noreplace) /etc/func/settings
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
 %{python_sitelib}/func/minion/*.py*
 %{python_sitelib}/func/overlord/*.py*
-
+%{python_sitelib}/func/*.py*
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
 %dir /var/log/func
