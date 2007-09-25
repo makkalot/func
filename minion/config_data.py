@@ -12,8 +12,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import codes
 
-from codes import *
 import os
 import ConfigParser
 
@@ -35,7 +35,7 @@ class Config:
     def read(self):
 
         if not os.path.exists(CONFIG_FILE):
-            raise FuncException("Missing %s" % CONFIG_FILE)
+            raise codes.FuncException("Missing %s" % CONFIG_FILE)
 
         cp = ConfigParser.ConfigParser()
 

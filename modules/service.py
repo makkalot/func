@@ -14,8 +14,7 @@
 ##
 ##
 
-
-from codes import *
+import codes
 from modules import func_module
 
 import sub_process
@@ -39,7 +38,7 @@ class Service(func_module.FuncModule):
         if os.path.exists(filename):
             return sub_process.call(["/sbin/service", service_name, command])
         else:
-            raise FuncException("Service not installed: %s" % service_name)
+            raise codes.FuncException("Service not installed: %s" % service_name)
 
     def start(self, service_name):
         return self.__command(service_name, "start")

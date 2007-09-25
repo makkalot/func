@@ -17,7 +17,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 # standard modules
 import SimpleXMLRPCServer
 import string
-import socket
 import sys
 import traceback
 

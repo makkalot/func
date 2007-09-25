@@ -23,7 +23,6 @@ sys.path.append("/usr/share/smolt/client")
 import smolt
 
 # our modules
-from codes import *
 from modules import func_module
 
 # =================================

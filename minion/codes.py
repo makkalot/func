@@ -14,9 +14,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 import exceptions
-import string
-import sys
-import traceback
 
 
 class FuncException(exceptions.Exception):
