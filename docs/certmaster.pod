@@ -1,0 +1,27 @@
+=head1 NAME
+
+certmaster -- hands out certificates to funcd and other components.
+
+=head1 SYNOPSIS
+
+certmaster (it's a daemon and takes no arguments)
+
+=head1 DESCRIPTION
+
+See https://hosted.fedoraproject.org/projects/func/
+
+Certmaster is run on the master-control machine on a network being
+controlled by func.  It hands out certificates to machines running
+funcd. 
+
+Certmaster is configured by /etc/func/certmaster.conf
+
+=head1 ADDITONAL RESOURCES
+
+See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
+
+=head1 AUTHOR
+
+Various. See https://hosted.fedoraproject.org/projects/func
+
+

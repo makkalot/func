@@ -50,6 +50,11 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
 %dir /var/log/func
+%doc AUTHORS README
+%{_mandir}/man1/func.1.gz
+%{_mandir}/man1/funcd.1.gz
+%{_mandir}/man1/certmaster.1.gz
+
 
 %post
 /sbin/chkconfig --add funcd
@@ -63,6 +68,10 @@ fi
 
 
 %changelog
+* Tue Sep 25 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.11-4
+- Added manpage documentation 
+- Renamed minion config file
+
 * Tue Sep 25 2007 Robin Norwood <rnorwood@redhat.com> - 0.0.11-3
 - Change server -> minion and client -> overlord
 
@@ -71,3 +80,4 @@ fi
 
 * Thu Sep 20 2007 Adrian Likins <alikins@redhat.com> - 0.0.11-1
 - initial release (this one goes to .11)
+

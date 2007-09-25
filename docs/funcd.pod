@@ -1,0 +1,23 @@
+=head1 NAME
+
+funcd -- deaemon for the Fedora Universal Network Controller
+
+=head1 SYNOPSIS
+
+funcd (it's a daemon and takes no arguments)
+
+=head1 DESCRIPTION
+
+funcd registers itself to a server listed in /etc/func/minion.conf and takes orders from it.  See /etc/func/minion.conf for other configuration options.
+
+Modules and capabilities are specified at https://hosted.fedoraproject.org/projects/func/
+
+=head1 ADDITONAL RESOURCES
+
+See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
+
+=head1 AUTHOR
+
+Various. See https://hosted.fedoraproject.org/projects/func
+
+
