@@ -133,7 +133,7 @@ class CertMaster(object):
         # if we're autosign then sign it, write out the cert and return True, etc, etc
         # else write out the csr
         
-        if self.autosign:
+        if self.cfg.autosign:
             slavecert = func.certs.create_slave_certificate(csrreq,
                         self.cakey, self.cacert, self.cfg.cadir)
             

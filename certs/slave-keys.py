@@ -18,20 +18,33 @@
 import sys
 import os
 import os.path
+import xmlrpclib
+import time
+
 from  exceptions import Exception
 
 import func.certs
 
-cert_dir = '/etc/pki/func'
-key_file = '%s/slave.pem' % cert_dir
-csr_file = '%s/slave.csr' % cert_dir
 
-def submit_csr_to_master(csrfile, master):
-    # stuff happens here - I can just cram the csr in a POST if need be
-    pass
+def submit_csr_to_master(csr_file, master_uri):
+    # get csr_file
+    # submit buffer of file content to master_uri.wait_for_cert()
+    # wait for response and return
+    fo = open(csr_file)
+    csr = fo.read()
+    s = xmlrpclib.ServerProxy(master_uri)
+    
+    return s.wait_for_cert(csr)
+    
+    
 
-def main():
+def main(cert_dir, master_uri):
     keypair = None
+    key_file = '%s/slave.pem' % cert_dir
+    csr_file = '%s/slave.csr' % cert_dir
+    cert_file = '%s/slave.cert' % cert_dir
+    ca_cert_file = '%s/ca.cert' % cert_dir
+    
     try:
         if not os.path.exists(cert_dir):
             os.makedirs(cert_dir)
@@ -44,10 +57,36 @@ def main():
     except Exception, e: # need a little more specificity here
         print e
         return 1
-        
+    
+    result = False
+    while not result:
+        result, cert_string, ca_cert_string = submit_csr_to_master(csr_file, master_uri)
+        print 'looping'
+        time.sleep(10)    
+    
+    
+    if result:
+       cert_fo = open(cert_file, 'w')
+       cert_fo.write(cert_string)
+       cert_fo.close()
+       
+       ca_cert_fo = open(ca_cert_file, 'w')
+       ca_cert_fo.write(ca_cert_string)
+       ca_cert_fo.close()
+    
     return 0
 
 
 if __name__ == "__main__":
-   sys.exit(main())
+    if len(sys.argv[1:]) > 0: 
+       cert_dir = sys.argv[1]
+    else:
+       cert_dir = '/etc/pki/func'
+    
+    if len(sys.argv[1:]) > 1:
+        master_uri = sys.argv[2]
+    else:
+        master_uri = 'http://localhost:51235/'
+
+    sys.exit(main(cert_dir, master_uri))
        
