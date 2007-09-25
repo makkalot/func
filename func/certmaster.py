@@ -61,12 +61,22 @@ class CertMaster(object):
         else:
             self.cfg.autosign = False
         self.cfg.listen_port = int(self.cfg.listen_port)
+        self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
+        self.ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
+        try:
+            if not os.path.exists(self.cfg.cadir):
+                os.makedirs(self.cfg.cadir)
+            # fixme - should we creating these separately?
+            if not os.path.exists(self.ca_key_file) and not os.path.exists(self.ca_cert_file):
+                func.certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
+        except (IOError, OsError), e:
+            print 'Cannot make certmaster certificate authority keys/certs, aborting: %s' % e
+            sys.exit(1)
+
             
         # open up the cakey and cacert so we have them available
-        ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
-        ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
-        self.cakey = func.certs.retrieve_key_from_file(ca_key_file)
-        self.cacert = func.certs.retrieve_cert_from_file(ca_cert_file)
+        self.cakey = func.certs.retrieve_key_from_file(self.ca_key_file)
+        self.cacert = func.certs.retrieve_cert_from_file(self.ca_cert_file)
         
         for dirpath in [self.cfg.cadir, self.cfg.certroot, self.cfg.csrroot]:
             if not os.path.exists(dirpath):

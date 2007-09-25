@@ -35,6 +35,7 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %{_bindir}/funcd
+%{_bindir}/func
 %{_bindir}/certmaster
 /etc/init.d/funcd
 /etc/init.d/certmaster
