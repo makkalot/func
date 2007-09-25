@@ -28,7 +28,8 @@ import sha
 #from func.server import codes
 import func
 import func.certs
-import func.minion.utils
+import func.codes
+import func.utils
 
 class SimpleConfigFile(object):
     """simple config file object:
@@ -164,6 +165,11 @@ class CertMaster(object):
             return False, '', ''
 
         return False, '', ''
+
+class CertmasterXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
+    def __init__(self, args):
+       self.allow_reuse_address = True
+       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
         
 
 def serve(xmlrpcinstance):
@@ -172,7 +178,7 @@ def serve(xmlrpcinstance):
      Code for starting the XMLRPC service. 
      """
 
-     server = SimpleXMLRPCServer.SimpleXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
+     server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
      server.logRequests = 0 # don't print stuff to console
      server.register_instance(xmlrpcinstance)
      server.serve_forever()
@@ -192,7 +198,7 @@ def main(argv):
     cm = CertMaster('/etc/func/certmaster.conf', defaults)
 
     if "daemon" in argv or "--daemon" in argv:
-        func.minion.utils.daemonize("/var/run/certmaster.pid")
+        func.utils.daemonize("/var/run/certmaster.pid")
     else:
         print "serving...\n"
 
