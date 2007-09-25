@@ -21,7 +21,7 @@ import time
 import SocketServer
 import xmlrpclib
 import SimpleXMLRPCServer
-import SSLCommon
+from func import SSLCommon
 import OpenSSL
 
 
