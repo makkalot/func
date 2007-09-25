@@ -55,7 +55,8 @@ class Logger(Singleton):
         self._no_handlers = False
 
 
-class AuditLogger(Logger):
+class AuditLogger(Singleton):
+    _no_handlers = True
     def __init__(self, logfilepath = "/var/log/func/audit.log"):
         self.loglevel = logging.INFO
         self._setup_logging()
@@ -67,6 +68,16 @@ class AuditLogger(Logger):
         self.logger.info("%s called with %s" % (method, params))
 
 
+    def _setup_logging(self):
+        self.logger = logging.getLogger("audit")
+
+    def _setup_handlers(self, logfilepath="/var/log/func/audit.log"):
+        handler = logging.FileHandler(logfilepath, "a")
+        self.logger.setLevel(self.loglevel)
+        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+        self._no_handlers = False
 
 
         
