@@ -52,7 +52,7 @@ if __name__ == "__main__":
 	        	    "%s/minion/modules" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd", "init-scripts/certmaster"]),
-                              (etcpath, ["settings",]),
+                              (etcpath, ["settings","etc/certmaster.conf"]),
 			      (etcpathdb, []),
 			      (logpath, []),
 			      (logpathdb, []),
