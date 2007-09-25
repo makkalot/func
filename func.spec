@@ -44,7 +44,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/client
 %{python_sitelib}/func/server/*.py*
 %{python_sitelib}/func/client/*.py*
-
+%{python_sitelib}/func/*.py*
 %dir %{python_sitelib}/func/server/modules
 %{python_sitelib}/func/server/modules/*.py*
 %dir /var/log/func

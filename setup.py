@@ -51,7 +51,7 @@ if __name__ == "__main__":
 			    "%s/client" % NAME,
 	        	    "%s/server/modules" % NAME
                 ],
-                data_files = [(initpath, ["init-scripts/funcd"]),
+                data_files = [(initpath, ["init-scripts/funcd", "init-scripts/certmaster"]),
                               (etcpath, ["settings",]),
 			      (etcpathdb, []),
 			      (logpath, []),
