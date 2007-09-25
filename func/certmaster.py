@@ -34,7 +34,7 @@ class SimpleConfigFile(object):
     """simple config file object:
        reads in key=value pairs from a file and stores each as an attribute"""
        
-    def __init__(self, filename):
+    def __init__(self, filename, defaults={}):
         self.fn = filename
         fo = open(filename, 'r')
         for line in fo.readlines():
@@ -44,34 +44,31 @@ class SimpleConfigFile(object):
             key = key.strip().lower()
             val = val.strip()
             setattr(self, key, val)
+        for k,v in defaults.items():
+            if not hasattr(self, k):
+                setattr(self, k, v)
         fo.close()
 
 
 class CertMaster(object):
-    def __init__(self, conf_file):
-        self.cfg = SimpleConfigFile(conf_file)
-        self.listen_addr = 'localhost'
-        self.listen_port =  '51235'
-        self.cadir = '/etc/pki/func/ca'
-        self.certroot = '/etc/pki/func/ca/certs'
-        self.csrroot = '/etc/pki/func/ca/csrs'
-        self.autosign = True
-        for attr in ['listen_addr', 'listen_port', 'cadir', 'certroot',
-                     'csrroot']:
-            if hasattr(self.cfg, attr):
-                setattr(self, attr, getattr(self.cfg, attr))
+    def __init__(self, conf_file, defaults={}):
+        self.cfg = SimpleConfigFile(conf_file, defaults)
         if hasattr(self.cfg, 'autosign'):
             if getattr(self.cfg, 'autosign').lower() in ['yes', 'true', 1, 'on']:
-                self.autosign = True
+                self.cfg.autosign = True
             elif getattr(self.cfg, 'autosign').lower() in ['no', 'false', 0, 'off']:
-                self.autosign = False
+                self.cfg.autosign = False
+        else:
+            self.cfg.autosign = False
+        self.cfg.listen_port = int(self.cfg.listen_port)
+            
         # open up the cakey and cacert so we have them available
-        ca_key_file = '%s/funcmaster.key' % self.cadir
-        ca_cert_file = '%s/funcmaster.crt' % self.cadir
+        ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
+        ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
         self.cakey = func.certs.retrieve_key_from_file(ca_key_file)
         self.cacert = func.certs.retrieve_cert_from_file(ca_cert_file)
         
-        for dirpath in [self.cadir, self.certroot, self.csrroot]:
+        for dirpath in [self.cfg.cadir, self.cfg.certroot, self.cfg.csrroot]:
             if not os.path.exists(dirpath):
                 os.makedirs(dirpath)
 
@@ -105,8 +102,8 @@ class CertMaster(object):
             return False, '', ''
             
         requesting_host = csrreq.get_subject().CN
-        certfile = '%s/%s.pem' % (self.certroot, requesting_host)
-        csrfile = '%s/%s.csr' % (self.csrroot, requesting_host)
+        certfile = '%s/%s.pem' % (self.cfg.certroot, requesting_host)
+        csrfile = '%s/%s.csr' % (self.cfg.csrroot, requesting_host)
 
         # check for old csr on disk
         # if we have it - compare the two - if they are not the same - raise a fault
@@ -138,7 +135,7 @@ class CertMaster(object):
         
         if self.autosign:
             slavecert = func.certs.create_slave_certificate(csrreq,
-                        self.cakey, self.cacert, self.cadir)
+                        self.cakey, self.cacert, self.cfg.cadir)
             
             destfo = open(certfile, 'w')
             destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert))
@@ -165,7 +162,7 @@ def serve(xmlrpcinstance):
      Code for starting the XMLRPC service. 
      """
 
-     server =FuncXMLRPCServer((xmlrpcinstance.listen_addr, xmlrpcinstance.list_port))
+     server = SimpleXMLRPCServer.SimpleXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
      server.logRequests = 0 # don't print stuff to console
      server.register_instance(xmlrpcinstance)
      server.serve_forever()

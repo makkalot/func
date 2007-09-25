@@ -7,6 +7,15 @@ sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
 
 import certmaster
 
-cm = certmaster.CertMaster('/etc/func/certmaster.conf')
-server = certmaster.serve(cm)
+defaults = { 'listen_addr': 'localhost',
+             'listen_port': '51235',
+             'cadir': '/etc/pki/func/ca',
+             'certroot': '/var/lib/func/certmaster/certs',
+             'csrroot': '/var/lib/func/certmaster/csrs',
+             'autosign': 'false'
+            }
+
+cm = certmaster.CertMaster('/etc/func/certmaster.conf', defaults)
+certmaster.serve(cm)
+
 
