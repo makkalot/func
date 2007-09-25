@@ -28,7 +28,7 @@ import sha
 #from func.server import codes
 import func
 import func.certs
-
+import func.minion.utils
 
 class SimpleConfigFile(object):
     """simple config file object:
@@ -176,3 +176,33 @@ def serve(xmlrpcinstance):
      server.logRequests = 0 # don't print stuff to console
      server.register_instance(xmlrpcinstance)
      server.serve_forever()
+
+
+def main(argv):
+    
+    defaults = { 'listen_addr': 'localhost',
+                 'listen_port': '51235',
+                 'cadir': '/etc/pki/func/ca',
+                 'certroot': '/var/lib/func/certmaster/certs',
+                 'csrroot': '/var/lib/func/certmaster/csrs',
+                 'autosign': 'false'
+                 }
+
+
+    cm = CertMaster('/etc/func/certmaster.conf', defaults)
+
+    if "daemon" in argv or "--daemon" in argv:
+        func.minion.utils.daemonize("/var/run/certmaster.pid")
+    else:
+        print "serving...\n"
+
+
+    # just let exceptions bubble up for now
+    serve(cm)
+
+ 
+
+if __name__ == "__main__":
+    textdomain(I18N_DOMAIN)
+    main(sys.argv)
+

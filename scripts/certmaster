@@ -2,15 +2,10 @@
 
 from func import certmaster
 
-defaults = { 'listen_addr': 'localhost',
-             'listen_port': '51235',
-             'cadir': '/etc/pki/func/ca',
-             'certroot': '/var/lib/func/certmaster/certs',
-             'csrroot': '/var/lib/func/certmaster/csrs',
-             'autosign': 'false'
-            }
+import sys
 
-cm = certmaster.CertMaster('/etc/func/certmaster.conf', defaults)
-certmaster.serve(cm)
+if __name__ == "__main__":
+    certmaster.main(sys.argv)
+    
 
 
