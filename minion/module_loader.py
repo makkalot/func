@@ -31,7 +31,7 @@ def module_walker(topdir):
                 # we don't really care about __init__ files, though we do requure them
                 if filename[:8] == "__init__":
                     continue
-                # the normpath is important, since we 
+                # the normpath is important, since we (since we what?! -RN)
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
                 
@@ -39,8 +39,8 @@ def module_walker(topdir):
 
 def load_modules(blacklist=None):
 
-    module_file_path="%s/func/server/modules/" % distutils.sysconfig.get_python_lib()
-    mod_path="%s/func/server/"  % distutils.sysconfig.get_python_lib()
+    module_file_path="%s/func/minion/modules/" % distutils.sysconfig.get_python_lib()
+    mod_path="%s/func/minion/"  % distutils.sysconfig.get_python_lib()
 
     sys.path.insert(0, mod_path)
     mods = {}
@@ -52,7 +52,7 @@ def load_modules(blacklist=None):
         # aka, everything after the module_file_path
         module_name_part = fn[len(module_file_path):]
         dirname, basename = os.path.split(module_name_part)
-        
+
         if basename == "__init__.py":
             continue
         if basename[-3:] == ".py":
@@ -63,8 +63,12 @@ def load_modules(blacklist=None):
         pathname = modname
         if dirname != "":
             pathname = "%s/%s" % (dirname, modname)
-            
+
         mod_imp_name = pathname.replace("/", ".")
+
+        if mods.has_key(mod_imp_name):
+            # If we've already imported mod_imp_name, don't import it again
+            continue
 
         try:
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
@@ -75,14 +79,17 @@ def load_modules(blacklist=None):
             mods[mod_imp_name] = blip
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
-            print e
+            errmsg = _("Could not load %s module: %s")
+            print errmsg % (mod_imp_name, e)
+
+            continue
 
     return mods
 
 
 if __name__ == "__main__":
 
-    module_file_path = "/usr/lib/python2.5/site-packages/func/server/modules/"
+    module_file_path = "/usr/lib/python2.5/site-packages/func/minion/modules/"
     bar = module_walker(module_file_path)
     print bar
     for f in bar:

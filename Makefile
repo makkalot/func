@@ -20,8 +20,8 @@ clean:
 #	python tests/tests.py
 #	-rm -rf /tmp/_cobbler-*
 
-messages: server/*.py
-	xgettext -k_ -kN_ -o $(MESSAGESPOT) server/*.py 
+messages: minion/*.py
+	xgettext -k_ -kN_ -o $(MESSAGESPOT) minion/*.py 
 	sed -i'~' -e 's/SOME DESCRIPTIVE TITLE/func/g' -e 's/YEAR THE PACKAGE'"'"'S COPYRIGHT HOLDER/2007 Red Hat, inc. /g' -e 's/FIRST AUTHOR <EMAIL@ADDRESS>, YEAR/Adrian Likins <alikins@redhat.com>, 2007/g' -e 's/PACKAGE VERSION/func $(VERSION)-$(RELEASE)/g' -e 's/PACKAGE/func/g' $(MESSAGESPOT)
 
 

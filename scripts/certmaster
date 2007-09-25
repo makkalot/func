@@ -1,12 +1,12 @@
 #!/usr/bin/python
 
-
 import sys
 import distutils.sysconfig
 
 sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
 
-from minion import server
+import certmaster
 
-if __name__ == "__main__":
-    server.main(sys.argv)
+cm = certmaster.CertMaster('/etc/func/certmaster.conf')
+server = certmaster.serve(cm)
+
