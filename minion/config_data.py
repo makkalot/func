@@ -41,8 +41,7 @@ class Config:
 
         cp.read([CONFIG_FILE])
         
-        self.ds["is_overlord"] = int(cp.get("general","is_overlord"))
-        self.ds["is_minion"] = int(cp.get("general","is_minion"))
+        self.ds["log_level"] = cp.get("general","log_level")
         self.ds["overlord_server"] = cp.get("general","overlord_server")
 
     def get(self):

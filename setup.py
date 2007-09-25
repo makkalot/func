@@ -18,20 +18,8 @@ if __name__ == "__main__":
  
         manpath    = "share/man/man1/"
         etcpath    = "/etc/%s" % NAME
-        etcpathdb  = "/etc/%s/db" % NAME
-        wwwpath    = "/var/www/%s" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
-        logpathdb  = "/var/log/%s/db/" % NAME
-	settingspath = "/var/lib/%s/" % NAME
-        migraterepopath = "/var/lib/%s/db/" % NAME
-	schemapath = "/usr/share/%s/db_schema/" % NAME
-	upgradepath = schemapath + "upgrade/"
-	puppetpath = "/usr/share/%s/puppet-config/" % NAME
-	manifestpath = "/etc/puppet/manifests/"
-	profiletemplatepath = "/usr/share/%s/profile-template/" % NAME
-        profilespath    = "/var/lib/%s/profiles/" % NAME
-        queuedprofilespath    = "/var/lib/%s/profiles/queued/" % NAME
         setup(
                 name="%s" % NAME,
                 version = VERSION,
@@ -53,12 +41,8 @@ if __name__ == "__main__":
                 ],
                 data_files = [(initpath, ["init-scripts/funcd", "init-scripts/certmaster"]),
                               (etcpath, ["etc/minion.conf","etc/certmaster.conf"]),
-			      (etcpathdb, []),
-			      (logpath, []),
-			      (logpathdb, []),
-			      (migraterepopath, []),
-			      (profilespath, []),
-			      (queuedprofilespath, [])],
+			      (logpath, [])
+                ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC
         )
