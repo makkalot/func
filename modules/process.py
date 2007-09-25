@@ -16,6 +16,7 @@
 
 # other modules
 import sub_process
+import codes
 
 # our modules
 from modules import func_module
@@ -54,8 +55,16 @@ class ProcessModule(func_module.FuncModule):
         return results
 
 
-    def kill(self,pid,level=""):
-        rc = sub_process.call(["/bin/kill", pid, level], executable="/bin/kill", shell=False)
+    def kill(self,pid,signal="TERM"):
+        if pid == "0":
+             raise codes.FuncException("Killing pid group 0 not permitted")
+        if signal == "":
+            # this is default /bin/kill behaviour, it claims, but enfore it anyway
+            signal = "-TERM"
+        if signal[0] != "-":
+            signal = "-%s" % signal
+        rc = sub_process.call(["/bin/kill",signal, pid], executable="/bin/kill", shell=False)
+        print rc
         return rc
 
     def pkill(self,name,level=""):
