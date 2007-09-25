@@ -40,7 +40,9 @@ class ProcessModule(func_module.FuncModule):
 
         flags.replace(";","") # prevent stupidity
 
-        cmd = sub_process.Popen("ps %s" % flags,stdout=sub_process.PIPE,shell=True)
+
+        #FIXME: we need to swallow stdout/stderr as well, right now it spews to the console
+        cmd = sub_process.Popen(["/bin/ps", flags] ,executable="/bin/ps", stdout=sub_process.PIPE,shell=False)
         data = cmd.communicate()[0]
 
         results = []       
@@ -51,13 +53,14 @@ class ProcessModule(func_module.FuncModule):
 
         return results
 
+
     def kill(self,pid,level=""):
-        rc = sub_process.call("/bin/kill %s %s" % (pid, level), shell=True)
+        rc = sub_process.call(["/bin/kill", pid, level], executable="/bin/kill", shell=False)
         return rc
 
     def pkill(self,name,level=""):
         # example killall("thunderbird","-9")
-        rc = sub_process.call("/usr/bin/pkill %s %s" % (name, level), shell=True)
+        rc = sub_process.call(["/usr/bin/pkill", name, level], executable="/usr/bin/pkill", shell=False)
         return rc
 
 methods = ProcessModule()
