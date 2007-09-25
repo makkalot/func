@@ -40,13 +40,13 @@ rm -fr $RPM_BUILD_ROOT
 /etc/init.d/certmaster
 %config(noreplace) /etc/func/settings
 %dir %{python_sitelib}/func
-%dir %{python_sitelib}/func/server
-%dir %{python_sitelib}/func/client
-%{python_sitelib}/func/server/*.py*
-%{python_sitelib}/func/client/*.py*
+%dir %{python_sitelib}/func/minion
+%dir %{python_sitelib}/func/overlord
+%{python_sitelib}/func/minion/*.py*
+%{python_sitelib}/func/overlord/*.py*
 %{python_sitelib}/func/*.py*
-%dir %{python_sitelib}/func/server/modules
-%{python_sitelib}/func/server/modules/*.py*
+%dir %{python_sitelib}/func/minion/modules
+%{python_sitelib}/func/minion/modules/*.py*
 %dir /var/log/func
 
 %post
@@ -61,6 +61,9 @@ fi
 
 
 %changelog
+* Tue Sep 25 2007 Robin Norwood <rnorwood@redhat.com> - 0.0.11-3
+- Change server -> minion and client -> overlord
+
 * Thu Sep 20 2007 James Bowes <jbowes@redhat.com> - 0.0.11-2
 - Clean up some speclint warnings
 

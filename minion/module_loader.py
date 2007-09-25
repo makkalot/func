@@ -40,8 +40,8 @@ def module_walker(topdir):
 
 def load_modules(blacklist=None):
 
-    module_file_path="%s/func/server/modules/" % distutils.sysconfig.get_python_lib()
-    mod_path="%s/func/server/"  % distutils.sysconfig.get_python_lib()
+    module_file_path="%s/func/minion/modules/" % distutils.sysconfig.get_python_lib()
+    mod_path="%s/func/minion/"  % distutils.sysconfig.get_python_lib()
 
     sys.path.insert(0, mod_path)
     mods = {}
@@ -90,7 +90,7 @@ def load_modules(blacklist=None):
 
 if __name__ == "__main__":
 
-    module_file_path = "/usr/lib/python2.5/site-packages/func/server/modules/"
+    module_file_path = "/usr/lib/python2.5/site-packages/func/minion/modules/"
     bar = module_walker(module_file_path)
     print bar
     for f in bar:

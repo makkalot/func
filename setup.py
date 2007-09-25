@@ -41,15 +41,15 @@ if __name__ == "__main__":
                 license = "GPL",
 		scripts = ["scripts/funcd", "scripts/certmaster"],
 		# package_data = { '' : ['*.*'] },
-                package_dir = {"%s" % NAME: "%s" % NAME, 
-			       "%s/server" % NAME: "server",
-			       "%s/server/modules" % NAME: "modules/",
-			       "%s/client" % NAME: "client"
+                package_dir = {"%s" % NAME: "%s" % NAME,
+			       "%s/minion" % NAME: "minion/",
+			       "%s/minion/modules" % NAME: "modules/",
+			       "%s/overlord" % NAME: "overlord/"
                 },
 		packages = ["%s" % NAME,
-	        	    "%s/server" % NAME,
-			    "%s/client" % NAME,
-	        	    "%s/server/modules" % NAME
+	        	    "%s/minion" % NAME,
+			    "%s/overlord" % NAME,
+	        	    "%s/minion/modules" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd", "init-scripts/certmaster"]),
                               (etcpath, ["settings",]),
