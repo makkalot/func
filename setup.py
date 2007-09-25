@@ -43,14 +43,14 @@ if __name__ == "__main__":
                 ],
 		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "",
-			       "%s/server" % NAME: "server",
-			       "%s/server/modules" % NAME: "modules/",
-			       "%s/client" % NAME: "client"
+			       "%s/minion" % NAME: "minion/",
+			       "%s/minion/modules" % NAME: "modules/",
+			       "%s/overlord" % NAME: "overlord/"
                 },
 		packages = ["%s" % NAME,
-	        	    "%s/server" % NAME,
-			    "%s/client" % NAME,
-	        	    "%s/server/modules" % NAME
+	        	    "%s/minion" % NAME,
+			    "%s/overlord" % NAME,
+	        	    "%s/minion/modules" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (etcpath, ["settings",]),
