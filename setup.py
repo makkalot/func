@@ -10,7 +10,7 @@ NAME = "func"
 VERSION = open("version", "r+").read().split()[0]
 SHORT_DESC = "%s remote configuration and management api" % NAME
 LONG_DESC = """
-A small pluggabe xml-rpc daemon used by %s to implement various web services hooks
+A small pluggable xml-rpc daemon used by %s to implement various web services hooks
 """ % NAME
 
 
@@ -36,13 +36,12 @@ if __name__ == "__main__":
                 name="%s" % NAME,
                 version = VERSION,
                 author = "Lots",
-                author_email = "et-mgmt-tools@redhat.com",
+                author_email = "func-list@redhat.com",
                 url = "https://hosted.fedoraproject.org/projects/func/",
                 license = "GPL",
-		scripts = ["scripts/funcd",
-                ],
+		scripts = ["scripts/funcd", "scripts/certmaster"],
 		# package_data = { '' : ['*.*'] },
-                package_dir = {"%s" % NAME: "",
+                package_dir = {"%s" % NAME: "%s" % NAME, 
 			       "%s/server" % NAME: "server",
 			       "%s/server/modules" % NAME: "modules/",
 			       "%s/client" % NAME: "client"

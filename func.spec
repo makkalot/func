@@ -35,7 +35,9 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %{_bindir}/funcd
+%{_bindir}/certmaster
 /etc/init.d/funcd
+/etc/init.d/certmaster
 %config(noreplace) /etc/func/settings
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/server
