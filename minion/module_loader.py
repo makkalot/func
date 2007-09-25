@@ -31,7 +31,8 @@ def module_walker(topdir):
                 # we don't really care about __init__ files, though we do requure them
                 if filename[:8] == "__init__":
                     continue
-                # the normpath is important, since we (since we what?! -RN)
+                # the normpath is important, since we eventually replace /'s with .'s
+                # in the module name, and foo..bar doesnt work -akl
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
                 
@@ -44,6 +45,7 @@ def load_modules(blacklist=None):
 
     sys.path.insert(0, mod_path)
     mods = {}
+    bad_mods = {}
 
     filenames = module_walker(module_file_path)
 
@@ -70,17 +72,23 @@ def load_modules(blacklist=None):
             # If we've already imported mod_imp_name, don't import it again
             continue
 
+        # ignore modules that we've already determined aren't valid modules
+        if bad_mods.has_key(mod_imp_name):
+            continue
+
         try:
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
             if not hasattr(blip, "register_rpc"):
 		errmsg = _("%(module_path)s%(modname)s module not a proper module")
-                print errmsg % {'module_path': module_file_path, 'modname':mod_imp_name} 
+                print errmsg % {'module_path': module_file_path, 'modname':mod_imp_name}
+                bad_mods[mod_imp_name] = True
                 continue
             mods[mod_imp_name] = blip
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
             errmsg = _("Could not load %s module: %s")
             print errmsg % (mod_imp_name, e)
+            bad_mods[mod_imp_name] = True
 
             continue
 

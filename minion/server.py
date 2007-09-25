@@ -180,8 +180,6 @@ def main(argv):
     Start things up.
     """
 
-    modules = module_loader.load_modules()
-
     print "\n\n\n\n\n"
     print " WARNING WARNING WARNING"
     print "DANGER DANGER DANGER"
