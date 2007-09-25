@@ -17,7 +17,7 @@ import codes
 import os
 import ConfigParser
 
-CONFIG_FILE = "/etc/func/settings"
+CONFIG_FILE = "/etc/func/minion.conf"
 
 class Config:
 

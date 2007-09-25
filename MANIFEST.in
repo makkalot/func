@@ -1,5 +1,5 @@
-include settings
 include version
+include etc/minion.conf
 include etc/certmaster.conf
 recursive-include docs *
 recursive-include init-scripts *
