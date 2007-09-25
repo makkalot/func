@@ -39,9 +39,14 @@ if __name__ == "__main__":
 			    "%s/overlord" % NAME,
 	        	    "%s/minion/modules" % NAME
                 ],
-                data_files = [(initpath, ["init-scripts/funcd", "init-scripts/certmaster"]),
-                              (etcpath, ["etc/minion.conf","etc/certmaster.conf"]),
-			      (logpath, [])
+                data_files = [(initpath, ["init-scripts/funcd"]),
+                              (initpath, ["init-scripts/certmaster"]),
+                              (etcpath,  ["etc/minion.conf"]),
+                              (etcpath,  ["etc/certmaster.conf"]),
+                              (manpath,  ["docs/func.1.gz"]),
+                              (manpath,  ["docs/funcd.1.gz"]),
+                              (manpath,  ["docs/certmaster.1.gz"]),
+			      (logpath,  [])
                 ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC

@@ -11,14 +11,12 @@ clean:
 	-rm -rf dist/ build/
 	-rm -rf *~
 	-rm -rf rpm-build/
+	-rm -rf docs/*.gz
 
-#manpage:
-#	pod2man --center="cobbler" --release="" cobbler.pod | gzip -c > cobbler.1.gz
-#	pod2html cobbler.pod > cobbler.html
-
-#test:
-#	python tests/tests.py
-#	-rm -rf /tmp/_cobbler-*
+manpage:
+	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
+	pod2man --center="func" --release="" ./docs/func.pod | gzip -c > ./docs/func.1.gz
+	pod2man --center="certmaster" --release="" ./docs/certmaster.pod | gzip -c > ./docs/certmaster.1.gz
 
 messages: minion/*.py
 	xgettext -k_ -kN_ -o $(MESSAGESPOT) minion/*.py 
@@ -31,19 +29,19 @@ bumprelease:
 setversion: 
 	-echo "$(VERSION) $(RELEASE)" > version
 
-build: clean
+build:
 	python setup.py build -f
 
-install: build 
+install: build manpage
 	python setup.py install -f
 
-sdist: clean messages
+sdist: messages
 	python setup.py sdist
 
 new-rpms: bumprelease rpms
 
 
-rpms: sdist 
+rpms: build manpage sdist
 	mkdir -p rpm-build
 	cp dist/*.gz rpm-build/
 	cp version rpm-build/

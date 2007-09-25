@@ -1,0 +1,32 @@
+=head1 NAME
+
+Func -- Fedora Unified Network Controller.
+
+=head1 SYNOPSIS
+
+func target.example.org module command [args ...] [--verbose]
+func "target*.example.org" module command [args ...] [--verbose]
+func "webserver1;mailserver2" module command [args ...] [--verbose]
+
+=head1 DESCRIPTION
+
+Func allows remote control of machines running funcd that are set
+to obey this machine.  
+
+Func can address multiple machines at the same time by specifying
+their names with globs, which follow shell glob syntax.
+
+=head1 EXIT_STATUS
+
+Func commands have return values that vary based on the module being
+called.
+
+=head1 ADDITONAL RESOURCES
+
+See https://hosted.fedoraproject.org/projects/func/ for more information, including information on scripting func from Python.
+
+=head1 AUTHOR
+
+Various. See https://hosted.fedoraproject.org/projects/func
+
+
