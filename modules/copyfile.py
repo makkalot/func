@@ -47,10 +47,13 @@ class CopyFile(func_module.FuncModule):
         return thissum.hexdigest()
 
 
-    def copyfile(self, filepath, filebuf):
+    def copyfile(self, filepath, filebuf, mode=0644, uid=0, gid=0, force=None):
         # -1 = problem file was not copied
         # 1 =  file was copied
         # 0 = file was not copied b/c file is unchanged
+
+
+        # we should probably verify mode,uid,gid are valid as well
         
         dirpath = os.path.dirname(filepath)
         basepath = os.path.basename(filepath)
@@ -62,7 +65,7 @@ class CopyFile(func_module.FuncModule):
         if os.path.exists(filepath):
             local_sum = self.checksum(filepath)
         
-        if remote_sum != local_sum:
+        if remote_sum != local_sum or force is not None:
             # back up the localone
             if os.path.exists(filepath):
                 if not self._backuplocal(filepath):
@@ -79,6 +82,14 @@ class CopyFile(func_module.FuncModule):
                 return -1
         else:
             return 0
+
+        # hmm, need to figure out proper exceptions -akl
+        try:
+            # we could intify the mode here if it's a string
+            os.chmod(filepath, mode)
+            os.chown(filepath, uid, gid)
+        except (IOError, OSError), e:
+            return -1
             
         return 1
 
