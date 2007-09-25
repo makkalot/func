@@ -19,12 +19,16 @@ import optparse
 import sys
 import xmlrpclib
 import traceback
+import glob
+import os
 
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
 
 DEFAULT_PORT = 51234
+CERT_PATH = "/var/lib/func/certmaster/certs"
+
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 
 # ===================================
@@ -52,15 +56,28 @@ class Client():
        of server ids.
        """
 
-       # FIXME: currently globbing is not supported (yet)
-       # needs knowledge of the tree of certs
-       # will be done soon
+       all_hosts = []
+       all_certs = []
+       seperate_gloobs = spec.split(";")
+       for each_gloob in seperate_gloobs:
+           actual_gloob = "%s/%s.pem" % (CERT_PATH, each_gloob)
+           certs = glob.glob(actual_gloob)
+           for cert in certs:
+               all_certs.append(cert)
+               host = cert.replace(CERT_PATH,"")[1:-4]
+               all_hosts.append(host)
 
-       results = []
+       # debug only:
+       # print all_hosts
+       
+       all_urls = []
+       for x in all_hosts:
+           all_urls.append("http://%s:%s" % (x, self.port))
 
-       # FIXME: add SSL
-       results.append("http://%s:%s" % (spec, self.port))
-       return results
+       if self.verbose and len(all_urls) == 0:
+           sys.stderr.write("no hosts matched\n")
+
+       return all_urls
 
    # ----------------------------------------------- 
 
