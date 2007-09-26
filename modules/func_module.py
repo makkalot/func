@@ -13,8 +13,8 @@
 ##
 
 
-from server import config_data
-from server import logger
+from minion import config_data
+from minion import logger
 
 
 class FuncModule(object):
