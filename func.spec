@@ -12,6 +12,7 @@ Group: Applications/System
 Requires: python >= 2.3
 Requires: rhpl
 Requires: yum-utils
+Requires: pyOpenSSL
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
@@ -68,6 +69,9 @@ fi
 
 
 %changelog
+* Wed Sep 26 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-5
+- fixed Requires to include pyOpenSSL for use by certmaster
+
 * Tue Sep 25 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.11-4
 - Added manpage documentation 
 - Renamed minion config file
