@@ -75,7 +75,7 @@ class CertMaster(object):
             # fixme - should we creating these separately?
             if not os.path.exists(self.ca_key_file) and not os.path.exists(self.ca_cert_file):
                 func.certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
-        except (IOError, OsError), e:
+        except (IOError, OSError), e:
             print 'Cannot make certmaster certificate authority keys/certs, aborting: %s' % e
             sys.exit(1)
 
