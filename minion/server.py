@@ -193,17 +193,17 @@ def main(argv):
     print ""
     print "Seriously.\n\n"
 
+
+    if "daemon" in sys.argv or "--daemon" in sys.argv:
+        utils.daemonize("/var/run/funcd.pid")
+    else:
+        print "serving...\n"
+
     try:
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
         sys.exit(1)
-
-    if "daemon" in sys.argv or "--daemon" in sys.argv:
-        utils.daemonize("/var/run/vf_server.pid")
-    else:
-        print "serving...\n"
-
        
 # ======================================================================================
 

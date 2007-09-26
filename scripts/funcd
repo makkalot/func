@@ -4,9 +4,7 @@
 import sys
 import distutils.sysconfig
 
-sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
-
-from minion import server
+from func.minion import server
 
 if __name__ == "__main__":
     server.main(sys.argv)

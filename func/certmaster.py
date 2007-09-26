@@ -28,7 +28,8 @@ import sha
 #from func.server import codes
 import func
 import func.certs
-
+import func.codes
+import func.utils
 
 class SimpleConfigFile(object):
     """simple config file object:
@@ -164,6 +165,11 @@ class CertMaster(object):
             return False, '', ''
 
         return False, '', ''
+
+class CertmasterXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
+    def __init__(self, args):
+       self.allow_reuse_address = True
+       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
         
 
 def serve(xmlrpcinstance):
@@ -172,7 +178,37 @@ def serve(xmlrpcinstance):
      Code for starting the XMLRPC service. 
      """
 
-     server = SimpleXMLRPCServer.SimpleXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
+     server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
      server.logRequests = 0 # don't print stuff to console
      server.register_instance(xmlrpcinstance)
      server.serve_forever()
+
+
+def main(argv):
+    
+    defaults = { 'listen_addr': 'localhost',
+                 'listen_port': '51235',
+                 'cadir': '/etc/pki/func/ca',
+                 'certroot': '/var/lib/func/certmaster/certs',
+                 'csrroot': '/var/lib/func/certmaster/csrs',
+                 'autosign': 'false'
+                 }
+
+
+    cm = CertMaster('/etc/func/certmaster.conf', defaults)
+
+    if "daemon" in argv or "--daemon" in argv:
+        func.utils.daemonize("/var/run/certmaster.pid")
+    else:
+        print "serving...\n"
+
+
+    # just let exceptions bubble up for now
+    serve(cm)
+
+ 
+
+if __name__ == "__main__":
+    textdomain(I18N_DOMAIN)
+    main(sys.argv)
+
