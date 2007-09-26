@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+# FIXME: Perms checked and okayed on all csr, certs and keys, everywhere
+# FIXME: picky about bogus CN names ../ ../ ./ etc, etc to avoid stupid attacks
+# FIXME: more intelligent fault raises
+
 """
 cert master listener
 
@@ -24,6 +28,7 @@ import os.path
 import traceback
 from OpenSSL import crypto
 import sha
+import glob
 
 #from func.server import codes
 import func
@@ -95,8 +100,7 @@ class CertMaster(object):
         if method in self.handlers.keys():
             return self.handlers[method](*params)
         else:
-            pass
-            #raise codes.InvalidMethodException
+            raise func.codes.InvalidMethodException
     
 
     def wait_for_cert(self, csrbuf):
@@ -113,7 +117,7 @@ class CertMaster(object):
             return False, '', ''
             
         requesting_host = csrreq.get_subject().CN
-        certfile = '%s/%s.pem' % (self.cfg.certroot, requesting_host)
+        certfile = '%s/%s.cert' % (self.cfg.certroot, requesting_host)
         csrfile = '%s/%s.csr' % (self.cfg.csrroot, requesting_host)
 
         # check for old csr on disk
@@ -134,8 +138,7 @@ class CertMaster(object):
         # look for a cert:
         # if we have it, then return True, etc, etc
         if os.path.exists(certfile):
-            slavecert = crypto.load_certificate(crypto.FILETYPE_PEM, certfile)
-                
+            slavecert = func.certs.retrieve_cert_from_file(certfile)
             cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
@@ -145,14 +148,9 @@ class CertMaster(object):
         # else write out the csr
         
         if self.cfg.autosign:
-            slavecert = func.certs.create_slave_certificate(csrreq,
-                        self.cakey, self.cacert, self.cfg.cadir)
-            
-            destfo = open(certfile, 'w')
-            destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert))
-            destfo.close()
-            del destfo
-            cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
+            cert_fn = self.sign_this_csr(csrreq)
+            cert = func.certs.retrieve_cert_from_file(cert_fn)            
+            cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
         
@@ -165,6 +163,56 @@ class CertMaster(object):
             return False, '', ''
 
         return False, '', ''
+
+    def get_csrs_waiting(self):
+        hosts = [] 
+        csrglob = '%s/*.csr' % self.cfg.csrroot
+        csr_list = glob.glob(csrglob)
+        for f in csr_list:
+            hn = os.path.basename(f)
+            hn = hn[:-4]
+            hosts.append(hn)
+        return hosts
+    
+            
+    def sign_this_csr(self, csr):
+        """returns the path to the signed cert file"""
+        csr_unlink_file = None
+
+        if type(csr) is type(''): 
+            if csr.startswith('/') and os.path.exists(csr):  # we have a full path to the file
+                csrfo = open(csr)
+                csr_buf = csrfo.read()
+                csr_unlink_file = csr
+                
+            elif os.path.exists('%s/%s' % (self.cfg.csrroot, csr)): # we have a partial path?
+                csrfo = open('%s/%s' % (self.cfg.csrroot, csr))
+                csr_buf = csrfo.read()
+                csr_unlink_file = '%s/%s' % (self.cfg.csrroot, csr)
+                
+            # we have a string of some kind
+            else:
+                csr_buf = csr
+
+            try:
+                csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, csr_buf)                
+            except crypto.Error, e:
+               print 'Bad CSR: %s' % csr
+                
+        else: # assume we got a bare csr req
+            csrreq = csr
+        requesting_host = csrreq.get_subject().CN
+        certfile = '%s/%s.cert' % (self.cfg.certroot, requesting_host)
+        thiscert = func.certs.create_slave_certificate(csrreq, self.cakey, self.cacert, self.cfg.cadir)
+        destfo = open(certfile, 'w')
+        destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, thiscert))
+        destfo.close()
+        del destfo
+        if csr_unlink_file and os.path.exists(csr_unlink_file):
+            os.unlink(csr_unlink_file)
+            
+        return certfile
+        
 
 class CertmasterXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
     def __init__(self, args):

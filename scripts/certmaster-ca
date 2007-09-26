@@ -1,0 +1,70 @@
+#!/usr/bin/python -tt
+# sign/list keys
+# --sign hostname hostname hostname
+# --list # lists all csrs needing to be signed
+# --list-all ?
+# --clean? not sure what it will do
+
+import sys
+
+import func
+import func.certs
+import func.certmaster
+
+
+
+from optparse import OptionParser
+defaults = { 'listen_addr': 'localhost',
+             'listen_port': '51235',
+             'cadir': '/etc/pki/func/ca',
+             'certroot': '/var/lib/func/certmaster/certs',
+             'csrroot': '/var/lib/func/certmaster/csrs',
+             'autosign': 'false'
+            }
+
+def errorprint(stuff):
+    print >> sys.stderr, stuff
+
+
+def parseargs(args):
+    usage = 'certmaster-ca [options]'
+    parser = OptionParser(usage=usage)
+    
+    parser.add_option('-l', '--list', default=False, action="store_true",
+          help='list signing requests remaining')
+    parser.add_option('-s', '--sign', default=False, action="store_true",
+          help='sign requests of hosts specified')
+    
+    (opts, args) = parser.parse_args()
+    # XXX FIXME check for obviously impossible things and exit, etc
+    
+    return (opts, args)
+
+def main(args):
+    cm = func.certmaster.CertMaster('/etc/func/certmaster.conf', defaults)
+    
+    (opts, args) = parseargs(args)
+    if opts.list:
+        hns = cm.get_csrs_waiting()
+        if hns:
+            for hn in cm.get_csrs_waiting():
+                print hn
+        else:
+           print 'No certificates to sign'
+
+        return 0
+    
+    if opts.sign:
+        if not args:
+            errorprint('Need hostnames to sign')
+            return 1
+            
+        for hn in args:
+            csrfile = '%s/%s.csr' % (cm.cfg.csrroot, hn)
+            certfile = cm.sign_this_csr(csrfile)
+            print '%s signed - cert located at %s' % (hn, certfile)
+        return 0
+        
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))
