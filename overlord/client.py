@@ -22,6 +22,9 @@ import traceback
 import glob
 import os
 
+
+import sslclient
+
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
@@ -147,7 +150,8 @@ class Client():
 
            # FIXME: add SSL
 
-           conn = xmlrpclib.ServerProxy(server)
+	   conn = sslclient.FuncServer(server)
+#           conn = xmlrpclib.ServerProxy(server)
 
            if self.verbose:
                 sys.stderr.write("on %s running %s %s (%s)\n" % (server, module, method, ",".join(args)))
