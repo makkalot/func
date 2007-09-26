@@ -90,7 +90,7 @@ class Client():
        """
 
        if self.noglobs:
-           return [ "http://%s:%s" % (spec, self.port) ] 
+           return [ "https://%s:%s" % (spec, self.port) ] 
 
        all_hosts = []
        all_certs = []
@@ -108,7 +108,7 @@ class Client():
        
        all_urls = []
        for x in all_hosts:
-           all_urls.append("http://%s:%s" % (x, self.port))
+           all_urls.append("https://%s:%s" % (x, self.port))
 
        if self.verbose and len(all_urls) == 0:
            sys.stderr.write("no hosts matched\n")
@@ -148,10 +148,8 @@ class Client():
 
        for server in self.servers:
 
-           # FIXME: add SSL
-
 	   conn = sslclient.FuncServer(server)
-#           conn = xmlrpclib.ServerProxy(server)
+           # conn = xmlrpclib.ServerProxy(server)
 
            if self.verbose:
                 sys.stderr.write("on %s running %s %s (%s)\n" % (server, module, method, ",".join(args)))
