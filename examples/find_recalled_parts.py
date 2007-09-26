@@ -7,7 +7,7 @@ import func.overlord.client as fc
 
 bad = open("./part_data.txt").read().split()
 
-info = fc.Client("*").hardware.info()
+info = fc.Client("*").hardware.hal_info()
 
 for (host,details) in info.iteritems():
 
@@ -15,10 +15,10 @@ for (host,details) in info.iteritems():
         print "%s had an error : %s" % (host,str(details))
         break
 
-    for device in details["devices"]:
+    for (device, full_output) in details.iteritems():
         for bad_value in bad:
-           if device["Description"].find(bad_value) != -1:
-              print "%s has flagged part: %s " % (host, device["Description"])
-              break
-  
+             if full_output.find(bad_value) != -1:
+                print "%s has flagged part: %s, matched %s" % (host, device, bad_value)
+                break
+
 

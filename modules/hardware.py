@@ -3,6 +3,7 @@
 ## 
 ## Hardware profiler plugin
 ## requires the "smolt" client package be installed
+## but also relies on lspci for some things
 ##
 ## Copyright 2007, Red Hat, Inc
 ## Michael DeHaan <mdehaan@redhat.com>
@@ -23,6 +24,7 @@ sys.path.append("/usr/share/smolt/client")
 import smolt
 
 # our modules
+import sub_process
 from modules import func_module
 
 # =================================
@@ -30,9 +32,37 @@ from modules import func_module
 class HardwareModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
-            "info": self.info
+            "info"     : self.info,
+            "hal_info" : self.hal_info 
         }
         func_module.FuncModule.__init__(self)
+
+    def hal_info(self):
+        """
+        Returns the output of lshal, but split up into seperate devices
+        for easier parsing.  Each device is a entry in the return hash.
+        """
+
+        cmd = sub_process.Popen(["/usr/bin/lshal"],shell=False,stdout=sub_process.PIPE)
+        data = cmd.communicate()[0]        
+     
+        data = data.split("\n")
+       
+        results = {}
+        current = ""
+        label = data[0]
+        for d in data:
+            if d == '':
+               results[label] = current
+               current = ""
+               label = ""
+            else:
+               if label == "":
+                   label = d
+               current = current + d        
+
+        return results
+
 
     def info(self,with_devices=True):
         """
