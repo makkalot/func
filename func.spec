@@ -38,6 +38,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/funcd
 %{_bindir}/func
 %{_bindir}/certmaster
+%{_bindir}/certmaster-ca
 /etc/init.d/funcd
 /etc/init.d/certmaster
 %config(noreplace) /etc/func/minion.conf
