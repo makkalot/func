@@ -33,6 +33,32 @@ FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module metho
 
 # ===================================
 
+class CommandAutomagic():
+   """
+   This allows a client object to act as if it were one machine, when in 
+   reality it represents many.
+   """
+
+   def __init__(self, clientref, base):
+       self.base = base
+       self.clientref = clientref
+
+   def __getattr__(self,name):
+       base2 = self.base[:]
+       base2.append(name)
+       return CommandAutomagic(self.clientref, base2)
+
+   def __call__(self, *args):
+       if not self.base:
+           raise AttributeError("something wrong here")
+       if len(self.base) < 2:
+           raise AttributeError("no method called: %s" % ".".join(self.base))
+       module = self.base[0]
+       method = ".".join(self.base[1:])
+       return self.clientref.run(module,method,args)
+
+# ===================================
+
 class Client():
 
    def __init__(self, server_spec, port=DEFAULT_PORT, verbose=False, silent=False):
@@ -79,6 +105,22 @@ class Client():
 
        return all_urls
 
+   # -----------------------------------------------
+
+   def __getattr__(self, name):
+       """
+       This getattr allows manipulation of the object as if it were
+       a XMLRPC handle to a single machine, when in reality it is a handle
+       to an unspecified number of machines.
+
+       So, it enables stuff like this:
+
+       Client("*.example.org").yum.install("foo")
+       """
+
+       return CommandAutomagic(self, [name])
+
+
    # ----------------------------------------------- 
 
    def run(self, module, method, args):
@@ -87,7 +129,7 @@ class Client():
        """
 
        count = len(self.servers)
-       results = []
+       results = {}
 
        for server in self.servers:
 
@@ -114,7 +156,7 @@ class Client():
                 if not self.silent:
                     sys.stderr.write("remote exception on %s: %s\n" % (server, str(e)))
 
-           results.append(retval)
+           results[server] = retval
 
        return results
 
@@ -126,17 +168,26 @@ class Client():
        and all sorts of crazy stuff, reduce it down to a simple
        integer return.  It may not be useful but we need one.
        """
-       nonzeros = []
-       for x in results:         
+       numbers = []
+       for x in results.keys():         
            # faults are the most important
            if type(x) == Exception:
                return -911
-           # then pay attention to non-zeros
+           # then pay attention to numbers
            if type(x) == int:
-               nonzeros.append(x)    
-       if len(nonzeros) > 0:
-           return nonzeros[1]          
-       return 0
+               numbers.append(x)
+
+       # if there were no numbers, assume 0
+       if len(numbers) == 0:
+           return 0
+
+       # if there were numbers, return the highest 
+       # (presumably the worst error code
+       max = -9999
+       for x in numbers:
+           if x > max:
+               max = x
+       return max
 
 # ===================================================================
 
