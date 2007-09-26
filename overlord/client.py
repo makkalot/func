@@ -64,20 +64,19 @@ class CommandAutomagic():
 
 class Client():
 
-   def __init__(self, server_spec, port=DEFAULT_PORT, verbose=False, silent=False, noglobs=False):
+   def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False, verbose=False, noglobs=False):
        """
        Constructor.  
        @server_spec -- something like "*.example.org" or "foosball"
        @port -- is the port where all funcd processes should be contacted
        @verbose -- whether to print unneccessary things
-       @silent -- whether to print anything
        @noglobs -- specifies server_spec is not a glob, and run should return single values
        """
 
        self.server_spec = server_spec
        self.port        = port
        self.verbose     = verbose
-       self.silent      = silent
+       self.interactive = interactive
        self.noglobs     = noglobs
        self.servers     = self.expand_servers(self.server_spec)
 
@@ -151,7 +150,7 @@ class Client():
 	   conn = sslclient.FuncServer(server)
            # conn = xmlrpclib.ServerProxy(server)
 
-           if self.verbose:
+           if self.interactive:
                 sys.stderr.write("on %s running %s %s (%s)\n" % (server, module, method, ",".join(args)))
 
            # FIXME: support userland command subclassing only if a module
@@ -163,17 +162,17 @@ class Client():
                 # we call gettatr around it. 
                 meth = "%s.%s" % (module, method)
                 retval = getattr(conn, meth)(*args[:])
-                if not self.silent:
+                if self.interactive:
                     print retval 
            except Exception, e:
                 retval = e 
-                if not self.silent:
+                if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" % (server, str(e)))
 
            if self.noglobs:
                return retval
            else:
-               left = server.rfind("/")
+               left = server.rfind("/")+1
                right = server.rfind(":")
                server_name = server[left:right]
                results[server_name] = retval
@@ -289,7 +288,7 @@ class FuncCommandLine():
         """
         Runs the actual command.
         """
-        client = Client(self.server_spec,port=self.port,verbose=self.verbose)
+        client = Client(self.server_spec,port=self.port,interactive=True,verbose=self.verbose)
         results = client.run(self.module, self.method, self.method_args)
     
         # TO DO: add multiplexer support

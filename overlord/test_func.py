@@ -16,9 +16,10 @@ TEST_SMART = True
 
 if TEST_GETATTR:
    import func.overlord.client as func_client
-   print func_client.Client("*").hardware.info()
-   print func_client.Client("*").run("hardware","info",[])
-   print func_client.Client(socket.gethostname(),silent=True,noglobs=True).test.add("1","2")
+   print func_client.Client("*").test.add(1,2)
+   #print func_client.Client("*").hardware.info()
+   #print func_client.Client("*").run("hardware","info",[])
+   #print func_client.Client(socket.gethostname(),noglobs=True).test.add("1","2")
    sys.exit(1)
 
 # get a connecton (to be replaced by client lib logic)
