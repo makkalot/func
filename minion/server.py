@@ -19,6 +19,7 @@ import SimpleXMLRPCServer
 import string
 import sys
 import traceback
+import socket
 
 from rhpl.translate import _, N_, textdomain, utf8
 I18N_DOMAIN = "func"
@@ -155,9 +156,10 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
     def __init__(self, args):
         self.allow_reuse_address = True
         # is this right?
-        self.key = "/etc/pki/func/slave.pem"
-        self.cert = "/etc/pki/func/slave.cert"
-        self.ca = "/etc/pki/func/ca/funcmaster.crt"
+        hn = socket.getfqdn()
+        self.key = "/etc/pki/func/%s.pem" % hn
+        self.cert = "/etc/pki/func/%s.cert" % hn
+        self.ca = "/etc/pki/func/ca.cert"
 
         self.modules = module_loader.load_modules()
 
@@ -207,8 +209,9 @@ def main(argv):
         utils.daemonize("/var/run/funcd.pid")
     else:
         print "serving...\n"
-
+    
     try:
+        utils.create_minion_keys()
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
