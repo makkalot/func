@@ -13,8 +13,8 @@
 ##
 
 
-from minion import config_data
-from minion import logger
+from func.minion import config_data
+from func.minion import logger
 
 
 class FuncModule(object):
