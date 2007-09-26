@@ -24,17 +24,16 @@ from rhpl.translate import _, N_, textdomain, utf8
 I18N_DOMAIN = "func"
 
 # our modules
+import AuthedXMLRPCServer
 import codes
 import config_data
 import logger
 import module_loader
 import utils
 
-# ======================================================================================
-
 class XmlRpcInterface(object):
 
-    def __init__(self, modules={}, server=None):
+    def __init__(self):
 
         """
         Constructor.
@@ -42,13 +41,12 @@ class XmlRpcInterface(object):
 
         config_obj = config_data.Config()
         self.config = config_obj.get()
-        self.modules = modules
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
 
         # need a reference so we can log ip's, certs, etc
-        self.server = server
+#        self.server = server
         
     def __setup_handlers(self):
 
@@ -74,8 +72,6 @@ class XmlRpcInterface(object):
     def list_methods(self):
         return self.handlers.keys()
 
-
-
     def get_dispatch_method(self, method):
 
         if method in self.handlers:
@@ -85,24 +81,8 @@ class XmlRpcInterface(object):
             self.logger.info("Unhandled method call for method: %s " % method)
             raise codes.InvalidMethodException
 
-    def _dispatch(self, method, params):
+ 
 
-        """
-        the SimpleXMLRPCServer class will call _dispatch if it doesn't
-        find a handler method 
-        """
-
-        # Recognize ipython's tab completion calls
-        if method == 'trait_names' or method == '_getAttributeNames':
-            return self.handlers.keys()
-
-        # XXX FIXME - need to figure out how to dig into the server base classes
-        # so we can get client ip, and eventually cert id info -akl
-        self.audit_logger.log_call(method, params)
-
-        return self.get_dispatch_method(method)(*params)
-
-# ======================================================================================
 
 class FuncApiMethod:
 
@@ -144,7 +124,7 @@ class FuncApiMethod:
 
         return rc
 
-# ======================================================================================
+
 
 def serve():
 
@@ -152,27 +132,70 @@ def serve():
      Code for starting the XMLRPC service. 
      FIXME:  make this HTTPS (see RRS code) and make accompanying Rails changes..
      """
-
-     modules = module_loader.load_modules()
-
-     server =FuncXMLRPCServer(('', 51234))
+     server =FuncSSLXMLRPCServer(('', 51234))
      server.logRequests = 0 # don't print stuff to console
-
-     websvc = XmlRpcInterface(modules=modules,server=server)
-     
-     server.register_instance(websvc)
      server.serve_forever()
 
-# ======================================================================================
 
-class FuncXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
+
+class FuncXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer, XmlRpcInterface):
 
     def __init__(self, args):
 
        self.allow_reuse_address = True
-       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
 
-# ======================================================================================
+       self.modules = module_loader.load_modules()
+       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
+       XmlRpcInterface.__init__(self)
+
+
+
+class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
+                          XmlRpcInterface):
+    def __init__(self, args):
+        self.allow_reuse_address = True
+        # is this right?
+        self.key = "/etc/pki/func/slave.pem"
+        self.cert = "/etc/pki/func/slave.cert"
+        self.ca = "/etc/pki/func/ca/funcmaster.crt"
+
+        self.modules = module_loader.load_modules()
+
+        
+        XmlRpcInterface.__init__(self)
+        AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
+                                                          self.key, self.cert,
+                                                          self.ca)
+
+    def _dispatch(self, method, params):
+
+        """
+        the SimpleXMLRPCServer class will call _dispatch if it doesn't
+        find a handler method 
+        """
+
+        # Recognize ipython's tab completion calls
+        if method == 'trait_names' or method == '_getAttributeNames':
+            return self.handlers.keys()
+
+        if hasattr(self, '_this_request'):
+            r,a = self._this_request
+            p = r.get_peer_certificate()
+            cn = p.get_subject().CN
+            sub_hash = p.subject_name_hash()
+        else:
+            print 'no cert'    
+
+        # XXX FIXME - need to figure out how to dig into the server base classes
+        # so we can get client ip, and eventually cert id info -akl
+        self.audit_logger.log_call(cn, sub_hash, method, params)
+
+        return self.get_dispatch_method(method)(*params)
+    
+    def auth_cb(self, request, client_address):
+        peer_cert = request.get_peer_certificate()
+        return peer_cert.get_subject().CN
+
       
 def main(argv):
 

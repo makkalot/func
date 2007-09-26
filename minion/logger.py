@@ -63,9 +63,9 @@ class AuditLogger(Singleton):
         if self._no_handlers:
              self._setup_handlers(logfilepath=logfilepath)
 
-    def log_call(self, method, params):
+    def log_call(self, CN, cert_hash, method, params):
         # square away a good parseable format at some point -akl
-        self.logger.info("%s called with %s" % (method, params))
+        self.logger.info("%s %s %s called with %s" % (CN, cert_hash, method, params))
 
 
     def _setup_logging(self):
