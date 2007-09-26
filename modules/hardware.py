@@ -19,9 +19,6 @@
 
 # other modules
 import sys
-# hack: smolt is not installed in site-packages
-sys.path.append("/usr/share/smolt/client")
-import smolt
 
 # our modules
 import sub_process
@@ -75,6 +72,13 @@ class HardwareModule(func_module.FuncModule):
 # =================================
 
 def hw_info(with_devices=True):
+
+    # this may fail if smolt is not installed.  That's ok.  hal_info will
+    # still work.
+    
+    # hack: smolt is not installed in site-packages
+    sys.path.append("/usr/share/smolt/client")
+    import smolt
 
     hardware = smolt.Hardware()
     host = hardware.host
