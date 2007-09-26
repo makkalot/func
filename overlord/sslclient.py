@@ -35,10 +35,25 @@ class SSLXMLRPCServerProxy(xmlrpclib.ServerProxy):
         xmlrpclib.ServerProxy.__init__(self, uri, SSL_Transport(ssl_context=self.ctx, timeout=timeout))
 
 
+class FuncServer(SSLXMLRPCServerProxy):
+    def __init__(self, uri):
+        self.pem = "/etc/pki/func/slave.pem"
+        self.crt = "/etc/pki/func/slave.cert"
+        self.ca = "/etc/pki/func/ca/funcmaster.crt"
+
+        SSLXMLRPCServerProxy.__init__(self, uri,
+                                      self.pem,
+                                      self.crt,
+                                      self.ca)
+        
 
 if __name__ == "__main__":
-    s = SSLXMLRPCServerProxy('https://localhost:51234/', '/etc/pki/func/slave.pem', '/etc/pki/func/slave.crt', '/etc/pki/func/ca/funcmaster.crt')
+    s = SSLXMLRPCServerProxy('https://localhost:51234/', '/etc/pki/func/slave.pem', '/etc/pki/func/slave.cert', '/etc/pki/func/ca/funcmaster.crt')
     f = s.ping(1, 2)
     print f
-    
+
+
+
+
+
     
