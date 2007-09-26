@@ -138,8 +138,7 @@ class CertMaster(object):
         # look for a cert:
         # if we have it, then return True, etc, etc
         if os.path.exists(certfile):
-            slavecert = crypto.load_certificate(crypto.FILETYPE_PEM, certfile)
-                
+            slavecert = func.certs.retrieve_cert_from_file(certfile)
             cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
@@ -150,7 +149,8 @@ class CertMaster(object):
         
         if self.cfg.autosign:
             cert_fn = self.sign_this_csr(csrreq)
-            cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, cert_fn)
+            cert = func.certs.retrieve_cert_from_file(cert_fn)            
+            cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
         
