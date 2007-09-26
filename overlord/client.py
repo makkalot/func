@@ -64,17 +64,21 @@ class CommandAutomagic():
 
 class Client():
 
-   def __init__(self, server_spec, port=DEFAULT_PORT, verbose=False, silent=False):
+   def __init__(self, server_spec, port=DEFAULT_PORT, verbose=False, silent=False, noglobs=False):
        """
        Constructor.  
-       server_spec is something like "*.example.org" or "foosball"
-       everything else optional and mostly self explanatory.
+       @server_spec -- something like "*.example.org" or "foosball"
+       @port -- is the port where all funcd processes should be contacted
+       @verbose -- whether to print unneccessary things
+       @silent -- whether to print anything
+       @noglobs -- specifies server_spec is not a glob, and run should return single values
        """
 
        self.server_spec = server_spec
        self.port        = port
        self.verbose     = verbose
        self.silent      = silent
+       self.noglobs     = noglobs
        self.servers     = self.expand_servers(self.server_spec)
 
    # ----------------------------------------------- 
@@ -84,6 +88,9 @@ class Client():
        Given a regex/blob of servers, expand to a list
        of server ids.
        """
+
+       if self.noglobs:
+           return [ "https://%s:%s" % (spec, self.port) ] 
 
        all_hosts = []
        all_certs = []
@@ -101,7 +108,7 @@ class Client():
        
        all_urls = []
        for x in all_hosts:
-           all_urls.append("http://%s:%s" % (x, self.port))
+           all_urls.append("https://%s:%s" % (x, self.port))
 
        if self.verbose and len(all_urls) == 0:
            sys.stderr.write("no hosts matched\n")
@@ -115,31 +122,34 @@ class Client():
        This getattr allows manipulation of the object as if it were
        a XMLRPC handle to a single machine, when in reality it is a handle
        to an unspecified number of machines.
-
+   
        So, it enables stuff like this:
-
+   
        Client("*.example.org").yum.install("foo")
+
+       # WARNING: any missing values in Client's source will yield
+       # strange errors with this engaged.  Be aware of that.
        """
-
+   
        return CommandAutomagic(self, [name])
-
 
    # ----------------------------------------------- 
 
    def run(self, module, method, args):
        """
        Invoke a remote method on one or more servers.
+       Run returns a hash, the keys are server names, the values are the returns.
+       The returns may include exception objects.
+       If Client() was constructed with noglobs=True, the return is instead just
+       a single value, not a hash.
        """
 
-       count = len(self.servers)
        results = {}
 
        for server in self.servers:
 
-           # FIXME: add SSL
-
 	   conn = sslclient.FuncServer(server)
-#           conn = xmlrpclib.ServerProxy(server)
+           # conn = xmlrpclib.ServerProxy(server)
 
            if self.verbose:
                 sys.stderr.write("on %s running %s %s (%s)\n" % (server, module, method, ",".join(args)))
@@ -160,7 +170,13 @@ class Client():
                 if not self.silent:
                     sys.stderr.write("remote exception on %s: %s\n" % (server, str(e)))
 
-           results[server] = retval
+           if self.noglobs:
+               return retval
+           else:
+               left = server.rfind("/")
+               right = server.rfind(":")
+               server_name = server[left:right]
+               results[server_name] = retval
 
        return results
 
