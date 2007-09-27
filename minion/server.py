@@ -24,11 +24,15 @@ import socket
 from rhpl.translate import textdomain
 I18N_DOMAIN = "func"
 
+
+from func import config_data
+from func import logger
+
 # our modules
 import AuthedXMLRPCServer
 import codes
-import config_data
-import logger
+#import config_data
+#import logger
 import module_loader
 import utils
 

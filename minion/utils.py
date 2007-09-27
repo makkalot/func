@@ -13,16 +13,17 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 import os
+import socket
 import string
 import sys
+import time
 import traceback
 import xmlrpclib
-from func import certs
-import codes
-import socket
-import time
 
-import config_data
+import codes
+
+from func import certs
+from func import config_data
 
 
 

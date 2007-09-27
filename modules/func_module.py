@@ -13,8 +13,8 @@
 ##
 
 
-from func.minion import config_data
-from func.minion import logger
+from func import config_data
+from func import logger
 
 
 class FuncModule(object):
@@ -49,6 +49,9 @@ class FuncModule(object):
         for meth in self.methods:
             handlers["%s.%s" % (module_name,meth)] = self.methods[meth]
 
+#    def list_methods(self):
+#        return self.methods.keys() + self.__base_methods.keys()
+
     def __module_version(self):
         return self.version
 
@@ -58,3 +61,6 @@ class FuncModule(object):
     def __module_description(self):
         return self.description
 
+
+methods = FuncModule()
+register_rpc = methods.register_rpc
