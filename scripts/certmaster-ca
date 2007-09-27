@@ -14,13 +14,6 @@ import func.certmaster
 
 
 from optparse import OptionParser
-defaults = { 'listen_addr': 'localhost',
-             'listen_port': '51235',
-             'cadir': '/etc/pki/func/ca',
-             'certroot': '/var/lib/func/certmaster/certs',
-             'csrroot': '/var/lib/func/certmaster/csrs',
-             'autosign': 'false'
-            }
 
 def errorprint(stuff):
     print >> sys.stderr, stuff
@@ -41,7 +34,7 @@ def parseargs(args):
     return (opts, args)
 
 def main(args):
-    cm = func.certmaster.CertMaster('/etc/func/certmaster.conf', defaults)
+    cm = func.certmaster.CertMaster('/etc/func/certmaster.conf')
     
     (opts, args) = parseargs(args)
     if opts.list:

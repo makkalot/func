@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-# FIXME: Perms checked and okayed on all csr, certs and keys, everywhere
 # FIXME: picky about bogus CN names ../ ../ ./ etc, etc to avoid stupid attacks
 # FIXME: more intelligent fault raises
 
@@ -28,41 +27,22 @@ import sha
 import glob
 
 #from func.server import codes
-import func
-import func.certs
-import func.codes
-import func.utils
+import certs
+import codes
+import utils
+from config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
 
-class SimpleConfigFile(object):
-    """simple config file object:
-       reads in key=value pairs from a file and stores each as an attribute"""
-       
-    def __init__(self, filename, defaults={}):
-        self.fn = filename
-        fo = open(filename, 'r')
-        for line in fo.readlines():
-            if line.startswith('#'): continue
-            if line.strip() == '': continue
-            (key, val) = line.split('=')
-            key = key.strip().lower()
-            val = val.strip()
-            setattr(self, key, val)
-        for k,v in defaults.items():
-            if not hasattr(self, k):
-                setattr(self, k, v)
-        fo.close()
-
+class CMConfig(BaseConfig):
+    listen_addr = Option('')
+    listen_port = IntOption(51235)
+    cadir = Option('/etc/pki/func/ca')
+    certroot =  Option('/var/lib/func/certmaster/certs')
+    csrroot = Option('/var/lib/func/certmaster/csrs')
+    autosign = BoolOption(False)
 
 class CertMaster(object):
-    def __init__(self, conf_file, defaults={}):
-        self.cfg = SimpleConfigFile(conf_file, defaults)
-        if hasattr(self.cfg, 'autosign'):
-            if getattr(self.cfg, 'autosign').lower() in ['yes', 'true', 1, 'on']:
-                self.cfg.autosign = True
-            elif getattr(self.cfg, 'autosign').lower() in ['no', 'false', 0, 'off']:
-                self.cfg.autosign = False
-        else:
-            self.cfg.autosign = False
+    def __init__(self, conf_file):
+        self.cfg = read_config(conf_file, CMConfig)
         self.cfg.listen_port = int(self.cfg.listen_port)
         self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
         self.ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
@@ -71,15 +51,15 @@ class CertMaster(object):
                 os.makedirs(self.cfg.cadir)
             # fixme - should we creating these separately?
             if not os.path.exists(self.ca_key_file) and not os.path.exists(self.ca_cert_file):
-                func.certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
+                certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
         except (IOError, OSError), e:
             print 'Cannot make certmaster certificate authority keys/certs, aborting: %s' % e
             sys.exit(1)
 
             
         # open up the cakey and cacert so we have them available
-        self.cakey = func.certs.retrieve_key_from_file(self.ca_key_file)
-        self.cacert = func.certs.retrieve_cert_from_file(self.ca_cert_file)
+        self.cakey = certs.retrieve_key_from_file(self.ca_key_file)
+        self.cacert = certs.retrieve_cert_from_file(self.ca_cert_file)
         
         for dirpath in [self.cfg.cadir, self.cfg.certroot, self.cfg.csrroot]:
             if not os.path.exists(dirpath):
@@ -97,7 +77,7 @@ class CertMaster(object):
         if method in self.handlers.keys():
             return self.handlers[method](*params)
         else:
-            raise func.codes.InvalidMethodException
+            raise codes.InvalidMethodException
     
 
     def wait_for_cert(self, csrbuf):
@@ -135,7 +115,7 @@ class CertMaster(object):
         # look for a cert:
         # if we have it, then return True, etc, etc
         if os.path.exists(certfile):
-            slavecert = func.certs.retrieve_cert_from_file(certfile)
+            slavecert = certs.retrieve_cert_from_file(certfile)
             cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, slavecert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
@@ -146,7 +126,7 @@ class CertMaster(object):
         
         if self.cfg.autosign:
             cert_fn = self.sign_this_csr(csrreq)
-            cert = func.certs.retrieve_cert_from_file(cert_fn)            
+            cert = certs.retrieve_cert_from_file(cert_fn)            
             cert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
             cacert_buf = crypto.dump_certificate(crypto.FILETYPE_PEM, self.cacert)
             return True, cert_buf, cacert_buf
@@ -200,7 +180,7 @@ class CertMaster(object):
             csrreq = csr
         requesting_host = csrreq.get_subject().CN
         certfile = '%s/%s.cert' % (self.cfg.certroot, requesting_host)
-        thiscert = func.certs.create_slave_certificate(csrreq, self.cakey, self.cacert, self.cfg.cadir)
+        thiscert = certs.create_slave_certificate(csrreq, self.cakey, self.cacert, self.cfg.cadir)
         destfo = open(certfile, 'w')
         destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, thiscert))
         destfo.close()
@@ -231,19 +211,10 @@ def serve(xmlrpcinstance):
 
 def main(argv):
     
-    defaults = { 'listen_addr': 'localhost',
-                 'listen_port': '51235',
-                 'cadir': '/etc/pki/func/ca',
-                 'certroot': '/var/lib/func/certmaster/certs',
-                 'csrroot': '/var/lib/func/certmaster/csrs',
-                 'autosign': 'false'
-                 }
-
-
-    cm = CertMaster('/etc/func/certmaster.conf', defaults)
+    cm = CertMaster('/etc/func/certmaster.conf')
 
     if "daemon" in argv or "--daemon" in argv:
-        func.utils.daemonize("/var/run/certmaster.pid")
+        utils.daemonize("/var/run/certmaster.pid")
     else:
         print "serving...\n"
 
@@ -254,6 +225,6 @@ def main(argv):
  
 
 if __name__ == "__main__":
-    textdomain(I18N_DOMAIN)
+    #textdomain(I18N_DOMAIN)
     main(sys.argv)
 
