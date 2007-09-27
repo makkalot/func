@@ -31,14 +31,7 @@ import certs
 import codes
 import utils
 from config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
-
-class CMConfig(BaseConfig):
-    listen_addr = Option('')
-    listen_port = IntOption(51235)
-    cadir = Option('/etc/pki/func/ca')
-    certroot =  Option('/var/lib/func/certmaster/certs')
-    csrroot = Option('/var/lib/func/certmaster/csrs')
-    autosign = BoolOption(False)
+from commonconfig import CMConfig
 
 class CertMaster(object):
     def __init__(self, conf_file):
