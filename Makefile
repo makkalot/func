@@ -21,6 +21,9 @@ clean_harder:
 	-rm -rf /etc/func
 	-rm -rf /var/lib/func
 
+clean_hardest:
+	-rpm -e func
+
 manpage:
 	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
 	pod2man --center="func" --release="" ./docs/func.pod | gzip -c > ./docs/func.1.gz
@@ -47,9 +50,20 @@ install_hard: clean_hard install
 
 install_harder: clean_harder install
 
-recombuild: install_harder
+restart:
 	-/etc/init.d/certmaster restart
 	-/etc/init.d/funcd restart
+
+
+recombuild: install_harder restart
+
+clean_rpms:
+	-rpm -e func
+
+install_rpm:
+	-rpm -Uvh rpm-build/func-$(VERSION)-$(RELEASE)$(shell rpm -E "%{?dist}").noarch.rpm
+
+install_hardest: clean_harder clean_rpms rpms install_rpm restart
 
 sdist: messages
 	python setup.py sdist
