@@ -49,7 +49,7 @@ class XmlRpcInterface(object):
         Constructor.
         """
 
-        config_fle = '/etc/func/minion.conf'
+        config_file = '/etc/func/minion.conf'
         self.config = read_config(config_file, FuncdConfig)
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()

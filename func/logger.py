@@ -16,7 +16,9 @@
 
 
 import logging
-import config_data
+from func.config import read_config
+
+from server import FuncdConfig
 
 
 # from the comments in http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531
@@ -33,12 +35,9 @@ class Logger(Singleton):
     _no_handlers = True
 
     def __init__(self, logfilepath ="/var/log/func/func.log"):
-
-        self.config = config_data.Config().get()     
-        if self.config.has_key("log_level"):
-           self.loglevel = logging._levelNames[self.config["log_level"]]
-        else:
-           self.loglevel = logging.INFO   
+        config_file = '/etc/func/minion.conf'
+        self.config = read_config(config_file, FuncdConfig)    
+        self.loglevel = logging._levelNames[self.config.log_level]
         self._setup_logging()
         if self._no_handlers:
             self._setup_handlers(logfilepath=logfilepath)
