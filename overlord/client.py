@@ -18,7 +18,7 @@
 import optparse
 import sys
 import glob
-from func.certmaster import CMConfig
+from func.commonconfig import CMConfig
 from func.config import read_config
 
 import sslclient
