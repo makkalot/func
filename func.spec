@@ -57,6 +57,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/funcd.1.gz
 %{_mandir}/man1/certmaster.1.gz
+%{_mandir}/man1/certmaster-ca.1.gz
 
 
 %post

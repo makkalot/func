@@ -34,6 +34,7 @@ manpage:
 	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
 	pod2man --center="func" --release="" ./docs/func.pod | gzip -c > ./docs/func.1.gz
 	pod2man --center="certmaster" --release="" ./docs/certmaster.pod | gzip -c > ./docs/certmaster.1.gz
+	pod2man --center="certmaster-ca" --release="" ./docs/certmaster-ca.pod | gzip -c > ./docs/certmaster-ca.1.gz
 
 messages: minion/*.py
 	xgettext -k_ -kN_ -o $(MESSAGESPOT) minion/*.py 

@@ -44,6 +44,7 @@ if __name__ == "__main__":
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
                               (manpath,  ["docs/certmaster.1.gz"]),
+                              (manpath,  ["docs/certmaster-ca.1.gz"]),
 			      (logpath,  []),
 			      (etcpath, []),
 			      (pkipath, [])
