@@ -34,7 +34,7 @@ import codes
 import module_loader
 import utils
 
-class FuncdConfig(BaseConfig)
+class FuncdConfig(BaseConfig):
     overlord_server = Option('funcmaster')
     log_level = Option('INFO')
     certmaster = Option('http://certmaster:51235/')
