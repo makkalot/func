@@ -92,7 +92,7 @@ class Client():
        all_certs = []
        seperate_gloobs = spec.split(";")
        for each_gloob in seperate_gloobs:
-           actual_gloob = "%s/%s.pem" % (CERT_PATH, each_gloob)
+           actual_gloob = "%s/%s.cert" % (CERT_PATH, each_gloob)
            certs = glob.glob(actual_gloob)
            for cert in certs:
                all_certs.append(cert)
