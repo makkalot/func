@@ -11,7 +11,6 @@ License: GPL+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: rhpl
-Requires: yum-utils
 Requires: pyOpenSSL
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
