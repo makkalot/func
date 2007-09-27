@@ -69,6 +69,9 @@ fi
 
 
 %changelog
+* Thu Sep 27 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-7
+- removed unnecessary yum-utils Require
+
 * Wed Sep 26 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-5
 - fixed Requires to include pyOpenSSL for use by certmaster
 
