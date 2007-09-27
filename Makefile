@@ -5,6 +5,7 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 MESSAGESPOT=po/messages.pot
 
 DIRS	= modules minion overlord func docs
+PYDIRS	= modules minion overlord func
 
 all: rpms
 
@@ -74,6 +75,10 @@ sdist: messages
 
 new-rpms: bumprelease rpms
 
+pychecker:
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pychecker ); done   
+pyflakes:
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pyflakes ); done	
 
 rpms: build manpage sdist
 	mkdir -p rpm-build
