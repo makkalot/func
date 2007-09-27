@@ -17,10 +17,7 @@
 
 import optparse
 import sys
-import xmlrpclib
-import traceback
 import glob
-import os
 
 
 import sslclient

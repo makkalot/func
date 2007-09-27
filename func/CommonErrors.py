@@ -14,8 +14,6 @@
 #
 # Copyright 2005 Dan Williams <dcbw@redhat.com> and Red Hat, Inc.
 
-import socket
-
 
 def canIgnoreSSLError(e):
     """

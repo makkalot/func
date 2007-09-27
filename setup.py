@@ -1,10 +1,7 @@
 #!/usr/bin/python
 
-import sys
-from distutils.core import setup, Extension
+from distutils.core import setup
 #from setuptools import setup,find_packages
-import string
-import glob
 
 NAME = "func"
 VERSION = open("version", "r+").read().split()[0]
