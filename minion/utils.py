@@ -23,15 +23,15 @@ import xmlrpclib
 import codes
 
 from func import certs
-from func import config_data
+from func.config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
 
-
+from server import FuncdConfig
 
 def create_minion_keys():
-    config_obj = config_data.Config()
-    config = config_obj.get()
-    cert_dir = config['cert_dir']
-    master_uri = config['certmaster']
+    config_fle = '/etc/func/minion.conf'
+    config = read_config(config_file, FuncdConfig)    
+    cert_dir = config.cert_dir
+    master_uri = config.certmaster
     hn = socket.getfqdn()
    
     key_file = '%s/%s.pem' % (cert_dir, hn)

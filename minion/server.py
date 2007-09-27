@@ -25,7 +25,7 @@ from rhpl.translate import textdomain
 I18N_DOMAIN = "func"
 
 
-from func import config_data
+from func.config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
 from func import logger
 
 # our modules
@@ -33,6 +33,13 @@ import AuthedXMLRPCServer
 import codes
 import module_loader
 import utils
+
+class FuncdConfig(BaseConfig)
+    overlord_server = Option('funcmaster')
+    log_level = Option('INFO')
+    certmaster = Option('http://certmaster:51235/')
+    cert_dir = Option('/etc/pki/func')
+    
 
 class XmlRpcInterface(object):
 
@@ -42,8 +49,8 @@ class XmlRpcInterface(object):
         Constructor.
         """
 
-        config_obj = config_data.Config()
-        self.config = config_obj.get()
+        config_fle = '/etc/func/minion.conf'
+        self.config = read_config(config_file, FuncdConfig)
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
@@ -167,9 +174,9 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         
         XmlRpcInterface.__init__(self)
         hn = socket.getfqdn()
-        self.key = "%s/%s.pem" % (self.config['cert_dir'], hn)
-        self.cert = "%s/%s.cert" % (self.config['cert_dir'], hn)
-        self.ca = "%s/ca.cert" % self.config['cert_dir']
+        self.key = "%s/%s.pem" % (self.config.cert_dir, hn)
+        self.cert = "%s/%s.cert" % (self.config.cert_dir, hn)
+        self.ca = "%s/ca.cert" % self.config.cert_dir
         
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,
