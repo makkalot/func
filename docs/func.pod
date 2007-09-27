@@ -10,20 +10,38 @@ func "webserver1;mailserver2" module command [args ...] [--verbose]
 
 =head1 DESCRIPTION
 
-Func allows remote control of machines running funcd that are set
-to obey this machine.  
+"func" allows remote control of machines running funcd (called "minions")
+that are set to obey this machine (called the "overlord").  This includes
+performing various remote operations and gathering data.
 
-Func can address multiple machines at the same time by specifying
+"func" can address multiple machines at the same time by specifying
 their names with globs, which follow shell glob syntax.
+
+See the project homepage (below) for a list of modules available
+and a more in-depth description of what each of them do.
+
+=head1 LISTING REMOTE MODULES AVAILABLE
+
+func target.example.org system list_modules
+
+=head1 LISTING REMOTE FUNCTIONS AVAILABLE IN A MODULE
+
+func target.example.org modulename list_methods
+
+=head1 CALLING A REMOTE COMMAND
+
+func target.example.org modulename methodname
 
 =head1 EXIT_STATUS
 
 Func commands have return values that vary based on the module being
-called.
+called.  See the project page (linked below) for more information.
 
 =head1 ADDITONAL RESOURCES
 
 See https://hosted.fedoraproject.org/projects/func/ for more information, including information on scripting func from Python.
+
+See also the manpages for "funcd", "certmaster", and "certmaster-ca".
 
 =head1 AUTHOR
 

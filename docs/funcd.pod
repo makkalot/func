@@ -8,13 +8,15 @@ funcd (it's a daemon and takes no arguments)
 
 =head1 DESCRIPTION
 
-funcd registers itself to a server listed in /etc/func/minion.conf and takes orders from it.  See /etc/func/minion.conf for other configuration options.
+funcd registers itself to a certificate server (certmaster) listed in /etc/func/minion.conf and takes orders from the command line func when that program is run from that certificate server.  See /etc/func/minion.conf for other configuration options.
 
-Modules and capabilities are specified at https://hosted.fedoraproject.org/projects/func/
+Modules and capabilities provided by funcd are specified at https://hosted.fedoraproject.org/projects/func/
 
 =head1 ADDITONAL RESOURCES
 
 See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
+
+See also the manpages for "func", "certmaster", and "certmaster-ca".
 
 =head1 AUTHOR
 
