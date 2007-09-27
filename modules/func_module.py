@@ -13,8 +13,10 @@
 ##
 
 
-from func import config_data
+from func import config
 from func import logger
+from func.config import read_config
+from func.server import FuncdConfig
 
 
 class FuncModule(object):
@@ -26,9 +28,8 @@ class FuncModule(object):
     
     def __init__(self):
 
-        config_obj = config_data.Config()
-        config_result = config_obj.get()
-        self.config = config_result
+        config_file = '/etc/func/minion.conf'
+        self.config = read_config(config_file, FuncdConfig)    
         self.__init_log()
         self.__base_methods = {
             # __'s so we don't clobber useful names

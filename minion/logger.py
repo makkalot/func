@@ -35,7 +35,7 @@ class Logger(Singleton):
     _no_handlers = True
 
     def __init__(self, logfilepath ="/var/log/func/func.log"):
-        config_fle = '/etc/func/minion.conf'
+        config_file = '/etc/func/minion.conf'
         self.config = read_config(config_file, FuncdConfig)    
         self.loglevel = logging._levelNames[self.config.log_level]
         self._setup_logging()
