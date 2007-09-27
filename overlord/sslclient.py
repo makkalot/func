@@ -6,7 +6,6 @@ import xmlrpclib
 import urllib
 
 from func import SSLCommon
-from func import config_data
 
 
 class SSL_Transport(xmlrpclib.Transport):
@@ -38,14 +37,9 @@ class SSLXMLRPCServerProxy(xmlrpclib.ServerProxy):
 
 class FuncServer(SSLXMLRPCServerProxy):
     def __init__(self, uri, pem=None, crt=None, ca=None):
-
-        config_obj = config_data.Config()
-        self.config = config_obj.get()
-
-	hn = socket.getfqdn()
-        self.key = "%s/%s.pem" % (self.config['cert_dir'], hn)
-        self.cert = "%s/%s.cert" % (self.config['cert_dir'], hn)
-        self.ca = "%s/ca.cert" % self.config['cert_dir']        
+        self.pem = pem
+        self.crt = crt
+        self.ca = ca
 
         SSLXMLRPCServerProxy.__init__(self, uri,
                                       self.pem,

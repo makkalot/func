@@ -18,7 +18,8 @@
 import optparse
 import sys
 import glob
-
+from func.certmaster import CMConfig
+from func.config import read_config
 
 import sslclient
 
@@ -28,7 +29,7 @@ import sslclient
 
 DEFAULT_PORT = 51234
 CERT_PATH = "/var/lib/func/certmaster/certs"
-
+CONFIG_FILE = "/etc/func/certmaster.conf"
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 
 # ===================================
@@ -69,13 +70,18 @@ class Client():
        @verbose -- whether to print unneccessary things
        @noglobs -- specifies server_spec is not a glob, and run should return single values
        """
-
+       self.config      = read_config(CONFIG_FILE, CMConfig)       
        self.server_spec = server_spec
        self.port        = port
        self.verbose     = verbose
        self.interactive = interactive
        self.noglobs     = noglobs
        self.servers     = self.expand_servers(self.server_spec)
+       
+       # default cert/ca/key is the same as the certmaster ca - need to be able to change that on the cli
+       self.key = '%s/funcmaster.key' % self.config.cadir
+       self.cert = '%s/funcmaster.crt' % self.config.cadir
+       self.ca = '%s/funcmaster.crt' % self.config.cadir # yes, they're the same, that's the point
 
    # ----------------------------------------------- 
 
@@ -92,11 +98,11 @@ class Client():
        all_certs = []
        seperate_gloobs = spec.split(";")
        for each_gloob in seperate_gloobs:
-           actual_gloob = "%s/%s.cert" % (CERT_PATH, each_gloob)
+           actual_gloob = "%s/%s.cert" % (self.config.certroot, each_gloob)
            certs = glob.glob(actual_gloob)
            for cert in certs:
                all_certs.append(cert)
-               host = cert.replace(CERT_PATH,"")[1:-4]
+               host = cert.replace(self.config.certroot,"")[1:-4]
                all_hosts.append(host)
 
        # debug only:
@@ -144,7 +150,7 @@ class Client():
 
        for server in self.servers:
 
-	   conn = sslclient.FuncServer(server)
+	   conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
            # conn = xmlrpclib.ServerProxy(server)
 
            if self.interactive:

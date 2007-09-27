@@ -43,7 +43,6 @@ class CMConfig(BaseConfig):
 class CertMaster(object):
     def __init__(self, conf_file):
         self.cfg = read_config(conf_file, CMConfig)
-        self.cfg.listen_port = int(self.cfg.listen_port)
         self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
         self.ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
         try:
