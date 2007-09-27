@@ -102,7 +102,7 @@ class Client():
            certs = glob.glob(actual_gloob)
            for cert in certs:
                all_certs.append(cert)
-               host = cert.replace(self.config.certroot,"")[1:-4]
+               host = cert.replace(self.config.certroot,"")[1:-5]
                all_hosts.append(host)
 
        # debug only:
