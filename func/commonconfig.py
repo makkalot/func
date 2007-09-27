@@ -12,5 +12,5 @@ class CMConfig(BaseConfig):
 
 class FuncdConfig(BaseConfig):
     log_level = Option('INFO')
-    certmaster_server = Option('certmaster')
+    certmaster = Option('certmaster')
     cert_dir = Option('/etc/pki/func')
