@@ -4,6 +4,8 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 
 MESSAGESPOT=po/messages.pot
 
+DIRS	= modules minion overlord func docs
+
 all: rpms
 
 clean:
@@ -12,6 +14,7 @@ clean:
 	-rm -rf *~
 	-rm -rf rpm-build/
 	-rm -rf docs/*.gz
+	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
 
 clean_hard:
 	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
@@ -56,6 +59,7 @@ restart:
 
 
 recombuild: install_harder restart
+
 
 clean_rpms:
 	-rpm -e func
