@@ -40,6 +40,8 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/certmaster-ca
 /etc/init.d/funcd
 /etc/init.d/certmaster
+%dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/pki/%{name}
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/certmaster.conf
 %dir %{python_sitelib}/func

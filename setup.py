@@ -17,6 +17,7 @@ if __name__ == "__main__":
         etcpath    = "/etc/%s" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
+        pkipath    = "/etc/pki/%s" % NAME
         setup(
                 name="%s" % NAME,
                 version = VERSION,
@@ -43,7 +44,9 @@ if __name__ == "__main__":
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
                               (manpath,  ["docs/certmaster.1.gz"]),
-			      (logpath,  [])
+			      (logpath,  []),
+			      (etcpath, []),
+			      (pkipath, [])
                 ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC

@@ -29,9 +29,9 @@ def make_keypair(dest=None):
     pkey = crypto.PKey()
     pkey.generate_key(crypto.TYPE_RSA, 2048)
     if dest:
-        destfo = open(dest, 'w')
-        destfo.write(crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey))
-        destfo.close()
+        destfd = os.open(dest, os.O_RDWR|os.O_CREAT, 0600)
+        os.write(destfd, (crypto.dump_privatekey(crypto.FILETYPE_PEM, pkey)))
+        os.close(destfd)
     
     return pkey
 

@@ -24,10 +24,10 @@ class Config:
     # this class is a Borg
     __shared_state = {}
     has_read = False
+    ds = {}
 
     def __init__(self):
         self.__dict__ = self.__shared_state
-        self.ds = {}
         if not self.has_read:
             self.read()
             Config.has_read = True
