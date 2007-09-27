@@ -24,12 +24,11 @@ import codes
 
 from func import certs
 from func.config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
-
-from server import FuncdConfig
+import server
 
 def create_minion_keys():
     config_fle = '/etc/func/minion.conf'
-    config = read_config(config_file, FuncdConfig)    
+    config = read_config(config_file, server.FuncdConfig)    
     cert_dir = config.cert_dir
     master_uri = config.certmaster
     hn = socket.getfqdn()
