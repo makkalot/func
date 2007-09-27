@@ -4,6 +4,9 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 
 MESSAGESPOT=po/messages.pot
 
+DIRS	= modules minion overlord func docs
+PYDIRS	= modules minion overlord func
+
 all: rpms
 
 clean:
@@ -12,6 +15,7 @@ clean:
 	-rm -rf *~
 	-rm -rf rpm-build/
 	-rm -rf docs/*.gz
+	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
 
 clean_hard:
 	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
@@ -21,8 +25,7 @@ clean_harder:
 	-rm -rf /etc/func
 	-rm -rf /var/lib/func
 
-clean_hardest:
-	-rpm -e func
+clean_hardest: clean_rpms
 
 manpage:
 	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
@@ -50,26 +53,29 @@ install_hard: clean_hard install
 
 install_harder: clean_harder install
 
+install_hardest: clean_harder clean_rpms rpms install_rpm restart
+
+install_rpm:
+	-rpm -Uvh rpm-build/func-$(VERSION)-$(RELEASE)$(shell rpm -E "%{?dist}").noarch.rpm
+
 restart:
 	-/etc/init.d/certmaster restart
 	-/etc/init.d/funcd restart
-
 
 recombuild: install_harder restart
 
 clean_rpms:
 	-rpm -e func
 
-install_rpm:
-	-rpm -Uvh rpm-build/func-$(VERSION)-$(RELEASE)$(shell rpm -E "%{?dist}").noarch.rpm
-
-install_hardest: clean_harder clean_rpms rpms install_rpm restart
-
 sdist: messages
 	python setup.py sdist
 
 new-rpms: bumprelease rpms
 
+pychecker:
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pychecker ); done   
+pyflakes:
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pyflakes ); done	
 
 rpms: build manpage sdist
 	mkdir -p rpm-build
