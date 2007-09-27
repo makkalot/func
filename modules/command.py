@@ -15,7 +15,6 @@ Abitrary command execution module for func.
 from modules import func_module
 
 import sub_process
-import os
 
 class Command(func_module.FuncModule):
 

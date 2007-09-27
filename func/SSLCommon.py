@@ -15,7 +15,6 @@
 # Copyright 2005 Dan Williams <dcbw@redhat.com> and Red Hat, Inc.
 
 import os, sys
-import CommonErrors
 from OpenSSL import SSL
 import SSLConnection
 import httplib

@@ -15,11 +15,8 @@
 # Copyright 2005 Dan Williams <dcbw@redhat.com> and Red Hat, Inc.
 # Modifications by Seth Vidal - 2007
 
-import os, sys
+import sys
 import socket
-import time
-import SocketServer
-import xmlrpclib
 import SimpleXMLRPCServer
 from func import SSLCommon
 import OpenSSL

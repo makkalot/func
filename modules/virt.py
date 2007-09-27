@@ -20,7 +20,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 # to use this to come.  
 
 # other modules
-import sys
 import os
 import sub_process
 import libvirt

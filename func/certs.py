@@ -130,4 +130,4 @@ def create_slave_certificate(csr, cakey, cacert, cadir, slave_cert_file=None):
         destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
         destfo.close()
     return cert
-    
+

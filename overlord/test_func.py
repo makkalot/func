@@ -5,7 +5,6 @@
 
 import xmlrpclib
 import sys
-import socket
 
 TEST_GETATTR = True
 TEST_PROCESS = False

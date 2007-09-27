@@ -20,7 +20,6 @@ from modules import func_module
 
 from packagekit import PackageKit
 
-import StringIO
 
 class PackageKitInterface(PackageKit):
 
