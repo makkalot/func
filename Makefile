@@ -13,6 +13,14 @@ clean:
 	-rm -rf rpm-build/
 	-rm -rf docs/*.gz
 
+clean_hard:
+	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
+
+clean_harder:
+	-rm -rf /etc/pki/func
+	-rm -rf /etc/func
+	-rm -rf /var/lib/func
+
 manpage:
 	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
 	pod2man --center="func" --release="" ./docs/func.pod | gzip -c > ./docs/func.1.gz
@@ -29,11 +37,19 @@ bumprelease:
 setversion: 
 	-echo "$(VERSION) $(RELEASE)" > version
 
-build:
+build: clean
 	python setup.py build -f
 
 install: build manpage
 	python setup.py install -f
+
+install_hard: clean_hard install
+
+install_harder: clean_harder install
+
+recombuild: install_harder
+	-/etc/init.d/certmaster restart
+	-/etc/init.d/funcd restart
 
 sdist: messages
 	python setup.py sdist
