@@ -35,6 +35,7 @@ class FuncModule(object):
             "module_version" : self.__module_version,
             "module_api_version" : self.__module_api_version,
             "module_description" : self.__module_description,
+            "list_methods"       : self.__list_methods
             }
         
     def __init_log(self):
@@ -49,8 +50,8 @@ class FuncModule(object):
         for meth in self.methods:
             handlers["%s.%s" % (module_name,meth)] = self.methods[meth]
 
-#    def list_methods(self):
-#        return self.methods.keys() + self.__base_methods.keys()
+    def __list_methods(self):
+        return self.methods.keys() + self.__base_methods.keys()
 
     def __module_version(self):
         return self.version

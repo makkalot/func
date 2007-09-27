@@ -31,8 +31,6 @@ from func import logger
 # our modules
 import AuthedXMLRPCServer
 import codes
-#import config_data
-#import logger
 import module_loader
 import utils
 
@@ -71,8 +69,14 @@ class XmlRpcInterface(object):
         # internal methods that we do instead of spreading internal goo
         # all over the modules. For now, at lest -akl
 
-        self.handlers["system.listMethods"] = self.list_methods
 
+        # system.listMethods os a quasi stanard xmlrpc method, so
+        # thats why it has a odd looking name
+        self.handlers["system.listMethods"] = self.list_methods
+        self.handlers["system.list_modules"] = self.list_modules
+
+    def list_modules(self):
+        return self.modules.keys()
     
     def list_methods(self):
         return self.handlers.keys()
