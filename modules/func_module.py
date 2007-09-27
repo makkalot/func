@@ -16,7 +16,7 @@
 from func import config
 from func import logger
 from func.config import read_config
-from func.server import FuncdConfig
+from func.commonconfig import FuncdConfig
 
 
 class FuncModule(object):

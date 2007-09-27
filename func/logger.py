@@ -17,8 +17,7 @@
 
 import logging
 from func.config import read_config
-
-from server import FuncdConfig
+from func.commonconfig import FuncdConfig
 
 
 # from the comments in http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/66531

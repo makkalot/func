@@ -25,7 +25,8 @@ from rhpl.translate import textdomain
 I18N_DOMAIN = "func"
 
 
-from func.config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
+from func.config import read_config
+from func.commonconfig import FuncdConfig
 from func import logger
 
 # our modules
@@ -34,11 +35,6 @@ import codes
 import module_loader
 import utils
 
-class FuncdConfig(BaseConfig):
-    overlord_server = Option('funcmaster')
-    log_level = Option('INFO')
-    certmaster = Option('http://certmaster:51235/')
-    cert_dir = Option('/etc/pki/func')
     
 
 class XmlRpcInterface(object):
