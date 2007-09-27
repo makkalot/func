@@ -4,8 +4,10 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 
 MESSAGESPOT=po/messages.pot
 
-DIRS	= modules minion overlord func docs
-PYDIRS	= modules minion overlord func
+DIRS	= modules minion overlord func docs scripts
+PYDIRS	= modules minion overlord func scripts
+EXAMPLEDIR = examples
+INITDIR	= init-scripts
 
 all: rpms
 
@@ -77,6 +79,9 @@ pychecker:
 pyflakes:
 	-for d in $(PYDIRS); do ($(MAKE) -C $$d pyflakes ); done	
 
+money: clean
+	-sloccount $(PYDIRS) $(EXAMPLEDIR) $(INITDIR)
+ 
 rpms: build manpage sdist
 	mkdir -p rpm-build
 	cp dist/*.gz rpm-build/
