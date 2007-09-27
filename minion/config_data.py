@@ -43,7 +43,9 @@ class Config:
         
         self.ds["log_level"] = cp.get("general","log_level")
         self.ds["overlord_server"] = cp.get("general","overlord_server")
-
+        self.ds["certmaster"] = cp.get("general", "certmaster")
+        self.ds["cert_dir"] = cp.get("general", "cert_dir")
+        
     def get(self):
         return self.ds
 

@@ -155,16 +155,14 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
                           XmlRpcInterface):
     def __init__(self, args):
         self.allow_reuse_address = True
-        # is this right?
-        hn = socket.getfqdn()
-        self.key = "/etc/pki/func/%s.pem" % hn
-        self.cert = "/etc/pki/func/%s.cert" % hn
-        self.ca = "/etc/pki/func/ca.cert"
-
         self.modules = module_loader.load_modules()
-
         
         XmlRpcInterface.__init__(self)
+        hn = socket.getfqdn()
+        self.key = "%s/%s.pem" % (self.config['cert_dir'], hn)
+        self.cert = "%s/%s.cert" % (self.config['cert_dir'], hn)
+        self.ca = "%s/ca.cert" % self.config['cert_dir']
+        
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,
                                                           self.ca)

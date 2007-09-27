@@ -22,14 +22,15 @@ import codes
 import socket
 import time
 
-#import config_data
+import config_data
 
 
 
 def create_minion_keys():
-    #config_obj = config_data.Config()
-    cert_dir = '/etc/pki/func' # clearly needs to be a config
-    master_uri = 'http://certmaster:51235/' # clearly needs to be a config
+    config_obj = config_data.Config()
+    config = config_obj.get()
+    cert_dir = config['cert_dir']
+    master_uri = config['certmaster']
     hn = socket.getfqdn()
    
     key_file = '%s/%s.pem' % (cert_dir, hn)
