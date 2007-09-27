@@ -30,7 +30,7 @@ def create_minion_keys():
     config_file = '/etc/func/minion.conf'
     config = read_config(config_file, FuncdConfig)    
     cert_dir = config.cert_dir
-    master_uri = config.certmaster
+    master_uri = 'http://%s:51235/' % config.certmaster_server
     hn = socket.getfqdn()
    
     key_file = '%s/%s.pem' % (cert_dir, hn)

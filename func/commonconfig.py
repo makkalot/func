@@ -11,7 +11,6 @@ class CMConfig(BaseConfig):
     autosign = BoolOption(False)
 
 class FuncdConfig(BaseConfig):
-    overlord_server = Option('funcmaster')
     log_level = Option('INFO')
-    certmaster = Option('http://certmaster:51235/')
+    certmaster_server = Option('certmaster')
     cert_dir = Option('/etc/pki/func')
