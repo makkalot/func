@@ -21,7 +21,7 @@ import sys
 import traceback
 import socket
 
-from rhpl.translate import textdomain
+from gettext import textdomain
 I18N_DOMAIN = "func"
 
 
