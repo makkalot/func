@@ -1,6 +1,5 @@
 include version
-include etc/minion.conf
-include etc/certmaster.conf
+recursive-include etc *
 recursive-include docs *
 recursive-include init-scripts *
 recursive-include po *.po

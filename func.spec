@@ -12,6 +12,7 @@ Group: Applications/System
 Requires: python >= 2.3
 Requires: rhpl
 Requires: pyOpenSSL
+BuildRequires: python-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
@@ -44,6 +45,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/pki/%{name}
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/certmaster.conf
+%config(noreplace) /etc/logrotate.d/func_rotate
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
@@ -72,6 +74,11 @@ fi
 
 
 %changelog
+* Fri Sep 28 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.12-1
+- bump version and get ready for first public release
+- add BuildRequires python-devel
+- add logrotate config
+
 * Thu Sep 27 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-7
 - removed unnecessary yum-utils Require
 

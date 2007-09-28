@@ -1,0 +1,19 @@
+/var/log/func/audit.log {
+   missingok
+   notifempty
+   rotate 4
+   weekly
+   postrotate
+      if [ -f /var/lock/subsys/funcd ]; then
+         /etc/init.d/funcd condrestart
+      fi
+   endscript
+}
+
+/var/log/func/func.log {
+   missingok
+   notifempty
+   rotate 4
+   weekly
+}
+

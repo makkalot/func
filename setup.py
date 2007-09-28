@@ -18,6 +18,7 @@ if __name__ == "__main__":
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
         pkipath    = "/etc/pki/%s" % NAME
+        rotpath    = "/etc/logrotate.d"
         setup(
                 name="%s" % NAME,
                 version = VERSION,
@@ -45,9 +46,10 @@ if __name__ == "__main__":
                               (manpath,  ["docs/funcd.1.gz"]),
                               (manpath,  ["docs/certmaster.1.gz"]),
                               (manpath,  ["docs/certmaster-ca.1.gz"]),
-			      (logpath,  []),
-			      (etcpath, []),
-			      (pkipath, [])
+			      (rotpath,  ['etc/func_rotate']),
+                              (logpath,  []),
+			      (etcpath,  []),
+			      (pkipath,  [])
                 ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC
