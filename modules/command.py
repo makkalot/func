@@ -25,8 +25,16 @@ class Command(func_module.FuncModule):
         func_module.FuncModule.__init__(self)
 
     def run(self, command):
-        return  sub_process.call(command.split())
+        """
+        Runs a command, returning the return code, stdout, and stderr as a tuple.
+        NOT FOR USE WITH INTERACTIVE COMMANDS.
+        """
 
+        cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
+        data = cmdref.communicate()
+        return (cmdref.returncode, data[0], data[1])
 
 methods = Command()
 register_rpc = methods.register_rpc
+
+
