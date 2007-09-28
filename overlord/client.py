@@ -18,9 +18,10 @@
 import optparse
 import sys
 import glob
+import pprint
+
 from func.commonconfig import CMConfig
 from func.config import read_config
-
 import sslclient
 
 # ===================================
@@ -28,7 +29,6 @@ import sslclient
 # TO DO: some of this may want to come from config later
 
 DEFAULT_PORT = 51234
-CERT_PATH = "/var/lib/func/certmaster/certs"
 CONFIG_FILE = "/etc/func/certmaster.conf"
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 
@@ -105,9 +105,6 @@ class Client():
                host = cert.replace(self.config.certroot,"")[1:-5]
                all_hosts.append(host)
 
-       # debug only:
-       # print all_hosts
-       
        all_urls = []
        for x in all_hosts:
            all_urls.append("https://%s:%s" % (x, self.port))
@@ -166,7 +163,7 @@ class Client():
                 meth = "%s.%s" % (module, method)
                 retval = getattr(conn, meth)(*args[:])
                 if self.interactive:
-                    print retval 
+                    pprint.pprint(retval) 
            except Exception, e:
                 retval = e 
                 if self.interactive:
