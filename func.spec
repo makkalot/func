@@ -10,7 +10,6 @@ Source0: %{name}-%{version}.tar.gz
 License: GPL+
 Group: Applications/System
 Requires: python >= 2.3
-Requires: rhpl
 Requires: pyOpenSSL
 BuildRequires: python-devel
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -74,6 +73,9 @@ fi
 
 
 %changelog
+* Fri Sep 28 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
+- remove rhpl deps
+
 * Fri Sep 28 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.12-1
 - bump version and get ready for first public release
 - add BuildRequires python-devel

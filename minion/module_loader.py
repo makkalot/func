@@ -18,7 +18,8 @@
 import distutils.sysconfig
 import os
 import sys
-from rhpl.translate import _
+from gettext import gettext
+_ = gettext
 
 
 def module_walker(topdir):
