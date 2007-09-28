@@ -12,23 +12,6 @@ INITDIR	= init-scripts
 
 all: rpms
 
-clean:
-	-rm -f  MANIFEST
-	-rm -rf dist/ build/
-	-rm -rf *~
-	-rm -rf rpm-build/
-	-rm -rf docs/*.gz
-	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
-
-clean_hard:
-	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
-
-clean_harder:
-	-rm -rf /etc/pki/func
-	-rm -rf /etc/func
-	-rm -rf /var/lib/func
-
-clean_hardest: clean_rpms
 
 manpage:
 	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
@@ -49,6 +32,25 @@ setversion:
 
 build: clean
 	python setup.py build -f
+
+clean:
+	-rm -f  MANIFEST
+	-rm -rf dist/ build/
+	-rm -rf *~
+	-rm -rf rpm-build/
+	-rm -rf docs/*.gz
+	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
+
+clean_hard:
+	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
+
+clean_harder:
+	-rm -rf /etc/pki/func
+	-rm -rf /etc/func
+	-rm -rf /var/lib/func
+
+clean_hardest: clean_rpms
+
 
 install: build manpage
 	python setup.py install -f
