@@ -192,6 +192,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         if hasattr(self, '_this_request'):
             r,a = self._this_request
             p = r.get_peer_certificate()
+            ip = a[0]
             cn = p.get_subject().CN
             sub_hash = p.subject_name_hash()
         else:
@@ -199,7 +200,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         # XXX FIXME - need to figure out how to dig into the server base classes
         # so we can get client ip, and eventually cert id info -akl
-        self.audit_logger.log_call(cn, sub_hash, method, params)
+        self.audit_logger.log_call(ip, cn, sub_hash, method, params)
 
         return self.get_dispatch_method(method)(*params)
     

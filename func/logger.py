@@ -61,9 +61,9 @@ class AuditLogger(Singleton):
         if self._no_handlers:
              self._setup_handlers(logfilepath=logfilepath)
 
-    def log_call(self, CN, cert_hash, method, params):
+    def log_call(self, ip, CN, cert_hash, method, params):
         # square away a good parseable format at some point -akl
-        self.logger.info("%s %s %s called with %s" % (CN, cert_hash, method, params))
+        self.logger.info("%s %s %s %s called with %s" % (ip, CN, cert_hash, method, params))
 
 
     def _setup_logging(self):
@@ -72,7 +72,7 @@ class AuditLogger(Singleton):
     def _setup_handlers(self, logfilepath="/var/log/func/audit.log"):
         handler = logging.FileHandler(logfilepath, "a")
         self.logger.setLevel(self.loglevel)
-        formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+        formatter = logging.Formatter("%(asctime)s - %(message)s")
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self._no_handlers = False
