@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-# FIXME: picky about bogus CN names ../ ../ ./ etc, etc to avoid stupid attacks
 # FIXME: more intelligent fault raises
 
 """
@@ -41,7 +40,6 @@ class CertMaster(object):
         try:
             if not os.path.exists(self.cfg.cadir):
                 os.makedirs(self.cfg.cadir)
-            # fixme - should we creating these separately?
             if not os.path.exists(self.ca_key_file) and not os.path.exists(self.ca_cert_file):
                 certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
         except (IOError, OSError), e:
@@ -71,7 +69,11 @@ class CertMaster(object):
         else:
             raise codes.InvalidMethodException
     
-
+    def _sanitize_cn(self, commonname):
+        commonname = commonname.replace('/', '')
+        commonname = commonname.replace('\\', '')       
+        return commonname
+    
     def wait_for_cert(self, csrbuf):
         """
            takes csr as a string
@@ -85,7 +87,10 @@ class CertMaster(object):
             #XXX need to raise a fault here and document it - but false is just as good
             return False, '', ''
             
-        requesting_host = csrreq.get_subject().CN
+        requesting_host = self._sanitize_cn(csrreq.get_subject().CN)
+        
+        # get rid of dodgy characters in the filename we're about to make
+        
         certfile = '%s/%s.cert' % (self.cfg.certroot, requesting_host)
         csrfile = '%s/%s.csr' % (self.cfg.csrroot, requesting_host)
 
@@ -170,7 +175,8 @@ class CertMaster(object):
                 
         else: # assume we got a bare csr req
             csrreq = csr
-        requesting_host = csrreq.get_subject().CN
+        requesting_host = self._sanitize_cn(csrreq.get_subject().CN)
+        
         certfile = '%s/%s.cert' % (self.cfg.certroot, requesting_host)
         thiscert = certs.create_slave_certificate(csrreq, self.cakey, self.cacert, self.cfg.cadir)
         destfo = open(certfile, 'w')
