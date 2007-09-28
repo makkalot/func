@@ -24,6 +24,7 @@ import os.path
 from OpenSSL import crypto
 import sha
 import glob
+import socket
 
 #from func.server import codes
 import certs
@@ -35,13 +36,14 @@ from commonconfig import CMConfig
 class CertMaster(object):
     def __init__(self, conf_file):
         self.cfg = read_config(conf_file, CMConfig)
+        mycn = '%s-CA-KEY' % socket.getfqdn()
         self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
         self.ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
         try:
             if not os.path.exists(self.cfg.cadir):
                 os.makedirs(self.cfg.cadir)
             if not os.path.exists(self.ca_key_file) and not os.path.exists(self.ca_cert_file):
-                certs.create_ca(ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
+                certs.create_ca(CN=mycn, ca_key_file=self.ca_key_file, ca_cert_file=self.ca_cert_file)
         except (IOError, OSError), e:
             print 'Cannot make certmaster certificate authority keys/certs, aborting: %s' % e
             sys.exit(1)
