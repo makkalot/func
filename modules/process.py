@@ -57,7 +57,7 @@ class ProcessModule(func_module.FuncModule):
 
     def kill(self,pid,signal="TERM"):
         if pid == "0":
-             raise codes.FuncException("Killing pid group 0 not permitted")
+            raise codes.FuncException("Killing pid group 0 not permitted")
         if signal == "":
             # this is default /bin/kill behaviour, it claims, but enfore it anyway
             signal = "-TERM"

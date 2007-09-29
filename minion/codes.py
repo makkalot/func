@@ -17,9 +17,9 @@ import exceptions
 
 
 class FuncException(exceptions.Exception):
-   pass
+    pass
 
 class InvalidMethodException(FuncException):
-   pass
+    pass
 
 # FIXME: more sub-exceptions maybe

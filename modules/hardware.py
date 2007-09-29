@@ -50,13 +50,13 @@ class HardwareModule(func_module.FuncModule):
         label = data[0]
         for d in data:
             if d == '':
-               results[label] = current
-               current = ""
-               label = ""
+                results[label] = current
+                current = ""
+                label = ""
             else:
-               if label == "":
-                   label = d
-               current = current + d        
+                if label == "":
+                    label = d
+                current = current + d        
 
         return results
 

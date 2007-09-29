@@ -147,7 +147,7 @@ class Client():
 
        for server in self.servers:
 
-	   conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
+       conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
            # conn = xmlrpclib.ServerProxy(server)
 
            if self.interactive:

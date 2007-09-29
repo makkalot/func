@@ -67,13 +67,13 @@ def create_minion_keys():
     
     
     if result:
-       cert_fo = open(cert_file, 'w')
-       cert_fo.write(cert_string)
-       cert_fo.close()
-       
-       ca_cert_fo = open(ca_cert_file, 'w')
-       ca_cert_fo.write(ca_cert_string)
-       ca_cert_fo.close()
+        cert_fo = open(cert_file, 'w')
+        cert_fo.write(cert_string)
+        cert_fo.close()
+
+        ca_cert_fo = open(ca_cert_file, 'w')
+        ca_cert_fo.write(ca_cert_string)
+        ca_cert_fo.close()
     
 def submit_csr_to_master(csr_file, master_uri):
     """"
@@ -93,9 +93,9 @@ def submit_csr_to_master(csr_file, master_uri):
 # but we really need to fix out server side logging and error
 # reporting so we don't need it
 def trace_me():
-   x = traceback.extract_stack()
-   bar = string.join(traceback.format_list(x))
-   return bar
+    x = traceback.extract_stack()
+    bar = string.join(traceback.format_list(x))
+    return bar
 
 
 def daemonize(pidfile=None):
@@ -107,13 +107,13 @@ def daemonize(pidfile=None):
     print pidfile
     pid = os.fork()
     if pid > 0:
-       sys.exit(0)
+        sys.exit(0)
     os.setsid()
     os.umask(0)
     pid = os.fork()
 
 
     if pid > 0:
-       if pidfile is not None:
-          open(pidfile, "w").write(str(pid))
-       sys.exit(0)
+        if pidfile is not None:
+            open(pidfile, "w").write(str(pid))
+        sys.exit(0)

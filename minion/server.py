@@ -140,13 +140,12 @@ class FuncApiMethod:
 
 def serve():
 
-     """
-     Code for starting the XMLRPC service. 
-     FIXME:  make this HTTPS (see RRS code) and make accompanying Rails changes..
-     """
-     server =FuncSSLXMLRPCServer(('', 51234))
-     server.logRequests = 0 # don't print stuff to console
-     server.serve_forever()
+    """
+    Code for starting the XMLRPC service. 
+    """
+    server =FuncSSLXMLRPCServer(('', 51234))
+    server.logRequests = 0 # don't print stuff to console
+    server.serve_forever()
 
 
 
@@ -154,12 +153,11 @@ class FuncXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer, XmlRpcInterface):
 
     def __init__(self, args):
 
-       self.allow_reuse_address = True
+        self.allow_reuse_address = True
 
-       self.modules = module_loader.load_modules()
-       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
-       XmlRpcInterface.__init__(self)
-
+        self.modules = module_loader.load_modules()
+        SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
+        XmlRpcInterface.__init__(self)
 
 
 class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,

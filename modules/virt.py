@@ -52,7 +52,7 @@ class FuncLibvirtConnection():
             conn = libvirt.open("qemu:///system")
 
         if not conn:
-           raise codes.FuncException("hypervisor connection failure")
+            raise codes.FuncException("hypervisor connection failure")
 
         self.conn = conn
 
