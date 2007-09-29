@@ -173,7 +173,7 @@ class CertMaster(object):
             try:
                 csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, csr_buf)                
             except crypto.Error, e:
-               print 'Bad CSR: %s' % csr
+                print 'Bad CSR: %s' % csr
                 
         else: # assume we got a bare csr req
             csrreq = csr
@@ -193,20 +193,20 @@ class CertMaster(object):
 
 class CertmasterXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer):
     def __init__(self, args):
-       self.allow_reuse_address = True
-       SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
+        self.allow_reuse_address = True
+        SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
         
 
 def serve(xmlrpcinstance):
 
-     """
-     Code for starting the XMLRPC service. 
-     """
+    """
+    Code for starting the XMLRPC service.
+    """
 
-     server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
-     server.logRequests = 0 # don't print stuff to console
-     server.register_instance(xmlrpcinstance)
-     server.serve_forever()
+    server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
+    server.logRequests = 0 # don't print stuff to console
+    server.register_instance(xmlrpcinstance)
+    server.serve_forever()
 
 
 def main(argv):

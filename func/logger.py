@@ -59,7 +59,7 @@ class AuditLogger(Singleton):
         self.loglevel = logging.INFO
         self._setup_logging()
         if self._no_handlers:
-             self._setup_handlers(logfilepath=logfilepath)
+            self._setup_handlers(logfilepath=logfilepath)
 
     def log_call(self, ip, CN, cert_hash, method, params):
         # square away a good parseable format at some point -akl

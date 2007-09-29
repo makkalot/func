@@ -66,22 +66,22 @@ def main(cert_dir, master_uri):
     
     
     if result:
-       cert_fo = open(cert_file, 'w')
-       cert_fo.write(cert_string)
-       cert_fo.close()
-       
-       ca_cert_fo = open(ca_cert_file, 'w')
-       ca_cert_fo.write(ca_cert_string)
-       ca_cert_fo.close()
+        cert_fo = open(cert_file, 'w')
+        cert_fo.write(cert_string)
+        cert_fo.close()
+
+        ca_cert_fo = open(ca_cert_file, 'w')
+        ca_cert_fo.write(ca_cert_string)
+        ca_cert_fo.close()
     
     return 0
 
 
 if __name__ == "__main__":
     if len(sys.argv[1:]) > 0: 
-       cert_dir = sys.argv[1]
+        cert_dir = sys.argv[1]
     else:
-       cert_dir = '/etc/pki/func'
+        cert_dir = '/etc/pki/func'
     
     if len(sys.argv[1:]) > 1:
         master_uri = sys.argv[2]

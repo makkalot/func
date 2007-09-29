@@ -21,9 +21,9 @@ import traceback
 # but we really need to fix out server side logging and error
 # reporting so we don't need it
 def trace_me():
-   x = traceback.extract_stack()
-   bar = string.join(traceback.format_list(x))
-   return bar
+    x = traceback.extract_stack()
+    bar = string.join(traceback.format_list(x))
+    return bar
 
 
 def daemonize(pidfile=None):
@@ -35,13 +35,13 @@ def daemonize(pidfile=None):
     print pidfile
     pid = os.fork()
     if pid > 0:
-       sys.exit(0)
+        sys.exit(0)
     os.setsid()
     os.umask(0)
     pid = os.fork()
 
 
     if pid > 0:
-       if pidfile is not None:
-          open(pidfile, "w").write(str(pid))
-       sys.exit(0)
+        if pidfile is not None:
+            open(pidfile, "w").write(str(pid))
+        sys.exit(0)
