@@ -466,4 +466,3 @@ def read_config(config_file, BaseConfigDerived):
             sys.exit(1)
     opts.populate(confparser, 'main')
     return opts
-                                                                                    

@@ -30,7 +30,7 @@ import socket
 import certs
 import codes
 import utils
-from config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
+from config import read_config
 from commonconfig import CMConfig
 
 class CertMaster(object):

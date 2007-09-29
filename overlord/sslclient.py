@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import socket
 import sys
 import xmlrpclib
 import urllib

@@ -21,7 +21,6 @@ import traceback
 import xmlrpclib
 
 import codes
-import func
 from func import certs
 from func.config import read_config
 from func.commonconfig import FuncdConfig

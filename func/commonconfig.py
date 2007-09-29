@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from config import BaseConfig, BoolOption, IntOption, Option, ConfigError, read_config, ListOption
+from config import BaseConfig, BoolOption, IntOption, Option
 
 class CMConfig(BaseConfig):
     listen_addr = Option('')
