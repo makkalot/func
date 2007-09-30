@@ -21,7 +21,7 @@ import glob
 import pprint
 
 from func.commonconfig import CMConfig
-from func.config import read_config
+from func.config import read_config, CONFIG_FILE
 import sslclient
 
 import command
@@ -31,7 +31,6 @@ import command
 # TO DO: some of this may want to come from config later
 
 DEFAULT_PORT = 51234
-CONFIG_FILE = "/etc/func/certmaster.conf"
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 
 # ===================================
@@ -65,15 +64,19 @@ class CommandAutomagic(object):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False):
+        verbose=False, noglobs=False, config=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
         @port -- is the port where all funcd processes should be contacted
         @verbose -- whether to print unneccessary things
         @noglobs -- specifies server_spec is not a glob, and run should return single values
+        @config -- optional config object
         """
-        self.config      = read_config(CONFIG_FILE, CMConfig)
+        self.config  = config
+        if config is None:
+            self.config  = read_config(CONFIG_FILE, CMConfig)
+
         self.server_spec = server_spec
         self.port        = port
         self.verbose     = verbose
@@ -223,8 +226,10 @@ class Call(command.Command):
     name = "call"
     useage = "call nodule method name arg1 arg2..."
     def addOptions(self):
-        self.parser.add_option("-v","--verbose",dest="verbose",action="store_true")
-        self.parser.add_option("-p","--port",dest="port",default=DEFAULT_PORT)
+        self.parser.add_option("-v", "--verbose", dest="verbose",
+            action="store_true")
+        self.parser.add_option("-p", "--port", dest="port",
+            default=DEFAULT_PORT)
 
     def handleOptions(self, options):
         self.options = options
@@ -245,14 +250,13 @@ class Call(command.Command):
         self.method_args = args[3:]
 
         client = Client(self.server_spec,port=self.port,interactive=True,
-                        verbose=self.verbose)
+            verbose=self.verbose, config=self.config)
         results = client.run(self.module, self.method, self.method_args)
     
         # TO DO: add multiplexer support
         # probably as a higher level module.
 
         return client.cli_return(results)
-
 
 class FuncCommandLine(command.Command):
     name = "client"
@@ -269,14 +273,28 @@ class FuncCommandLine(command.Command):
     
     def addOptions(self):
         self.parser.add_option('', '--version', action="store_true",
-                               help="show version information")
+            help="show version information")
+        self.parser.add_option("--list-minions", dest="list_minions",
+            action="store_true", help="list all available minions")
 
     def handleOptions(self, options):
         if options.version:
             #FIXME
             print "version is NOT IMPLEMENTED YET"
+        if options.list_minions:
+            self.list_minions()
 
+    # -----------------------------------------------
 
+    def list_minions(self):
+        print "Minions:"
+        gloob = "%s/%s.cert" % (self.config.certroot, "*")
+        certs = glob.glob(gloob)
+        for cert in certs:
+            host = cert.replace(self.config.certroot, "")[1:-5]
+            print "   %s" % host
+
+# ===================================================================
 
 if __name__ == "__main__":
     # this is what /usr/bin/func will run
