@@ -284,7 +284,7 @@ class FuncCommandLine(command.Command):
         if options.list_minions:
             self.list_minions()
 
-    # -----------------------------------------------
+            sys.exit(0) # stop execution
 
     def list_minions(self):
         print "Minions:"
@@ -293,18 +293,3 @@ class FuncCommandLine(command.Command):
         for cert in certs:
             host = cert.replace(self.config.certroot, "")[1:-5]
             print "   %s" % host
-
-# ===================================================================
-
-if __name__ == "__main__":
-    # this is what /usr/bin/func will run
-    myname, argv = sys.argv[0], sys.argv[1:]
-    cli = FuncCommandLine()
-    rc = cli.do()
-    sys.exit(rc)
-#    cli = FuncCommandLine(myname,argv)
-
-#    rc = cli.run()
-    sys.exit(rc)
-
-
