@@ -34,7 +34,7 @@ FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module metho
 
 # ===================================
 
-class CommandAutomagic():
+class CommandAutomagic(object):
     """
     This allows a client object to act as if it were one machine, when in
     reality it represents many.
@@ -60,7 +60,7 @@ class CommandAutomagic():
 
 # ===================================
 
-class Client():
+class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False):
@@ -217,7 +217,7 @@ class Client():
 
 # ===================================================================
 
-class FuncCommandLine():
+class FuncCommandLine(object):
 
     def __init__(self,myname,args):
         """
