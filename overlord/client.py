@@ -24,6 +24,8 @@ from func.commonconfig import CMConfig
 from func.config import read_config
 import sslclient
 
+import command
+
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
@@ -59,6 +61,7 @@ class CommandAutomagic():
         return self.clientref.run(module,method,args)
 
 # ===================================
+
 
 class Client():
 
@@ -217,102 +220,75 @@ class Client():
 
 # ===================================================================
 
-class FuncCommandLine():
+class Call(command.Command):
+    name = "call"
+    useage = "call nodule method name arg1 arg2..."
 
-    def __init__(self,myname,args):
-        """
-        Constructor.  Takes name of program + arguments.
-        """
-        self.myname       = myname
-        self.args         = args
-        self.verbose      = 0
-        self.server_spec  = None
-        self.port         = DEFAULT_PORT
+    def addOptions(self):
+        self.parser.add_option("-v","--verbose",dest="verbose",action="store_true")
+        self.parser.add_option("-p","--port",dest="port",default=DEFAULT_PORT)
 
-    # ----------------------------------------------- 
+    def handleOptions(self, options):
+        self.options = options
 
-    def usage(self):
-        """
-        Returns usage string for command line users.
-        """
-        return FUNC_USAGE % self.myname
-
-    # ----------------------------------------------- 
-
-    def run(self):
-        """
-        Engages the command line.
-        """
-        
-        rc = self.parse_command_line()
-        if rc != 0:
-           return rc
-
-        return self.run_command()
-
-    # ----------------------------------------------- 
-
-    def parse_command_line(self):
-        """
-        Parses the command line and loads up all the variables.
-        """
-
-        # parse options
-        p = optparse.OptionParser()
-        p.add_option("-v","--verbose",dest="verbose",action="store_true")
-        p.add_option("-p","--port",dest="port",default=DEFAULT_PORT)
-        (options, args) = p.parse_args(self.args)
-
-        self.args    = args
         self.verbose = options.verbose
-        self.port    = options.port
-        # self.help  = options.help 
+        self.port = options.port
+        # I'm not really a fan of the "module methodname" approach
+        # but we'll keep it for now -akl
 
-        # provided for free:
-        # 
-        #if self.help:
-        #    print self.usage()
-        #    return -411
+    def do(self, args):
 
-        # process arguments
-        # a good Klingon program does not have parameters
-        # it has arguments, and it always wins them.
+        # I'm not really a fan of the "module methodname" approach
+        # but we'll keep it for now -akl
 
-        if len(args) < 3:
-            print self.usage()
-            return -411
+        self.server_spec = args[0]
+        self.module      = args[1]
+        self.method      = args[2]
+        self.method_args = args[3:]
 
-        self.server_spec = self.args[0]
-        self.module      = self.args[1] 
-        self.method      = self.args[2]
-        self.method_args = self.args[3:]
-
-        return 0
-
-    # ----------------------------------------------- 
-
-    def run_command(self):
-        """
-        Runs the actual command.
-        """
         client = Client(self.server_spec,port=self.port,interactive=True,
-            verbose=self.verbose)
+                        verbose=self.verbose)
         results = client.run(self.module, self.method, self.method_args)
     
         # TO DO: add multiplexer support
         # probably as a higher level module.
- 
+
         return client.cli_return(results)
 
-       
-# ===================================================================
+
+class FuncCommandLine(command.Command):
+    name = "client"
+    useage = "func is the commandline interface to a func minion"
+
+    subCommandClasses = [Call]
+    
+    def __init__(self):
+        
+        command.Command.__init__(self)
+
+    def do(self, args):
+        pass
+    
+    def addOptions(self):
+        self.parser.add_option('', '--version', action="store_true",
+                               help="show version information")
+
+    def handleOptions(self, options):
+        if options.version:
+            #FIXME
+            print "version is NOT IMPLEMENTED YET"
+
 
 
 if __name__ == "__main__":
     # this is what /usr/bin/func will run
     myname, argv = sys.argv[0], sys.argv[1:]
-    cli = FuncCommandLine(myname,argv)
-    rc = cli.run()
+    cli = FuncCommandLine()
+    rc = cli.do()
+    sys.exit(rc)
+#    cli = FuncCommandLine(myname,argv)
+
+#    rc = cli.run()
     sys.exit(rc)
 
 
