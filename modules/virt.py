@@ -38,7 +38,7 @@ VIRT_STATE_NAME_MAP = {
    6 : "crashed"
 }
 
-class FuncLibvirtConnection():
+class FuncLibvirtConnection(object):
 
     def __init__(self):
 

@@ -36,7 +36,7 @@ FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module metho
 
 # ===================================
 
-class CommandAutomagic():
+class CommandAutomagic(object):
     """
     This allows a client object to act as if it were one machine, when in
     reality it represents many.
@@ -62,8 +62,7 @@ class CommandAutomagic():
 
 # ===================================
 
-
-class Client():
+class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False):
@@ -223,7 +222,6 @@ class Client():
 class Call(command.Command):
     name = "call"
     useage = "call nodule method name arg1 arg2..."
-
     def addOptions(self):
         self.parser.add_option("-v","--verbose",dest="verbose",action="store_true")
         self.parser.add_option("-p","--port",dest="port",default=DEFAULT_PORT)
