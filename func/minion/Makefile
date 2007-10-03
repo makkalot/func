@@ -1,6 +1,7 @@
 
 
 PYFILES		= $(wildcard *.py)
+PYDIRS = modules
 
 PYCHECKER       = /usr/bin/pychecker
 PYFLAKES	= /usr/bin/pyflakes
@@ -16,3 +17,8 @@ pychecker::
 
 pyflakes::
 	@$(PYFLAKES) $(PYFILES) || exit 0
+
+pychecker::
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pychecker ); done   
+pyflakes::
+	-for d in $(PYDIRS); do ($(MAKE) -C $$d pyflakes ); done	

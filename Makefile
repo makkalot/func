@@ -5,8 +5,8 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 MESSAGESPOT=po/messages.pot
 
 TOPDIR = $(shell pwd)
-DIRS	= modules minion overlord func docs scripts
-PYDIRS	= modules minion overlord func scripts
+DIRS	= func docs scripts
+PYDIRS	= func scripts
 EXAMPLEDIR = examples
 INITDIR	= init-scripts
 
