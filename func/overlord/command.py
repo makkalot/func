@@ -3,7 +3,7 @@
 
 # This file is released under the standard PSF license.
 #
-#  from MOAP - https://thomas.apestaart.org/moap/trac 
+#  from MOAP - https://thomas.apestaart.org/moap/trac
 #    written by Thomas Vander Stichele (thomas at apestaart dot org)
 #
 
@@ -197,7 +197,7 @@ class Command:
         # handle pleas for help
         if args and args[0] == 'help':
             self.debug('Asked for help, args %r' % args)
-            
+
             # give help on current command if only 'help' is passed
             if len(args) == 1:
                 self.outputHelp()

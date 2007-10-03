@@ -38,7 +38,7 @@ if TEST_PROCESS:
 # here's the service module testing
 if TEST_SERVICES:
     print s.service.restart("httpd")
-    
+
 if TEST_HARDWARE:
     print s.hardware.info()
 
@@ -58,5 +58,4 @@ if TEST_VIRT:
         if status == "shutdown":
             s.virt.start(vm)
 
-# add more tests here           
-
+# add more tests here

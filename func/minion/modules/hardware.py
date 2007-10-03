@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## 
+##
 ## Hardware profiler plugin
 ## requires the "smolt" client package be installed
 ## but also relies on lspci for some things
@@ -30,7 +30,7 @@ class HardwareModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
             "info"     : self.info,
-            "hal_info" : self.hal_info 
+            "hal_info" : self.hal_info
         }
         func_module.FuncModule.__init__(self)
 
@@ -41,10 +41,10 @@ class HardwareModule(func_module.FuncModule):
         """
 
         cmd = sub_process.Popen(["/usr/bin/lshal"],shell=False,stdout=sub_process.PIPE)
-        data = cmd.communicate()[0]        
-     
+        data = cmd.communicate()[0]
+
         data = data.split("\n")
-       
+
         results = {}
         current = ""
         label = data[0]
@@ -56,7 +56,7 @@ class HardwareModule(func_module.FuncModule):
             else:
                 if label == "":
                     label = d
-                current = current + d        
+                current = current + d
 
         return results
 
@@ -75,7 +75,7 @@ def hw_info(with_devices=True):
 
     # this may fail if smolt is not installed.  That's ok.  hal_info will
     # still work.
-    
+
     # hack: smolt is not installed in site-packages
     sys.path.append("/usr/share/smolt/client")
     import smolt
@@ -92,14 +92,14 @@ def hw_info(with_devices=True):
         'cpuModel'        : str(host.cpuModel),
         'numCpus'         : str(host.numCpus),
         'cpuSpeed'        : str(host.cpuSpeed),
-        'systemMemory'    : str(host.systemMemory),  
+        'systemMemory'    : str(host.systemMemory),
         'systemSwap'      : str(host.systemSwap),
         'kernelVersion'   : str(host.kernelVersion),
         'language'        : str(host.language),
         'platform'        : str(host.platform),
         'systemVendor'    : str(host.systemVendor),
         'systemModel'     : str(host.systemModel),
-        'formfactor'      : str(host.formfactor), 
+        'formfactor'      : str(host.formfactor),
         'selinux_enabled' : str(host.selinux_enabled),
         'selinux_enforce' : str(host.selinux_enforce)
     }
@@ -107,7 +107,7 @@ def hw_info(with_devices=True):
     # if no hardware info requested, just return the above bits
     if not with_devices:
         return data
-    
+
     collection = data["devices"] = []
 
     for item in hardware.deviceIter():
@@ -121,13 +121,10 @@ def hw_info(with_devices=True):
             "Bus"            : str(Bus),
             "Driver"         : str(Driver),
             "Type"           : str(Type),
-            "Description"    : str(Description) 
+            "Description"    : str(Description)
         })
 
     return data
 
 methods = HardwareModule()
 register_rpc = methods.register_rpc
-
-
-

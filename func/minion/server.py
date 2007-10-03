@@ -35,7 +35,7 @@ import codes
 import module_loader
 import utils
 
-    
+
 
 class XmlRpcInterface(object):
 
@@ -53,7 +53,7 @@ class XmlRpcInterface(object):
 
         # need a reference so we can log ip's, certs, etc
 #        self.server = server
-        
+
     def __setup_handlers(self):
 
         """
@@ -80,7 +80,7 @@ class XmlRpcInterface(object):
 
     def list_modules(self):
         return self.modules.keys()
-    
+
     def list_methods(self):
         return self.handlers.keys()
 
@@ -88,12 +88,12 @@ class XmlRpcInterface(object):
 
         if method in self.handlers:
             return FuncApiMethod(self.logger, method, self.handlers[method])
-      
+
         else:
             self.logger.info("Unhandled method call for method: %s " % method)
             raise codes.InvalidMethodException
 
- 
+
 
 
 class FuncApiMethod:
@@ -107,7 +107,7 @@ class FuncApiMethod:
         self.logger = logger
         self.__method = method
         self.__name = name
-        
+
     def __log_exc(self):
 
         """
@@ -141,7 +141,7 @@ class FuncApiMethod:
 def serve():
 
     """
-    Code for starting the XMLRPC service. 
+    Code for starting the XMLRPC service.
     """
     server =FuncSSLXMLRPCServer(('', 51234))
     server.logRequests = 0 # don't print stuff to console
@@ -165,13 +165,13 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
     def __init__(self, args):
         self.allow_reuse_address = True
         self.modules = module_loader.load_modules()
-        
+
         XmlRpcInterface.__init__(self)
         hn = socket.getfqdn()
         self.key = "%s/%s.pem" % (self.config.cert_dir, hn)
         self.cert = "%s/%s.cert" % (self.config.cert_dir, hn)
         self.ca = "%s/ca.cert" % self.config.cert_dir
-        
+
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,
                                                           self.ca)
@@ -180,7 +180,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         """
         the SimpleXMLRPCServer class will call _dispatch if it doesn't
-        find a handler method 
+        find a handler method
         """
 
         # Recognize ipython's tab completion calls
@@ -194,19 +194,19 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
             cn = p.get_subject().CN
             sub_hash = p.subject_name_hash()
         else:
-            print 'no cert'    
+            print 'no cert'
 
         # XXX FIXME - need to figure out how to dig into the server base classes
         # so we can get client ip, and eventually cert id info -akl
         self.audit_logger.log_call(ip, cn, sub_hash, method, params)
 
         return self.get_dispatch_method(method)(*params)
-    
+
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()
         return peer_cert.get_subject().CN
 
-      
+
 def main(argv):
 
     """
@@ -217,18 +217,16 @@ def main(argv):
         utils.daemonize("/var/run/funcd.pid")
     else:
         print "serving...\n"
-    
+
     try:
         utils.create_minion_keys()
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
         sys.exit(1)
-       
+
 # ======================================================================================
 
 if __name__ == "__main__":
     textdomain(I18N_DOMAIN)
     main(sys.argv)
-
-

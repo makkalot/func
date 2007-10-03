@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## 
+##
 ## Grabs status from SMART to see if your hard drives are ok
 ## Returns in the format of (return code, [line1, line2, line3,...])
 ##
@@ -42,7 +42,7 @@ class SmartModule(func_module.FuncModule):
         cmd = sub_process.Popen("/usr/sbin/smartd %s" % flags,stdout=sub_process.PIPE,shell=True)
         data = cmd.communicate()[0]
 
-        results = []       
+        results = []
 
         for x in data.split("\n"):
             results.append(x)
@@ -51,6 +51,3 @@ class SmartModule(func_module.FuncModule):
 
 methods = SmartModule()
 register_rpc = methods.register_rpc
-
-
-

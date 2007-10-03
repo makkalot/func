@@ -27,21 +27,21 @@ from func.commonconfig import FuncdConfig
 
 def create_minion_keys():
     config_file = '/etc/func/minion.conf'
-    config = read_config(config_file, FuncdConfig)    
+    config = read_config(config_file, FuncdConfig)
     cert_dir = config.cert_dir
     master_uri = 'http://%s:51235/' % config.certmaster
     hn = socket.getfqdn()
-   
+
     key_file = '%s/%s.pem' % (cert_dir, hn)
     csr_file = '%s/%s.csr' % (cert_dir, hn)
     cert_file = '%s/%s.cert' % (cert_dir, hn)
     ca_cert_file = '%s/ca.cert' % cert_dir
-    
+
 
     if os.path.exists(cert_file) and os.path.exists(ca_cert_file):
         return
 
-    keypair = None        
+    keypair = None
     try:
         if not os.path.exists(cert_dir):
             os.makedirs(cert_dir)
@@ -53,19 +53,19 @@ def create_minion_keys():
             csr = certs.make_csr(keypair, dest=csr_file)
     except Exception, e: # need a little more specificity here
         raise codes.FuncException, "Could not create local keypair or csr for minion funcd session"
-    
+
     result = False
     while not result:
         try:
             result, cert_string, ca_cert_string = submit_csr_to_master(csr_file, master_uri)
         except socket.gaierror, e:
             raise codes.FuncException, "Could not locate certmaster at: http://certmaster:51235/"
-            
+
         # logging here would be nice
         if not result:
-            time.sleep(10)    
-    
-    
+            time.sleep(10)
+
+
     if result:
         cert_fo = open(cert_file, 'w')
         cert_fo.write(cert_string)
@@ -74,18 +74,18 @@ def create_minion_keys():
         ca_cert_fo = open(ca_cert_file, 'w')
         ca_cert_fo.write(ca_cert_string)
         ca_cert_fo.close()
-    
+
 def submit_csr_to_master(csr_file, master_uri):
     """"
     gets us our cert back from the certmaster.wait_for_cert() method
     takes csr_file as path location and master_uri
     returns Bool, str(cert), str(ca_cert)
     """
-    
+
     fo = open(csr_file)
     csr = fo.read()
     s = xmlrpclib.ServerProxy(master_uri)
-    
+
     return s.wait_for_cert(csr)
 
 

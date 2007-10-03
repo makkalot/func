@@ -6,7 +6,7 @@
 ## Copyright 2007, Red Hat, Inc
 ## Michael DeHaan <mdehaan@redhat.com>
 ## +AUTHORS
-## 
+##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
 ##
@@ -83,7 +83,7 @@ class Client(object):
         self.interactive = interactive
         self.noglobs     = noglobs
         self.servers     = self.expand_servers(self.server_spec)
-       
+
         # default cert/ca/key is the same as the certmaster ca - need to
         # be able to change that on the cli
         self.key = '%s/funcmaster.key' % self.config.cadir
@@ -131,13 +131,13 @@ class Client(object):
         to an unspecified number of machines.
 
         So, it enables stuff like this:
-   
+
         Client("*.example.org").yum.install("foo")
 
         # WARNING: any missing values in Client's source will yield
         # strange errors with this engaged.  Be aware of that.
         """
-   
+
         return CommandAutomagic(self, [name])
 
     # -----------------------------------------------
@@ -170,13 +170,13 @@ class Client(object):
             try:
                 # thats some pretty code right there aint it? -akl
                 # we can't call "call" on s, since thats a rpc, so
-                # we call gettatr around it. 
+                # we call gettatr around it.
                 meth = "%s.%s" % (module, method)
                 retval = getattr(conn, meth)(*args[:])
                 if self.interactive:
-                    pprint.pprint(retval) 
+                    pprint.pprint(retval)
             except Exception, e:
-                retval = e 
+                retval = e
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
@@ -191,7 +191,7 @@ class Client(object):
 
         return results
 
-   # ----------------------------------------------- 
+   # -----------------------------------------------
 
     def cli_return(self,results):
         """
@@ -252,7 +252,7 @@ class Call(command.Command):
         client = Client(self.server_spec,port=self.port,interactive=True,
             verbose=self.verbose, config=self.config)
         results = client.run(self.module, self.method, self.method_args)
-    
+
         # TO DO: add multiplexer support
         # probably as a higher level module.
 
@@ -263,14 +263,14 @@ class FuncCommandLine(command.Command):
     useage = "func is the commandline interface to a func minion"
 
     subCommandClasses = [Call]
-    
+
     def __init__(self):
-        
+
         command.Command.__init__(self)
 
     def do(self, args):
         pass
-    
+
     def addOptions(self):
         self.parser.add_option('', '--version', action="store_true",
             help="show version information")
