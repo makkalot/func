@@ -25,12 +25,52 @@ from func import certs
 from func.config import read_config
 from func.commonconfig import FuncdConfig
 
+# "localhost" is a lame hostname to use for a key, so try to get
+# a more meaningful hostname. We do this by connecting to the certmaster
+# and seeing what interface/ip it uses to make that connection, and looking
+# up the hostname for that. 
+def get_hostname():
+
+    # FIXME: this code ignores http proxies (which granted, we don't
+    #      support elsewhere either. It also hardcodes the port number
+    #      for the certmaster for now
+    hostname = None
+    hostname = socket.gethostname()
+    ip = socket.gethostbyname(hostname)
+    if ip != "127.0.0.1":
+        return hostname
+
+
+    config_file = '/etc/func/minion.conf'
+    config = read_config(config_file, FuncdConfig)
+
+    server = config.certmaster
+    port = 51235
+
+    try:
+        s = socket.socket()
+        s.settimeout(5)
+        s.connect((server, port))
+        (intf, port) = s.getsockname()
+        hostname = socket.gethostbyaddr(intf)[0]
+        s.close()
+    except:
+        s.close()
+        raise
+
+    return hostname
+    
+
+
 def create_minion_keys():
     config_file = '/etc/func/minion.conf'
     config = read_config(config_file, FuncdConfig)
     cert_dir = config.cert_dir
     master_uri = 'http://%s:51235/' % config.certmaster
-    hn = socket.getfqdn()
+    hn = get_hostname()
+
+    if hn is None:
+        raise codes.FuncException("Could not determine a hostname other than localhost")
 
     key_file = '%s/%s.pem' % (cert_dir, hn)
     csr_file = '%s/%s.csr' % (cert_dir, hn)
