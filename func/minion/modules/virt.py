@@ -15,9 +15,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 # warning: virt management is rather complicated
-# to see a simple example of func, look at the 
+# to see a simple example of func, look at the
 # service control module.  API docs on how
-# to use this to come.  
+# to use this to come.
 
 # other modules
 import os
@@ -102,7 +102,7 @@ class FuncLibvirtConnection(object):
 
     def create(self, vmid):
         return self.find_vm(vmid).create()
-    
+
     def destroy(self, vmid):
         return self.find_vm(vmid).destroy()
 
@@ -112,8 +112,8 @@ class FuncLibvirtConnection(object):
     def get_status2(self, vm):
         state = vm.info()[0]
         # print "DEBUG: state: %s" % state
-        return VIRT_STATE_NAME_MAP.get(state,"unknown")  
- 
+        return VIRT_STATE_NAME_MAP.get(state,"unknown")
+
     def get_status(self, vmid):
         state = self.find_vm(vmid).info()[0]
         return VIRT_STATE_NAME_MAP.get(state,"unknown")
@@ -121,10 +121,10 @@ class FuncLibvirtConnection(object):
 
 
 class Virt(func_module.FuncModule):
-    
-    
+
+
     def __init__(self):
- 
+
         """
         Constructor.  Register methods and make them available.
         """
@@ -140,7 +140,7 @@ class Virt(func_module.FuncModule):
             "status"   : self.get_status,
             "list_vms" : self.list_vms,
         }
-        
+
         func_module.FuncModule.__init__(self)
 
     def get_conn(self):
@@ -157,13 +157,13 @@ class Virt(func_module.FuncModule):
             except:
                 pass
         return results
-   
+
     def install(self, server_name, target_name, system=False):
 
         """
         Install a new virt system by way of a named cobbler profile.
         """
-   
+
         # Example:
         # install("bootserver.example.org", "fc7webserver", True)
 
@@ -192,8 +192,8 @@ class Virt(func_module.FuncModule):
             return 0
         else:
             raise codes.FuncException("koan returned %d" % rc)
- 
-   
+
+
     def shutdown(self, vmid):
         """
         Make the machine with the given vmid stop running.
@@ -201,9 +201,9 @@ class Virt(func_module.FuncModule):
         """
         self.get_conn()
         self.conn.shutdown(vmid)
-        return 0       
+        return 0
 
-   
+
     def pause(self, vmid):
 
         """
@@ -213,7 +213,7 @@ class Virt(func_module.FuncModule):
         self.conn.suspend(vmid)
         return 0
 
-   
+
     def unpause(self, vmid):
 
         """
@@ -228,12 +228,12 @@ class Virt(func_module.FuncModule):
     def create(self, vmid):
 
         """
-        Start the machine via the given mac address. 
+        Start the machine via the given mac address.
         """
         self.get_conn()
         self.conn.create(vmid)
         return 0
- 
+
 
     def destroy(self, vmid):
 
@@ -247,7 +247,7 @@ class Virt(func_module.FuncModule):
 
 
     def undefine(self, vmid):
-        
+
         """
         Stop a domain, and then wipe it from the face of the earth.
         by deleting the disk image and it's configuration file.
@@ -263,12 +263,10 @@ class Virt(func_module.FuncModule):
         """
         Return a state suitable for server consumption.  Aka, codes.py values, not XM output.
         """
-        
+
         self.get_conn()
         return self.conn.get_status(vmid)
 
 
 methods = Virt()
 register_rpc = methods.register_rpc
-
-

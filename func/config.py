@@ -26,6 +26,8 @@ from ConfigParser import NoSectionError, NoOptionError, ConfigParser
 from ConfigParser import ParsingError
 import exceptions
 
+CONFIG_FILE = "/etc/func/certmaster.conf"
+
 class ConfigError(exceptions.Exception):
     def __init__(self, value=None):
         exceptions.Exception.__init__(self)

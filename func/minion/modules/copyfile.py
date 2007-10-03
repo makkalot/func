@@ -27,7 +27,7 @@ class CopyFile(func_module.FuncModule):
                 "checksum" : self.checksum
         }
         func_module.FuncModule.__init__(self)
-                             
+
     def checksum(self, thing):
 
         CHUNK=2**16
@@ -54,17 +54,17 @@ class CopyFile(func_module.FuncModule):
 
 
         # we should probably verify mode,uid,gid are valid as well
-        
+
         dirpath = os.path.dirname(filepath)
         basepath = os.path.basename(filepath)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
-        
+
         remote_sum = self.checksum(filebuf)
         local_sum = 0
         if os.path.exists(filepath):
             local_sum = self.checksum(filepath)
-        
+
         if remote_sum != local_sum or force is not None:
             # back up the localone
             if os.path.exists(filepath):
@@ -90,18 +90,18 @@ class CopyFile(func_module.FuncModule):
             os.chown(filepath, uid, gid)
         except (IOError, OSError), e:
             return -1
-            
+
         return 1
 
     def _backuplocal(self, fn):
         """
-        make a date-marked backup of the specified file, 
+        make a date-marked backup of the specified file,
         return True or False on success or failure
         """
         # backups named basename-YYYY-MM-DD@HH:MM~
         ext = time.strftime("%Y-%m-%d@%H:%M~", time.localtime(time.time()))
         backupdest = '%s.%s' % (fn, ext)
-        
+
         try:
             shutil.copy2(fn, backupdest)
         except shutil.Error, e:

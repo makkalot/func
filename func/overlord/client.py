@@ -6,7 +6,7 @@
 ## Copyright 2007, Red Hat, Inc
 ## Michael DeHaan <mdehaan@redhat.com>
 ## +AUTHORS
-## 
+##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
 ##
@@ -21,15 +21,16 @@ import glob
 import pprint
 
 from func.commonconfig import CMConfig
-from func.config import read_config
+from func.config import read_config, CONFIG_FILE
 import sslclient
+
+import command
 
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
 
 DEFAULT_PORT = 51234
-CONFIG_FILE = "/etc/func/certmaster.conf"
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 
 # ===================================
@@ -63,22 +64,26 @@ class CommandAutomagic(object):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False):
+        verbose=False, noglobs=False, config=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
         @port -- is the port where all funcd processes should be contacted
         @verbose -- whether to print unneccessary things
         @noglobs -- specifies server_spec is not a glob, and run should return single values
+        @config -- optional config object
         """
-        self.config      = read_config(CONFIG_FILE, CMConfig)
+        self.config  = config
+        if config is None:
+            self.config  = read_config(CONFIG_FILE, CMConfig)
+
         self.server_spec = server_spec
         self.port        = port
         self.verbose     = verbose
         self.interactive = interactive
         self.noglobs     = noglobs
         self.servers     = self.expand_servers(self.server_spec)
-       
+
         # default cert/ca/key is the same as the certmaster ca - need to
         # be able to change that on the cli
         self.key = '%s/funcmaster.key' % self.config.cadir
@@ -126,13 +131,13 @@ class Client(object):
         to an unspecified number of machines.
 
         So, it enables stuff like this:
-   
+
         Client("*.example.org").yum.install("foo")
 
         # WARNING: any missing values in Client's source will yield
         # strange errors with this engaged.  Be aware of that.
         """
-   
+
         return CommandAutomagic(self, [name])
 
     # -----------------------------------------------
@@ -165,13 +170,13 @@ class Client(object):
             try:
                 # thats some pretty code right there aint it? -akl
                 # we can't call "call" on s, since thats a rpc, so
-                # we call gettatr around it. 
+                # we call gettatr around it.
                 meth = "%s.%s" % (module, method)
                 retval = getattr(conn, meth)(*args[:])
                 if self.interactive:
-                    pprint.pprint(retval) 
+                    pprint.pprint(retval)
             except Exception, e:
-                retval = e 
+                retval = e
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
@@ -186,7 +191,7 @@ class Client(object):
 
         return results
 
-   # ----------------------------------------------- 
+   # -----------------------------------------------
 
     def cli_return(self,results):
         """
@@ -217,102 +222,74 @@ class Client(object):
 
 # ===================================================================
 
-class FuncCommandLine(object):
+class Call(command.Command):
+    name = "call"
+    useage = "call nodule method name arg1 arg2..."
+    def addOptions(self):
+        self.parser.add_option("-v", "--verbose", dest="verbose",
+            action="store_true")
+        self.parser.add_option("-p", "--port", dest="port",
+            default=DEFAULT_PORT)
 
-    def __init__(self,myname,args):
-        """
-        Constructor.  Takes name of program + arguments.
-        """
-        self.myname       = myname
-        self.args         = args
-        self.verbose      = 0
-        self.server_spec  = None
-        self.port         = DEFAULT_PORT
+    def handleOptions(self, options):
+        self.options = options
 
-    # ----------------------------------------------- 
-
-    def usage(self):
-        """
-        Returns usage string for command line users.
-        """
-        return FUNC_USAGE % self.myname
-
-    # ----------------------------------------------- 
-
-    def run(self):
-        """
-        Engages the command line.
-        """
-        
-        rc = self.parse_command_line()
-        if rc != 0:
-           return rc
-
-        return self.run_command()
-
-    # ----------------------------------------------- 
-
-    def parse_command_line(self):
-        """
-        Parses the command line and loads up all the variables.
-        """
-
-        # parse options
-        p = optparse.OptionParser()
-        p.add_option("-v","--verbose",dest="verbose",action="store_true")
-        p.add_option("-p","--port",dest="port",default=DEFAULT_PORT)
-        (options, args) = p.parse_args(self.args)
-
-        self.args    = args
         self.verbose = options.verbose
-        self.port    = options.port
-        # self.help  = options.help 
+        self.port = options.port
+        # I'm not really a fan of the "module methodname" approach
+        # but we'll keep it for now -akl
 
-        # provided for free:
-        # 
-        #if self.help:
-        #    print self.usage()
-        #    return -411
+    def do(self, args):
 
-        # process arguments
-        # a good Klingon program does not have parameters
-        # it has arguments, and it always wins them.
+        # I'm not really a fan of the "module methodname" approach
+        # but we'll keep it for now -akl
 
-        if len(args) < 3:
-            print self.usage()
-            return -411
+        self.server_spec = args[0]
+        self.module      = args[1]
+        self.method      = args[2]
+        self.method_args = args[3:]
 
-        self.server_spec = self.args[0]
-        self.module      = self.args[1] 
-        self.method      = self.args[2]
-        self.method_args = self.args[3:]
-
-        return 0
-
-    # ----------------------------------------------- 
-
-    def run_command(self):
-        """
-        Runs the actual command.
-        """
         client = Client(self.server_spec,port=self.port,interactive=True,
-            verbose=self.verbose)
+            verbose=self.verbose, config=self.config)
         results = client.run(self.module, self.method, self.method_args)
-    
+
         # TO DO: add multiplexer support
         # probably as a higher level module.
- 
+
         return client.cli_return(results)
 
-       
-# ===================================================================
+class FuncCommandLine(command.Command):
+    name = "client"
+    useage = "func is the commandline interface to a func minion"
 
+    subCommandClasses = [Call]
 
-if __name__ == "__main__":
-    # this is what /usr/bin/func will run
-    myname, argv = sys.argv[0], sys.argv[1:]
-    cli = FuncCommandLine(myname,argv)
-    rc = cli.run()
-    sys.exit(rc)
+    def __init__(self):
 
+        command.Command.__init__(self)
 
+    def do(self, args):
+        pass
+
+    def addOptions(self):
+        self.parser.add_option('', '--version', action="store_true",
+            help="show version information")
+        self.parser.add_option("--list-minions", dest="list_minions",
+            action="store_true", help="list all available minions")
+
+    def handleOptions(self, options):
+        if options.version:
+            #FIXME
+            print "version is NOT IMPLEMENTED YET"
+        if options.list_minions:
+            self.list_minions()
+
+            sys.exit(0) # stop execution
+
+    def list_minions(self):
+        print "Minions:"
+        gloob = "%s/%s.cert" % (self.config.certroot, "*")
+        certs = glob.glob(gloob)
+        for cert in certs:
+            host = cert.replace(self.config.certroot, "")[1:-5]
+            print "   %s" % host

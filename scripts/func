@@ -8,7 +8,7 @@ import distutils.sysconfig
 import func.overlord.client as client
 
 myname, argv = sys.argv[0], sys.argv[1:]
-cli = client.FuncCommandLine(myname, argv)
-cli.run()
+cli = client.FuncCommandLine()
+print cli.parse(argv)
 
 

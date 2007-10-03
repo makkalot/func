@@ -5,8 +5,8 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 MESSAGESPOT=po/messages.pot
 
 TOPDIR = $(shell pwd)
-DIRS	= modules minion overlord func docs scripts
-PYDIRS	= modules minion overlord func scripts
+DIRS	= func docs scripts
+PYDIRS	= func scripts
 EXAMPLEDIR = examples
 INITDIR	= init-scripts
 
@@ -19,8 +19,8 @@ manpage:
 	pod2man --center="certmaster" --release="" ./docs/certmaster.pod | gzip -c > ./docs/certmaster.1.gz
 	pod2man --center="certmaster-ca" --release="" ./docs/certmaster-ca.pod | gzip -c > ./docs/certmaster-ca.1.gz
 
-messages: minion/*.py
-	xgettext -k_ -kN_ -o $(MESSAGESPOT) minion/*.py 
+messages: func/minion/*.py
+	xgettext -k_ -kN_ -o $(MESSAGESPOT) func/minion/*.py
 	sed -i'~' -e 's/SOME DESCRIPTIVE TITLE/func/g' -e 's/YEAR THE PACKAGE'"'"'S COPYRIGHT HOLDER/2007 Red Hat, inc. /g' -e 's/FIRST AUTHOR <EMAIL@ADDRESS>, YEAR/Adrian Likins <alikins@redhat.com>, 2007/g' -e 's/PACKAGE VERSION/func $(VERSION)-$(RELEASE)/g' -e 's/PACKAGE/func/g' $(MESSAGESPOT)
 
 
