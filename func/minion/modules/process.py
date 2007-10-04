@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-## 
+##
 ## Process lister (control TBA)
 ##
 ## Copyright 2007, Red Hat, Inc
@@ -46,7 +46,7 @@ class ProcessModule(func_module.FuncModule):
         cmd = sub_process.Popen(["/bin/ps", flags] ,executable="/bin/ps", stdout=sub_process.PIPE,shell=False)
         data = cmd.communicate()[0]
 
-        results = []       
+        results = []
 
         for x in data.split("\n"):
             tokens = x.split()
@@ -74,6 +74,3 @@ class ProcessModule(func_module.FuncModule):
 
 methods = ProcessModule()
 register_rpc = methods.register_rpc
-
-
-

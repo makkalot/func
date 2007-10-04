@@ -44,15 +44,9 @@ class FuncServer(SSLXMLRPCServerProxy):
                                       self.pem,
                                       self.crt,
                                       self.ca)
-        
+
 
 if __name__ == "__main__":
     s = SSLXMLRPCServerProxy('https://localhost:51234/', '/etc/pki/func/slave.pem', '/etc/pki/func/slave.cert', '/etc/pki/func/ca/funcmaster.crt')
     f = s.ping(1, 2)
     print f
-
-
-
-
-
-    

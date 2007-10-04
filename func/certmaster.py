@@ -33,6 +33,8 @@ import utils
 from config import read_config
 from commonconfig import CMConfig
 
+CERTMASTER_LISTEN_PORT = 51235
+
 class CertMaster(object):
     def __init__(self, conf_file):
         self.cfg = read_config(conf_file, CMConfig)
@@ -203,7 +205,7 @@ def serve(xmlrpcinstance):
     Code for starting the XMLRPC service.
     """
 
-    server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, xmlrpcinstance.cfg.listen_port))
+    server = CertmasterXMLRPCServer((xmlrpcinstance.cfg.listen_addr, CERTMASTER_LISTEN_PORT))
     server.logRequests = 0 # don't print stuff to console
     server.register_instance(xmlrpcinstance)
     server.serve_forever()

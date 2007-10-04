@@ -36,7 +36,7 @@ def module_walker(topdir):
                 # in the module name, and foo..bar doesnt work -akl
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
-                
+
     return module_files
 
 def load_modules(blacklist=None):

@@ -36,5 +36,3 @@ class Command(func_module.FuncModule):
 
 methods = Command()
 register_rpc = methods.register_rpc
-
-

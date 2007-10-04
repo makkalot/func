@@ -24,11 +24,11 @@ class FuncModule(object):
     version = "0.0.0"
     api_version = "0.0.0"
     description = "No Description provided"
-    
+
     def __init__(self):
 
         config_file = '/etc/func/minion.conf'
-        self.config = read_config(config_file, FuncdConfig)    
+        self.config = read_config(config_file, FuncdConfig)
         self.__init_log()
         self.__base_methods = {
             # __'s so we don't clobber useful names
@@ -37,11 +37,11 @@ class FuncModule(object):
             "module_description" : self.__module_description,
             "list_methods"       : self.__list_methods
             }
-        
+
     def __init_log(self):
         log = logger.Logger()
         self.logger = log.logger
-    
+
     def register_rpc(self, handlers, module_name):
         # add the internal methods, note that this means they
         # can get clobbbered by subclass versions

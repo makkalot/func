@@ -28,10 +28,7 @@ if __name__ == "__main__":
                 license = "GPL",
 		scripts = ["scripts/funcd", "scripts/func", "scripts/certmaster", "scripts/certmaster-ca"],
 		# package_data = { '' : ['*.*'] },
-                package_dir = {"%s" % NAME: "%s" % NAME,
-			       "%s/minion" % NAME: "minion/",
-			       "%s/minion/modules" % NAME: "modules/",
-			       "%s/overlord" % NAME: "overlord/"
+                package_dir = {"%s" % NAME: "%s" % NAME
                 },
 		packages = ["%s" % NAME,
 	        	    "%s/minion" % NAME,

@@ -15,5 +15,6 @@ pychecker::
 	@$(PYCHECKER) $(PYFILES) || exit 0
 
 pyflakes::
+ifneq ($(PYFILES)x, x)
 	@$(PYFLAKES) $(PYFILES) || exit 0
-
+endif

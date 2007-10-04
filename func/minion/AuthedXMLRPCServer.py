@@ -39,7 +39,7 @@ class AuthedSimpleXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHan
         self.connection = self.request # for doPOST
         self.rfile = socket._fileobject(self.request, "rb", self.rbufsize)
         self.wfile = socket._fileobject(self.request, "wb", self.wbufsize)
-                                                                    
+
     def do_POST(self):
         self.server._this_request = (self.request, self.client_address)
         try:
@@ -101,7 +101,7 @@ class TestServer(AuthedSSLXMLRPCServer):
 
     def __init__(self, address, pkey, cert, ca_cert):
         AuthedSSLXMLRPCServer.__init__(self, address, pkey, cert, ca_cert, self.auth_cb)
-    
+
     def _dispatch(self, method, params):
         if method == 'trait_names' or method == '_getAttributeNames':
             return dir(self)
@@ -115,10 +115,10 @@ class TestServer(AuthedSSLXMLRPCServer):
             print dir(p)
             print p.get_subject()
         else:
-            print 'no cert'    
+            print 'no cert'
 
         return "your mom"
-                 
+
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()
         return peer_cert.get_subject().CN
@@ -138,4 +138,3 @@ if __name__ == '__main__':
     h = ReqHandler()
     server.register_instance(h)
     server.serve_forever()
-

@@ -6,6 +6,8 @@
 # --clean? not sure what it will do
 
 import sys
+import glob
+import os
 
 import func
 import func.certs
@@ -20,23 +22,35 @@ def errorprint(stuff):
 
 
 def parseargs(args):
-    usage = 'certmaster-ca [options]'
+    usage = 'certmaster-ca <option> [args]'
     parser = OptionParser(usage=usage)
     
     parser.add_option('-l', '--list', default=False, action="store_true",
           help='list signing requests remaining')
     parser.add_option('-s', '--sign', default=False, action="store_true",
           help='sign requests of hosts specified')
-    
+    parser.add_option('-c', '--clean', default=False, action="store_true",
+          help="clean out all certs or csrs for the hosts specified")
+          
     (opts, args) = parser.parse_args()
-    # XXX FIXME check for obviously impossible things and exit, etc
     
+    
+    if not opts.list and not opts.sign and not opts.clean:
+        parser.print_help()
+        sys.exit(1)
+            
     return (opts, args)
 
 def main(args):
+    if os.geteuid() != 0:
+        errorprint('Must be root to run certmaster-ca')
+        return 1
+        
     cm = func.certmaster.CertMaster('/etc/func/certmaster.conf')
     
     (opts, args) = parseargs(args)
+
+        
     if opts.list:
         hns = cm.get_csrs_waiting()
         if hns:
@@ -57,7 +71,26 @@ def main(args):
             certfile = cm.sign_this_csr(csrfile)
             print '%s signed - cert located at %s' % (hn, certfile)
         return 0
+    
+    if opts.clean:
+        if not args:
+            errorprint('Need hostname(s) to clean up')
+            return 1
         
+        for hn in args:
+            csrglob = '%s/%s.csr' % (cm.cfg.csrroot, hn)
+            csrs = glob.glob(csrglob)
+            certglob = '%s/%s.cert' % (cm.cfg.certroot, hn)
+            certs = glob.glob(certglob)
+            if not csrs and not certs:
+                errorprint('No match for %s to clean up' % hn)
+                continue
+            
+            for fn in csrs + certs:
+                print 'Cleaning out %s for host matching %s' % (fn, hn)
+                os.unlink(fn)
+        
+        return 0
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
