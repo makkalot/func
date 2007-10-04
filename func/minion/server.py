@@ -28,6 +28,7 @@ I18N_DOMAIN = "func"
 from func.config import read_config
 from func.commonconfig import FuncdConfig
 from func import logger
+from func import certs
 
 # our modules
 import AuthedXMLRPCServer
@@ -167,11 +168,13 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         self.modules = module_loader.load_modules()
 
         XmlRpcInterface.__init__(self)
-        hn = socket.getfqdn()
+        hn = utils.get_hostname()
         self.key = "%s/%s.pem" % (self.config.cert_dir, hn)
         self.cert = "%s/%s.cert" % (self.config.cert_dir, hn)
         self.ca = "%s/ca.cert" % self.config.cert_dir
-
+        
+        self._our_ca = certs.retrieve_cert_from_file(self.ca)
+        
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,
                                                           self.ca)
@@ -182,22 +185,25 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         the SimpleXMLRPCServer class will call _dispatch if it doesn't
         find a handler method
         """
-
+        # take _this_request and hand it off to check out the acls of the method
+        # being called vs the requesting host
+        
+        if not hasattr(self, '_this_request'):
+            raise codes.InvalidMethodException
+            
+        r,a = self._this_request
+        peer_cert = r.get_peer_certificate()
+        ip = a[0]
+        
+        if not self._check_acl(peer_cert, ip, method, params):
+            raise codes.AccessToMethodDenied
+            
         # Recognize ipython's tab completion calls
         if method == 'trait_names' or method == '_getAttributeNames':
             return self.handlers.keys()
 
-        if hasattr(self, '_this_request'):
-            r,a = self._this_request
-            p = r.get_peer_certificate()
-            ip = a[0]
-            cn = p.get_subject().CN
-            sub_hash = p.subject_name_hash()
-        else:
-            print 'no cert'
-
-        # XXX FIXME - need to figure out how to dig into the server base classes
-        # so we can get client ip, and eventually cert id info -akl
+        cn = peer_cert.get_subject().CN
+        sub_hash = peer_cert.subject_name_hash()
         self.audit_logger.log_call(ip, cn, sub_hash, method, params)
 
         return self.get_dispatch_method(method)(*params)
@@ -205,7 +211,21 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()
         return peer_cert.get_subject().CN
-
+    
+    def _check_acl(self, cert, ip, method, params):
+        cn = cert.get_subject().CN
+        sub_hash = cert.subject_name_hash()
+        # FIXME - make this be more useful, obviously :)
+        # until we figure out the right config - just say - if the cert
+        # is not the cert of our ca (which is where overlord/func/certmaster 
+        # runs then return False
+        ca_cn = self._our_ca.get_subject().CN
+        ca_hash = self._our_ca.subject_name_hash()
+        if cn == ca_cn and sub_hash == ca_hash:
+            return True
+        
+        # clearly other method/param checks here
+        return False
 
 def main(argv):
 

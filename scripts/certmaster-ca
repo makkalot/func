@@ -67,9 +67,15 @@ def main(args):
             return 1
             
         for hn in args:
-            csrfile = '%s/%s.csr' % (cm.cfg.csrroot, hn)
-            certfile = cm.sign_this_csr(csrfile)
-            print '%s signed - cert located at %s' % (hn, certfile)
+            csrglob = '%s/%s.csr' % (cm.cfg.csrroot, hn)
+            csrs = glob.glob(csrglob)
+            if not csrs:
+                errorprint('No match for %s to sign' % hn)
+                return 1
+            
+            for fn in csrs:
+                certfile = cm.sign_this_csr(fn)
+                print '%s signed - cert located at %s' % (fn, certfile)
         return 0
     
     if opts.clean:
