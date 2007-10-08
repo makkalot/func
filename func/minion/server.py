@@ -20,6 +20,7 @@ import string
 import sys
 import traceback
 import socket
+import fnmatch
 
 from gettext import textdomain
 I18N_DOMAIN = "func"
@@ -51,7 +52,7 @@ class XmlRpcInterface(object):
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
-
+        
         # need a reference so we can log ip's, certs, etc
 #        self.server = server
 
@@ -217,18 +218,27 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         return peer_cert.get_subject().CN
     
     def _check_acl(self, cert, ip, method, params):
-        cn = cert.get_subject().CN
-        sub_hash = cert.subject_name_hash()
-        # FIXME - make this be more useful, obviously :)
-        # until we figure out the right config - just say - if the cert
-        # is not the cert of our ca (which is where overlord/func/certmaster 
-        # runs then return False
+        acls = utils.get_acls_from_config(fn=self.config.acl_config)
+        # certmaster always gets to run things
         ca_cn = self._our_ca.get_subject().CN
         ca_hash = self._our_ca.subject_name_hash()
-        if cn == ca_cn and sub_hash == ca_hash:
-            return True
-        
-        # clearly other method/param checks here
+        ca_key = '%s-%s' % (ca_cn, ca_hash)
+        acls[ca_key] = ['*']
+
+        cn = cert.get_subject().CN
+        sub_hash = cert.subject_name_hash()
+        if acls:
+            allow_list = []
+            hostkey = '%s-%s' % (cn, sub_hash)
+            # search all the keys, match to 'cn-subhash'
+            for hostmatch in acls.keys():
+                if fnmatch.fnmatch(hostkey, hostmatch):
+                    allow_list.extend(acls[hostmatch])
+            # go through the allow_list and make sure this method is in there
+            for methodmatch in allow_list:
+                if fnmatch.fnmatch(method, methodmatch):
+                    return True
+                    
         return False
 
 def main(argv):
