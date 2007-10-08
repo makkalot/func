@@ -43,6 +43,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/pki/%{name}
 %config(noreplace) /etc/func/minion.conf
+%config(noreplace) /etc/func/minion-acl.conf
 %config(noreplace) /etc/func/certmaster.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
 %dir %{python_sitelib}/func
