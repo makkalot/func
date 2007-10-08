@@ -157,3 +157,40 @@ def daemonize(pidfile=None):
         if pidfile is not None:
             open(pidfile, "w").write(str(pid))
         sys.exit(0)
+
+def get_acls_from_config(fn='/etc/func/minion-acl.conf'):
+    """
+    takes a fn = filename of config file
+    returns a dict of hostname+hash =  [methods, to, run]
+    
+    """
+    
+    acls = {}
+    if not os.path.exists(fn):
+        print 'acl config file does not exist: %s' % fn
+        return acls
+    try:
+        fo = open(fn, 'r')
+    except (IOError, OSError), e:
+        print 'cannot open acl config file: %s' % e
+        return acls
+    
+    for line in fo.readlines():
+        if line.startswith('#'): continue
+        if line.strip() == '': continue
+        line = line.replace('\n', '')
+        (host, methods) = line.split('=')
+        host = host.strip().lower()
+        methods = methods.strip()
+        methods = methods.replace(',',' ')
+        methods = methods.split()
+        if not acls.has_key(host):
+            acls[host] = []
+        acls[host].extend(methods)
+    
+    return acls
+    
+        
+        
+
+    
