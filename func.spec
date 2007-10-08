@@ -48,8 +48,10 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
+%dir %{python_sitelib}/func/overlord/cmd_modules
 %{python_sitelib}/func/minion/*.py*
 %{python_sitelib}/func/overlord/*.py*
+%{python_sitelib}/func/overlord/cmd_modules/*.py*
 %{python_sitelib}/func/*.py*
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
@@ -73,6 +75,9 @@ fi
 
 
 %changelog
+* Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
+- add cmd_modules
+
 * Fri Sep 28 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
 - remove rhpl deps
 
