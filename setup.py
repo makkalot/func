@@ -33,6 +33,7 @@ if __name__ == "__main__":
 		packages = ["%s" % NAME,
 	        	    "%s/minion" % NAME,
 			    "%s/overlord" % NAME,
+			    "%s/overlord/cmd_modules" % NAME,
 	        	    "%s/minion/modules" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),

@@ -5,10 +5,10 @@ import distutils.sysconfig
 
 # sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
 
-import func.overlord.client as client
+import func.overlord.func_command as func_command
 
 myname, argv = sys.argv[0], sys.argv[1:]
-cli = client.FuncCommandLine()
+cli = func_command.FuncCommandLine()
 print cli.parse(argv)
 
 

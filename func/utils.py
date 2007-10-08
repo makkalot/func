@@ -17,6 +17,8 @@ import string
 import sys
 import traceback
 
+
+
 # this is kind of handy, so keep it around for now
 # but we really need to fix out server side logging and error
 # reporting so we don't need it
@@ -45,3 +47,5 @@ def daemonize(pidfile=None):
         if pidfile is not None:
             open(pidfile, "w").write(str(pid))
         sys.exit(0)
+
+    

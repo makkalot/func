@@ -22,9 +22,11 @@ import pprint
 
 from func.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
+
 import sslclient
 
 import command
+import func_command
 
 # ===================================
 # defaults
@@ -174,7 +176,8 @@ class Client(object):
                 meth = "%s.%s" % (module, method)
                 retval = getattr(conn, meth)(*args[:])
                 if self.interactive:
-                    pprint.pprint(retval)
+                    print retval
+#                    pprint.pprint(retval)
             except Exception, e:
                 retval = e
                 if self.interactive:
@@ -220,76 +223,4 @@ class Client(object):
                 max = x
         return max
 
-# ===================================================================
 
-class Call(command.Command):
-    name = "call"
-    useage = "call nodule method name arg1 arg2..."
-    def addOptions(self):
-        self.parser.add_option("-v", "--verbose", dest="verbose",
-            action="store_true")
-        self.parser.add_option("-p", "--port", dest="port",
-            default=DEFAULT_PORT)
-
-    def handleOptions(self, options):
-        self.options = options
-
-        self.verbose = options.verbose
-        self.port = options.port
-        # I'm not really a fan of the "module methodname" approach
-        # but we'll keep it for now -akl
-
-    def do(self, args):
-
-        # I'm not really a fan of the "module methodname" approach
-        # but we'll keep it for now -akl
-
-        self.server_spec = args[0]
-        self.module      = args[1]
-        self.method      = args[2]
-        self.method_args = args[3:]
-
-        client = Client(self.server_spec,port=self.port,interactive=True,
-            verbose=self.verbose, config=self.config)
-        results = client.run(self.module, self.method, self.method_args)
-
-        # TO DO: add multiplexer support
-        # probably as a higher level module.
-
-        return client.cli_return(results)
-
-class FuncCommandLine(command.Command):
-    name = "client"
-    useage = "func is the commandline interface to a func minion"
-
-    subCommandClasses = [Call]
-
-    def __init__(self):
-
-        command.Command.__init__(self)
-
-    def do(self, args):
-        pass
-
-    def addOptions(self):
-        self.parser.add_option('', '--version', action="store_true",
-            help="show version information")
-        self.parser.add_option("--list-minions", dest="list_minions",
-            action="store_true", help="list all available minions")
-
-    def handleOptions(self, options):
-        if options.version:
-            #FIXME
-            print "version is NOT IMPLEMENTED YET"
-        if options.list_minions:
-            self.list_minions()
-
-            sys.exit(0) # stop execution
-
-    def list_minions(self):
-        print "Minions:"
-        gloob = "%s/%s.cert" % (self.config.certroot, "*")
-        certs = glob.glob(gloob)
-        for cert in certs:
-            host = cert.replace(self.config.certroot, "")[1:-5]
-            print "   %s" % host
