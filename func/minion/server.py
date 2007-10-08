@@ -81,10 +81,14 @@ class XmlRpcInterface(object):
         self.handlers["system.list_modules"] = self.list_modules
 
     def list_modules(self):
-        return self.modules.keys()
+        modules = self.modules.keys()
+        modules.sort()
+        return modules
 
     def list_methods(self):
-        return self.handlers.keys()
+        methods = self.handlers.keys()
+        methods.sort()
+        return methods
 
     def get_dispatch_method(self, method):
 
