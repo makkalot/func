@@ -36,11 +36,6 @@ class Call(client.command.Command):
     def parse(self, argv):
         self.argv = argv
 
-        # FIXME? not sure this is good or bad, but it seems
-        # wronky... we try to grab the hostnamegoo from the
-        # args to the parentCommand
-        self.server_spec = self.argv[0]
-        
         return command.Command.parse(self, argv)
         
 
@@ -52,7 +47,6 @@ class Call(client.command.Command):
             return pprint.pformat(data)
 
         if self.options.json:
-            print "fffffffffffffffffffffffffffffffffffffffffff"
             try:
                 import simplejson
                 return simplejson.dumps(data)
@@ -69,10 +63,15 @@ class Call(client.command.Command):
 
         # I kind of feel like we shouldn't be parsing args here, but I'm
         # not sure what the write place is -al;
-        self.server_spec = args[0]
-        self.module      = args[1]
-        self.method      = args[2]
-        self.method_args = args[3:]
+        self.module      = args[0]
+        self.method      = args[1]
+        self.method_args = args[2:]
+
+        # this could get weird, sub sub classes might be calling this
+        # this with multiple.parentCommand.parentCommands...
+        # maybe command.py needs a way to set attrs on subCommands?
+        # or some sort of shared datastruct?
+        self.server_spec = self.parentCommand.server_spec
 
         client_obj = client.Client(self.server_spec,port=self.port,interactive=True,
             verbose=self.verbose, config=self.config)

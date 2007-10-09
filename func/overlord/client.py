@@ -63,6 +63,47 @@ class CommandAutomagic(object):
 
 # ===================================
 
+
+
+# this is a module level def so we can use it and isServer() from
+# other modules with a Client class
+def expand_servers(spec, port=51234, noglobs=None, verbose=None):
+    config  = read_config(CONFIG_FILE, CMConfig)
+    """
+    Given a regex/blob of servers, expand to a list
+    of server ids.
+    """
+
+    if noglobs:
+        return [ "https://%s:%s" % (spec, port) ]
+
+    all_hosts = []
+    all_certs = []
+    seperate_gloobs = spec.split(";")
+    for each_gloob in seperate_gloobs:
+        actual_gloob = "%s/%s.cert" % (config.certroot, each_gloob)
+        certs = glob.glob(actual_gloob)
+        for cert in certs:
+            all_certs.append(cert)
+            host = cert.replace(config.certroot,"")[1:-5]
+            all_hosts.append(host)
+
+    all_urls = []
+    for x in all_hosts:
+        all_urls.append("https://%s:%s" % (x, port))
+
+    if verbose and len(all_urls) == 0:
+        sys.stderr.write("no hosts matched\n")
+
+    return all_urls
+
+# does the hostnamegoo actually expand to anything?
+def isServer(server_string):
+    servers = expand_servers(server_string)
+    if len(servers) > 0:
+        return True
+    return False
+
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
@@ -84,7 +125,8 @@ class Client(object):
         self.verbose     = verbose
         self.interactive = interactive
         self.noglobs     = noglobs
-        self.servers     = self.expand_servers(self.server_spec)
+        self.servers     = expand_servers(self.server_spec,port=self.port,
+                                          noglobs=self.noglobs,verbose=self.verbose)
 
         # default cert/ca/key is the same as the certmaster ca - need to
         # be able to change that on the cli
@@ -93,38 +135,6 @@ class Client(object):
         # yes, they're the same, that's the point
         self.ca = '%s/funcmaster.crt' % self.config.cadir
 
-    # -----------------------------------------------
-
-    def expand_servers(self,spec):
-        """
-        Given a regex/blob of servers, expand to a list
-        of server ids.
-        """
-
-        if self.noglobs:
-            return [ "https://%s:%s" % (spec, self.port) ]
-
-        all_hosts = []
-        all_certs = []
-        seperate_gloobs = spec.split(";")
-        for each_gloob in seperate_gloobs:
-            actual_gloob = "%s/%s.cert" % (self.config.certroot, each_gloob)
-            certs = glob.glob(actual_gloob)
-            for cert in certs:
-                all_certs.append(cert)
-                host = cert.replace(self.config.certroot,"")[1:-5]
-                all_hosts.append(host)
-
-        all_urls = []
-        for x in all_hosts:
-            all_urls.append("https://%s:%s" % (x, self.port))
-
-        if self.verbose and len(all_urls) == 0:
-            sys.stderr.write("no hosts matched\n")
-
-        return all_urls
-
-    # -----------------------------------------------
 
     def __getattr__(self, name):
         """

@@ -5,13 +5,18 @@ import sys
 
 
 import command
+
+#FIXME: need a plug-in runtime module loader here
 from cmd_modules import call
+from cmd_modules import show
+
+from func.overlord import client
 
 class FuncCommandLine(command.Command):
     name = "client"
     useage = "func is the commandline interface to a func minion"
 
-    subCommandClasses = [call.Call]
+    subCommandClasses = [call.Call,show.Show]
 
     def __init__(self):
 
@@ -25,6 +30,17 @@ class FuncCommandLine(command.Command):
             help="show version information")
         self.parser.add_option("--list-minions", dest="list_minions",
             action="store_true", help="list all available minions")
+
+    def handleArguments(self, args):
+        server_string = args[0]
+        # try to be clever about this for now
+        if client.isServer(server_string):
+            self.server_spec = server_string
+            args.pop(0)
+        # if it doesn't look like server, assume it
+        # is a sub command? that seems wrong, what about
+        # typo's and such? How to catch that? -akl
+        # maybe a class variable self.data on Command?
 
     def handleOptions(self, options):
         if options.version:
