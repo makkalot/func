@@ -227,6 +227,10 @@ class Command:
 
             return ret
 
+        # if we have args that we need to deal with, do it now
+        # before we start looking for subcommands
+        self.handleArguments(args)
+
         # if we do have subcommands, defer to them
         try:
             command = args[0]
@@ -262,6 +266,12 @@ class Command:
     def handleOptions(self, options):
         """
         Handle the parsed options.
+        """
+        pass
+
+    def handleArguments(self, arguments):
+        """
+        Handle the parsed arguments.
         """
         pass
 
