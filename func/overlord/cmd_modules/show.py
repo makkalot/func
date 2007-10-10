@@ -24,6 +24,8 @@ class ShowHardware(client.command.Command):
                                action="store_true")
         self.parser.add_option("", "--memory", dest="memory",
                                action="store_true")
+        self.parser.add_option("","--os", dest="os",
+                               action="store_true")
 
 
     def handleOptions(self, options):
@@ -58,7 +60,7 @@ class ShowHardware(client.command.Command):
         # do the big dump
 
         # also, optparse is annoying -akl
-        opt_list = ["--platform", "--memory"]
+        opt_list = ["--platform", "--memory", "--os"]
         for opt in opt_list:
             if self.parser.has_option(opt):
                 options_set = True
@@ -76,6 +78,9 @@ class ShowHardware(client.command.Command):
 
             if self.options.memory:
                 print minion_data["systemMemory"]
+
+            if self.options.os:
+                print minion_data["os"]
 
 class Show(client.command.Command):
     name = "show"
@@ -103,14 +108,4 @@ class Show(client.command.Command):
     def do(self, args):
         pass
     
-#        self.server_spec = self.parentCommand.server_spec
-#        client_obj = client.Client(self.server_spec,port=self.port,interactive=True,
-#            verbose=self.verbose, config=self.config)
-#        results = client_obj.run("hardware", "info", [])
-
-        # TO DO: add multiplexer support
-        # probably as a higher level module.
-
-        # dump the return code stuff atm till we figure out the right place for it
-#        return self.format_return(results)
 
