@@ -34,7 +34,7 @@ class CopyFile(client.command.Command):
     def addOptions(self):
         self.parser.add_option("-f", "--file", dest="filename",
                                action="store")
-        self.parser.add_option("", "--remotepath", dest="rpath",
+        self.parser.add_option("", "--remotepath", dest="remotepath",
                                 action="store")
         self.parser.add_option("", "--force", dest="force",
                                action="store_true")
@@ -74,6 +74,6 @@ class CopyFile(client.command.Command):
 
     
 
-        results = client_obj.run("copyfile", "copyfile", [self.options.rpath, fb,
+        results = client_obj.run("copyfile", "copyfile", [self.options.remotepath, fb,
                                                           mode, uid, gid])
 
