@@ -47,9 +47,6 @@ class CopyFile(client.command.Command):
         if self.options.port:
             self.port = self.options.port
 
-    def parse(self, argv):
-        self.argv = argv
-        return command.Command.parse(self,argv)
 
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec

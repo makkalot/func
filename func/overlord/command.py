@@ -217,6 +217,11 @@ class Command:
             # command
             args = [args[1], args[0]]
 
+
+        # if we have args that we need to deal with, do it now
+        # before we start looking for subcommands
+        self.handleArguments(args)
+
         # if we don't have subcommands, defer to our do() method
         if not self.subCommands:
             ret = self.do(args)
@@ -227,9 +232,6 @@ class Command:
 
             return ret
 
-        # if we have args that we need to deal with, do it now
-        # before we start looking for subcommands
-        self.handleArguments(args)
 
         # if we do have subcommands, defer to them
         try:

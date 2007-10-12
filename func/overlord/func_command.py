@@ -9,6 +9,7 @@ import command
 #FIXME: need a plug-in runtime module loader here
 from cmd_modules import call
 from cmd_modules import show
+from cmd_modules import copyfile
 
 from func.overlord import client
 
@@ -16,7 +17,8 @@ class FuncCommandLine(command.Command):
     name = "client"
     useage = "func is the commandline interface to a func minion"
 
-    subCommandClasses = [call.Call,show.Show]
+    subCommandClasses = [call.Call, show.Show,
+                         copyfile.CopyFile]
 
     def __init__(self):
 
