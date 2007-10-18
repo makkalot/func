@@ -41,7 +41,7 @@ rm -fr $RPM_BUILD_ROOT
 /etc/init.d/funcd
 /etc/init.d/certmaster
 %dir %{_sysconfdir}/%{name}
-%dir %{_sysconfdir}/minion-acl.d/
+%dir %{_sysconfdir}/%{name}/minion-acl.d/
 %dir %{_sysconfdir}/pki/%{name}
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/certmaster.conf
