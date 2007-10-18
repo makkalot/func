@@ -41,7 +41,6 @@ if __name__ == "__main__":
                               (initpath, ["init-scripts/certmaster"]),
                               (etcpath,  ["etc/minion.conf"]),
                               (etcpath,  ["etc/certmaster.conf"]),
-                              (etcpath,  ["etc/minion-acl.conf"]),
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
                               (manpath,  ["docs/certmaster.1.gz"]),
