@@ -19,6 +19,7 @@ import sys
 import time
 import traceback
 import xmlrpclib
+import glob
 
 import codes
 from func import certs
@@ -158,35 +159,42 @@ def daemonize(pidfile=None):
             open(pidfile, "w").write(str(pid))
         sys.exit(0)
 
-def get_acls_from_config(fn='/etc/func/minion-acl.conf'):
+def get_acls_from_config(acldir='/etc/func/minion-acl.d'):
     """
-    takes a fn = filename of config file
+    takes a dir of .acl files
     returns a dict of hostname+hash =  [methods, to, run]
     
     """
     
     acls = {}
-    if not os.path.exists(fn):
-        print 'acl config file does not exist: %s' % fn
-        return acls
-    try:
-        fo = open(fn, 'r')
-    except (IOError, OSError), e:
-        print 'cannot open acl config file: %s' % e
+    if not os.path.exists(acldir):
+        print 'acl dir does not exist: %s' % acldir
         return acls
     
-    for line in fo.readlines():
-        if line.startswith('#'): continue
-        if line.strip() == '': continue
-        line = line.replace('\n', '')
-        (host, methods) = line.split('=')
-        host = host.strip().lower()
-        methods = methods.strip()
-        methods = methods.replace(',',' ')
-        methods = methods.split()
-        if not acls.has_key(host):
-            acls[host] = []
-        acls[host].extend(methods)
+    # get the set of files
+    acl_glob = '%s/*.acl' % acldir
+    files = glob.glob(acl_glob)
+    
+    for acl_file in files:
+        
+        try:
+            fo = open(acl_file, 'r')
+        except (IOError, OSError), e:
+            print 'cannot open acl config file: %s - %s' % (acl_file, e)
+            continue
+    
+        for line in fo.readlines():
+            if line.startswith('#'): continue
+            if line.strip() == '': continue
+            line = line.replace('\n', '')
+            (host, methods) = line.split('=')
+            host = host.strip().lower()
+            methods = methods.strip()
+            methods = methods.replace(',',' ')
+            methods = methods.split()
+            if not acls.has_key(host):
+                acls[host] = []
+            acls[host].extend(methods)
     
     return acls
     

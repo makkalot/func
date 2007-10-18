@@ -218,7 +218,8 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         return peer_cert.get_subject().CN
     
     def _check_acl(self, cert, ip, method, params):
-        acls = utils.get_acls_from_config(fn=self.config.acl_config)
+        acls = utils.get_acls_from_config(acldir=self.config.acl_dir)
+        
         # certmaster always gets to run things
         ca_cn = self._our_ca.get_subject().CN
         ca_hash = self._our_ca.subject_name_hash()

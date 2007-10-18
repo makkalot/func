@@ -19,6 +19,7 @@ if __name__ == "__main__":
         logpath    = "/var/log/%s/" % NAME
         pkipath    = "/etc/pki/%s" % NAME
         rotpath    = "/etc/logrotate.d"
+        aclpath    = "%s/minion-acl.d" % etcpath
         setup(
                 name="%s" % NAME,
                 version = VERSION,
@@ -48,7 +49,8 @@ if __name__ == "__main__":
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
 			      (etcpath,  []),
-			      (pkipath,  [])
+			      (pkipath,  []),
+			      (aclpath,  [])
                 ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC

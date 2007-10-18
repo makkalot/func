@@ -13,5 +13,5 @@ class FuncdConfig(BaseConfig):
     log_level = Option('INFO')
     certmaster = Option('certmaster')
     cert_dir = Option('/etc/pki/func')
-    acl_config = Option('/etc/func/minion-acl.conf')
+    acl_dir = Option('/etc/func/minion-acl.d')
     

@@ -41,9 +41,9 @@ rm -fr $RPM_BUILD_ROOT
 /etc/init.d/funcd
 /etc/init.d/certmaster
 %dir %{_sysconfdir}/%{name}
+%dir %{_sysconfdir}/minion-acl.d/
 %dir %{_sysconfdir}/pki/%{name}
 %config(noreplace) /etc/func/minion.conf
-%config(noreplace) /etc/func/minion-acl.conf
 %config(noreplace) /etc/func/certmaster.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
 %dir %{python_sitelib}/func
@@ -76,6 +76,10 @@ fi
 
 
 %changelog
+* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
+- change out minion-acl.conf for minion-acl.d
+
+
 * Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
 - add cmd_modules
 
