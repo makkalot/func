@@ -1,0 +1,63 @@
+=head1 NAME
+
+func-inventory -- Takes inventory of data from func minions, and stores them in git.
+
+=head1 SYNOPSIS
+
+func-inventory [--verbose] [--server-spec glob] [--methods list] [--modules list] [--tree path] [--no-git]
+
+=head1 DESCRIPTION
+
+func-inventory runs against func-minions to gather information, and stores this information on the filesystem, in a tree arranged by hostname, module name, and method name.
+
+After each update, differences are commited to version control (using git), where they can be examined with tools such as "git log" and "gitk".
+
+=head1 --verbose
+
+Provides extra output about what func-inventory is doing.
+
+=head1 --server-spec
+
+A glob, as can be given to "func", that describes what machines the inventory program should run against.  The default is "*".
+
+=head1 --modules list
+
+A comma-seperated list of modules that should be included in the inventory, for instance "hardware,packages".  
+The default is "all".  
+
+=head1 --methods list
+
+A comma-seperated list of methods that should be included in the inventory, for each module being queried.  The default
+is "info", which saves the data for any module that has an "info" method.
+
+=head1 --tree-path
+
+Selects the location where func-inventory will output data.  The default is /var/lib/func/inventory.  This directory will
+contain a tree structure based on the hostnames, modules, and methods included in the inventory.
+
+=head1 --no-git
+
+Disables git integration, meaning changes will not be tracked using version control.   This option is present
+for those that do not have the "git-core" package installed, though installing it is highly recommended to get
+the full degree of power out of func-inventory.
+
+=head1 VIEWING CHANGES
+
+Since func-inventory integrates with git, all changes to the remote systems (including additions of new systems) can
+be tracked using standard git-tools such as "git log" and "gitk", when run on the directory specified for --tree.
+
+Additional built in hooks to notify changes can be written using git's own trigger mechanism, though something
+more specific to func will likely be developed in the future -- also eliminating the need to grok git internals.
+
+=head1 ADDITONAL RESOURCES
+
+See https://hosted.fedoraproject.org/projects/func/ for more information.
+
+See also the manpages for "func", "funcd", "certmaster", and "certmaster-ca".
+
+=head1 AUTHOR
+
+Michael DeHaan <mdehaan@redhat.com>
+
+
+

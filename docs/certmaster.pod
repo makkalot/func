@@ -20,7 +20,7 @@ Certmaster is configured by /etc/func/certmaster.conf
 
 See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
 
-See also the manpages for "func", "funcd", "certmaster-ca".
+See also the manpages for "func", "func-inventory", "funcd", "certmaster-ca".
 
 =head1 AUTHOR
 

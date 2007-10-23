@@ -32,7 +32,7 @@ To configure this, edit /etc/func/certmaster.conf.
 
 See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
 
-See also the manpages for "func", "funcd", and "certmaster".
+See also the manpages for "func", "func-inventory", "funcd", and "certmaster".
 
 =head1 AUTHOR
 

@@ -91,7 +91,7 @@ called.  See the project page (linked below) for more information.
 
 See https://hosted.fedoraproject.org/projects/func/ for more information, including information on scripting func from Python.
 
-See also the manpages for "funcd", "certmaster", and "certmaster-ca".
+See also the manpages for "func-inventory", "funcd", "certmaster", and "certmaster-ca".
 
 =head1 AUTHOR
 

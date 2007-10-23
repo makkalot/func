@@ -60,6 +60,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir /var/log/func
 %doc AUTHORS README
 %{_mandir}/man1/func.1.gz
+%{_mandir}/man1/func-inventory.1.gz
 %{_mandir}/man1/funcd.1.gz
 %{_mandir}/man1/certmaster.1.gz
 %{_mandir}/man1/certmaster-ca.1.gz
@@ -78,7 +79,7 @@ fi
 
 %changelog
 * Tue Oct 23 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-1
-- packaged func-inventory script
+- packaged func-inventory and associated manpage
 - release bump
 
 * Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
