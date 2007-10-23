@@ -38,6 +38,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func
 %{_bindir}/certmaster
 %{_bindir}/certmaster-ca
+%{_bindir}/func-inventory
 /etc/init.d/funcd
 /etc/init.d/certmaster
 %dir %{_sysconfdir}/%{name}
@@ -76,9 +77,12 @@ fi
 
 
 %changelog
+* Tue Oct 23 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-1
+- packaged func-inventory script
+- release bump
+
 * Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
 - change out minion-acl.conf for minion-acl.d
-
 
 * Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
 - add cmd_modules

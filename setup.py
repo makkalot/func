@@ -27,7 +27,11 @@ if __name__ == "__main__":
                 author_email = "func-list@redhat.com",
                 url = "https://hosted.fedoraproject.org/projects/func/",
                 license = "GPL",
-		scripts = ["scripts/funcd", "scripts/func", "scripts/certmaster", "scripts/certmaster-ca"],
+		scripts = [
+                     "scripts/funcd", "scripts/func", 
+                     "scripts/certmaster", "scripts/certmaster-ca",
+                     "scripts/func-inventory"
+                ],
 		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME
                 },

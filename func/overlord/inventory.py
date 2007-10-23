@@ -1,0 +1,153 @@
+#!/usr/bin/python
+
+##
+## func inventory app.
+## use func to collect inventory data on anything, yes, anything
+##
+## Copyright 2007, Red Hat, Inc
+## Michael DeHaan <mdehaan@redhat.com>
+## +AUTHORS
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##
+
+import os.path
+import time
+import optparse
+import sys
+import glob
+import pprint
+from func.minion import sub_process
+
+import func.overlord.client as func_client
+
+DEFAULT_TREE = "/var/lib/func/inventory/"
+
+class FuncInventory(object):
+
+    def __init__(self):
+        pass 
+
+    def run(self,args): 
+
+        p = optparse.OptionParser()
+        p.add_option("-v", "--verbose",
+                     dest="verbose",
+                     action="store_true",
+                     help="provide extra output")
+        p.add_option("-s", "--server-spec",
+                     dest="server_spec",
+                     default="*",
+                     help="run against specific servers, default: '*'")
+        p.add_option("-m", "--methods",
+                     dest="methods",
+                     default="info",
+                     help="run inventory only on certain function names, default: 'info'")
+        p.add_option("-M", "--modules",
+                     dest="modules",
+                     default="all",
+                     help="run inventory only on certain module names, default: 'all'")
+        p.add_option("-t", "--tree",
+                     dest="tree",
+                     default=DEFAULT_TREE,
+                     help="output results tree here, default: %s" % DEFAULT_TREE)
+        p.add_option("-n", "--no-git",
+                     dest="nogit",
+                     action="store_false",
+                     help="disable useful change tracking features")
+        (options, args) = p.parse_args(args)
+
+        filtered_module_list = options.modules.split(",")
+        filtered_function_list = options.methods.split(",")
+
+        self.git_setup(options)
+
+        # see what modules each host provides (as well as what hosts we have)
+        host_modules = func_client.Client(options.server_spec).system.list_modules()
+
+        # call all remote info methods and handle them
+        if options.verbose:
+            print "- scanning ..."
+        for (host, modules) in host_modules.iteritems():
+            if type(modules) != list:
+                if options.verbose:
+                    print "-- connection refused: %s" % host
+                continue
+            else:
+                if options.verbose:
+                    print "-- connected: %s" % host
+
+            for module_name in modules:
+                if ("all" in filtered_module_list) or (module_name in filtered_module_list):
+                    if options.verbose:
+                        print "---- scanning module: %s" % module_name
+                    host_module = getattr(func_client.Client(host,noglobs=True),module_name)
+                    remote_methods = host_module.list_methods()
+                    for remote_method in remote_methods:
+                         if ("all" in filtered_function_list) or (remote_method in filtered_function_list):
+                             if options.verbose:
+                                 print "------ adding to inventory: %s/%s" % (module_name, remote_method)
+                             results = getattr(host_module, remote_method)()
+                             self.save_results(options, host, module_name, remote_method, results)
+        self.git_update(options)
+        return 1
+
+    # FUTURE: skvidal points out that guest symlinking would be an interesting feature       
+
+    def save_results(self, options, host_name, module_name, method_name, results):
+        dirname = os.path.join(options.tree, host_name, module_name)
+        if not os.path.exists(dirname):
+             os.makedirs(dirname)
+        filename = os.path.join(dirname, method_name)
+        results_file = open(filename,"w+")
+        data = pprint.pformat(results)
+        results_file.write(data)
+        results_file.close()
+
+    def git_setup(self,options):
+        if options.nogit:
+            return  
+        if not os.path.exists("/usr/bin/git"):
+            print "git-core is not installed, so no change tracking is available."
+            print "use --no-git or, better, just install it."
+            sys.exit(411) 
+            
+        if not os.path.exists(options.tree):
+            os.makedirs(options.tree)
+        dirname = os.path.join(options.tree, ".git")
+        if not os.path.exists(dirname):
+            if options.verbose:
+                print "- initializing git repo: %s" % options.tree
+            cwd = os.getcwd()
+            os.chdir(options.tree)
+            rc1 = sub_process.call(["/usr/bin/git", "init"], shell=False)
+            # FIXME: check rc's
+            os.chdir(cwd)
+        else:
+            if options.verbose:
+                print "- git already initialized: %s" % options.tree
+
+    def git_update(self,options):
+        if options.nogit:
+            return
+        else:
+            if options.verbose:
+               print "- updating git"
+        mytime = time.asctime()
+        cwd = os.getcwd()
+        os.chdir(options.tree)
+        rc1 = sub_process.call(["/usr/bin/git", "add", "*" ], shell=False)
+        rc2 = sub_process.call(["/usr/bin/git", "commit", "-a", "-m", "Func-inventory update: %s" % mytime], shell=False)
+        # FIXME: check rc's
+        os.chdir(cwd)
+
+if __name__ == "__main__":
+
+    inv = FuncInventory()
+    inv.run(sys.argv)
+    
