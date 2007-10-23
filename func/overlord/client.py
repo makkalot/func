@@ -187,7 +187,6 @@ class Client(object):
                 retval = getattr(conn, meth)(*args[:])
                 if self.interactive:
                     print retval
-#                    pprint.pprint(retval)
             except Exception, e:
                 retval = e
                 if self.interactive:
