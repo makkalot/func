@@ -4,13 +4,13 @@ Func -- Fedora Unified Network Controller.
 
 =head1 SYNOPSIS
 
-func target.example.org call module command [args ...] [--verbose]
+func --list-minions
 
-func "target*.example.org" call module command [args ...] [--verbose]
+func target.example.org call module command [args ...]
 
-func "webserver1;mailserver2" call module command [args ...] [--verbose]
+func "target*.example.org" call module command [args ...]
 
-func "*" --list-minions
+func "webserver1;mailserver2" call module command [args ...]
 
 =head1 DESCRIPTION
 
@@ -24,17 +24,63 @@ their names with globs, which follow shell glob syntax.
 See the project homepage (below) for a list of modules available
 and a more in-depth description of what each of them do.
 
+=head1 THE "CALL" MODULE
+
+The "call" module is used for running func modules remotely.  
+
+Format:  func "*.example.org" call <module> <function> [ args ... ]
+
 =head1 LISTING REMOTE MODULES AVAILABLE
 
-func target.example.org system list_modules
+It's possible to ask func minions what modules they have installed:
+
+func "*.example.org" call system list_modules
 
 =head1 LISTING REMOTE FUNCTIONS AVAILABLE IN A MODULE
 
-func target.example.org modulename list_methods
+It is also possible to ask remote func modules what functions they support:
+
+func target.example.org call modulename list_methods
 
 =head1 CALLING A REMOTE COMMAND
 
-func target.example.org modulename methodname
+Once you have the name of a module you want to run, use call to invoke it:
+
+func target.example.org call modulename methodname
+
+=head1 HELPER MODULES
+
+In addition to "call", there are other modules that make control of remote
+machines, as well as data display, more user friendly.  They augment "call"
+by providing some additional functionality.
+
+You will notice that the syntax for using one of these helper modules
+varies slightly from just using "call" directly.
+
+For example "show" can be used to show remote data.  The normal command "func '*'
+command would dump a very large amount of data, while the show command can mine
+only a few details.  This might make things more readable, for instance, when
+not going through the Python API (where you would not care). 
+
+func "*.example.org" show hardware --help
+
+func "*.example.org" show hardware --memory
+
+func "*.example.org" show hardware --os
+
+Another useful helper command module is copyfile, which allows func to work like scp from 
+the shell, though it can address multiple systems at the same time.  
+
+The following example pushes one file out to multiple systems:
+
+func "*.example.org" copyfile --file=/tmp/foo --remotepath=/tmp/foo
+
+While these helper modules will grow over time, usage of "call" syntax 
+directly is fine also.  See the Wiki for more examples as they evolve.
+
+=head1 --verbose
+
+Use this flag to output extra information from func while it is running.
 
 =head1 EXIT_STATUS
 
