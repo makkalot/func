@@ -46,8 +46,8 @@ class FuncInventory(object):
                      help="run against specific servers, default: '*'")
         p.add_option("-m", "--methods",
                      dest="methods",
-                     default="info",
-                     help="run inventory only on certain function names, default: 'info'")
+                     default="inventory",
+                     help="run inventory only on certain function names, default: 'inventory'")
         p.add_option("-M", "--modules",
                      dest="modules",
                      default="all",
@@ -58,7 +58,7 @@ class FuncInventory(object):
                      help="output results tree here, default: %s" % DEFAULT_TREE)
         p.add_option("-n", "--no-git",
                      dest="nogit",
-                     action="store_false",
+                     action="store_true",
                      help="disable useful change tracking features")
         (options, args) = p.parse_args(args)
 
