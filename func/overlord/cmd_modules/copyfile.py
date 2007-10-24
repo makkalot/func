@@ -70,7 +70,7 @@ class CopyFile(client.command.Command):
         gid = st.st_gid
 
     
-
-        results = client_obj.run("copyfile", "copyfile", [self.options.remotepath, fb,
+        data = xmlrpclib.Binary(fb)
+        results = client_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
                                                           mode, uid, gid])
 

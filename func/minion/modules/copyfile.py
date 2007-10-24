@@ -20,6 +20,10 @@ from modules import func_module
 
 
 class CopyFile(func_module.FuncModule):
+    version = "0.0.1"
+    api_version = "0.0.2"
+    
+    
 
     def __init__(self):
         self.methods = {
@@ -28,6 +32,12 @@ class CopyFile(func_module.FuncModule):
         }
         func_module.FuncModule.__init__(self)
 
+    def _checksum_blob(self, blob):
+        CHUNK=2**16
+        thissum = sha.new()
+        thissum.update(blob)
+        return thissum.hexdigest()
+                       
     def checksum(self, thing):
 
         CHUNK=2**16
@@ -60,7 +70,7 @@ class CopyFile(func_module.FuncModule):
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
 
-        remote_sum = self.checksum(filebuf)
+        remote_sum = self._checksum_blob(filebuf.data)
         local_sum = 0
         if os.path.exists(filepath):
             local_sum = self.checksum(filepath)
@@ -74,7 +84,7 @@ class CopyFile(func_module.FuncModule):
             # do the new write
             try:
                 fo = open(filepath, 'w')
-                fo.write(filebuf)
+                fo.write(filebuf.data)
                 fo.close()
                 del fo
             except (IOError, OSError), e:
