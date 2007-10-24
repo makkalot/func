@@ -10,6 +10,7 @@ import command
 from cmd_modules import call
 from cmd_modules import show
 from cmd_modules import copyfile
+from cmd_modules import listminions
 
 from func.overlord import client
 
@@ -18,7 +19,7 @@ class FuncCommandLine(command.Command):
     useage = "func is the commandline interface to a func minion"
 
     subCommandClasses = [call.Call, show.Show,
-                         copyfile.CopyFile]
+                         copyfile.CopyFile, listminions.ListMinions]
 
     def __init__(self):
 
@@ -30,13 +31,18 @@ class FuncCommandLine(command.Command):
     def addOptions(self):
         self.parser.add_option('', '--version', action="store_true",
             help="show version information")
-        self.parser.add_option("--list-minions", dest="list_minions",
-            action="store_true", help="list all available minions")
 
+    # just some ugly goo to try to guess if arg[1] is hostnamegoo or
+    # a command name
+    def _isGlob(self, str):
+        if str.find("*") or str.find("?") or str.find("[") or str.find("]"):
+            return True
+        return False
+        
     def handleArguments(self, args):
         server_string = args[0]
         # try to be clever about this for now
-        if client.isServer(server_string):
+        if client.isServer(server_string) or self._isGlob(server_string):
             self.server_spec = server_string
             args.pop(0)
         # if it doesn't look like server, assume it
@@ -48,15 +54,3 @@ class FuncCommandLine(command.Command):
         if options.version:
             #FIXME
             print "version is NOT IMPLEMENTED YET"
-        if options.list_minions:
-            self.list_minions()
-
-            sys.exit(0) # stop execution
-
-    def list_minions(self):
-        print "Minions:"
-        gloob = "%s/%s.cert" % (self.config.certroot, "*")
-        certs = glob.glob(gloob)
-        for cert in certs:
-            host = cert.replace(self.config.certroot, "")[1:-5]
-            print "   %s" % host
