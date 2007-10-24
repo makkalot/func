@@ -130,16 +130,17 @@ class Virt(func_module.FuncModule):
         """
 
         self.methods = {
-            "install"  : self.install,
-            "shutdown" : self.shutdown,
-            "destroy"  : self.destroy,
-            "start"    : self.create,
-            "pause"    : self.pause,
-            "unpause"  : self.unpause,
-            "delete"   : self.undefine,
-            "status"   : self.get_status,
-	    "info"     : self.info,
-            "list_vms" : self.list_vms,
+            "install"   : self.install,
+            "shutdown"  : self.shutdown,
+            "destroy"   : self.destroy,
+            "start"     : self.create,
+            "pause"     : self.pause,
+            "unpause"   : self.unpause,
+            "delete"    : self.undefine,
+            "status"    : self.get_status,
+	    "info"      : self.info,
+	    "inventory" : self.info,   # for func-inventory
+            "list_vms"  : self.list_vms,
         }
 
         func_module.FuncModule.__init__(self)

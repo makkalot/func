@@ -29,8 +29,9 @@ from modules import func_module
 class HardwareModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
-            "info"     : self.info,
-            "hal_info" : self.hal_info
+            "info"      : self.info,
+            "inventory" : self.info,       # for func-inventory
+            "hal_info"  : self.hal_info
         }
         func_module.FuncModule.__init__(self)
 
