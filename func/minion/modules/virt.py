@@ -138,6 +138,7 @@ class Virt(func_module.FuncModule):
             "unpause"  : self.unpause,
             "delete"   : self.undefine,
             "status"   : self.get_status,
+	    "info"     : self.info,
             "list_vms" : self.list_vms,
         }
 
@@ -146,6 +147,15 @@ class Virt(func_module.FuncModule):
     def get_conn(self):
 	self.conn = FuncLibvirtConnection()
         return self.conn
+
+    def info(self):
+	vms = self.list_vms()
+	info = []
+	for vm in vms:
+	    print vm
+	    info_blurb = self.conn.get_status(vm)
+	    info.append("%s %s" % (vm,info_blurb))
+	return info
 
     def list_vms(self):
         self.conn = self.get_conn()
