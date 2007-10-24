@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+import sys
+import distutils.sysconfig
+import func.overlord.inventory as func_inventory
+
+inventory = func_inventory.FuncInventory()
+inventory.run(sys.argv)
