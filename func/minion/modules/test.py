@@ -8,12 +8,16 @@ class Test(func_module.FuncModule):
     description = "Just a very simple example module"
     def __init__(self):
         self.methods = {
-            "add": self.add
+            "add":  self.add,
+            "ping": self.ping
         }
         func_module.FuncModule.__init__(self)
 
     def add(self, numb1, numb2):
         return numb1 + numb2
+
+    def ping(self):
+        return 1
 
 methods = Test()
 register_rpc = methods.register_rpc

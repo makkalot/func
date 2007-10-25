@@ -11,6 +11,7 @@ from cmd_modules import call
 from cmd_modules import show
 from cmd_modules import copyfile
 from cmd_modules import listminions
+from cmd_modules import ping
 
 from func.overlord import client
 
@@ -19,7 +20,7 @@ class FuncCommandLine(command.Command):
     useage = "func is the commandline interface to a func minion"
 
     subCommandClasses = [call.Call, show.Show,
-                         copyfile.CopyFile, listminions.ListMinions]
+                         copyfile.CopyFile, listminions.ListMinions, ping.Ping]
 
     def __init__(self):
 
