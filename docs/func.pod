@@ -4,7 +4,7 @@ Func -- Fedora Unified Network Controller.
 
 =head1 SYNOPSIS
 
-func --list-minions
+func "*" list_minons
 
 func target.example.org call module command [args ...]
 
