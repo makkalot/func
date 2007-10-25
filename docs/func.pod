@@ -78,9 +78,17 @@ func "*.example.org" copyfile --file=/tmp/foo --remotepath=/tmp/foo
 While these helper modules will grow over time, usage of "call" syntax 
 directly is fine also.  See the Wiki for more examples as they evolve.
 
+=head1 OUTPUT COMMANDS
+
+The "call" command by default outputs data using a "pretty printer".  Other
+display options include --raw, --json, and --xmlrpc, which may be more
+desirable if you are running func inside another script or prefer to read
+those display formats.
+
 =head1 --verbose
 
 Use this flag to output extra information from func while it is running.
+All func commands can take this flag.
 
 =head1 EXIT_STATUS
 
