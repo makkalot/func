@@ -78,9 +78,9 @@ fi
 
 
 %changelog
-* Tue Oct 23 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-1
+* Wed Oct 24 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-2
 - packaged func-inventory and associated manpage
-- release bump
+- release bump for Fedora submission
 
 * Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
 - change out minion-acl.conf for minion-acl.d

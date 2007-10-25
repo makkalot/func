@@ -24,11 +24,14 @@ class Service(func_module.FuncModule):
 
     def __init__(self):
         self.methods = {
-            "start"   : self.start,
-            "stop"    : self.stop,
-            "restart" : self.restart,
-            "reload"  : self.reload,
-            "status"  : self.status
+            "start"       : self.start,
+            "stop"        : self.stop,
+            "restart"     : self.restart,
+            "reload"      : self.reload,
+            "status"      : self.status,
+            "get_enabled" : self.get_enabled,
+            "get_running" : self.get_running,
+            "inventory"   : self.inventory,
         }
         func_module.FuncModule.__init__(self)
 
@@ -54,6 +57,33 @@ class Service(func_module.FuncModule):
 
     def status(self, service_name):
         return self.__command(service_name, "status")
+
+    def inventory(self):
+        return {
+            "running" : self.get_running(),
+            "enabled" : self.get_enabled()
+        }
+
+    def get_enabled(self):
+        chkconfig = sub_process.Popen(["/sbin/chkconfig", "--list"], stdout=sub_process.PIPE)
+        data = chkconfig.communicate()[0]
+        results = []
+        for line in data.split("\n"):
+            if line.find("0:") != -1:
+               # regular services
+               tokens = line.split()
+               results.append((tokens[0],tokens[1:]))
+            elif line.find(":") != -1 and not line.endswith(":"):
+               # xinetd.d based services
+               tokens = line.split()
+               tokens[0] = tokens[0].replace(":","")
+               results.append((tokens[0],tokens[1]))
+        return results
+
+    def get_running(self):
+        return {
+
+        }
 
 methods = Service()
 register_rpc = methods.register_rpc
