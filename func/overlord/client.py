@@ -66,7 +66,7 @@ class CommandAutomagic(object):
 
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
-def expand_servers(spec, port=51234, noglobs=None, verbose=None):
+def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=False):
     config  = read_config(CONFIG_FILE, CMConfig)
     """
     Given a regex/blob of servers, expand to a list
@@ -74,7 +74,10 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None):
     """
 
     if noglobs:
-        return [ "https://%s:%s" % (spec, port) ]
+        if not just_fqdns:
+            return [ "https://%s:%s" % (spec, port) ]
+        else:
+            return spec
 
     all_hosts = []
     all_certs = []
@@ -89,7 +92,10 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None):
 
     all_urls = []
     for x in all_hosts:
-        all_urls.append("https://%s:%s" % (x, port))
+        if not just_fqdns:
+            all_urls.append("https://%s:%s" % (x, port))
+        else:
+            all_urls.append(x)
 
     if verbose and len(all_urls) == 0:
         sys.stderr.write("no hosts matched\n")

@@ -54,17 +54,22 @@ class Ping(client.command.Command):
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec
 
-        client_obj = client.Client(self.server_spec,
-                                   port=self.options.port,
-                                   interactive=False,
-                                   verbose=self.options.verbose,
-                                   config=self.config)
+        # because this is mainly an interactive command, expand the server list and make seperate connections.
+        # to make things look more speedy.
 
-        results = client_obj.run("test", "ping", [])
-        for (host,result) in results.iteritems():
-            if result == 1:
-                print "[ ok ... ] %s" % host
+        servers = client.expand_servers(self.server_spec, port=self.options.port, noglobs=None, 
+                                        verbose=self.options.verbose, just_fqdns=True)
+
+        for server in servers:
+
+            client_obj = client.Client(server,port=self.options.port,interactive=False,
+                                       verbose=self.options.verbose,config=self.config, noglobs=True)
+
+            results = client_obj.run("test", "ping", [])
+            if results == 1:
+                print "[ ok ... ] %s" % server
             else:
-                print "[ FAILED ] %s" % host
+                print "[ FAILED ] %s" % server
+
         return 1
 
