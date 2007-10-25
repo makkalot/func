@@ -65,6 +65,11 @@ class Service(func_module.FuncModule):
         }
 
     def get_enabled(self):
+        """
+        Get the list of services that are enabled at the various runlevels.  Xinetd services
+        only provide whether or not they are running, not specific runlevel info.
+        """
+
         chkconfig = sub_process.Popen(["/sbin/chkconfig", "--list"], stdout=sub_process.PIPE)
         data = chkconfig.communicate()[0]
         results = []
@@ -81,9 +86,17 @@ class Service(func_module.FuncModule):
         return results
 
     def get_running(self):
-        return {
-
-        }
+        """
+        Get a list of which services are running, stopped, or disabled.
+        """
+        chkconfig = sub_process.Popen(["/sbin/service", "--status-all"], stdout=sub_process.PIPE)
+        data = chkconfig.communicate()[0]
+        results = []
+        for line in data.split("\n"):
+            if line.find(" is ") != -1:
+                tokens = line.split()
+                results.append((tokens[0], tokens[-1].replace("...","")))
+        return results
 
 methods = Service()
 register_rpc = methods.register_rpc
