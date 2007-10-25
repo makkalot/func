@@ -31,10 +31,13 @@ class Call(client.command.Command):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
         self.parser.add_option("-x", "--xmlrpc", dest="xmlrpc",
+                               help="output return data in XMLRPC format",
                                action="store_true")
-        self.parser.add_option("", "--pprint", dest="pprint",
+        self.parser.add_option("", "--raw", dest="rawprint",
+                               help="output return data using Python print",
                                action="store_true")
         self.parser.add_option("-j", "--json", dest="json",
+                               help="output return data using JSON",
                                action="store_true")
         self.parser.add_option("-p", "--port", dest="port",
                                default=DEFAULT_PORT)
@@ -55,21 +58,25 @@ class Call(client.command.Command):
         
 
     def format_return(self, data):
+        """
+        The call module supports multiple output return types, the default is pprint.
+        """
+        
         if self.options.xmlrpc:
             return xmlrpclib.dumps((data,""))
-
-        if self.options.pprint:
-            return pprint.pformat(data)
 
         if self.options.json:
             try:
                 import simplejson
                 return simplejson.dumps(data)
             except ImportError:
-                print "json support not found"
+                print "WARNING: json support not found, install python-simplejson"
                 return data
 
-        return data
+        if self.options.rawprint:
+            return data
+            
+        return pprint.pformat(data)
 
     def do(self, args):
 
