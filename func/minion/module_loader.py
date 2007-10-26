@@ -90,7 +90,11 @@ def load_modules(blacklist=None):
             errmsg = _("Could not load %s module: %s")
             print errmsg % (mod_imp_name, e)
             bad_mods[mod_imp_name] = True
-
+            continue
+        except:
+            errmsg = _("Could not load %s module")
+            print errmsg % (mod_imp_name)
+            bad_mods[mod_imp_name] = True
             continue
 
     return mods
