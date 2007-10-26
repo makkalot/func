@@ -92,7 +92,7 @@ fi
 - packaged func-inventory and associated manpage
 - release bump for Fedora submission
 
-* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
+* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> - 0.0.12-1
 - change out minion-acl.conf for minion-acl.d
 
 * Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
