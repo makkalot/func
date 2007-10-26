@@ -22,7 +22,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 # other modules
 import os
 import sub_process
-# import libvirt
+import libvirt
 
 # our modules
 import codes
@@ -41,14 +41,6 @@ VIRT_STATE_NAME_MAP = {
 class FuncLibvirtConnection(object):
 
     def __init__(self):
-
-        self.loaded = False
-
-        try:
-            import libvirt
-            self.loaded = True
-        except:
-            return
 
         cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE)
         output = cmd.communicate()[0]
@@ -154,8 +146,6 @@ class Virt(func_module.FuncModule):
 
     def get_conn(self):
 	self.conn = FuncLibvirtConnection()
-        if not self.conn.loaded:
-            return False
         return self.conn
 
     def info(self):
