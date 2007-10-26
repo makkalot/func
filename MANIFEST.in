@@ -5,5 +5,6 @@ recursive-include init-scripts *
 recursive-include po *.po
 recursive-include po *.pot
 include AUTHORS
+include LICENSE
 include README
 

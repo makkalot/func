@@ -8,14 +8,13 @@
 ### BEGIN INIT INFO
 # Provides: certmaster
 # Required-Start: network
-# Default-Start: 3 4 5
 # Short-Description: certificate master for Fedora Unified Network Control 'master server only'
 # Description: certificate master to sign/manage ca/cert infrastructure for func
 ### END INIT INFO
 
 # chkconfig header
 
-# chkconfig: 345 98 99 
+# chkconfig: - 98 99 
 # description:  certificate master to sign/manage ca/cert infrastructure for func
 #
 # processname: /usr/bin/certmaster

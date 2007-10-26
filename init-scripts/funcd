@@ -8,14 +8,13 @@
 ### BEGIN INIT INFO
 # Provides: funcd
 # Required-Start: network, xinetd, httpd
-# Default-Start: 3 4 5
 # Short-Description: Fedora Unified Network Control
 # Description: Crazy simple, secure remote management.
 ### END INIT INFO
 
 # chkconfig header
 
-# chkconfig: 345 99 99 
+# chkconfig: - 99 99 
 # description:  Crazy simple, secure remote management.
 #
 # processname: /usr/bin/funcd
