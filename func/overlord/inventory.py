@@ -22,6 +22,8 @@ import optparse
 import sys
 import glob
 import pprint
+import exceptions
+import xmlrpclib
 from func.minion import sub_process
 
 import func.overlord.client as func_client
@@ -60,7 +62,16 @@ class FuncInventory(object):
                      dest="nogit",
                      action="store_true",
                      help="disable useful change tracking features")
+        p.add_option("-x", "--xmlrpc", dest="xmlrpc",
+                     help="output data using XMLRPC format",
+                     action="store_true")
+        p.add_option("-j", "--json", dest="json",
+                     help="output data using JSON",
+                     action="store_true")
+
+
         (options, args) = p.parse_args(args)
+        self.options = options
 
         filtered_module_list = options.modules.split(",")
         filtered_function_list = options.methods.split(",")
@@ -97,6 +108,24 @@ class FuncInventory(object):
         self.git_update(options)
         return 1
 
+    def format_return(self, data):
+        """
+        The call module supports multiple output return types, the default is pprint.
+        """
+
+        if self.options.xmlrpc:
+            return xmlrpclib.dumps((data,""))
+
+        if self.options.json:
+            try:
+                import simplejson
+                return simplejson.dumps(data)
+            except ImportError:
+                print "ERROR: json support not found, install python-simplejson"
+                sys.exit(1)
+
+        return pprint.pformat(data)
+
     # FUTURE: skvidal points out that guest symlinking would be an interesting feature       
 
     def save_results(self, options, host_name, module_name, method_name, results):
@@ -105,7 +134,7 @@ class FuncInventory(object):
              os.makedirs(dirname)
         filename = os.path.join(dirname, method_name)
         results_file = open(filename,"w+")
-        data = pprint.pformat(results)
+        data = self.format_return(results)
         results_file.write(data)
         results_file.close()
 

@@ -49,6 +49,13 @@ be tracked using standard git-tools such as "git log" and "gitk", when run on th
 Additional built in hooks to notify changes can be written using git's own trigger mechanism, though something
 more specific to func will likely be developed in the future -- also eliminating the need to grok git internals.
 
+=head1 ALTERNATIVE OUTPUT FORMATS
+
+func-inventory can be passed a --json or --xmlrpc parameter to override the default output format.  These
+output formats are much less readable in the git-produced diffs, but are more easily loaded by other programs
+that may want to "mine" the output of a func-inventory tree.   Using --json requires that the python-simplejson
+RPM be installed.
+
 =head1 ADDITONAL RESOURCES
 
 See https://hosted.fedoraproject.org/projects/func/ for more information.
