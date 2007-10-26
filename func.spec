@@ -7,11 +7,16 @@ Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
 Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 Source0: %{name}-%{version}.tar.gz
-License: GPL+
+License: GPLv2+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
 BuildRequires: python-devel
+%if 0%{?fedora} >= 8
+BuildRequires: python-setuptools-devel
+%else
+BuildRequires: python-setuptools
+%endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
@@ -34,6 +39,7 @@ test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 rm -fr $RPM_BUILD_ROOT
 
 %files
+%defattr(-, root, root, -)
 %{_bindir}/funcd
 %{_bindir}/func
 %{_bindir}/certmaster
@@ -58,7 +64,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
 %dir /var/log/func
-%doc AUTHORS README
+%doc AUTHORS README LICENSE
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/func-inventory.1.gz
 %{_mandir}/man1/funcd.1.gz
@@ -68,6 +74,7 @@ rm -fr $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add funcd
+/sbin/chkconfig --add certmaster
 exit 0
 
 %preun
@@ -78,11 +85,14 @@ fi
 
 
 %changelog
+* Fri Oct 26 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-3
+- Misc fixes per Fedora package-review
+
 * Wed Oct 24 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-2
 - packaged func-inventory and associated manpage
 - release bump for Fedora submission
 
-* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> 0.0.12-1
+* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> - 0.0.12-1
 - change out minion-acl.conf for minion-acl.d
 
 * Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1

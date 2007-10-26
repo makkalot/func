@@ -41,6 +41,9 @@ class FuncCommandLine(command.Command):
         return False
         
     def handleArguments(self, args):
+        if len(args) < 2:
+            print "see the func manpage for usage"
+            sys.exit(411)
         server_string = args[0]
         # try to be clever about this for now
         if client.isServer(server_string) or self._isGlob(server_string):
