@@ -9,6 +9,6 @@ import func.overlord.func_command as func_command
 
 myname, argv = sys.argv[0], sys.argv[1:]
 cli = func_command.FuncCommandLine()
-print cli.parse(argv)
+cli.parse(argv)
 
 
