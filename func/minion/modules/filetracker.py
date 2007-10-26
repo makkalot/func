@@ -20,8 +20,8 @@
 from modules import func_module
 
 # other modules
-# import ConfigParser
 from stat import *
+import glob
 import os
 import sys
 import md5
@@ -164,10 +164,19 @@ class FileTracker(func_module.FuncModule):
                 tracked_file = open(file_name)
                 data = tracked_file.read()
                 if flatten:
-                    this_result = this_result + "*** DATA *******\n" + data + "\n*** END DATA ***\n\n"
+                    this_result = this_result + "*** DATA ***\n" + data + "\n*** END DATA ***\n\n"
                 else:
                     this_result.append(data)
                 tracked_file.close()
+           
+            if os.path.isdir(file_name):
+                if not file_name.endswith("/"):
+                    file_name = file_name + "/"
+                files = glob.glob(file_name + "*") 
+                if flatten:
+                    this_result = this_result + "*** FILES ***\n" + "\n".join(files) + "\n*** END FILES ***\n\n"
+                else:
+                    this_result.append({"files" : files})
 
             if flatten:
                 results = results + "\n" + this_result
