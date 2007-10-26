@@ -7,6 +7,7 @@
 ##  provides file meta-data (and optionally full data) to func-inventory
 ##
 ## (C) Vito Laurenza <vitolaurenza@gmail.com>
+## + Michael DeHaan <mdehaan@redhat.com>
 ##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
@@ -99,8 +100,6 @@ class FileTracker(func_module.FuncModule):
         """
 
         filehash = self.__load()
-        print "DEBUG: deleting: %s" % file_name
-        print "DEBUG: keys: %s" % filehash
         if file_name in filehash.keys():
             del filehash[file_name]
         self.__save(filehash)
