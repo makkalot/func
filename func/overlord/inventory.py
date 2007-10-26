@@ -113,6 +113,10 @@ class FuncInventory(object):
         The call module supports multiple output return types, the default is pprint.
         """
 
+        # special case... if the return is a string, just print it straight
+        if type(data) == str:
+            return data
+
         if self.options.xmlrpc:
             return xmlrpclib.dumps((data,""))
 
