@@ -15,6 +15,7 @@ if __name__ == "__main__":
  
         manpath    = "share/man/man1/"
         etcpath    = "/etc/%s" % NAME
+        etcmodpath = "/etc/%s/modules" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
         pkipath    = "/etc/pki/%s" % NAME
@@ -45,6 +46,7 @@ if __name__ == "__main__":
                               (initpath, ["init-scripts/certmaster"]),
                               (etcpath,  ["etc/minion.conf"]),
                               (etcpath,  ["etc/certmaster.conf"]),
+                              (etcmodpath, []),
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),

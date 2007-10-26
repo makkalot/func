@@ -50,6 +50,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/minion-acl.d/
 %dir %{_sysconfdir}/pki/%{name}
+%dir /etc/func/modules/
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/certmaster.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
