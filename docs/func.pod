@@ -6,11 +6,11 @@ Func -- Fedora Unified Network Controller.
 
 func "*" list_minons
 
-func target.example.org call module command [args ...]
+func target.example.org call module method [args ...]
 
-func "target*.example.org" call module command [args ...]
+func "target*.example.org" call module method [args ...]
 
-func "webserver1;mailserver2" call module command [args ...]
+func "webserver1;mailserver2" call module method [args ...]
 
 =head1 DESCRIPTION
 
