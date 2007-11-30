@@ -26,6 +26,7 @@ from func.config import read_config, CONFIG_FILE
 import sslclient
 
 import command
+import forkbomb
 
 # ===================================
 # defaults
@@ -42,14 +43,15 @@ class CommandAutomagic(object):
     reality it represents many.
     """
 
-    def __init__(self, clientref, base):
+    def __init__(self, clientref, base, nforks=1):
         self.base = base
         self.clientref = clientref
+        self.nforks = nforks
 
     def __getattr__(self,name):
         base2 = self.base[:]
         base2.append(name)
-        return CommandAutomagic(self.clientref, base2)
+        return CommandAutomagic(self.clientref, base2, self.nforks)
 
     def __call__(self, *args):
         if not self.base:
@@ -58,7 +60,7 @@ class CommandAutomagic(object):
             raise AttributeError("no method called: %s" % ".".join(self.base))
         module = self.base[0]
         method = ".".join(self.base[1:])
-        return self.clientref.run(module,method,args)
+        return self.clientref.run(module,method,args,nforks=self.nforks)
 
 # ===================================
 
@@ -112,7 +114,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, config=None):
+        verbose=False, noglobs=False, nforks=1, config=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -124,12 +126,14 @@ class Client(object):
         self.config  = config
         if config is None:
             self.config  = read_config(CONFIG_FILE, CMConfig)
+    
 
         self.server_spec = server_spec
         self.port        = port
         self.verbose     = verbose
         self.interactive = interactive
         self.noglobs     = noglobs
+        self.nforks      = nforks
         self.servers     = expand_servers(self.server_spec,port=self.port,
                                           noglobs=self.noglobs,verbose=self.verbose)
 
@@ -155,11 +159,11 @@ class Client(object):
         # strange errors with this engaged.  Be aware of that.
         """
 
-        return CommandAutomagic(self, [name])
+        return CommandAutomagic(self, [name], self.nforks)
 
     # -----------------------------------------------
 
-    def run(self, module, method, args):
+    def run(self, module, method, args, nforks=1):
         """
         Invoke a remote method on one or more servers.
         Run returns a hash, the keys are server names, the values are the
@@ -170,10 +174,12 @@ class Client(object):
         just a single value, not a hash.
         """
 
+       
+
         results = {}
 
-        for server in self.servers:
-
+        def process_server(bucketnumber, buckets, server):
+            
             conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
             # conn = xmlrpclib.ServerProxy(server)
 
@@ -204,7 +210,15 @@ class Client(object):
                 left = server.rfind("/")+1
                 right = server.rfind(":")
                 server_name = server[left:right]
-                results[server_name] = retval
+                # TEST (changed for integration with forkbomb)
+                # results[server_name] = retval
+                return (server_name, retval)
+
+        if not self.noglobs:
+            results = forkbomb.batch_run(self.servers, process_server,nforks)
+        else:
+            # just call the handler without the forkbomb code in play
+            self.process_server(0, 0, None)
 
         return results
 

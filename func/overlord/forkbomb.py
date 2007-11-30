@@ -88,8 +88,8 @@ def __with_my_bucket(bucket_number,buckets,what_to_do,filename):
     things_in_my_bucket = buckets[bucket_number]
     results = {}
     for thing in things_in_my_bucket:
-        rc = what_to_do(bucket_number,buckets,thing)
-        __access_buckets(filename,False,thing,rc)
+        (nkey,nvalue) = what_to_do(bucket_number,buckets,thing)
+        __access_buckets(filename,False,nkey,nvalue)
 
 def __forkbomb(mybucket,buckets,what_to_do,filename):
     """
@@ -120,7 +120,7 @@ def __demo(bucket_number, buckets, my_item):
     # just to verify forks are not sequential
     sleep = random.randrange(0,4)
     time.sleep(sleep)
-    return my_item * 1000
+    return (my_item, my_item * 1000)
 
 def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     """
