@@ -134,6 +134,7 @@ class Client(object):
         self.interactive = interactive
         self.noglobs     = noglobs
         self.nforks      = nforks
+        
         self.servers     = expand_servers(self.server_spec,port=self.port,
                                           noglobs=self.noglobs,verbose=self.verbose)
 
@@ -215,10 +216,18 @@ class Client(object):
                 return (server_name, retval)
 
         if not self.noglobs:
-            results = forkbomb.batch_run(self.servers, process_server,nforks)
+            if self.nforks > 1:
+                # using forkbomb module to distribute job over multiple threads
+                results = forkbomb.batch_run(self.servers, process_server,nforks)
+            else:
+                # no need to go through the fork code, we can do this directly
+                results = {}
+                for x in self.servers:
+                    (nkey,nvalue) = process_server(0, 0, x)
+                    results[nkey] = nvalue    
         else:
-            # just call the handler without the forkbomb code in play
-            self.process_server(0, 0, None)
+            # no need to go through the fork code, we can do this directly
+            self.process_server(0, 0, self.server)
 
         return results
 

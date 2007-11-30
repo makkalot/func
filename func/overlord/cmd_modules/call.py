@@ -23,6 +23,7 @@ from func.overlord import command
 from func.overlord import client
 
 DEFAULT_PORT = 51234
+DEFAULT_FORKS = 1
 
 class Call(client.command.Command):
     name = "call"
@@ -41,6 +42,9 @@ class Call(client.command.Command):
                                action="store_true")
         self.parser.add_option("-p", "--port", dest="port",
                                default=DEFAULT_PORT)
+        self.parser.add_option("-f", "--forks", dest="forks",
+                               help="how many parallel processes?  (default 1)",
+                               default=DEFAULT_FORKS)
 
     def handleOptions(self, options):
         self.options = options
@@ -85,9 +89,15 @@ class Call(client.command.Command):
 
         # I kind of feel like we shouldn't be parsing args here, but I'm
         # not sure what the write place is -al;
-        self.module      = args[0]
-        self.method      = args[1]
-        self.method_args = args[2:]
+        self.module           = args[0]
+        if len(args) > 1:
+            self.method       = args[1]
+        else:
+            self.method       = None
+        if len(args) > 2:
+            self.method_args  = args[2:]
+        else:
+            self.method_args  = []
 
         # this could get weird, sub sub classes might be calling this
         # this with multiple.parentCommand.parentCommands...
@@ -96,7 +106,7 @@ class Call(client.command.Command):
         self.server_spec = self.parentCommand.server_spec
 
         client_obj = client.Client(self.server_spec,port=self.port,interactive=True,
-            verbose=self.verbose, config=self.config)
+            verbose=self.verbose, config=self.config, nforks=self.options.forks)
         results = client_obj.run(self.module, self.method, self.method_args)
 
         # TO DO: add multiplexer support
