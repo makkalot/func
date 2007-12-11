@@ -40,6 +40,9 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
+%if 0%{?fedora} > 8
+%{python_sitearch}/func*.egg-info
+%endif
 %{_bindir}/funcd
 %{_bindir}/func
 %{_bindir}/certmaster
@@ -86,6 +89,9 @@ fi
 
 
 %changelog
+* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.14-2
+- python egg section added for F9 and later
+
 * Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.14-1
 - new release to mirrors
 
