@@ -135,8 +135,7 @@ class Client(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         
-        self.servers     = expand_servers(self.server_spec,port=self.port,
-                                          noglobs=self.noglobs,verbose=self.verbose)
+        self.servers     = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
         # default cert/ca/key is the same as the certmaster ca - need to
         # be able to change that on the cli
@@ -226,8 +225,10 @@ class Client(object):
                     (nkey,nvalue) = process_server(0, 0, x)
                     results[nkey] = nvalue    
         else:
-            # no need to go through the fork code, we can do this directly
-            self.process_server(0, 0, self.server)
+            # globbing is not being used, but still need to make sure
+            # URI is well formed.
+            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
+            process_server(0, 0, expanded)
 
         return results
 
