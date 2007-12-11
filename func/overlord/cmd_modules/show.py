@@ -35,12 +35,6 @@ class ShowHardware(client.command.Command):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
         self.parser.add_option("-p", "--port", dest="port")
-        self.parser.add_option("", "--platform", dest="platform",
-                               action="store_true")
-        self.parser.add_option("", "--memory", dest="memory",
-                               action="store_true")
-        self.parser.add_option("","--os", dest="os",
-                               action="store_true")
 
 
     def handleOptions(self, options):
@@ -67,35 +61,17 @@ class ShowHardware(client.command.Command):
         # if the user 
         top_options = ["port","verbose"]
         
-        # figure out of the user set any options we care about
-        options_set = False
-
-        #ugh, cant find a better way to do this. Look for args
-        # that specify a "mode", if we set them, then don't
-        # do the big dump
-
-        # also, optparse is annoying -akl
-        opt_list = ["--platform", "--memory", "--os"]
-        for opt in opt_list:
-            if self.parser.has_option(opt):
-                options_set = True
-        
-
         for minion in results:
             print "%s:" % minion
             minion_data = results[minion]
-            if not options_set:
+            # if user set no args
+            if not args:
                 pprint.pprint(minion_data)
                 continue
             
-            if self.options.platform:
-                print minion_data['platform']
-
-            if self.options.memory:
-                print minion_data["systemMemory"]
-
-            if self.options.os:
-                print minion_data["os"]
+            for arg in args:
+                if arg in minion_data:
+                    print minion_data[arg]
 
 class Show(client.command.Command):
     name = "show"

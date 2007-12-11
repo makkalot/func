@@ -74,9 +74,9 @@ not going through the Python API (where you would not care).
 
 func "*.example.org" show hardware --help
 
-func "*.example.org" show hardware --memory
+func "*.example.org" show hardware systemMemory
 
-func "*.example.org" show hardware --os
+func "*.example.org" show hardware os
 
 Another useful helper command module is copyfile, which allows func to work like scp from 
 the shell, though it can address multiple systems at the same time.  

@@ -86,6 +86,9 @@ fi
 
 
 %changelog
+* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.14-1
+- new release to mirrors
+
 * Fri Oct 26 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-3
 - Misc fixes per Fedora package-review
 
