@@ -30,7 +30,7 @@ class HardwareModule(func_module.FuncModule):
     def __init__(self):
         self.methods = {
             "info"      : self.info,
-            "inventory" : self.info,       # for func-inventory
+            "inventory" : self.inventory,       # for func-inventory
             "hal_info"  : self.hal_info
         }
         func_module.FuncModule.__init__(self)
@@ -61,6 +61,13 @@ class HardwareModule(func_module.FuncModule):
 
         return results
 
+    def inventory(self):
+        data = hw_info(with_devices=True)
+        # remove bogomips because it keeps changing for laptops
+        # and makes inventory tracking noisy
+        if data.has_key("bogomips"):
+            del data["bogomips"]
+        return data
 
     def info(self,with_devices=True):
         """
