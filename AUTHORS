@@ -1,19 +1,19 @@
 
-func is written by (alphabetically) ...
+func is written and maintained by (alphabetically) ...
 
-   James Bowes <jbowes@redhat.com>
    Michael DeHaan <mdehaan@redhat.com>
    Adrian Likins <alikins@redhat.com>
-   Robin Norwood <rnorwood@redhat.com>
    Seth Vidal <skvidal@redhat.com>
    ...
-   (committers: please add yourself)
 
 Additional patches and contributions by ...
 
    James Anthill <james@mail.and.org>
+   James Bowes <jbowes@redhat.com>
    Eli Criffield <elicriffield@gmail.com>
+   John Eckersberg <jeckersb@redhat.com>
    Stephen Nelson-Smith <atalanta.systems@googlemail.com>
+   Robin Norwood <rnorwood@redhat.com>
    Vito Laurenza <vitolaurenza@gmail.com>
    ...
    [ send in patches (or modules!) to get your name here ]
