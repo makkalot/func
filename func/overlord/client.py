@@ -228,7 +228,7 @@ class Client(object):
             # globbing is not being used, but still need to make sure
             # URI is well formed.
             expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
-            process_server(0, 0, expanded)
+            results = process_server(0, 0, expanded)
 
         return results
 

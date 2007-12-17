@@ -79,37 +79,35 @@ class FuncInventory(object):
         self.git_setup(options)
 
         # see what modules each host provides (as well as what hosts we have)
-        host_modules = func_client.Client(options.server_spec).system.list_modules()
+        host_methods = func_client.Client(options.server_spec).system.list_methods()
+       
+           
 
         # call all remote info methods and handle them
         if options.verbose:
+            # print "- DEBUG: %s" % host_methods
             print "- scanning ..."
-        for (host, modules) in host_modules.iteritems():
-            if type(modules) != list:
-                if options.verbose:
-                    print "-- connection refused: %s" % host
-                continue
-            else:
-                if options.verbose:
-                    print "-- connected: %s" % host
+        # for (host, modules) in host_modules.iteritems():
 
-            for module_name in modules:
-                if ("all" in filtered_module_list) or (module_name in filtered_module_list):
-                    if options.verbose:
-                        print "---- scanning module: %s" % module_name
-                    host_module = getattr(func_client.Client(host,noglobs=True),module_name)
-                    if options.verbose:
-                        print "--- DEBUG: remote module: %s" % host_module
+        for (host, methods) in host_methods.iteritems():
+ 
+            for each_method in methods:
 
-                    remote_methods = host_module.list_methods()
-                    if options.verbose:
-                        print "--- DEBUG: available remote methods: %s" % remote_methods
-                    for remote_method in remote_methods:
-                         if ("all" in filtered_function_list) or (remote_method in filtered_function_list):
-                             if options.verbose:
-                                 print "------ adding to inventory: %s/%s" % (module_name, remote_method)
-                             results = getattr(host_module, remote_method)()
-                             self.save_results(options, host, module_name, remote_method, results)
+                if options.verbose:
+                    print "-- analyzing: %s" % each_method
+                (module_name, method_name) = each_method.split(".")
+
+                if not "all" in filtered_module_list and not module_name in filtered_module_list:
+                    continue
+
+                if not "all" in filtered_function_list and not method_name in filtered_function_list:
+                    continue
+               
+                client = func_client.Client(host,noglobs=True) # ,noglobs=True)
+                results = getattr(getattr(client,module_name),method_name)()
+                if self.options.verbose:
+                    print "DEBUG: results=%s" % results
+                self.save_results(options, host, module_name, method_name, results)
         self.git_update(options)
         return 1
 
