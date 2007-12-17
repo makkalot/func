@@ -80,5 +80,23 @@ class MountModule(func_module.FuncModule):
         else:
             return False
 
+    def inventory():
+        cmd = sub_process.Popen(["/bin/mount"], stdout=sub_process.PIPE, shell=False)
+        output = cmd.communicate()[0]
+        lines = output.split("\n")
+        results = []
+        for line in lines:
+            if line.find(" on ") == -1:
+                continue
+            (resource,rest) = line.split(" on ")
+            (mountpoint,mtype) = rest.split(" type ")
+            (realtype, params) = mtype.split(None)
+            params = params.replace("(","")
+            params = params.replace(")","")
+            paramlist = params.split(",")
+            results.append([resource,mountpoint,realtype,paramlist])
+        return results
+
+
 methods = MountModule()
 register_rpc = methods.register_rpc
