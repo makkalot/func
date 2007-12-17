@@ -14,6 +14,10 @@ BUILD=Y
 # do we do a fresh pull from git to build
 BUILD_FROM_FRESH_CHECKOUT=Y
 
+# should we backup existing func pki setup, since
+# we are going to be deleting it from the normal spot?
+BACKUP_FUNC_PKI="N"
+
 rm -rf $RPM_PATH/rpms
 rm -rf $RPM_PATH/srpms
 rm -rf $RPM_PATH/tars
@@ -116,6 +120,42 @@ start_the_func()
 
 }
 
+backup_the_secret_of_the_func()
+{
+	# whatever, this should probably be some standard date format
+	# but I just wanted something sans spaces
+	DATE=`date  "+%F_%R"`
+	tar -c /etc/pki/func/* > func-pki-backup-$DATE.tar
+
+}
+
+#yes, I'm in a funny variable naming mood, I'll change them
+#later
+no_more_secrets()
+{
+	rm -rf /etc/pki/func/*
+}
+
+find_certmaster_certs()
+{
+	MINION_CERTS=`certmaster-ca --list`
+	STATUS=$?
+	echo "certmaster found the following certs:"
+	echo $MINION_CERTS
+}
+
+sign_the_certmaster_certs()
+{
+	echo
+	echo $MINION_CERTS
+	for i in $MINION_CERTS
+	do
+		echo /usr/bin/certmaster-ca -s $i
+		/usr/bin/certmaster-ca -s $i
+	done
+	
+}
+
 
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
@@ -138,9 +178,19 @@ fi
 # see if funcd is install
 find_the_func
 
+if [ "$BACKUP_FUNC_PKI" == "Y" ] ; then
+	backup_the_secret_of_the_func
+fi
+
+# remove any existing keys
+#no_more_secrets
 
 # test start up of init scripts
 start_the_func
+
+find_certmaster_certs
+
+sign_the_certmaster_certs
 
 # see if funcd is running
 # see if certmaster is installed
