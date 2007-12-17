@@ -8,6 +8,8 @@
 ### BEGIN INIT INFO
 # Provides: certmaster
 # Required-Start: network
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
 # Short-Description: certificate master for Fedora Unified Network Control 'master server only'
 # Description: certificate master to sign/manage ca/cert infrastructure for func
 ### END INIT INFO
@@ -22,18 +24,47 @@
 # Sanity checks.
 [ -x /usr/bin/certmaster ] || exit 0
 
-# Source function library.
-. /etc/rc.d/init.d/functions
-
 SERVICE=certmaster
 PROCESS=certmaster
+DAEMON=/usr/bin/certmaster
 CONFIG_ARGS=" "
+
+CAStatus()
+{
+  ps wt? | grep "$DAEMON" 2>&1 > /dev/null
+  if [ "x$?" = "x0" ]; then
+    RVAL=0
+    echo "certmaster is running"
+  else
+    RVAL=3
+    echo "certmaster is not running"
+  fi
+}
+
+if [ -f /lib/lsb/init-functions ]; then
+  . /lib/lsb/init-functions
+  alias START_DAEMON=start_daemon
+  alias STATUS=CAStatus
+  alias LOG_SUCCESS=log_success_msg
+  alias LOG_FAILURE=log_failure_msg
+  alias LOG_WARNING=log_warning_msg
+elif [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+  alias START_DAEMON=daemon
+  alias STATUS=status
+  alias LOG_SUCCESS=success
+  alias LOG_FAILURE=failure
+  alias LOG_WARNING=passed
+else
+  echo "Error: your platform is not supported by $0" > /dev/stderr
+  exit 1
+fi
 
 RETVAL=0
 
 start() {
     echo -n $"Starting certmaster daemon: "
-    daemon --check $SERVICE $PROCESS --daemon $CONFIG_ARGS
+    START_DAEMON $PROCESS $CONFIG_ARGS
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE

@@ -7,7 +7,10 @@
 
 ### BEGIN INIT INFO
 # Provides: funcd
-# Required-Start: network, xinetd, httpd
+# Required-Start: network
+# Required-Stop:
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
 # Short-Description: Fedora Unified Network Control
 # Description: Crazy simple, secure remote management.
 ### END INIT INFO
@@ -22,18 +25,49 @@
 # Sanity checks.
 [ -x /usr/bin/funcd ] || exit 0
 
-# Source function library.
-. /etc/rc.d/init.d/functions
-
 SERVICE=funcd
 PROCESS=funcd
+DAEMON=/usr/bin/funcd
 CONFIG_ARGS=" "
+
+
+FuncStatus()
+{
+  ps wt? | grep "$DAEMON" 2>&1 > /dev/null
+  if [ "x$?" = "x0" ]; then
+    RVAL=0
+    echo "$DAEMON is running"
+  else
+    RVAL=3
+    echo "$DAEMON is not running"
+  fi
+}
+
+if [ -f /lib/lsb/init-functions ]; then
+  . /lib/lsb/init-functions
+  alias START_DAEMON=start_daemon
+  alias STATUS=FuncStatus
+  alias LOG_SUCCESS=log_success_msg
+  alias LOG_FAILURE=log_failure_msg
+  alias LOG_WARNING=log_warning_msg
+elif [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+  alias START_DAEMON=daemon
+  alias STATUS=status
+  alias LOG_SUCCESS=success
+  alias LOG_FAILURE=failure
+  alias LOG_WARNING=passed
+else
+  echo "Error: your platform is not supported by $0" > /dev/stderr
+  exit 1
+fi
+
 
 RETVAL=0
 
 start() {
     echo -n $"Starting func daemon: "
-    daemon --check $SERVICE $PROCESS --daemon $CONFIG_ARGS
+    START_DAEMON $PROCESS $CONFIG_ARGS
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
