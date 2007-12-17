@@ -27,7 +27,7 @@
 SERVICE=certmaster
 PROCESS=certmaster
 DAEMON=/usr/bin/certmaster
-CONFIG_ARGS=" "
+CONFIG_ARGS="--daemon"
 
 CAStatus()
 {

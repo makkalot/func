@@ -28,7 +28,7 @@
 SERVICE=funcd
 PROCESS=funcd
 DAEMON=/usr/bin/funcd
-CONFIG_ARGS=" "
+CONFIG_ARGS="--daemon"
 
 
 FuncStatus()
