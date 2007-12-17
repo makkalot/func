@@ -93,8 +93,12 @@ class FuncInventory(object):
  
             for each_method in methods:
 
-                if options.verbose:
-                    print "-- analyzing: %s" % each_method
+
+                if type(each_method) == int:
+                    if self.options.verbose:
+                        print "-- connection refused: %s" % host
+                    break
+
                 (module_name, method_name) = each_method.split(".")
 
                 if not "all" in filtered_module_list and not module_name in filtered_module_list:
@@ -106,7 +110,7 @@ class FuncInventory(object):
                 client = func_client.Client(host,noglobs=True) # ,noglobs=True)
                 results = getattr(getattr(client,module_name),method_name)()
                 if self.options.verbose:
-                    print "DEBUG: results=%s" % results
+                    print "-- %s: running: %s %s" % (host, module_name, method_name)
                 self.save_results(options, host, module_name, method_name, results)
         self.git_update(options)
         return 1
