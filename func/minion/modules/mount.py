@@ -24,6 +24,7 @@ class MountModule(func_module.FuncModule):
             "list": self.list,
             "mount": self.mount,
             "umount": self.umount
+            "inventory": self.inventory,
         }
         func_module.FuncModule.__init__(self)
 
@@ -80,7 +81,7 @@ class MountModule(func_module.FuncModule):
         else:
             return False
 
-    def inventory():
+    def inventory(self):
         cmd = sub_process.Popen(["/bin/mount"], stdout=sub_process.PIPE, shell=False)
         output = cmd.communicate()[0]
         lines = output.split("\n")

@@ -78,6 +78,7 @@ class XmlRpcInterface(object):
         # system.listMethods os a quasi stanard xmlrpc method, so
         # thats why it has a odd looking name
         self.handlers["system.listMethods"] = self.list_methods
+        self.handlers["system.list_methods"] = self.list_methods
         self.handlers["system.list_modules"] = self.list_modules
 
     def list_modules(self):

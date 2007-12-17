@@ -98,7 +98,12 @@ class FuncInventory(object):
                     if options.verbose:
                         print "---- scanning module: %s" % module_name
                     host_module = getattr(func_client.Client(host,noglobs=True),module_name)
+                    if options.verbose:
+                        print "--- DEBUG: remote module: %s" % host_module
+
                     remote_methods = host_module.list_methods()
+                    if options.verbose:
+                        print "--- DEBUG: available remote methods: %s" % remote_methods
                     for remote_method in remote_methods:
                          if ("all" in filtered_function_list) or (remote_method in filtered_function_list):
                              if options.verbose:
