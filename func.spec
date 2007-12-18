@@ -74,6 +74,8 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
 %dir /var/log/func
+%dir /var/lib/func
+%dir /var/lib/func/certmaster
 %doc AUTHORS README LICENSE
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/func-inventory.1.gz
@@ -122,6 +124,9 @@ fi
 
 
 %changelog
+* Tue Dec 18 2007 Adrian Likins <alikins@redhat.com> - 0.0.14-5
+- add /var/lib/ dirs to spec file
+
 * Thu Dec 13 2007 Eli Criffield <elicriffield@gmail.com> - 0.0.14-4
 - changes for suse integration 
 
