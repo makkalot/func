@@ -125,8 +125,8 @@ backup_the_secret_of_the_func()
 	# whatever, this should probably be some standard date format
 	# but I just wanted something sans spaces
 	DATE=`date  "+%F_%R"`
-	tar -c /etc/pki/func/* > func-pki-backup-$DATE.tar
-
+	tar -c /etc/pki/func/*  /var/lib/func/* > func-pki-backup-$DATE.tar
+	
 }
 
 #yes, I'm in a funny variable naming mood, I'll change them
@@ -134,6 +134,7 @@ backup_the_secret_of_the_func()
 no_more_secrets()
 {
 	rm -rf /etc/pki/func/*
+	rm -rf /var/lib/func/certmaster/*
 }
 
 find_certmaster_certs()
@@ -142,6 +143,9 @@ find_certmaster_certs()
 	STATUS=$?
 	echo "certmaster found the following certs:"
 	echo $MINION_CERTS
+	if [ "$MINION_CERTS" == "No certificates to sign" ] ; then
+		MINION_CERTS=""
+	fi
 }
 
 sign_the_certmaster_certs()
@@ -183,10 +187,12 @@ if [ "$BACKUP_FUNC_PKI" == "Y" ] ; then
 fi
 
 # remove any existing keys
-#no_more_secrets
+no_more_secrets
 
 # test start up of init scripts
 start_the_func
+
+sleep 5
 
 find_certmaster_certs
 
