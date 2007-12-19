@@ -10,6 +10,7 @@
 
 from OpenSSL import SSL
 import time, socket, select
+from func.CommonErrors import canIgnoreSSLError
 
 
 class SSLConnection:
@@ -144,6 +145,11 @@ class SSLConnection:
                 return None
             except SSL.WantReadError:
                 time.sleep(0.2)
+            except Exception, e:
+                if canIgnoreSSLError(e):
+                    return None
+                else:
+                    raise e
         return None
 
 class PlgFileObject(socket._fileobject):
