@@ -85,8 +85,11 @@ pyflakes:
 	-for d in $(PYDIRS); do ($(MAKE) -C $$d pyflakes ); done	
 
 money: clean
-	-sloccount --addlang "makefile" $(TOPDIR) $(PYDIRS) $(EXAMPLEDIR) $(INITDIR)
- 
+	-sloccount --addlang "makefile" $(TOPDIR) $(PYDIRS) $(EXAMPLEDIR) $(INITDIR) 
+
+testit: clean
+	-cd test; sh test-it.sh
+
 rpms: build manpage sdist
 	mkdir -p rpm-build
 	cp dist/*.gz rpm-build/

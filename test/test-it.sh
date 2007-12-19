@@ -1,4 +1,14 @@
 #!/bin/bash
+# Copyright 2007, Red Hat, Inc
+# Adrian Likins <alikins@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+
+# this is pretty Red Hat distro specific at the moment
+# I'll try to make it a bit more portable if there is
+# interest
 
 # where do we build stuff
 BUILD_PATH="/tmp/func-build"
@@ -42,6 +52,7 @@ check_out_code()
     echo $?
     popd
 }
+
 
 
 build_rpm()
@@ -125,8 +136,8 @@ backup_the_secret_of_the_func()
 	# whatever, this should probably be some standard date format
 	# but I just wanted something sans spaces
 	DATE=`date  "+%F_%R"`
-	tar -c /etc/pki/func/* > func-pki-backup-$DATE.tar
-
+	tar -c /etc/pki/func/*  /var/lib/func/* > func-pki-backup-$DATE.tar
+	
 }
 
 #yes, I'm in a funny variable naming mood, I'll change them
@@ -134,6 +145,7 @@ backup_the_secret_of_the_func()
 no_more_secrets()
 {
 	rm -rf /etc/pki/func/*
+	rm -rf /var/lib/func/certmaster/*
 }
 
 find_certmaster_certs()
@@ -142,6 +154,9 @@ find_certmaster_certs()
 	STATUS=$?
 	echo "certmaster found the following certs:"
 	echo $MINION_CERTS
+	if [ "$MINION_CERTS" == "No certificates to sign" ] ; then
+		MINION_CERTS=""
+	fi
 }
 
 sign_the_certmaster_certs()
@@ -156,6 +171,23 @@ sign_the_certmaster_certs()
 	
 }
 
+# just some random "poke at func and make sure it works stuff"
+test_funcd()
+{
+	# it seems to take a second for the signed certs to be
+	# ready, so this is here
+	sleep 10
+
+	func "*" list_minions
+
+	for i in $MINION_CERTS
+	do
+		func $i call system listMethods
+		func $i call test add "23" "45"
+	done
+
+}
+
 
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
@@ -165,6 +197,7 @@ if [ "$BUILD" == "Y" ] ; then
 		BUILD_PATH="`pwd`/../../"
 	fi
 	
+	# FIXME: red hat specifc
 	build_rpm func $BUILD_PATH
 
 	#if we are building, then we should remove the installed
@@ -183,21 +216,31 @@ if [ "$BACKUP_FUNC_PKI" == "Y" ] ; then
 fi
 
 # remove any existing keys
-#no_more_secrets
+no_more_secrets
 
 # test start up of init scripts
 start_the_func
+
+#we seem to need to wait a bit for certmaster to create the certs and whatnot
+sleep 5
 
 find_certmaster_certs
 
 sign_the_certmaster_certs
 
+
+test_funcd
+
+stop_the_func
 # see if funcd is running
 # see if certmaster is installed
 # see if cermtasterd is running
 
 # setup certs
 ## see if we have certs set up properly
+
+
+
 ### probably do some stuff to test bad/no/malformed/unauthed certs as well
 
 # see if we can connect to funcd with the overloard

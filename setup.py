@@ -18,6 +18,7 @@ if __name__ == "__main__":
         etcmodpath = "/etc/%s/modules" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
+	certdir    = "/var/lib/%s/certmaster" % NAME
         pkipath    = "/etc/pki/%s" % NAME
         rotpath    = "/etc/logrotate.d"
         aclpath    = "%s/minion-acl.d" % etcpath
@@ -54,6 +55,7 @@ if __name__ == "__main__":
                               (manpath,  ["docs/certmaster-ca.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
+			      (certdir,  []),
 			      (etcpath,  []),
 			      (pkipath,  []),
 			      (aclpath,  [])
