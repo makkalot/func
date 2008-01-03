@@ -148,14 +148,34 @@ class Virt(func_module.FuncModule):
 	self.conn = FuncLibvirtConnection()
         return self.conn
 
+    def state(self):
+        vms = self.list_vms()
+        state = []
+        for vm in vms:
+            state_blurb = self.conn.get_status(vm)
+            state.append("%s %s" % (vm,state_blurb))
+        return state
+
+
     def info(self):
-	vms = self.list_vms()
-	info = []
-	for vm in vms:
-	    print vm
-	    info_blurb = self.conn.get_status(vm)
-	    info.append("%s %s" % (vm,info_blurb))
-	return info
+        vms = self.list_vms()
+        info = dict()
+        for vm in vms:
+            data = self.conn.find_vm(vm).info()
+            # libvirt returns maxMem, memory, and cpuTime as long()'s, which
+            # xmlrpclib tries to convert to regular int's during serialization.
+            # This throws exceptions, so convert them to strings here and
+            # assume the other end of the xmlrpc connection can figure things
+            # out or doesn't care.
+            info[vm] = {
+                "state"     : VIRT_STATE_NAME_MAP.get(data[0],"unknown"),
+                "maxMem"    : str(data[1]),
+                "memory"    : str(data[2]),
+                "nrVirtCpu" : data[3],
+                "cpuTime"   : str(data[4])
+            }
+        return info
+
 
     def list_vms(self):
         self.conn = self.get_conn()
