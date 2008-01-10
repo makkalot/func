@@ -47,7 +47,7 @@ rm -fr $RPM_BUILD_ROOT
 %files
 %defattr(-, root, root, -)
 %if 0%{?fedora} > 8
-%{python_sitearch}/func*.egg-info
+%{python_sitelib}/func*.egg-info
 %endif
 %{_bindir}/funcd
 %{_bindir}/func
