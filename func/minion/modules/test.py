@@ -1,4 +1,5 @@
 from modules import func_module
+import time
 
 class Test(func_module.FuncModule):
     version = "11.11.11"
@@ -18,7 +19,7 @@ class Test(func_module.FuncModule):
     def ping(self):
         return 1
 
-    def sleep(t):
+    def sleep(self,t):
         """
         Sleeps for t seconds, and returns time of day.
         Simply a test function for trying out async and threaded voodoo.
