@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 copyfile command line
 
@@ -73,4 +71,3 @@ class CopyFile(client.command.Command):
         data = xmlrpclib.Binary(fb)
         results = client_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
                                                           mode, uid, gid])
-

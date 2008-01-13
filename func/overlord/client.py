@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## func command line interface & client lib
 ##
@@ -62,10 +60,8 @@ class CommandAutomagic(object):
         method = ".".join(self.base[1:])
         return self.clientref.run(module,method,args,nforks=self.nforks)
 
+
 # ===================================
-
-
-
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
 def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=False):
@@ -104,12 +100,14 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
 
     return all_urls
 
+
 # does the hostnamegoo actually expand to anything?
 def isServer(server_string):
     servers = expand_servers(server_string)
     if len(servers) > 0:
         return True
     return False
+
 
 class Client(object):
 
@@ -263,5 +261,3 @@ class Client(object):
             if x > max:
                 max = x
         return max
-
-
