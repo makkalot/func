@@ -14,7 +14,7 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-import sub_process, os.path
+import sub_process, os
 from modules import func_module
 
 
@@ -53,6 +53,11 @@ class MountModule(func_module.FuncModule):
             cmdline.append(options)
         cmdline.append(device)
         cmdline.append(dir)
+        if createdir:
+            try:
+                os.makedirs(dir)
+            except:
+                return False
         cmd = sub_process.Popen(cmdline, executable="/bin/mount", stdout=sub_process.PIPE, shell=False)
         if cmd.wait() == 0:
             return True
