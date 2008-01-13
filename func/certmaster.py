@@ -225,8 +225,6 @@ def main(argv):
     serve(cm)
 
  
-
 if __name__ == "__main__":
     #textdomain(I18N_DOMAIN)
     main(sys.argv)
-

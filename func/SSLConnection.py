@@ -1,5 +1,3 @@
-#!/usr/bin/python
-#
 # Higher-level SSL objects used by rpclib
 #
 # Copyright (c) 2002 Red Hat, Inc.
@@ -152,6 +150,7 @@ class SSLConnection:
                     raise e
         return None
 
+
 class PlgFileObject(socket._fileobject):
     def close(self):
         """
@@ -164,4 +163,3 @@ class PlgFileObject(socket._fileobject):
                 self._sock.close()
         finally:
             self._sock = None
-
