@@ -1,6 +1,8 @@
-# forkbomb is a module that partitions arbitrary workloads
-# among N seperate forks, for a configurable N, and
-# collates results upon return, as if it never forked.
+# jobthing is a module that allows for background execution of a task, and
+# getting status of that task.  The ultimate goal is to allow ajaxyness
+# of GUI apps using Func, and also for extremely long running tasks that
+# we don't want to block on as called by scripts using the FunC API.  The
+# CLI should not use this.
 #
 # Copyright 2007, Red Hat, Inc
 # Michael DeHaan <mdehaan@redhat.com>
