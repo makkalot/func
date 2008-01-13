@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+# Steve 'Ashcrow' Milner <smilner@redhat.com>
+# John Eckersberg <jeckersb@redhat.com>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+TEMPLATE = """\
+from modules import func_module
+# Add your imports here
+import sub_process
+
+class %s(func_module.FuncModule):
+
+    # Update these if need be.
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "%s"
+
+    def __init__(self):
+        self.methods = {
+%s
+        }
+        func_module.FuncModule.__init__(self)
+
+%s
+
+
+methods = %s()
+register_rpc = methods.register_rpc
+"""
+
+
+def populate_template(module_name, desc, methods):
+    """
+    Makes the method strings and populates the template.
+    """
+    actual_methods = ""
+    method_str_dict = ""
+    for method in methods:
+        method_str_dict += '            "%s": self.%s,\n' % (method, method)
+        actual_methods += "    def self.%s(self):\n        pass\n\n" % method
+    return TEMPLATE % (module_name, desc, 
+                       method_str_dict[:-1], actual_methods[:-2], module_name)
+
+
+if __name__ == '__main__':
+    module_name = raw_input("Name: ").capitalize()
+    desc = raw_input("Description: ")
+    methods = []
+    print "\nLeave blank to finish."
+    while True:
+        method = raw_input("Method: ")
+        if method == '':
+            break
+        methods.append(method)
+    # Write it out to a file
+    file_name = "%s.py" % module_name.lower()
+    file_obj = open(file_name, "w")
+    file_obj.write(populate_template(module_name, desc, methods))
+    file_obj.close()
+    print "Your module is ready to be hacked on. Wrote out to %s." % file_name

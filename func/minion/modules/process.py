@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## Process lister (control TBA)
 ##

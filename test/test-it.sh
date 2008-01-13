@@ -171,6 +171,25 @@ sign_the_certmaster_certs()
 	
 }
 
+
+pound_on_the_threads()
+{
+    msg "Trying to poke at the threads a bit"
+    THREAD_COUNT=5
+    for i in $MINION_CERTS
+    do
+	for Q in `seq 1 $THREAD_COUNT`
+	do
+	    # background these so they run more or less in parallel to
+	    # each minion
+	    echo "test add $Q 6" for $i
+	    func $i call test add "$Q" "6" &
+	done
+    done
+
+
+}
+
 # just some random "poke at func and make sure it works stuff"
 test_funcd()
 {
@@ -185,6 +204,7 @@ test_funcd()
 		func $i call system listMethods
 		func $i call test add "23" "45"
 	done
+
 
 }
 
@@ -230,6 +250,8 @@ sign_the_certmaster_certs
 
 
 test_funcd
+
+pound_on_the_threads
 
 stop_the_func
 # see if funcd is running

@@ -54,6 +54,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/certmaster
 %{_bindir}/certmaster-ca
 %{_bindir}/func-inventory
+%{_bindir}/func-create-module
 /etc/init.d/funcd
 /etc/init.d/certmaster
 %dir %{_sysconfdir}/%{name}
@@ -124,6 +125,9 @@ fi
 
 
 %changelog
+* Sun Jan 13 2008 Steve 'Ashcrow' Milner <smilner@redhat.como> - 0.0.14-6
+- Added in func-create-module for scripts.
+
 * Tue Dec 18 2007 Adrian Likins <alikins@redhat.com> - 0.0.14-5
 - add /var/lib/ dirs to spec file
 
@@ -175,4 +179,3 @@ fi
 
 * Thu Sep 20 2007 Adrian Likins <alikins@redhat.com> - 0.0.11-1
 - initial release (this one goes to .11)
-

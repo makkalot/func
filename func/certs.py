@@ -1,4 +1,3 @@
-#!/usr/bin/python -tt
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -25,6 +24,7 @@ def_local = 'Func-ytown'
 def_org = 'func'
 def_ou = 'slave-key'
 
+
 def make_keypair(dest=None):
     pkey = crypto.PKey()
     pkey.generate_key(crypto.TYPE_RSA, 2048)
@@ -34,6 +34,7 @@ def make_keypair(dest=None):
         os.close(destfd)
     
     return pkey
+
 
 def make_csr(pkey, dest=None, cn=None):
     req = crypto.X509Req()
@@ -59,11 +60,13 @@ def make_csr(pkey, dest=None, cn=None):
 
     return req
 
+
 def retrieve_key_from_file(keyfile):
     fo = open(keyfile, 'r')
     buf = fo.read()
     keypair = crypto.load_privatekey(crypto.FILETYPE_PEM, buf)
     return keypair
+
     
 def retrieve_csr_from_file(csrfile):
     fo = open(csrfile, 'r')
@@ -71,11 +74,13 @@ def retrieve_csr_from_file(csrfile):
     csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, buf)
     return csrreq
 
+
 def retrieve_cert_from_file(certfile):
     fo = open(certfile, 'r')
     buf = fo.read()
     cert = crypto.load_certificate(crypto.FILETYPE_PEM, buf)
     return cert
+
 
 def create_ca(CN="Func Certificate Authority", ca_key_file=None, ca_cert_file=None):
     cakey = make_keypair(dest=ca_key_file)
@@ -92,7 +97,8 @@ def create_ca(CN="Func Certificate Authority", ca_key_file=None, ca_cert_file=No
         destfo = open(ca_cert_file, 'w')
         destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cacert))
         destfo.close()
-                                            
+ 
+                                           
 def _get_serial_number(cadir):
     serial = '%s/serial.txt' % cadir
     i = 1
@@ -108,6 +114,7 @@ def _get_serial_number(cadir):
     _set_serial_number(cadir, i)        
     return i
 
+
 def _set_serial_number(cadir, last):
     serial = '%s/serial.txt' % cadir
     f = open(serial, 'w')
@@ -115,7 +122,6 @@ def _set_serial_number(cadir, last):
     f.close()
             
         
-
 def create_slave_certificate(csr, cakey, cacert, cadir, slave_cert_file=None):
     cert = crypto.X509()
     cert.set_serial_number(_get_serial_number(cadir))
@@ -130,4 +136,3 @@ def create_slave_certificate(csr, cakey, cacert, cadir, slave_cert_file=None):
         destfo.write(crypto.dump_certificate(crypto.FILETYPE_PEM, cert))
         destfo.close()
     return cert
-

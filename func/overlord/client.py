@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## func command line interface & client lib
 ##
@@ -63,10 +61,8 @@ class CommandAutomagic(object):
         method = ".".join(self.base[1:])
         return self.clientref.run(module,method,args,nforks=self.nforks)
 
+
 # ===================================
-
-
-
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
 def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=False):
@@ -105,6 +101,7 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
 
     return all_urls
 
+
 # does the hostnamegoo actually expand to anything?
 def isServer(server_string):
     servers = expand_servers(server_string)
@@ -112,10 +109,11 @@ def isServer(server_string):
         return True
     return False
 
+
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, async=False, config=None):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False, noexceptions=True):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -136,8 +134,9 @@ class Client(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async       = async
+        self.noexceptions= noexceptions
         
-        self.servers     = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
+        self.servers  = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
         # default cert/ca/key is the same as the certmaster ca - need to
         # be able to change that on the cli
@@ -211,6 +210,8 @@ class Client(object):
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
+                if self.noglob and not self.noexceptions:
+                    raise(e)
 
             if self.noglobs:
                 return retval
@@ -269,5 +270,3 @@ class Client(object):
             if x > max:
                 max = x
         return max
-
-

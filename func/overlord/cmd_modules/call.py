@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 call func method invoker
 

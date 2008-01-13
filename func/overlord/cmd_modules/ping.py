@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 copyfile command line
 
@@ -15,7 +13,6 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
-
 import optparse
 import os
 import pprint
@@ -28,10 +25,10 @@ from func.overlord import client
 # FIXME: this really should not be in each sub module.
 DEFAULT_PORT = 51234
 
+
 class Ping(client.command.Command):
     name = "ping"
     useage = "see what func minions are up/accessible"
-
 
     def addOptions(self):
         """
@@ -43,13 +40,11 @@ class Ping(client.command.Command):
         self.parser.add_option("-p", "--port", dest="port",
                                default=DEFAULT_PORT)
 
-
     def handleOptions(self, options):
         """
         Nothing to do here...
         """
         pass
-
 
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec
@@ -72,4 +67,3 @@ class Ping(client.command.Command):
                 print "[ FAILED ] %s" % server
 
         return 1
-

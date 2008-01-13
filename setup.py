@@ -32,7 +32,8 @@ if __name__ == "__main__":
 		scripts = [
                      "scripts/funcd", "scripts/func", 
                      "scripts/certmaster", "scripts/certmaster-ca",
-                     "scripts/func-inventory"
+                     "scripts/func-inventory",
+                     "scripts/func-create-module",
                 ],
 		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME

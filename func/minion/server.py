@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 func
 
@@ -54,7 +53,7 @@ class XmlRpcInterface(object):
         self.__setup_handlers()
         
         # need a reference so we can log ip's, certs, etc
-#        self.server = server
+        # self.server = server
 
     def __setup_handlers(self):
 
@@ -101,8 +100,6 @@ class XmlRpcInterface(object):
             raise codes.InvalidMethodException
 
 
-
-
 class FuncApiMethod:
 
     """
@@ -142,7 +139,6 @@ class FuncApiMethod:
         self.logger.debug("Return code for %s: %s" % (self.__name, rc))
 
         return rc
-
 
 
 def serve():
@@ -243,6 +239,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
                     
         return False
 
+
 def main(argv):
 
     """
@@ -261,8 +258,8 @@ def main(argv):
         print >> sys.stderr, 'error: %s' % e
         sys.exit(1)
 
-# ======================================================================================
 
+# ======================================================================================
 if __name__ == "__main__":
     textdomain(I18N_DOMAIN)
     main(sys.argv)

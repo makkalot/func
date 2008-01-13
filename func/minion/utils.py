@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 Copyright 2007, Red Hat, Inc
 see AUTHORS
@@ -200,8 +198,3 @@ def get_acls_from_config(acldir='/etc/func/minion-acl.d'):
             acls[host].extend(methods)
     
     return acls
-    
-        
-        
-
-    
