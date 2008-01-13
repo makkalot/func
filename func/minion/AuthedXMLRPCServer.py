@@ -20,7 +20,7 @@ import socket
 import SimpleXMLRPCServer
 from func import SSLCommon
 import OpenSSL
-
+import SocketServer
 
 
 class AuthedSimpleXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHandler):
@@ -50,7 +50,7 @@ class AuthedSimpleXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHan
             print "Error (%s): socket error - '%s'" % (self.client_address, e)
 
 
-class BaseAuthedXMLRPCServer:
+class BaseAuthedXMLRPCServer(SocketServer.ThreadingMixIn):
     def __init__(self, address, authinfo_callback=None):
         self.allow_reuse_address = 1
         self.logRequests = 1
