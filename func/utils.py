@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 Copyright 2007, Red Hat, Inc
 see AUTHORS
@@ -16,7 +14,6 @@ import os
 import string
 import sys
 import traceback
-
 
 
 # this is kind of handy, so keep it around for now
@@ -47,5 +44,3 @@ def daemonize(pidfile=None):
         if pidfile is not None:
             open(pidfile, "w").write(str(pid))
         sys.exit(0)
-
-    

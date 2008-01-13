@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 func
 
@@ -18,6 +17,7 @@ import exceptions
 
 class FuncException(exceptions.Exception):
     pass
+
 
 class InvalidMethodException(FuncException):
     pass

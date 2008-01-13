@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ## func
 ##
 ## Copyright 2007, Red Hat, Inc

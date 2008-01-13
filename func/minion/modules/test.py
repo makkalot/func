@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 from modules import func_module
 
 class Test(func_module.FuncModule):

@@ -1,5 +1,3 @@
-#!/usr/bin/python -t
-
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation; either version 2 of the License, or
@@ -34,7 +32,8 @@ class ConfigError(exceptions.Exception):
         self.value = value
     def __str__(self):
         return "%s" %(self.value,)
-    
+ 
+   
 class Option(object):
     '''
     This class handles a single Yum configuration file option. Create
@@ -123,6 +122,7 @@ class Option(object):
         '''
         return str(value)
 
+
 def Inherit(option_obj):
     '''Clone an Option instance for the purposes of inheritance. The returned
     instance has all the same properties as the input Option and shares items
@@ -135,6 +135,7 @@ def Inherit(option_obj):
     new_option = option_obj.clone()
     new_option.inherit = True
     return new_option
+
 
 class ListOption(Option):
 
@@ -156,6 +157,7 @@ class ListOption(Option):
 
     def tostring(self, value):
         return '\n '.join(value)
+
 
 class UrlOption(Option):
     '''
@@ -195,6 +197,7 @@ class UrlOption(Option):
         else:
             return '%s or %s' % (', '.join(self.schemes[:-1]), self.schemes[-1])
 
+
 class UrlListOption(ListOption):
     '''
     Option for handling lists of URLs with validation of the URL scheme.
@@ -220,6 +223,7 @@ class IntOption(Option):
         except (ValueError, TypeError), e:
             raise ValueError('invalid integer value')
 
+
 class BoolOption(Option):
     def parse(self, s):
         s = s.lower()
@@ -236,12 +240,14 @@ class BoolOption(Option):
         else:
             return "0"
 
+
 class FloatOption(Option):
     def parse(self, s):
         try:
             return float(s.strip())
         except (ValueError, TypeError):
             raise ValueError('invalid float value')
+
 
 class SelectionOption(Option):
     '''Handles string values where only specific values are allowed
@@ -302,6 +308,7 @@ class BytesOption(Option):
             raise ValueError("bytes value may not be negative")
 
         return int(n * mult)
+
 
 class ThrottleOption(BytesOption):
 
@@ -456,6 +463,7 @@ class BaseConfig(object):
             setattr(self, option, value)
         else:
             raise ConfigError, 'No such option %s' % option
+
 
 def read_config(config_file, BaseConfigDerived):
     confparser = ConfigParser()
