@@ -22,7 +22,7 @@ class Command(func_module.FuncModule):
     def __init__(self):
         self.methods = {
                 "run" : self.run,
-                "exists" : self.exists,
+                "exists" : self.exists, 
         }
         func_module.FuncModule.__init__(self)
 
@@ -32,7 +32,8 @@ class Command(func_module.FuncModule):
         NOT FOR USE WITH INTERACTIVE COMMANDS.
         """
 
-        cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
+        cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
+                                   stderr=sub_process.PIPE, shell=False)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
 
@@ -40,9 +41,9 @@ class Command(func_module.FuncModule):
         """
         Checks to see if a command exists on the target system(s).
         """
-        cmdref = sub_process.Popen(['/usr/bin/which', command], stdout=sub_process.PIPE)
-        data = cmdref.communicate()
-        if cmdref.returncode == 0:
+        import os
+
+        if os.access(command, os.X_OK):
             return True
         return False
 
