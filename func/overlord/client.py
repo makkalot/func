@@ -114,7 +114,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None):
+        verbose=False, noglobs=False, nforks=1, config=None, noexceptions=True):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -134,6 +134,7 @@ class Client(object):
         self.interactive = interactive
         self.noglobs     = noglobs
         self.nforks      = nforks
+        self.noexceptions= noexceptions
         
         self.servers     = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
@@ -203,6 +204,8 @@ class Client(object):
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
+                if self.noglob and not self.noexceptions:
+                    raise(e)
 
             if self.noglobs:
                 return retval
