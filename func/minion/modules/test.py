@@ -17,5 +17,14 @@ class Test(func_module.FuncModule):
     def ping(self):
         return 1
 
+    def sleep(t):
+        """
+        Sleeps for t seconds, and returns time of day.
+        Simply a test function for trying out async and threaded voodoo.
+        """
+        t = int(t)
+        time.sleep(t)
+        return time.time()
+
 methods = Test()
 register_rpc = methods.register_rpc
