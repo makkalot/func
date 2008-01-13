@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## Grabs status from SMART to see if your hard drives are ok
 ## Returns in the format of (return code, [line1, line2, line3,...])

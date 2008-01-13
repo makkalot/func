@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## Mount manager
 ##

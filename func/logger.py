@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ## func
 ##
 ## Copyright 2007, Red Hat, Inc
@@ -76,6 +74,3 @@ class AuditLogger(Singleton):
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self._no_handlers = False
-
-
-        

@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 """
 show introspection commandline
 
@@ -73,6 +71,7 @@ class ShowHardware(client.command.Command):
                 if arg in minion_data:
                     print minion_data[arg]
 
+
 class Show(client.command.Command):
     name = "show"
     useage = "various simple report stuff"
@@ -98,5 +97,3 @@ class Show(client.command.Command):
 
     def do(self, args):
         pass
-    
-

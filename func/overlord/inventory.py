@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 ##
 ## func inventory app.
 ## use func to collect inventory data on anything, yes, anything
@@ -29,6 +28,7 @@ from func.minion import sub_process
 import func.overlord.client as func_client
 
 DEFAULT_TREE = "/var/lib/func/inventory/"
+
 
 class FuncInventory(object):
 
@@ -81,8 +81,6 @@ class FuncInventory(object):
         # see what modules each host provides (as well as what hosts we have)
         host_methods = func_client.Client(options.server_spec).system.list_methods()
        
-           
-
         # call all remote info methods and handle them
         if options.verbose:
             # print "- DEBUG: %s" % host_methods
@@ -186,8 +184,8 @@ class FuncInventory(object):
         # FIXME: check rc's
         os.chdir(cwd)
 
+
 if __name__ == "__main__":
 
     inv = FuncInventory()
     inv.run(sys.argv)
-    

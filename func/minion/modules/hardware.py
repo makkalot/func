@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ##
 ## Hardware profiler plugin
 ## requires the "smolt" client package be installed
