@@ -27,6 +27,7 @@ import sslclient
 
 import command
 import forkbomb
+import jobthing
 
 # ===================================
 # defaults
@@ -114,7 +115,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None):
+        verbose=False, noglobs=False, nforks=1, async=False, config=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -134,6 +135,7 @@ class Client(object):
         self.interactive = interactive
         self.noglobs     = noglobs
         self.nforks      = nforks
+        self.async       = async
         
         self.servers     = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
@@ -163,6 +165,14 @@ class Client(object):
 
     # -----------------------------------------------
 
+    def job_status(self, jobid):
+        """
+        Use this to acquire status from jobs when using run with async client handles
+        """
+        return jobthing.job_status(jobid)
+
+    # -----------------------------------------------
+
     def run(self, module, method, args, nforks=1):
         """
         Invoke a remote method on one or more servers.
@@ -173,8 +183,6 @@ class Client(object):
         If Client() was constructed with noglobs=True, the return is instead
         just a single value, not a hash.
         """
-
-       
 
         results = {}
 
@@ -210,14 +218,15 @@ class Client(object):
                 left = server.rfind("/")+1
                 right = server.rfind(":")
                 server_name = server[left:right]
-                # TEST (changed for integration with forkbomb)
-                # results[server_name] = retval
                 return (server_name, retval)
 
         if not self.noglobs:
-            if self.nforks > 1:
+            if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
-                results = forkbomb.batch_run(self.servers, process_server,nforks)
+                if not self.async:
+                    results = forkbomb.batch_run(self.servers, process_server, nforks)
+                else:
+                    results = jobthing.batch_run(self.servers, process_server, nforks)
             else:
                 # no need to go through the fork code, we can do this directly
                 results = {}

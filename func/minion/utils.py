@@ -37,7 +37,10 @@ def get_hostname():
     #      for the certmaster for now
     hostname = None
     hostname = socket.gethostname()
-    ip = socket.gethostbyname(hostname)
+    try:
+        ip = socket.gethostbyname(hostname)
+    except:
+        return hostname
     if ip != "127.0.0.1":
         return hostname
 
