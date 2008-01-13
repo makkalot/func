@@ -7,7 +7,8 @@ class Test(func_module.FuncModule):
     def __init__(self):
         self.methods = {
             "add":  self.add,
-            "ping": self.ping
+            "ping": self.ping,
+            "sleep": self.sleep
         }
         func_module.FuncModule.__init__(self)
 
