@@ -1,4 +1,5 @@
 from modules import func_module
+import time
 
 class Test(func_module.FuncModule):
     version = "11.11.11"
