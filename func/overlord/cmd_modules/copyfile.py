@@ -26,7 +26,7 @@ DEFAULT_PORT = 51234
 
 class CopyFile(client.command.Command):
     name = "copyfile"
-    useage = "copy a file to a client"
+    usage = "copy a file to a client"
 
 
     def addOptions(self):

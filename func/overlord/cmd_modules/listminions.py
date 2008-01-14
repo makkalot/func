@@ -22,7 +22,7 @@ DEFAULT_PORT = 51234
 
 class ListMinions(client.command.Command):
     name = "list_minions"
-    useage = "show known minions"
+    usage = "show known minions"
 
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
