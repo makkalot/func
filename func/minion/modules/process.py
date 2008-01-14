@@ -1,3 +1,4 @@
+## -*- coding: utf-8 -*-
 ##
 ## Process lister (control TBA)
 ##
@@ -64,7 +65,7 @@ class ProcessModule(func_module.FuncModule):
             ["52.3 MiB", "10.8 MiB", "63.0 MiB",  "liferea-bin"]
             ["171.6 MiB", "11.9 MiB", "183.5 MiB", "firefox-bin"]]
 
-        Taken from the ps_mem.py script written by P draigBrady com
+        Taken from the ps_mem.py script written by Pádraig Brady.
         http://www.pixelbeat.org/scripts/ps_mem.py
         """
         import os
