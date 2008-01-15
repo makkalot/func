@@ -22,7 +22,7 @@ import tempfile
 import fcntl
 
 DEFAULT_FORKS = 4
-DEFAULT_CACHE_DIR = "~/.func"
+DEFAULT_CACHE_DIR = "/var/lib/func"
 
 def __get_storage(dir):
     """
@@ -31,7 +31,7 @@ def __get_storage(dir):
     dir = os.path.expanduser(dir)
     if not os.path.exists(dir):
         os.makedirs(dir)
-    return tempfile.mktemp(suffix='', prefix='tmp', dir=dir)
+    return tempfile.mktemp(suffix='', prefix='asynctmp', dir=dir)
 
 def __access_buckets(filename,clear,new_key=None,new_value=None):
     """
@@ -133,7 +133,7 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     if nforks <= 1:
        # modulus voodoo gets crazy otherwise and bad things happen
        nforks = 2
-    shelf_file = __get_storage("~/.func")
+    shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)
     # print "DEBUG: buckets: %s" % buckets

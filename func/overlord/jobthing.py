@@ -28,7 +28,11 @@ JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
 
-DEFAULT_CACHE_DIR = "~/.func"
+# how long to retain old job records in the job id database
+RETAIN_INTERVAL = 60 * 60    
+
+# where to store the internal job id database
+CACHE_DIR = "/var/lib/func"
 
 def __update_status(jobid, status, results, clear=False):
     return __access_status(jobid=jobid, status=status, results=results, write=True)
@@ -36,12 +40,26 @@ def __update_status(jobid, status, results, clear=False):
 def __get_status(jobid):
     return __access_status(jobid=jobid, write=False)
 
+
+def __purge_old_jobs(storage):
+    """
+    Deletes jobs older than RETAIN_INTERVAL seconds.  
+    MINOR FIXME: this probably should be a more intelligent algorithm that only
+    deletes jobs if the database is too big and then only the oldest jobs
+    but this will work just as well.
+    """
+    nowtime = time.time()
+    for x in storage.keys():
+        create_time = float(x)
+        if nowtime - create_time > RETAIN_INTERVAL:
+            del storage[x]
+
 def __access_status(jobid=0, status=0, results=0, clear=False, write=False):
 
-    dir = os.path.expanduser("~/.func")
+    dir = os.path.expanduser(CACHE_DIR)
     if not os.path.exists(dir):
         os.makedirs(dir)
-    filename = os.path.join(dir,"status") 
+    filename = os.path.join(dir,"status-%s" % os.getuid()) 
 
     internal_db = bsddb.btopen(filename, 'c', 0644 )
     handle = open(filename,"r")
@@ -54,10 +72,8 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False):
         fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
         return {}
 
-    # FIXME: the jobid is the time of the job, so deleting jobs
-    # that are older than a set time would be a very good idea.
-        
     if write:
+        __purge_old_jobs(storage)
         storage[str(jobid)] = (status, results)
         rc = jobid
     else:
