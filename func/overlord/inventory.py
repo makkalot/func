@@ -1,4 +1,3 @@
-#!/usr/bin/python
 ##
 ## func inventory app.
 ## use func to collect inventory data on anything, yes, anything
@@ -186,6 +185,5 @@ class FuncInventory(object):
 
 
 if __name__ == "__main__":
-
     inv = FuncInventory()
     inv.run(sys.argv)
