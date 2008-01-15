@@ -85,10 +85,9 @@ def load_modules(blacklist=None):
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
             for obj in dir(blip):
                 attr = getattr(blip, obj)
-                if isclass(attr):
-                    if issubclass(attr, func_module.FuncModule):
-                        logger.debug("Loading %s module" % attr)
-                        mods[mod_imp_name] = attr()
+                if isclass(attr) and issubclass(attr, func_module.FuncModule):
+                    logger.debug("Loading %s module" % attr)
+                    mods[mod_imp_name] = attr()
 
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
