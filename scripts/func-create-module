@@ -10,9 +10,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 TEMPLATE = """\
-from modules import func_module
-# Add your imports here
-import sub_process
+import func_module
 
 class %s(func_module.FuncModule):
 
@@ -21,17 +19,7 @@ class %s(func_module.FuncModule):
     api_version = "0.0.1"
     description = "%s"
 
-    def __init__(self):
-        self.methods = {
 %s
-        }
-        func_module.FuncModule.__init__(self)
-
-%s
-
-
-methods = %s()
-register_rpc = methods.register_rpc
 """
 
 
@@ -40,12 +28,9 @@ def populate_template(module_name, desc, methods):
     Makes the method strings and populates the template.
     """
     actual_methods = ""
-    method_str_dict = ""
     for method in methods:
-        method_str_dict += '            "%s": self.%s,\n' % (method, method)
-        actual_methods += "    def self.%s(self):\n        pass\n\n" % method
-    return TEMPLATE % (module_name, desc, 
-                       method_str_dict[:-1], actual_methods[:-2], module_name)
+        actual_methods += "    def %s(self):\n        pass\n\n" % method
+    return TEMPLATE % (module_name, desc, actual_methods[:-2])
 
 
 if __name__ == '__main__':

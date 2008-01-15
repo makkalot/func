@@ -8,22 +8,10 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-from modules import func_module
-
+import func_module
 import sub_process
 
 class Reboot(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-                "reboot" : self.reboot
-        }
-        func_module.FuncModule.__init__(self)
-
     def reboot(self, when='now', message=''):
         return sub_process.call(["/sbin/shutdown", '-r', when, message])
-
-
-methods = Reboot()
-register_rpc = methods.register_rpc

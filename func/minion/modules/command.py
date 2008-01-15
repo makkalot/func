@@ -13,18 +13,10 @@
 Abitrary command execution module for func.
 """
 
-from modules import func_module
-
+import func_module
 import sub_process
 
 class Command(func_module.FuncModule):
-
-    def __init__(self):
-        self.methods = {
-                "run" : self.run,
-                "exists" : self.exists, 
-        }
-        func_module.FuncModule.__init__(self)
 
     def run(self, command):
         """
@@ -46,7 +38,3 @@ class Command(func_module.FuncModule):
         if os.access(command, os.X_OK):
             return True
         return False
-
-
-methods = Command()
-register_rpc = methods.register_rpc

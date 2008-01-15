@@ -13,18 +13,11 @@
 Abitrary command execution module for func.
 """
 
-from modules import func_module
-
+import func_module
 import sub_process
 base_snmp_command = '/usr/bin/snmpget -v2c -Ov -OQ'
 
 class Snmp(func_module.FuncModule):
-
-    def __init__(self):
-        self.methods = {
-                "get" : self.get
-        }
-        func_module.FuncModule.__init__(self)
 
     def get(self, oid, rocommunity, hostname='localhost'):
         """
@@ -39,8 +32,3 @@ class Snmp(func_module.FuncModule):
     #def walk(self, oid, rocommunity):
 
     #def table(self, oid, rocommunity):
-    
-methods = Snmp()
-register_rpc = methods.register_rpc
-
-
