@@ -49,7 +49,8 @@ class FuncModule(object):
 
         # register all methods that don't start with an underscore
         for attr in dir(self):
-            if inspect.ismethod(getattr(self, attr)) and attr[0] != '_':
+            if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and \
+                    attr != 'register_rpc':
                 handlers["%s.%s" % (module_name, attr)] = getattr(self, attr)
 
     def __list_methods(self):
