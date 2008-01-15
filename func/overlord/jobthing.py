@@ -37,6 +37,7 @@ def __get_status(jobid):
     return __access_status(jobid=jobid, write=False)
 
 def __access_status(jobid=0, status=0, results=0, clear=False, write=False):
+
     dir = os.path.expanduser("~/.func")
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -53,19 +54,16 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False):
         fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
         return {}
 
-    if not storage.has_key("data"):
-        storage["data"] = {}
-
     # FIXME: the jobid is the time of the job, so deleting jobs
     # that are older than a set time would be a very good idea.
         
     if write:
-        storage["data"][jobid] = (status, results)
+        storage[str(jobid)] = (status, results)
         rc = jobid
     else:
-        if storage["data"].has_key(jobid):
+        if storage.has_key(str(jobid)):
             # tuple of (status, results)
-            rc = storage["data"][jobid]
+            rc = storage[str(jobid)]
         else:
             rc = (JOB_ID_LOST_IN_SPACE, 0)
 
@@ -84,11 +82,14 @@ def batch_run(server, process_server, nforks):
     job_id = time.time()
     pid = os.fork()
     if pid != 0:
+        #print "DEBUG: UPDATE STATUS: r1: %s" % job_id
         __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
+        #print "DEBUG: UPDATE STATUS: r2: %s" % job_id
         __update_status(job_id, JOB_ID_RUNNING,  -1)
         results = forkbomb.batch_run(server, process_server, nforks)
+        #print "DEBUG: UPDATE STATUS: f1: %s" % job_id
         __update_status(job_id, JOB_ID_FINISHED, results)
         sys.exit(0)
 
