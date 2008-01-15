@@ -25,7 +25,7 @@ DEFAULT_FORKS = 1
 
 class Call(client.command.Command):
     name = "call"
-    useage = "call nodule method name arg1 arg2..."
+    usage = "call module method name arg1 arg2..."
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")

@@ -15,7 +15,7 @@ from func.overlord import client
 
 class FuncCommandLine(command.Command):
     name = "func"
-    useage = "func is the commandline interface to a func minion"
+    usage = "func is the commandline interface to a func minion"
 
     subCommandClasses = [call.Call, show.Show,
                          copyfile.CopyFile, listminions.ListMinions, ping.Ping]

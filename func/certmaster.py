@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # FIXME: more intelligent fault raises
 
 """

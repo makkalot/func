@@ -28,7 +28,7 @@ DEFAULT_PORT = 51234
 
 class Ping(client.command.Command):
     name = "ping"
-    useage = "see what func minions are up/accessible"
+    usage = "see what func minions are up/accessible"
 
     def addOptions(self):
         """

@@ -25,7 +25,7 @@ DEFAULT_PORT = 51234
 
 class ShowHardware(client.command.Command):
     name = "hardware"
-    useage = "show hardware details"
+    usage = "show hardware details"
 
     # FIXME: we might as well make verbose be in the subclass
     #      and probably an inc variable while we are at it
@@ -74,7 +74,7 @@ class ShowHardware(client.command.Command):
 
 class Show(client.command.Command):
     name = "show"
-    useage = "various simple report stuff"
+    usage = "various simple report stuff"
     subCommandClasses = [ShowHardware]
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
