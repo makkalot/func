@@ -84,16 +84,16 @@ class FuncLibvirtConnection(object):
             if vm.name() == vmid:
                 return vm
 
-        raise codes.FuncException("virtual machine %s not found" % needle)
+        raise codes.FuncException("virtual machine %s not found" % vmid)
 
     def shutdown(self, vmid):
         return self.find_vm(vmid).shutdown()
 
     def pause(self, vmid):
-        return suspend(self.conn,vmid)
+        return self.suspend(self.conn,vmid)
 
     def unpause(self, vmid):
-        return resume(self.conn,vmid)
+        return self.resume(self.conn,vmid)
 
     def suspend(self, vmid):
         return self.find_vm(vmid).suspend()
