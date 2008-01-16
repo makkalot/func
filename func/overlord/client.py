@@ -21,6 +21,7 @@ from func.config import read_config, CONFIG_FILE
 
 import sslclient
 
+import command
 import forkbomb
 import jobthing
 
