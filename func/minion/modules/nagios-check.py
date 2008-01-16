@@ -18,6 +18,10 @@ import sub_process
 
 class Nagios(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Runs nagios checks."
+
     def run(self, check_command):
         """
         Runs a nagios check returning the return code, stdout, and stderr as a tuple.

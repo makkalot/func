@@ -17,11 +17,11 @@ import shutil
 import func_module
 
 
-
-
 class CopyFile(func_module.FuncModule):
+
     version = "0.0.1"
     api_version = "0.0.2"
+    description = "Allows for smart copying of a file."
 
     def _checksum_blob(self, blob):
         CHUNK=2**16

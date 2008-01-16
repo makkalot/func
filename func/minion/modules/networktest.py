@@ -16,6 +16,10 @@ import sub_process
 
 class NetworkTest(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Defines various network testing tools."
+
     def ping(self, *args):
         if '-c' not in args:
             raise(FuncException("You must define a count with -c!"))

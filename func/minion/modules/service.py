@@ -20,6 +20,10 @@ import os
 
 class Service(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Allows for service control via func."
+
     def __command(self, service_name, command):
 
         filename = os.path.join("/etc/rc.d/init.d/",service_name)

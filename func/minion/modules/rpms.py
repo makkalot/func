@@ -13,6 +13,10 @@ import rpm
 
 class RpmModule(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "RPM related commands."
+
     def inventory(self, flatten=True):
         """
         Returns information on all installed packages.

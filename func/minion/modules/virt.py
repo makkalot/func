@@ -38,6 +38,10 @@ VIRT_STATE_NAME_MAP = {
 
 class FuncLibvirtConnection(object):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Virtualization items through func."
+
     def __init__(self):
 
         cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE)

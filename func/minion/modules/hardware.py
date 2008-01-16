@@ -26,6 +26,10 @@ import func_module
 
 class HardwareModule(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Hardware profiler."
+
     def hal_info(self):
         """
         Returns the output of lshal, but split up into seperate devices

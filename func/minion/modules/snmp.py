@@ -19,6 +19,10 @@ base_snmp_command = '/usr/bin/snmpget -v2c -Ov -OQ'
 
 class Snmp(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "SNMP related calls through func."
+
     def get(self, oid, rocommunity, hostname='localhost'):
         """
         Runs an snmpget on a specific oid returns the output of the call.

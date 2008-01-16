@@ -18,6 +18,10 @@ import sub_process
 
 class Command(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Works with shell commands."
+
     def run(self, command):
         """
         Runs a command, returning the return code, stdout, and stderr as a tuple.

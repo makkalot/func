@@ -24,6 +24,10 @@ import func_module
 
 class ProcessModule(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Process related reporting and control."
+
     def info(self, flags="-auxh"):
         """
         Returns a struct of hardware information.  By default, this pulls down

@@ -13,5 +13,9 @@ import sub_process
 
 class Reboot(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Reboots a machine."
+
     def reboot(self, when='now', message=''):
         return sub_process.call(["/sbin/shutdown", '-r', when, message])

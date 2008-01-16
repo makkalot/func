@@ -23,6 +23,10 @@ import func_module
 
 class SmartModule(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Grabs status from SMART to see if your hard drives are ok."
+
     def info(self,flags="-q onecheck"):
         """
         Returns a struct of hardware information.  By default, this pulls down

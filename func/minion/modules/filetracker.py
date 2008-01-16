@@ -30,6 +30,10 @@ CONFIG_FILE='/etc/func/modules/filetracker.conf'
 
 class FileTracker(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Maintains a manifest of files to keep track of."
+
     def __load(self):
         """
         Parse file and return data structure.

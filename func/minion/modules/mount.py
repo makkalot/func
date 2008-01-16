@@ -18,6 +18,10 @@ import func_module
 
 class MountModule(func_module.FuncModule):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Mounting, unmounting and getting information on mounted filesystems."
+
     def list(self):
         cmd = sub_process.Popen(["/bin/cat", "/proc/mounts"], executable="/bin/cat", stdout=sub_process.PIPE, shell=False)
         data = cmd.communicate()[0]
