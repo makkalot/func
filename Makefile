@@ -90,6 +90,9 @@ money: clean
 testit: clean
 	-cd test; sh test-it.sh
 
+unittest:
+	-nosetests -v -w test/unittest
+
 rpms: build manpage sdist
 	mkdir -p rpm-build
 	cp dist/*.gz rpm-build/
