@@ -187,6 +187,9 @@ pound_on_the_threads()
 	done
     done
 
+    # this is kind of dumb and ugly, but it gives a change for all the
+    # connections to complete before we shut the server down
+    sleep 10
 
 }
 
