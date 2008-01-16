@@ -212,6 +212,18 @@ test_funcd()
 }
 
 
+run_async_test()
+{
+    python async_test.py
+
+}
+
+run_unittests()
+{
+    nosetests -v -w unittest/
+    
+}
+
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
 		check_out_code
@@ -255,6 +267,10 @@ sign_the_certmaster_certs
 test_funcd
 
 pound_on_the_threads
+
+run_unittests
+
+run_async_test
 
 stop_the_func
 # see if funcd is running
