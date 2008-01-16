@@ -118,7 +118,7 @@ def _get_serial_number(cadir):
 def _set_serial_number(cadir, last):
     serial = '%s/serial.txt' % cadir
     f = open(serial, 'w')
-    f.write(str(last))
+    f.write(str(last) + '\n')
     f.close()
             
         
