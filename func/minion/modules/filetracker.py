@@ -22,7 +22,6 @@ import func_module
 from stat import *
 import glob
 import os
-import sys
 import md5
 
 # defaults
