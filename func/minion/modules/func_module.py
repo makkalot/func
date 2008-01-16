@@ -47,14 +47,24 @@ class FuncModule(object):
         for meth in self.__base_methods:
             handlers["%s.%s" % (module_name, meth)] = self.__base_methods[meth]
 
-        # register all methods that don't start with an underscore
+        # register our module's handlers
+        for name, handler in self.__list_handlers().items():
+            handlers["%s.%s" % (module_name, name)] = handler
+
+    def __list_handlers(self):
+        """ Return a dict of { handler_name, method, ... }.
+        All methods that do not being with an underscore will be exposed.
+        We also make sure to not expose our register_rpc method.
+        """
+        handlers = {}
         for attr in dir(self):
             if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and \
                     attr != 'register_rpc':
-                handlers["%s.%s" % (module_name, attr)] = getattr(self, attr)
+                handlers[attr] = getattr(self, attr)
+        return handlers
 
     def __list_methods(self):
-        return self.methods.keys() + self.__base_methods.keys()
+        return self.__list_handlers().keys() + self.__base_methods.keys()
 
     def __module_version(self):
         return self.version
