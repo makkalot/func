@@ -18,9 +18,7 @@ import os.path
 import time
 import optparse
 import sys
-import glob
 import pprint
-import exceptions
 import xmlrpclib
 from func.minion import sub_process
 
