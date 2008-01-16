@@ -54,9 +54,9 @@ def make_csr(pkey, dest=None, cn=None):
     req.set_pubkey(pkey)
     req.sign(pkey, 'md5')
     if dest:
-        destfo = open(dest, 'w')
-        destfo.write(crypto.dump_certificate_request(crypto.FILETYPE_PEM, req))
-        destfo.close()
+        destfd = os.open(dest, os.O_RDWR|os.O_CREAT, 0644)
+        os.write(destfd, crypto.dump_certificate_request(crypto.FILETYPE_PEM, req))
+        os.close(destfd)
 
     return req
 

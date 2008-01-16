@@ -109,13 +109,13 @@ def create_minion_keys():
 
 
     if result:
-        cert_fo = open(cert_file, 'w')
-        cert_fo.write(cert_string)
-        cert_fo.close()
+        cert_fd = os.open(cert_file, os.O_RDWR|os.O_CREAT, 0644)
+        os.write(cert_fd, cert_string)
+        os.close(cert_fd)
 
-        ca_cert_fo = open(ca_cert_file, 'w')
-        ca_cert_fo.write(ca_cert_string)
-        ca_cert_fo.close()
+        ca_cert_fd = os.open(ca_cert_file, os.O_RDWR|os.O_CREAT, 0644)
+        os.write(ca_cert_fd, ca_cert_string)
+        os.close(ca_cert_fd)
 
 def submit_csr_to_master(csr_file, master_uri):
     """"
