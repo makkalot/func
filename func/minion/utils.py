@@ -18,11 +18,13 @@ import time
 import traceback
 import xmlrpclib
 import glob
+import traceback
 
 import codes
 from func import certs
 from func.config import read_config
 from func.commonconfig import FuncdConfig
+from func import logger
 
 # "localhost" is a lame hostname to use for a key, so try to get
 # a more meaningful hostname. We do this by connecting to the certmaster
@@ -93,22 +95,27 @@ def create_minion_keys():
             if not keypair:
                 keypair = certs.retrieve_key_from_file(key_file)
             csr = certs.make_csr(keypair, dest=csr_file)
-    except Exception, e: # need a little more specificity here
+    except Exception, e:
+        traceback.print_exc()
         raise codes.FuncException, "Could not create local keypair or csr for minion funcd session"
 
     result = False
+    log = logger.Logger().logger
     while not result:
         try:
+            log.debug("submitting CSR to certmaster %s" % master_uri)
             result, cert_string, ca_cert_string = submit_csr_to_master(csr_file, master_uri)
         except socket.gaierror, e:
-            raise codes.FuncException, "Could not locate certmaster at: http://certmaster:51235/"
+            raise codes.FuncException, "Could not locate certmaster at %s" % master_uri
 
         # logging here would be nice
         if not result:
+            log.warning("no response from certmaster %s, sleeping 10 seconds" % master_uri)
             time.sleep(10)
 
 
     if result:
+        log.debug("received certificate from certmaster %s, storing" % master_uri)
         cert_fd = os.open(cert_file, os.O_RDWR|os.O_CREAT, 0644)
         os.write(cert_fd, cert_string)
         os.close(cert_fd)
