@@ -24,7 +24,6 @@ class CopyFile(func_module.FuncModule):
     description = "Allows for smart copying of a file."
 
     def _checksum_blob(self, blob):
-        CHUNK=2**16
         thissum = sha.new()
         thissum.update(blob)
         return thissum.hexdigest()
@@ -57,7 +56,6 @@ class CopyFile(func_module.FuncModule):
         # we should probably verify mode,uid,gid are valid as well
 
         dirpath = os.path.dirname(filepath)
-        basepath = os.path.basename(filepath)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
 
