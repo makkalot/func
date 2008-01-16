@@ -22,6 +22,15 @@ class %s(func_module.FuncModule):
 %s
 """
 
+METHOD_TEMPLATE = '''\
+    def %s(self):
+        """
+        TODO: Document me ...
+        """
+        pass
+
+'''
+
 
 def populate_template(module_name, desc, methods):
     """
@@ -29,7 +38,7 @@ def populate_template(module_name, desc, methods):
     """
     actual_methods = ""
     for method in methods:
-        actual_methods += "    def %s(self):\n        pass\n\n" % method
+        actual_methods += METHOD_TEMPLATE % method
     return TEMPLATE % (module_name, desc, actual_methods[:-2])
 
 

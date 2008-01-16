@@ -9,22 +9,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from modules import func_module
+import func_module
 from codes import FuncException
 
 import sub_process
 
 class NetworkTest(func_module.FuncModule):
-
-    def __init__(self):
-        self.methods = {
-                "ping" : self.ping,
-                "netstat" : self.netstat,
-                "traceroute" : self.traceroute,
-                "dig" : self.dig,
-                "isportopen" : self.isportopen,
-        }
-        func_module.FuncModule.__init__(self)
 
     def ping(self, *args):
         if '-c' not in args:
@@ -58,7 +48,3 @@ class NetworkTest(func_module.FuncModule):
         full_cmd = [command] + opts
         cmd = sub_process.Popen(full_cmd, stdout=sub_process.PIPE)
         return [line for line in cmd.communicate()[0].split('\n')]
-
-
-methods = NetworkTest()
-register_rpc = methods.register_rpc
