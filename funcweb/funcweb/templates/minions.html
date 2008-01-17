@@ -1,0 +1,27 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="master.html"/>
+<head/>
+<body>
+    <!--
+  <div id="sidebar">
+    <h2>FuncWeb</h2>
+    <ul class="links">
+      <li><a href="#">Groups</a></li>
+      <li><a href="#">Minions</a></li>
+      <li><a href="#">Modules</a></li>
+    </ul>
+  </div>
+  -->
+  <div id="getting_started">
+    <ol id="getting_started_steps">
+      <li py:for="minion in minions.keys()">
+        <a href="${tg.url('/minion/' + minion)}">${minion}</a>
+      </li>
+    </ol>
+  </div>
+
+</body>
+</html>
