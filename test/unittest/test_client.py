@@ -153,3 +153,37 @@ class TestNetworkTest(BaseTest):
         assert type(result[self.th]) != xmlrpclib.Fault
 
 
+class TestProcess(BaseTest):
+    def test_info(self):
+        result = self.client.process.info()
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_mem(self):
+        result = self.client.process.mem()
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    # FIXME: how to test kill/pkill? start a process with
+    #        command and then kill it?
+
+
+class TestService(BaseTest):
+    def test_inventory(self):
+        result = self.client.service.inventory()
+        assert type(result[self.th]) != xmlrpclib.Fault
+    
+    def test_get_enabled(self):
+        result = self.client.service.get_enabled()
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_get_running(self):
+        result = self.client.service.get_running()
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_get_status(self):
+        running_data = self.client.service.get_running()[self.th]
+        result = self.client.service.status(running_data[0][0])
+        assert type(result[self.th]) != xmlrpclib.Fault
+        assert result[self.th] == 0
+
+        #FIXME: whats a good way to test starting/stoping services without
+        #       doing bad things? -akl
