@@ -120,3 +120,36 @@ class TestMount(BaseTest):
         assert type(result[self.th]) != xmlrpclib.Fault
 
     # INSERT some clever way to test mount here
+
+
+class TestNetworkTest(BaseTest):
+    def test_ping(self):
+        result = self.client.networktest.ping(self.th, "-c", "2")
+        assert type(result[self.th]) != xmlrpclib.Fault
+    
+    def test_ping_bad_arg(self):
+         result = self.client.networktest.ping(self.th)
+         # this should give us a FuncException
+         assert type(result[self.th]) == xmlrpclib.Fault
+         
+    def test_netstat(self):
+        result = self.client.networktest.netstat("-n")
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_traceroute(self):
+        result = self.client.networktest.traceroute(self.th)
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_dig(self):
+        result = self.client.networktest.dig("redhat.com")
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_isportopen_closed_port(self):
+        result = self.client.networktest.isportopen(self.th, 34251)
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+    def test_isportopen_open_port(self):
+        result = self.client.networktest.isportopen(self.th, 51234)
+        assert type(result[self.th]) != xmlrpclib.Fault
+
+
