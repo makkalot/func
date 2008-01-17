@@ -38,12 +38,22 @@ class NetworkTest(func_module.FuncModule):
                                    self.__args_to_list(args))
 
     def isportopen(self, host, port):
+        # FIXME: the return api here needs some work... -akl
         import socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((host, int(port)))
-        data = sock.recv(2048)
+        timeout = 3.0
+        sock.settimeout(timeout)
+        try:
+            sock.connect((host, int(port)))
+        except socket.error, e:
+            sock.close()
+            return [1, ("connection to %s:%s failed" % (host, port), "%s" % e)]
+        except socket.timeout:
+            sock.close()
+            return [2, ("connection to %s:%s timed out after %s seconds" % (host, port, timeout))]
+
         sock.close()
-        return [line for line in data.split('\n')]
+        return [0, "connection to %s:%s succeeded" % (host, port)]
 
     def __args_to_list(self, args):
         return [arg for arg in args]
