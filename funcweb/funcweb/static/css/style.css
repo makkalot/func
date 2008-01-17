@@ -42,7 +42,7 @@ a img
 {
   display: block;
   text-indent: -9999px;
-  background: url(http://fedoraproject.org/static/images/fedora-logo.png) 20px 50% no-repeat;
+  /*background: url(http://fedoraproject.org/static/images/fedora-logo.png) 20px 50% no-repeat;*/
   height: 73px;
   width: 138px;
   overflow: hidden;
@@ -655,10 +655,14 @@ background-position:100% -24px;
 }
 
 #col2 {
+  width: 200px;
 }
 
 #col3 {
-  float: right;
+  width: 200px;
+}
+
+#col4 {
   width: 200px;
   
 }
