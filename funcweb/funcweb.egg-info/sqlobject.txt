@@ -1,0 +1,2 @@
+db_module=funcweb.model
+history_dir=$base/funcweb/sqlobject-history
