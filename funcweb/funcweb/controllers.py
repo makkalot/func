@@ -10,11 +10,17 @@ class Root(controllers.RootController):
     def minions(self):
         """ Return a list of our minions """
         fc = Client("*")
-        return dict(minions=fc.system.list_methods(), widgets=[])
+        return dict(minions=fc.system.list_methods())
 
     @expose(template="funcweb.templates.minion")
     def minion(self, name, module=None, method=None):
-        """ View all modules for a given minion """
+        """ Display details for a given minion.
+
+        If only the minion name is given, it will display a list of modules
+        for that minion.  If a module is supplied, it will display a list of
+        methods.  If a method is supplied, it will display a method execution
+        form.
+        """
         fc = Client(name)
         if not module: # list all modules
             modules = fc.system.list_modules()
