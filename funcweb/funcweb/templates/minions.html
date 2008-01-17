@@ -5,23 +5,18 @@
   <xi:include href="master.html"/>
 <head/>
 <body>
-    <!--
-  <div id="sidebar">
-    <h2>FuncWeb</h2>
-    <ul class="links">
-      <li><a href="#">Groups</a></li>
-      <li><a href="#">Minions</a></li>
-      <li><a href="#">Modules</a></li>
-    </ul>
+  <div class="col-group">
+    <div class="col" id="col1">
+       <b>Minions</b>
+       <ul>
+        <li py:for="minion in minions.keys()">
+        <a onclick="$('#col2').load('/minion/${minion}')" href="#">${minion}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="col" id="col2" />
+    <div class="col" id="col3" />
+    <div class="col" id="col4" />
   </div>
-  -->
-  <div id="getting_started">
-    <ol id="getting_started_steps">
-      <li py:for="minion in minions.keys()">
-        <a href="${tg.url('/minion/' + minion)}">${minion}</a>
-      </li>
-    </ol>
-  </div>
-
 </body>
 </html>
