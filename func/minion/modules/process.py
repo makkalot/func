@@ -18,19 +18,15 @@ import sub_process
 import codes
 
 # our modules
-from modules import func_module
+import func_module
 
 # =================================
 
 class ProcessModule(func_module.FuncModule):
-    def __init__(self):
-        self.methods = {
-            "info"    : self.info,
-            "kill"    : self.kill,
-            "pkill"   : self.pkill,
-            "mem"     : self.mem
-        }
-        func_module.FuncModule.__init__(self)
+
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Process related reporting and control."
 
     def info(self, flags="-auxh"):
         """
@@ -216,6 +212,3 @@ class ProcessModule(func_module.FuncModule):
         rc = sub_process.call(["/usr/bin/pkill", name, level], 
                               executable="/usr/bin/pkill", shell=False)
         return rc
-
-methods = ProcessModule()
-register_rpc = methods.register_rpc

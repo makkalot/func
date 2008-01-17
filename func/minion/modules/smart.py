@@ -17,17 +17,15 @@
 import sub_process
 
 # our modules
-from modules import func_module
+import func_module
 
 # =================================
 
 class SmartModule(func_module.FuncModule):
-    def __init__(self):
-        self.methods = {
-            "info"         : self.info,
-            "inventory"    : self.info,  # for func-inventory
-        }
-        func_module.FuncModule.__init__(self)
+
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Grabs status from SMART to see if your hard drives are ok."
 
     def info(self,flags="-q onecheck"):
         """
@@ -47,6 +45,3 @@ class SmartModule(func_module.FuncModule):
             results.append(x)
 
         return (cmd.returncode, results)
-
-methods = SmartModule()
-register_rpc = methods.register_rpc

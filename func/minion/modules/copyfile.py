@@ -14,26 +14,16 @@ import os
 import time
 import shutil
 
-from modules import func_module
-
-
+import func_module
 
 
 class CopyFile(func_module.FuncModule):
+
     version = "0.0.1"
     api_version = "0.0.2"
-    
-    
-
-    def __init__(self):
-        self.methods = {
-                "copyfile" : self.copyfile,
-                "checksum" : self.checksum
-        }
-        func_module.FuncModule.__init__(self)
+    description = "Allows for smart copying of a file."
 
     def _checksum_blob(self, blob):
-        CHUNK=2**16
         thissum = sha.new()
         thissum.update(blob)
         return thissum.hexdigest()
@@ -66,7 +56,6 @@ class CopyFile(func_module.FuncModule):
         # we should probably verify mode,uid,gid are valid as well
 
         dirpath = os.path.dirname(filepath)
-        basepath = os.path.basename(filepath)
         if not os.path.exists(dirpath):
             os.makedirs(dirpath)
 
@@ -118,8 +107,3 @@ class CopyFile(func_module.FuncModule):
             #XXX logger output here
             return False
         return True
-
-
-
-methods = CopyFile()
-register_rpc = methods.register_rpc

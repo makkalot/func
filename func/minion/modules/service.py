@@ -13,25 +13,16 @@
 ##
 
 import codes
-from modules import func_module
+import func_module
 
 import sub_process
 import os
 
 class Service(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-            "start"       : self.start,
-            "stop"        : self.stop,
-            "restart"     : self.restart,
-            "reload"      : self.reload,
-            "status"      : self.status,
-            "get_enabled" : self.get_enabled,
-            "get_running" : self.get_running,
-            "inventory"   : self.inventory,
-        }
-        func_module.FuncModule.__init__(self)
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Allows for service control via func."
 
     def __command(self, service_name, command):
 
@@ -95,6 +86,3 @@ class Service(func_module.FuncModule):
                 tokens = line.split()
                 results.append((tokens[0], tokens[-1].replace("...","")))
         return results
-
-methods = Service()
-register_rpc = methods.register_rpc

@@ -16,13 +16,12 @@
 ##
 
 # func modules
-from modules import func_module
+import func_module
 
 # other modules
 from stat import *
 import glob
 import os
-import sys
 import md5
 
 # defaults
@@ -30,16 +29,9 @@ CONFIG_FILE='/etc/func/modules/filetracker.conf'
 
 class FileTracker(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-            "track"       : self.track,
-            "untrack"     : self.untrack,
-            "info"        : self.inventory,
-            "inventory"   : self.inventory,
-        }
-        func_module.FuncModule.__init__(self)
-
-    #==========================================================
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Maintains a manifest of files to keep track of."
 
     def __load(self):
         """
@@ -145,7 +137,7 @@ class FileTracker(func_module.FuncModule):
             gid = filestat[ST_GID]
             if not os.path.isdir(file_name) and checksum_enabled:
                 sum_handle = open(file_name)
-                hash = self.sumfile(sum_handle)
+                hash = self.__sumfile(sum_handle)
                 sum_handle.close()
             else:
                 hash = "N/A"
@@ -185,7 +177,7 @@ class FileTracker(func_module.FuncModule):
 
     #==========================================================
 
-    def sumfile(self, fobj):
+    def __sumfile(self, fobj):
         """
         Returns an md5 hash for an object with read() method.
         credit: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/266486
@@ -198,6 +190,3 @@ class FileTracker(func_module.FuncModule):
                 break
             m.update(d)
         return m.hexdigest()
-
-methods = FileTracker()
-register_rpc = methods.register_rpc

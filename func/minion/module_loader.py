@@ -19,10 +19,11 @@ import sys
 from gettext import gettext
 _ = gettext
 
-
 from func import logger
 logger = logger.Logger().logger
 
+from inspect import isclass
+from func.minion.modules import func_module
 
 def module_walker(topdir):
     module_files = []
@@ -80,13 +81,14 @@ def load_modules(blacklist=None):
             continue
 
         try:
+            # Auto-detect and load all FuncModules
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
-            if not hasattr(blip, "register_rpc"):
-                errmsg = _("%(module_path)s%(modname)s module not a proper module")
-                logger.warning(errmsg % {'module_path': module_file_path, 'modname':mod_imp_name})
-                bad_mods[mod_imp_name] = True
-                continue
-            mods[mod_imp_name] = blip
+            for obj in dir(blip):
+                attr = getattr(blip, obj)
+                if isclass(attr) and issubclass(attr, func_module.FuncModule):
+                    logger.debug("Loading %s module" % attr)
+                    mods[mod_imp_name] = attr()
+
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
             errmsg = _("Could not load %s module: %s")

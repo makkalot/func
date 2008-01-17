@@ -10,6 +10,7 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
+import inspect
 
 from func import logger
 from func.config import read_config
@@ -34,7 +35,7 @@ class FuncModule(object):
             "module_api_version" : self.__module_api_version,
             "module_description" : self.__module_description,
             "list_methods"       : self.__list_methods
-            }
+        }
 
     def __init_log(self):
         log = logger.Logger()
@@ -45,11 +46,25 @@ class FuncModule(object):
         # can get clobbbered by subclass versions
         for meth in self.__base_methods:
             handlers["%s.%s" % (module_name, meth)] = self.__base_methods[meth]
-        for meth in self.methods:
-            handlers["%s.%s" % (module_name,meth)] = self.methods[meth]
+
+        # register our module's handlers
+        for name, handler in self.__list_handlers().items():
+            handlers["%s.%s" % (module_name, name)] = handler
+
+    def __list_handlers(self):
+        """ Return a dict of { handler_name, method, ... }.
+        All methods that do not being with an underscore will be exposed.
+        We also make sure to not expose our register_rpc method.
+        """
+        handlers = {}
+        for attr in dir(self):
+            if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and \
+                    attr != 'register_rpc':
+                handlers[attr] = getattr(self, attr)
+        return handlers
 
     def __list_methods(self):
-        return self.methods.keys() + self.__base_methods.keys()
+        return self.__list_handlers().keys() + self.__base_methods.keys()
 
     def __module_version(self):
         return self.version
@@ -59,7 +74,3 @@ class FuncModule(object):
 
     def __module_description(self):
         return self.description
-
-
-methods = FuncModule()
-register_rpc = methods.register_rpc

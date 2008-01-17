@@ -8,17 +8,14 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-from modules import func_module
+import func_module
 import rpm
 
 class RpmModule(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-           "inventory" : self.inventory,
-           "info"      : self.inventory
-        }
-        func_module.FuncModule.__init__(self)
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "RPM related commands."
 
     def inventory(self, flatten=True):
         """
@@ -43,6 +40,3 @@ class RpmModule(func_module.FuncModule):
             else:
                 results.append([name,epoch,version,release,arch])
         return results
-
-methods = RpmModule()
-register_rpc = methods.register_rpc

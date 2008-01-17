@@ -20,18 +20,15 @@ import sys
 
 # our modules
 import sub_process
-from modules import func_module
+import func_module
 
 # =================================
 
 class HardwareModule(func_module.FuncModule):
-    def __init__(self):
-        self.methods = {
-            "info"      : self.info,
-            "inventory" : self.inventory,       # for func-inventory
-            "hal_info"  : self.hal_info
-        }
-        func_module.FuncModule.__init__(self)
+
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Hardware profiler."
 
     def hal_info(self):
         """
@@ -131,6 +128,3 @@ def hw_info(with_devices=True):
         })
 
     return data
-
-methods = HardwareModule()
-register_rpc = methods.register_rpc

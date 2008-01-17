@@ -8,8 +8,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-from modules import func_module
+import func_module
 
 import yum
 from yum import repos
@@ -22,12 +21,9 @@ class DummyCallback(object):
 
 class Yum(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-                "update" : self.update,
-                "check_update" : self.check_update
-        }
-        func_module.FuncModule.__init__(self)
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Package updates through yum."
 
     def update(self):
         # XXX support updating specific rpms
@@ -52,7 +48,3 @@ class Yum(func_module.FuncModule):
         ayum.doTsSetup()
         ayum.repos.enableRepo(repo)
         return map(str, ayum.doPackageLists('updates').updates)
-
-
-methods = Yum()
-register_rpc = methods.register_rpc

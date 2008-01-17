@@ -13,10 +13,8 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-import optparse
 import sys
 import glob
-import pprint
 
 from func.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE

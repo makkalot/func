@@ -13,17 +13,14 @@
 Abitrary command execution module for func.
 """
 
-from modules import func_module
-
+import func_module
 import sub_process
 
 class Nagios(func_module.FuncModule):
 
-    def __init__(self):
-        self.methods = {
-                "run" : self.run
-        }
-        func_module.FuncModule.__init__(self)
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Runs nagios checks."
 
     def run(self, check_command):
         """
@@ -35,8 +32,3 @@ class Nagios(func_module.FuncModule):
         cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
-
-methods = Nagios()
-register_rpc = methods.register_rpc
-
-

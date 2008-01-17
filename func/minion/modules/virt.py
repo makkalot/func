@@ -38,6 +38,10 @@ VIRT_STATE_NAME_MAP = {
 
 class FuncLibvirtConnection(object):
 
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Virtualization items through func."
+
     def __init__(self):
 
         cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE)
@@ -80,16 +84,16 @@ class FuncLibvirtConnection(object):
             if vm.name() == vmid:
                 return vm
 
-        raise codes.FuncException("virtual machine %s not found" % needle)
+        raise codes.FuncException("virtual machine %s not found" % vmid)
 
     def shutdown(self, vmid):
         return self.find_vm(vmid).shutdown()
 
     def pause(self, vmid):
-        return suspend(self.conn,vmid)
+        return self.suspend(self.conn,vmid)
 
     def unpause(self, vmid):
-        return resume(self.conn,vmid)
+        return self.resume(self.conn,vmid)
 
     def suspend(self, vmid):
         return self.find_vm(vmid).suspend()
@@ -119,31 +123,8 @@ class FuncLibvirtConnection(object):
 
 class Virt(func_module.FuncModule):
 
-
-    def __init__(self):
-
-        """
-        Constructor.  Register methods and make them available.
-        """
-
-        self.methods = {
-            "install"   : self.install,
-            "shutdown"  : self.shutdown,
-            "destroy"   : self.destroy,
-            "start"     : self.create,
-            "pause"     : self.pause,
-            "unpause"   : self.unpause,
-            "delete"    : self.undefine,
-            "status"    : self.get_status,
-	    "info"      : self.info,
-	    "inventory" : self.info,   # for func-inventory
-            "list_vms"  : self.list_vms,
-        }
-
-        func_module.FuncModule.__init__(self)
-
-    def get_conn(self):
-	self.conn = FuncLibvirtConnection()
+    def __get_conn(self):
+        self.conn = FuncLibvirtConnection()
         return self.conn
 
     def state(self):
@@ -176,7 +157,7 @@ class Virt(func_module.FuncModule):
 
 
     def list_vms(self):
-        self.conn = self.get_conn()
+        self.conn = self.__get_conn()
         vms = self.conn.find_vm(-1)
         results = []
         for x in vms:
@@ -195,7 +176,7 @@ class Virt(func_module.FuncModule):
         # Example:
         # install("bootserver.example.org", "fc7webserver", True)
 
-        conn = self.get_conn()
+        conn = self.__get_conn()
 
         if conn is None:
             raise codes.FuncException("no connection")
@@ -227,7 +208,7 @@ class Virt(func_module.FuncModule):
         Make the machine with the given vmid stop running.
         Whatever that takes.
         """
-        self.get_conn()
+        self.__get_conn()
         self.conn.shutdown(vmid)
         return 0
 
@@ -237,7 +218,7 @@ class Virt(func_module.FuncModule):
         """
         Pause the machine with the given vmid.
         """
-        self.get_conn()
+        self.__get_conn()
         self.conn.suspend(vmid)
         return 0
 
@@ -248,7 +229,7 @@ class Virt(func_module.FuncModule):
         Unpause the machine with the given vmid.
         """
 
-        self.get_conn()
+        self.__get_conn()
         self.conn.resume(vmid)
         return 0
 
@@ -258,7 +239,7 @@ class Virt(func_module.FuncModule):
         """
         Start the machine via the given mac address.
         """
-        self.get_conn()
+        self.__get_conn()
         self.conn.create(vmid)
         return 0
 
@@ -269,7 +250,7 @@ class Virt(func_module.FuncModule):
         Pull the virtual power from the virtual domain, giving it virtually no
         time to virtually shut down.
         """
-        self.get_conn()
+        self.__get_conn()
         self.conn.destroy(vmid)
         return 0
 
@@ -281,7 +262,7 @@ class Virt(func_module.FuncModule):
         by deleting the disk image and it's configuration file.
         """
 
-        self.get_conn()
+        self.__get_conn()
         self.conn.undefine(vmid)
         return 0
 
@@ -292,9 +273,5 @@ class Virt(func_module.FuncModule):
         Return a state suitable for server consumption.  Aka, codes.py values, not XM output.
         """
 
-        self.get_conn()
+        self.__get_conn()
         return self.conn.get_status(vmid)
-
-
-methods = Virt()
-register_rpc = methods.register_rpc

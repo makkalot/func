@@ -13,18 +13,14 @@
 ##
 
 import sub_process, os
-from modules import func_module
+import func_module
 
 
 class MountModule(func_module.FuncModule):
-    def __init__(self):
-        self.methods = {
-            "list": self.list,
-            "mount": self.mount,
-            "umount": self.umount,
-            "inventory": self.inventory,
-        }
-        func_module.FuncModule.__init__(self)
+
+    version = "0.0.1"
+    api_version = "0.0.1"
+    description = "Mounting, unmounting and getting information on mounted filesystems."
 
     def list(self):
         cmd = sub_process.Popen(["/bin/cat", "/proc/mounts"], executable="/bin/cat", stdout=sub_process.PIPE, shell=False)
@@ -86,7 +82,3 @@ class MountModule(func_module.FuncModule):
 
     def inventory(self, flatten=True):
         return self.list()
-
-
-methods = MountModule()
-register_rpc = methods.register_rpc

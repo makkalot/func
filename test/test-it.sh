@@ -187,6 +187,9 @@ pound_on_the_threads()
 	done
     done
 
+    # this is kind of dumb and ugly, but it gives a change for all the
+    # connections to complete before we shut the server down
+    sleep 10
 
 }
 
@@ -208,6 +211,18 @@ test_funcd()
 
 }
 
+
+run_async_test()
+{
+    python async_test.py
+
+}
+
+run_unittests()
+{
+    nosetests -v -w unittest/
+    
+}
 
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
@@ -252,6 +267,10 @@ sign_the_certmaster_certs
 test_funcd
 
 pound_on_the_threads
+
+run_unittests
+
+run_async_test
 
 stop_the_func
 # see if funcd is running
