@@ -2,7 +2,6 @@ from setuptools import setup, find_packages
 from turbogears.finddata import find_package_data
 
 import os
-execfile(os.path.join("funcweb", "release.py"))
 
 packages=find_packages()
 package_data = find_package_data(where='funcweb',
@@ -16,10 +15,9 @@ setup(
     name="funcweb",
     version=version,
 
-    # uncomment the following lines if you fill them out in release.py
     #description=description,
-    #author=author,
-    #author_email=email,
+    author="Luke Macken",
+    author_email="lmacken@redhat.com",
     #url=url,
     #download_url=download_url,
     #license=license,
