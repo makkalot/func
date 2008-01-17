@@ -31,6 +31,11 @@ class BaseTest:
         result = mod.module_description()
         assert type(result[self.th]) != xmlrpclib.Fault
 
+    test_module_version.intro = True
+    test_module_api_version.intro = True
+    test_module_description.intro = True
+
+
 class TestTest(BaseTest):
     module = "test"
     def test_add(self):
@@ -257,4 +262,6 @@ class TestSystem(BaseTest):
 
     def test_module_description(self):
         pass
+
+
 
