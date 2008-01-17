@@ -66,11 +66,11 @@ class CommandAutomagic(object):
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
 def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=False):
-    config  = read_config(CONFIG_FILE, CMConfig)
     """
     Given a regex/blob of servers, expand to a list
     of server ids.
     """
+    config  = read_config(CONFIG_FILE, CMConfig)
 
     if noglobs:
         if not just_fqdns:
