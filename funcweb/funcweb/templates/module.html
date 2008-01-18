@@ -7,7 +7,7 @@
     <ul py:for="minion, methods in modules.items()">
       <h2>${module}</h2>
       <li py:for="method in methods">
-        <a href="#" onclick="$('#col4').load('/minion/${minion}/${module}/${method}')">${method}</a>
+        <a href="#" onclick="$('#col4').hide().load('/minion/${minion}/${module}/${method}').show('slow')">${method}</a>
       </li>
     </ul>
   </div>
