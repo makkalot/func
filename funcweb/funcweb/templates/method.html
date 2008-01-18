@@ -6,7 +6,7 @@
   <div class="method">
     ${minion}.${module}.${method}
 
-    <form action="" method="GET" onsubmit="$('#results').empty().load('/run/${minion}/${module}/${method}/').show('slow'); return false;">
+    <form action="" method="GET" onsubmit="$('#results').hide().load('/run/${minion}/${module}/${method}/').show('slow'); return false;">
       <input type="text" name="arguments" id="methodargs" class="methodargs"/>
     </form>
     <div class="results" id="results" />

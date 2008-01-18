@@ -7,7 +7,7 @@
     <ul py:for="minion, mods in modules.items()">
       <h2>${minion}</h2>
       <li py:for="module in mods">
-        <a href="#" onclick="$('#col4').hide().empty();$('#col3').hide().empty().load('/minion/${minion}/${module}').show('slow');">${module}</a>
+        <a href="#" onclick="$('#col4').hide();$('#col3').hide().load('/minion/${minion}/${module}').show('slow');">${module}</a>
       </li>
     </ul>
   </div>

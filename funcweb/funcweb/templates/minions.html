@@ -10,7 +10,7 @@
        <ul>
         <li><h2>minions</h2></li>
         <li py:for="minion in minions.keys()">
-        <a onclick="$('#col3').hide().empty();$('#col4').hide().empty();$('#col2').hide().empty().load('/minion/${minion}').show('slow');" href="#">${minion}</a>
+        <a onclick="$('#col3').hide();$('#col4').hide();$('#col2').hide().load('/minion/${minion}').show('slow');" href="#">${minion}</a>
         </li>
       </ul>
     </div>
