@@ -39,9 +39,6 @@ class Root(controllers.RootController):
     @expose(template="funcweb.templates.run")
     def run(self, minion="*", module=None, method=None, arguments=None):
         fc = Client(minion)
-        if arguments:
-            results = getattr(getattr(fc, module), method)(*arguments.split())
-        else:
-            results = getattr(getattr(fc, module), method)()
+        results = getattr(getattr(fc, module), method)(*arguments.split())
         cmd = "%s.%s.%s(%s)" % (minion, module, method, arguments)
         return dict(cmd=cmd, results=results)
