@@ -243,7 +243,6 @@ class TestYum(BaseTest):
     def test_check_update(self):
         result = self.client.yumcmd.check_update()
         self.assert_on_fault(result)
-        print result
 
 class TestSystem(BaseTest):
     module = "system"
