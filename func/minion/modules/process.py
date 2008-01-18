@@ -193,6 +193,8 @@ class ProcessModule(func_module.FuncModule):
 
         return results
 
+    memory = mem
+
     def kill(self,pid,signal="TERM"):
         if pid == "0":
             raise codes.FuncException("Killing pid group 0 not permitted")
