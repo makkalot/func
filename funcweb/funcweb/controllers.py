@@ -14,7 +14,7 @@ class Root(controllers.RootController):
 
     @expose(template="funcweb.templates.minion")
     def minion(self, name, module=None, method=None):
-        """ Display details for a given minion.
+        """ Display module or method details for a specific minion.
 
         If only the minion name is given, it will display a list of modules
         for that minion.  If a module is supplied, it will display a list of
