@@ -37,7 +37,7 @@ class Root(controllers.RootController):
     index = minions # start with our minion view, for now
 
     @expose(template="funcweb.templates.run")
-    def run(self, minion="*", module=None, method=None, arguments=None):
+    def run(self, minion="*", module=None, method=None, arguments=''):
         fc = Client(minion)
         results = getattr(getattr(fc, module), method)(*arguments.split())
         cmd = "%s.%s.%s(%s)" % (minion, module, method, arguments)
