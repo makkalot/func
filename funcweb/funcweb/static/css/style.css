@@ -527,6 +527,16 @@ background-position:100% -24px;
   padding: 0.5ex 2ex;
 }
 
+#results
+{
+  border: 1px solid #DDDDDD;
+  background: #F2F5F6;
+  font-size: 1.50ex;
+  width: 450px;
+  height: 400px;
+  overflow: auto;
+  display: none;
+}
 
 .content p.note
 {
@@ -650,16 +660,16 @@ background-position:100% -24px;
 }
 
 #col1 {
-  width: 200px;
+  width: 150px;
   height: 100%;
 }
 
 #col2 {
-  width: 200px;
+  width: 150px;
 }
 
 #col3 {
-  width: 200px;
+  width: 150px;
 }
 
 #col4 {
