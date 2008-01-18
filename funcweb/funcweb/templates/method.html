@@ -5,9 +5,12 @@
 <body>
   <div class="method">
     ${minion}.${module}.${method}
-    <form action="${tg.url('/run/%s/%s/%s' % (minion, module, method))}" method="POST">
-      <input type="text" name="arguments" id="methodargs"/>
+
+    <form action="" method="GET" onsubmit="$('#results').load('/run/${minion}/${module}/${method}/').show('slow'); return false;">
+      <input type="text" name="arguments" id="methodargs" class="methodargs"/>
     </form>
+    <div class="results" id="results" />
+
     <script type="text/javascript">
       $(document).ready($("#methodargs").focus());
     </script>
