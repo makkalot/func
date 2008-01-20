@@ -1,0 +1,8 @@
+This module is meant to be installed on a minion which is configured
+as an admin host for one or more NetApp filers.  Since we can't get
+our funcy awesomeness on the actual filer the admin host will have to do.
+
+Requirements:
+
+- passphraseless ssh key access from root on the netapp admin minion
+  to root on the target filer
