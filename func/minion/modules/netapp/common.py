@@ -2,6 +2,8 @@ import subprocess
 
 SSH = '/usr/bin/ssh'
 
+class GenericSSHException(Exception): pass
+
 def ssh(user, host, command):
     cmd = subprocess.Popen([SSH, "%s@%s" % (user, host), command], 
                            executable=SSH,
@@ -11,4 +13,8 @@ def ssh(user, host, command):
                            shell=False)
 
     (out, err) = cmd.communicate()
-    return out
+
+    if err:
+        raise GenericSSHException, err
+    else:
+        return out

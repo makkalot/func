@@ -12,7 +12,12 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
+import re
 from func.minion.modules import func_module
+from common import *
+
+class NetappCommandError(Exception): pass
+
 class Vol(func_module.FuncModule):
 
     # Update these if need be.
@@ -20,61 +25,68 @@ class Vol(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Interface to the 'vol' command"
 
-    def create(self, *args):
+    def create(self, filer, *args):
+        """
+        TODO: Document me ...
+        """
+        
+        create_re = """Creation of volume .* has completed."""
+
+        output = ssh('root', filer, ' '.join(args))
+        if re.search(create_re, output):
+            return True
+        else:
+            raise NetappCommandError, output
+
+    def clone(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def clone(self, *args):
+    def destroy(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def destroy(self):
+    def offline(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def offline(self):
+    def status(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def status(self):
+    def size(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def size(self):
+    def options(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def options(self):
+    def rename(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def rename(self):
+    def restrict(self, filer, *args):
         """
         TODO: Document me ...
         """
         pass
 
-    def restrict(self):
-        """
-        TODO: Document me ...
-        """
-        pass
-
-    def split(self):
+    def split(self, filer, *args):
         """
         TODO: Document me ...
         """
