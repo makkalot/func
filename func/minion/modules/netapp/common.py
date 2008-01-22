@@ -2,7 +2,9 @@ import subprocess
 
 SSH = '/usr/bin/ssh'
 
-class GenericSSHException(Exception): pass
+class GenericSSHError(Exception): pass
+class NetappCommandError(Exception): pass
+class NetappNotImplementedError(Exception): pass
 
 def ssh(user, host, command):
     cmd = subprocess.Popen([SSH, "%s@%s" % (user, host), command], 
@@ -13,8 +15,7 @@ def ssh(user, host, command):
                            shell=False)
 
     (out, err) = cmd.communicate()
-
-    if err:
-        raise GenericSSHException, err
+    if cmd.wait() != 0:
+        raise GenericSSHError, err
     else:
         return out
