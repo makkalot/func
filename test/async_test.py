@@ -23,6 +23,9 @@ def __tester(async):
                sys.exit(1)
            if code == jobthing.JOB_ID_RUNNING:  
                print "task is still running, %s elapsed ..." % delta
+           if code == jobthing.JOB_ID_PARTIAL:
+               print "task reports partial status, %s elapsed, results = %s" % (delta, results)
+                   
            elif code == jobthing.JOB_ID_FINISHED:
                print "task complete, %s elapsed, results = %s" % (delta, results)
                sys.exit(0)

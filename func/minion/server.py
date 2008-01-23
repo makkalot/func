@@ -28,6 +28,7 @@ from func.config import read_config
 from func.commonconfig import FuncdConfig
 from func import logger
 from func import certs
+import func.jobthing as jobthing
 
 # our modules
 import AuthedXMLRPCServer
@@ -196,6 +197,16 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         peer_cert = r.get_peer_certificate()
         ip = a[0]
         
+
+        # generally calling conventions are:  hardware.info
+        # async convention is async.hardware.info
+        # here we parse out the async to decide how to invoke it.
+        # see the async docs on the Wiki for further info.
+        async_dispatch = False
+        if method.startswith("async."):
+            async_dispatch = True
+            method = method.replace("async.","",1)
+
         if not self._check_acl(peer_cert, ip, method, params):
             raise codes.AccessToMethodDenied
             
@@ -207,7 +218,11 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         sub_hash = peer_cert.subject_name_hash()
         self.audit_logger.log_call(ip, cn, sub_hash, method, params)
 
-        return self.get_dispatch_method(method)(*params)
+        if not async_dispatch:
+            return self.get_dispatch_method(method)(*params)
+        else:
+            meth = self.get_dispatch_method(method)
+            return jobthing.minion_async_run(meth, *params)
 
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()

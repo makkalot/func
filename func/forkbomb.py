@@ -133,6 +133,7 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     if nforks <= 1:
        # modulus voodoo gets crazy otherwise and bad things happen
        nforks = 2
+    # print "DEBUG: nforks=%s" % 2
     shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)
