@@ -6,6 +6,7 @@ import unittest
 import xmlrpclib
 
 import func.overlord.client as fc
+import socket
 
 
 

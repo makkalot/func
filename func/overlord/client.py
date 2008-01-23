@@ -22,9 +22,9 @@ from func.config import read_config, CONFIG_FILE
 import sslclient
 
 import command
-import forkbomb
 import groups
-import jobthing
+import func.forkbomb as forkbomb
+import func.jobthing as jobthing
 
 
 # ===================================
@@ -187,7 +187,7 @@ class Client(object):
         """
         Use this to acquire status from jobs when using run with async client handles
         """
-        return jobthing.job_status(jobid)
+        return jobthing.job_status(jobid, client_class=Client)
 
     # -----------------------------------------------
 
@@ -221,7 +221,16 @@ class Client(object):
                 # we can't call "call" on s, since thats a rpc, so
                 # we call gettatr around it.
                 meth = "%s.%s" % (module, method)
+
+                # async calling signature has an "imaginary" prefix
+                # so async.abc.def does abc.def as a background task.
+                # see Wiki docs for details
+                if self.async:
+                    meth = "async.%s" % meth
+
+                # this is the point at which we make the remote call.
                 retval = getattr(conn, meth)(*args[:])
+
                 if self.interactive:
                     print retval
             except Exception, e:
