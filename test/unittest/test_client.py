@@ -238,6 +238,16 @@ class TestSmart(BaseTest):
         self.assert_on_fault(result)
     
 
+class TestSysctl(BaseTest):
+    module = "sysctl"
+    def test_list(self):
+        result = self.client.sysctl.list()
+        self.assert_on_fault(result)
+
+    def test_get(self):
+        result = self.client.sysctl.get("kernel.max_lock_depth")
+        self.assert_on_fault(result)
+
 class TestYum(BaseTest):
     module = "yumcmd"
     def test_check_update(self):
