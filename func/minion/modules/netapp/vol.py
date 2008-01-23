@@ -16,8 +16,6 @@ import re
 from func.minion.modules import func_module
 from common import *
 
-class NetappCommandError(Exception): pass
-
 class Vol(func_module.FuncModule):
 
     # Update these if need be.
@@ -29,11 +27,10 @@ class Vol(func_module.FuncModule):
         """
         TODO: Document me ...
         """
-        
-        create_re = """Creation of volume .* has completed."""
+        regex = """Creation of volume .* has completed."""
 
         output = ssh('root', filer, ' '.join(args))
-        if re.search(create_re, output):
+        if re.search(regex, output):
             return True
         else:
             raise NetappCommandError, output
@@ -42,7 +39,24 @@ class Vol(func_module.FuncModule):
         """
         TODO: Document me ...
         """
-        pass
+        if len(args)==1:
+            args = args[0].split()
+
+        if subcmd == 'create':
+            regex = """Creation of clone volume .* has completed."""
+        elif subcmd == 'split':
+            if args[1] == 'start':
+                regex = """Clone volume .* will be split from its parent."""
+            else:
+                raise NetappNotImplemented
+        else:
+            raise NetappNotImplemented
+
+        output = ssh('root', filer, ' '.join(args))
+        if re.search(regex, output):
+            return True
+        else:
+            raise NetappCommandError, output
 
     def destroy(self, filer, *args):
         """
