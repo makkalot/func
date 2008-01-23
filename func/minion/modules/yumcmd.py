@@ -11,7 +11,6 @@
 import func_module
 
 import yum
-from yum import repos
 
 # XXX Use internal yum callback or write a useful one.
 class DummyCallback(object):
@@ -46,5 +45,6 @@ class Yum(func_module.FuncModule):
         ayum = yum.YumBase()
         ayum.doConfigSetup()
         ayum.doTsSetup()
-        ayum.repos.enableRepo(repo)
+        if repo is not None:
+            ayum.repos.enableRepo(repo)
         return map(str, ayum.doPackageLists('updates').updates)

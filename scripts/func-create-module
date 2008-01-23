@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+#
+# Copyright 2008, Red Hat, Inc
 # Steve 'Ashcrow' Milner <smilner@redhat.com>
 # John Eckersberg <jeckersb@redhat.com>
 #
@@ -10,6 +12,17 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 TEMPLATE = """\
+#
+# Copyright %s
+# %s <%s>
+#
+# This software may be freely redistributed under the terms of the GNU
+# general public license.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
 import func_module
 
 class %s(func_module.FuncModule):
@@ -32,19 +45,24 @@ METHOD_TEMPLATE = '''\
 '''
 
 
-def populate_template(module_name, desc, methods):
+def populate_template(author_name, author_email, module_name, desc, methods):
     """
     Makes the method strings and populates the template.
     """
+    from datetime import datetime
+    
     actual_methods = ""
     for method in methods:
         actual_methods += METHOD_TEMPLATE % method
-    return TEMPLATE % (module_name, desc, actual_methods[:-2])
+    return TEMPLATE % (datetime.now().strftime("%Y"), author_name, 
+                       author_email, module_name, desc, actual_methods[:-2])
 
 
 if __name__ == '__main__':
-    module_name = raw_input("Name: ").capitalize()
+    module_name = raw_input("Module Name: ").capitalize()
     desc = raw_input("Description: ")
+    author_name = raw_input("Author: ")
+    author_email = raw_input("Email: ")
     methods = []
     print "\nLeave blank to finish."
     while True:
@@ -55,6 +73,7 @@ if __name__ == '__main__':
     # Write it out to a file
     file_name = "%s.py" % module_name.lower()
     file_obj = open(file_name, "w")
-    file_obj.write(populate_template(module_name, desc, methods))
+    file_obj.write(populate_template(author_name, author_email, 
+                                     module_name, desc, methods))
     file_obj.close()
     print "Your module is ready to be hacked on. Wrote out to %s." % file_name
