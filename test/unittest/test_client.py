@@ -5,11 +5,12 @@ import unittest
 import xmlrpclib
 
 import func.overlord.client as fc
+import socket
 
 
 
 class BaseTest:
-    th = "grimlock.devel.redhat.com"
+    th = "mdehaan.rdu.redhat.com"
     def __init__(self):
         pass
 

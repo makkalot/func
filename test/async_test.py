@@ -1,5 +1,5 @@
 from func.overlord.client import Client
-import func.overlord.jobthing as jobthing
+import func.jobthing as jobthing
 import time
 import sys
 

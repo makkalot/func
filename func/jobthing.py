@@ -90,6 +90,9 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False):
 
 def batch_run(server, process_server, nforks):
     """
+    This is the method used by the overlord side usage of jobthing.
+    It likely makes little sense for the minion async usage (yet).
+
     Given an array of items (pool), call callback in each one, but divide
     the workload over nfork forks.  Temporary files used during the
     operation will be created in cachedir and subsequently deleted.    
