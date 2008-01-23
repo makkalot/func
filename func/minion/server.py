@@ -222,7 +222,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
             return self.get_dispatch_method(method)(*params)
         else:
             meth = self.get_dispatch_method(method)
-            return jobthing.minion_async_run(meth, *params)
+            return jobthing.minion_async_run(meth, params)
 
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()

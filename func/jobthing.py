@@ -23,6 +23,7 @@ import sys
 import tempfile
 import fcntl
 import forkbomb
+import utils
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
@@ -82,6 +83,9 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
         __purge_old_jobs(storage)
 
     if write:
+        results = utils.remove_exceptions(results)
+        # print "DEBUG: status=%s" % status
+        # print "DEBUG: results=%s" % results
         storage[str(jobid)] = (status, results)
         rc = jobid
     elif not purge:
@@ -137,7 +141,7 @@ def minion_async_run(function_ref, args):
         return job_id
     else:
         __update_status(job_id, JOB_ID_RUNNING,  -1)
-        results = function_ref(args)
+        results = function_ref(*args)
         __update_status(job_id, JOB_ID_FINISHED, results)
         sys.exit(0)
 

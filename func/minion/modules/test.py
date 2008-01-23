@@ -1,5 +1,6 @@
 import func_module
 import time
+import exceptions
 
 class Test(func_module.FuncModule):
     version = "11.11.11"
@@ -7,6 +8,7 @@ class Test(func_module.FuncModule):
     description = "Just a very simple example module"
 
     def add(self, numb1, numb2):
+        time.sleep(10) 
         return numb1 + numb2
 
     def ping(self):
@@ -20,3 +22,9 @@ class Test(func_module.FuncModule):
         t = int(t)
         time.sleep(t)
         return time.time()
+
+    def explode(self):
+        """
+        Testing remote exception handling is useful
+        """
+        raise exceptions.Exception("khhhhhhaaaaaan!!!!!!")
