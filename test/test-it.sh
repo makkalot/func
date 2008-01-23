@@ -273,25 +273,13 @@ run_unittests
 run_async_test
 
 stop_the_func
-# see if funcd is running
-# see if certmaster is installed
-# see if cermtasterd is running
 
-# setup certs
-## see if we have certs set up properly
-
+# leaving the test cases with func not running is kind of
+# annoying, so restart it
+start_the_func
 
 
 ### probably do some stuff to test bad/no/malformed/unauthed certs as well
 
-# see if we can connect to funcd with the overloard
-
-# see what modules we have available
-# for each module, call the info stuff on them
-
-# / start walking over the modules, doing commandliney stuff to each, and
-# trying to check return data and return code as much as possible 
-
-# test shut down of init scripts
 
 

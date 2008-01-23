@@ -13,11 +13,16 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
     th = socket.gethostname()
+    nforks=1
+    async=False
+
     def __init__(self):
         pass
 
     def setUp(self):
-        self.client = fc.Client(self.th)
+        self.client = fc.Client(self.th,
+                                nforks=self.nforks,
+                                async=self.async)
 
     def test_module_version(self):
         mod = getattr(self.client, self.module)
@@ -284,3 +289,22 @@ class TestSystem(BaseTest):
 
 
 
+class TestAsyncTest(BaseTest):
+    module = "async.test"
+    nforks=4
+    async=True
+    def test_sleep_async(self):
+        job_id = self.client.test.sleep(5)
+        print "job_id", job_id
+        (return_code, results) = self.client.job_status(job_id)
+#        self.assert_on_fault(results)
+        print "return_code", return_code
+        print "results", results
+
+    def test_add_async(self):
+        job_id = self.client.test.add(1,5)
+        print "job_id", job_id
+        (return_code, results) = self.client.job_status(job_id)
+#        self.assert_on_fault(results)
+        print "return_code", return_code
+        print "results", results
