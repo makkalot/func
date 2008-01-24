@@ -6,16 +6,32 @@ import sys
 TEST_SLEEP = 5
 EXTRA_SLEEP = 5
 
-def __tester(async):
+SLOW_COMMAND = 1
+QUICK_COMMAND = 2
+RAISES_EXCEPTION_COMMAND = 3
+FAKE_COMMAND = 4
+TESTS = [ SLOW_COMMAND, QUICK_COMMAND, RAISES_EXCEPTION_COMMAND, FAKE_COMMAND ]
+
+def __tester(async,test):
    if async:
        client = Client("*",nforks=10,async=True)
        oldtime = time.time()
-       print "asking minion to sleep for %s seconds" % TEST_SLEEP
 
-       # job_id = client.test.sleep(TEST_SLEEP) # ok
-       # job_id = client.hardware.info() # ok
-       # job_id = client.test.explode() # doesn't work yet
-       job_id = client.test.does_not_exist(1,2) # ditto
+       job_id = -411
+       print "======================================================"
+       if test == SLOW_COMMAND:
+           print "TESTING command that sleeps %s seconds" % TEST_SLEEP
+           job_id = client.test.sleep(TEST_SLEEP)
+       elif test == QUICK_COMMAND:
+           print "TESTING a quick command"
+           job_id = client.test.add(1,2)
+       elif test == RAISES_EXCEPTION_COMMAND:
+           print "TESTING a command that deliberately raises an exception"
+           job_id = client.test.explode() # doesn't work yet
+       elif test == FAKE_COMMAND:
+           print "TESTING a command that does not exist"
+           job_id = client.test.does_not_exist(1,2) # ditto
+       print "======================================================"
 
        print "job_id = %s" % job_id
        while True:
@@ -25,22 +41,27 @@ def __tester(async):
            delta = int(nowtime - oldtime)
            if nowtime > oldtime + TEST_SLEEP + EXTRA_SLEEP:
                print "time expired, test failed"
-               sys.exit(1)
+               return
            if code == jobthing.JOB_ID_RUNNING:  
                print "task is still running, %s elapsed ..." % delta
-           if code == jobthing.JOB_ID_PARTIAL:
+           elif code == jobthing.JOB_ID_ASYNC_STATUS:
                print "task reports partial status, %s elapsed, results = %s" % (delta, results)
-                   
            elif code == jobthing.JOB_ID_FINISHED:
-               print "task complete, %s elapsed, results = %s" % (delta, results)
-               sys.exit(0)
+               print "(non-async) task complete, %s elapsed, results = %s" % (delta, results)
+               return
+           elif code == jobthing.JOB_ID_ASYNC_COMPLETE:
+               print "(async) task complete, %s elapsed, results = %s" % (delta, results)
+               return
            else:
                print "job not found: %s, %s elapased" % (code, delta)
            time.sleep(1)
    else:
        print Client("*",nforks=10,async=False).test.sleep(5)
 
-# __tester(False)
-__tester(True)
+for t in TESTS:
+    __tester(True,t)
 
+print "======================================================="
+print "Testing non-async call"
+print __tester(False,-1)
 

@@ -28,7 +28,8 @@ import utils
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
-JOB_ID_PARTIAL = 3
+JOB_ID_ASYNC_STATUS = 3
+JOB_ID_ASYNC_COMPLETE = 4
 
 # how long to retain old job records in the job id database
 RETAIN_INTERVAL = 60 * 60    
@@ -125,7 +126,7 @@ def batch_run(server, process_server, nforks):
         results = forkbomb.batch_run(server, process_server, nforks)
         
         # we now have a list of job id's for each minion, kill the task
-        __update_status(job_id, JOB_ID_PARTIAL, results)
+        __update_status(job_id, JOB_ID_ASYNC_STATUS, results)
         sys.exit(0)
 
 def minion_async_run(function_ref, args):
@@ -154,36 +155,37 @@ def job_status(jobid, client_class=None):
    
     got_status = __get_status(jobid)
 
-    # if the status comes back as JOB_ID_PARTIAL what we have is actually a hash
+    # if the status comes back as JOB_ID_ASYNC_STATUS what we have is actually a hash
     # of hostname/minion-jobid pairs.  Instantiate a client handle for each and poll them
     # for their actual status, filling in only the ones that are actually done.
 
     (interim_rc, interim_results) = got_status
 
-    if interim_rc == JOB_ID_PARTIAL:
+    if interim_rc == JOB_ID_ASYNC_STATUS:
 
         partial_results = {}
+
+        # print "DEBUG: partial results for batch task: %s" % interim_results
 
         for host in interim_results.keys():
 
             minion_job = interim_results[host]
             client = client_class(host, noglobs=True, async=False)
-            # print "DEBUG: client: %s" % client_class
             minion_result = client.jobs.job_status(minion_job)
-            # print "DEBUG: minion: %s" % minion_result
+            print "DEBUG: background task on minion (%s) has status %s" % (minion_job, minion_result)
+
             (minion_interim_rc, minion_interim_result) = minion_result
 
             some_missing = False
-            if minion_interim_rc == JOB_ID_FINISHED:
-                partial_results[host] = minion_interim_result 
+            if minion_interim_rc not in [ JOB_ID_RUNNING ]:
+                partial_results[host] = minion_interim_result
             else: 
-
                 some_missing = True
 
         if some_missing:
-            return (JOB_ID_PARTIAL, partial_results)
+            return (JOB_ID_ASYNC_STATUS, partial_results)
         else:
-            return (JOB_ID_FINISHED, partial_results)
+            return (JOB_ID_ASYNC_COMPLETE, partial_results)
 
     else:
         return got_status
