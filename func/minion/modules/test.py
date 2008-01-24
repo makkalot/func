@@ -8,7 +8,6 @@ class Test(func_module.FuncModule):
     description = "Just a very simple example module"
 
     def add(self, numb1, numb2):
-        time.sleep(10) 
         return numb1 + numb2
 
     def ping(self):
