@@ -1,25 +1,18 @@
 #!/usr/bin/python
-__requires__="TurboGears"
-import pkg_resources
+# -*- coding: utf-8 -*-
+"""Start script for the funcweb TurboGears project.
 
-from turbogears import config, update_config, start_server
-import cherrypy
-cherrypy.lowercase_api = True
-from os.path import *
+This script is only needed during development for running from the project
+directory. When the project is installed, easy_install will create a
+proper start script.
+"""
+
 import sys
+from funcweb.commands import start, ConfigurationError
 
-# first look on the command line for a desired config file,
-# if it's not on the command line, then
-# look for setup.py in this directory. If it's not there, this script is
-# probably installed
-if len(sys.argv) > 1:
-    update_config(configfile=sys.argv[1],
-        modulename="funcweb.config")
-elif exists(join(dirname(__file__), "setup.py")):
-    update_config(configfile="dev.cfg",modulename="funcweb.config")
-else:
-    update_config(configfile="prod.cfg",modulename="funcweb.config")
-config.update(dict(package="funcweb"))
-
-from funcweb.controllers import Root
-start_server(Root())
+if __name__ == "__main__":
+    try:
+        start()
+    except ConfigurationError, exc:
+        sys.stderr.write(str(exc))
+        sys.exit(1)
