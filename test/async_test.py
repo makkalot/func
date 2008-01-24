@@ -12,10 +12,10 @@ def __tester(async):
        oldtime = time.time()
        print "asking minion to sleep for %s seconds" % TEST_SLEEP
 
-       # job_id = client.test.sleep(TEST_SLEEP)
-       job_id = client.hardware.info()
-       # job_id = client.test.explode()
-       # job_id = client.test.does_not_exist(1,2)
+       # job_id = client.test.sleep(TEST_SLEEP) # ok
+       # job_id = client.hardware.info() # ok
+       # job_id = client.test.explode() # doesn't work yet
+       job_id = client.test.does_not_exist(1,2) # ditto
 
        print "job_id = %s" % job_id
        while True:
