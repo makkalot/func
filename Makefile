@@ -87,6 +87,11 @@ pyflakes:
 money: clean
 	-sloccount --addlang "makefile" $(TOPDIR) $(PYDIRS) $(EXAMPLEDIR) $(INITDIR) 
 
+async: install
+	/sbin/service funcd restart
+	sleep 4
+	python test/async_test.py 
+
 testit: clean
 	-cd test; sh test-it.sh
 
