@@ -23,19 +23,20 @@ class Vol(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Interface to the 'vol' command"
 
-    def create(self, filer, *args):
+    def create(self, filer, args):
         """
         TODO: Document me ...
         """
         regex = """Creation of volume .* has completed."""
+        param_check(args, ['name', 'aggr', 'size'])
+        
+        cmd_opts = ['vol', 'create']
+        cmd_opts.extend([args['name'], args['aggr'], args['size']])
 
-        output = ssh('root', filer, ' '.join(args))
-        if re.search(regex, output):
-            return True
-        else:
-            raise NetappCommandError, output
-
-    def clone(self, filer, *args):
+        output = ssh('root', filer, cmd_opts)
+        return check_output(regex, output)
+    
+    def clone(self, filer, args):
         """
         TODO: Document me ...
         """
@@ -58,17 +59,44 @@ class Vol(func_module.FuncModule):
         else:
             raise NetappCommandError, output
 
-    def destroy(self, filer, *args):
+    def destroy(self, filer, args):
         """
         TODO: Document me ...
         """
-        pass
+        regex = """Volume .* destroyed."""
+        param_check(args, ['name'])
+        
+        cmd_opts = ['vol', 'destroy']
+        cmd_opts.extend([args['name']])
 
-    def offline(self, filer, *args):
+        output = ssh('root', filer, cmd_opts, 'y')
+        return check_output(regex, output)
+
+    def offline(self, filer, args):
         """
         TODO: Document me ...
         """
-        pass
+        regex = """Volume .* is now offline."""
+        param_check(args, ['name'])
+        
+        cmd_opts = ['vol', 'offline']
+        cmd_opts.extend([args['name']])
+
+        output = ssh('root', filer, cmd_opts)
+        return check_output(regex, output)
+
+    def online(self, filer, args):
+        """
+        TODO: Document me ...
+        """
+        regex = """Volume .* is now online."""
+        param_check(args, ['name'])
+        
+        cmd_opts = ['vol', 'online']
+        cmd_opts.extend([args['name']])
+
+        output = ssh('root', filer, cmd_opts)
+        return check_output(regex, output)
 
     def status(self, filer, *args):
         """
