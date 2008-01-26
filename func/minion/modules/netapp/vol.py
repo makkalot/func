@@ -40,24 +40,7 @@ class Vol(func_module.FuncModule):
         """
         TODO: Document me ...
         """
-        if len(args)==1:
-            args = args[0].split()
-
-        if subcmd == 'create':
-            regex = """Creation of clone volume .* has completed."""
-        elif subcmd == 'split':
-            if args[1] == 'start':
-                regex = """Clone volume .* will be split from its parent."""
-            else:
-                raise NetappNotImplemented
-        else:
-            raise NetappNotImplemented
-
-        output = ssh('root', filer, ' '.join(args))
-        if re.search(regex, output):
-            return True
-        else:
-            raise NetappCommandError, output
+        pass
 
     def destroy(self, filer, args):
         """
@@ -98,37 +81,50 @@ class Vol(func_module.FuncModule):
         output = ssh('root', filer, cmd_opts)
         return check_output(regex, output)
 
-    def status(self, filer, *args):
+    def status(self, filer, args):
         """
         TODO: Document me ...
         """
         pass
 
-    def size(self, filer, *args):
+    def size(self, filer, args):
+        """
+        TODO: Document me ...
+        """
+        stat_regex = """vol size: Flexible volume .* has size .*."""
+        resize_regex = """vol size: Flexible volume .* size set to .*."""
+        param_check(args, ['name'])
+        cmd_opts = ['vol', 'size', args['name']]
+        
+        if len(args.keys()) == 1:
+            output = ssh('root', filer, cmd_opts)
+            check_output(stat_regex, output)
+            return output.split()[-1][:-1]
+        else:
+            param_check(args, ['delta'])
+            cmd_opts.append('%+d%s' % (int(args['delta'][:-1]), args['delta'][-1]))
+            output = ssh('root', filer, cmd_opts)
+            return check_output(resize_regex, output)
+
+    def options(self, filer, args):
         """
         TODO: Document me ...
         """
         pass
 
-    def options(self, filer, *args):
+    def rename(self, filer, args):
         """
         TODO: Document me ...
         """
         pass
 
-    def rename(self, filer, *args):
+    def restrict(self, filer, args):
         """
         TODO: Document me ...
         """
         pass
 
-    def restrict(self, filer, *args):
-        """
-        TODO: Document me ...
-        """
-        pass
-
-    def split(self, filer, *args):
+    def split(self, filer, args):
         """
         TODO: Document me ...
         """
