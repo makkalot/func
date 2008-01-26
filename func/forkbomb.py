@@ -20,6 +20,7 @@ import bsddb
 import sys
 import tempfile
 import fcntl
+import utils
 
 DEFAULT_FORKS = 4
 DEFAULT_CACHE_DIR = "/var/lib/func"
@@ -52,11 +53,16 @@ def __access_buckets(filename,clear,new_key=None,new_value=None):
 
     if not storage.has_key("data"):
         storage["data"] = {}
+    else: 
+        # print "DEBUG: existing: %s" % storage["data"]
+        pass
 
     if new_key is not None:
         # bsdb is a bit weird about this
         newish = storage["data"].copy()
+        new_value = utils.remove_exceptions(new_value)
         newish[new_key] = new_value
+        # print "DEBUG: newish: %s" % newish
         storage["data"] = newish
 
     rc = storage["data"].copy()
@@ -118,7 +124,7 @@ def __demo(bucket_number, buckets, my_item):
     This is a demo handler for test purposes.
     It just multiplies all numbers by 1000, but slowly.
     """
-    print ">> I am fork (%s) and I am processing item (%s)" % (bucket_number, my_item)
+    # print ">> I am fork (%s) and I am processing item (%s)" % (bucket_number, my_item)
     # just to verify forks are not sequential
     sleep = random.randrange(0,4)
     time.sleep(sleep)
@@ -133,6 +139,7 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     if nforks <= 1:
        # modulus voodoo gets crazy otherwise and bad things happen
        nforks = 2
+    # print "DEBUG: nforks=%s" % 2
     shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)

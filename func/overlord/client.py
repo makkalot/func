@@ -22,8 +22,10 @@ from func.config import read_config, CONFIG_FILE
 import sslclient
 
 import command
-import forkbomb
-import jobthing
+import groups
+import func.forkbomb as forkbomb
+import func.jobthing as jobthing
+
 
 # ===================================
 # defaults
@@ -68,6 +70,11 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
     Given a regex/blob of servers, expand to a list
     of server ids.
     """
+
+
+    # FIXME: we need to refactor expand_servers, it seems to do
+    # weird things, reload the config and groups config everytime it's
+    # called for one, which may or may not be bad... -akl
     config  = read_config(CONFIG_FILE, CMConfig)
 
     if noglobs:
@@ -76,9 +83,23 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
         else:
             return spec
 
+    group_class = groups.Groups()
+    group_dict = group_class.get_groups()
+
     all_hosts = []
     all_certs = []
     seperate_gloobs = spec.split(";")
+    new_hosts = []
+
+    # we notate groups with @foo annotation, so look for that in the hostnamegoo
+    for each_gloob in seperate_gloobs:
+        if each_gloob[0] == '@':
+            if group_dict.has_key(each_gloob[1:]):
+                new_hosts = new_hosts + group_dict[each_gloob[1:]]
+            else:
+                print "group %s not defined" % each_gloob
+
+    seperate_gloobs = seperate_gloobs + new_hosts
     for each_gloob in seperate_gloobs:
         actual_gloob = "%s/%s.cert" % (config.certroot, each_gloob)
         certs = glob.glob(actual_gloob)
@@ -166,7 +187,7 @@ class Client(object):
         """
         Use this to acquire status from jobs when using run with async client handles
         """
-        return jobthing.job_status(jobid)
+        return jobthing.job_status(jobid, client_class=Client)
 
     # -----------------------------------------------
 
@@ -200,7 +221,16 @@ class Client(object):
                 # we can't call "call" on s, since thats a rpc, so
                 # we call gettatr around it.
                 meth = "%s.%s" % (module, method)
+
+                # async calling signature has an "imaginary" prefix
+                # so async.abc.def does abc.def as a background task.
+                # see Wiki docs for details
+                if self.async:
+                    meth = "async.%s" % meth
+
+                # this is the point at which we make the remote call.
                 retval = getattr(conn, meth)(*args[:])
+
                 if self.interactive:
                     print retval
             except Exception, e:

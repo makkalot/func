@@ -1,7 +1,10 @@
+# -*- coding: utf-8 -*-
+
 from setuptools import setup, find_packages
 from turbogears.finddata import find_package_data
 
 import os
+execfile(os.path.join("funcweb", "release.py"))
 
 packages=find_packages()
 package_data = find_package_data(where='funcweb',
@@ -14,18 +17,16 @@ if os.path.isdir('locales'):
 setup(
     name="funcweb",
     version=version,
-
-    #description=description,
-    author="Luke Macken",
-    author_email="lmacken@redhat.com",
-    #url=url,
-    #download_url=download_url,
-    #license=license,
+    description=description,
+    author=author,
+    author_email=email,
+    url=url,
+    license=license,
 
     install_requires=[
-        "TurboGears >= 1.0.3.2",
+        "TurboGears >= 1.0.4.2",
+        "SQLAlchemy>=0.3.10",
     ],
-    scripts=["start-funcweb.py"],
     zip_safe=False,
     packages=packages,
     package_data=package_data,
@@ -63,5 +64,12 @@ setup(
         # 'Framework :: TurboGears :: Widgets',
     ],
     test_suite='nose.collector',
+    entry_points = {
+        'console_scripts': [
+            'start-funcweb = funcweb.commands:start',
+        ],
+    },
+    # Uncomment next line and create a default.cfg file in your project dir
+    # if you want to package a default configuration in your egg.
+    #data_files = [('config', ['default.cfg'])],
     )
-
