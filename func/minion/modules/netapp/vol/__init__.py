@@ -14,7 +14,7 @@
 
 import re
 from func.minion.modules import func_module
-from common import *
+from func.minion.modules.netapp.common import *
 
 class Vol(func_module.FuncModule):
 
@@ -36,12 +36,6 @@ class Vol(func_module.FuncModule):
         output = ssh('root', filer, cmd_opts)
         return check_output(regex, output)
     
-    def clone(self, filer, args):
-        """
-        TODO: Document me ...
-        """
-        pass
-
     def destroy(self, filer, args):
         """
         TODO: Document me ...

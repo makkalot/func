@@ -32,9 +32,6 @@ def module_walker(topdir):
         for filename in files:
             # ASSUMPTION: all module files will end with .py, .pyc, .pyo
             if filename[-3:] == ".py" or filename[-4:] == ".pyc" or filename[-4:] == ".pyo":
-                # we don't really care about __init__ files, though we do requure them
-                if filename[:8] == "__init__":
-                    continue
                 # the normpath is important, since we eventually replace /'s with .'s
                 # in the module name, and foo..bar doesnt work -akl
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
@@ -59,9 +56,10 @@ def load_modules(blacklist=None):
         module_name_part = fn[len(module_file_path):]
         dirname, basename = os.path.split(module_name_part)
 
-        if basename == "__init__.py":
-            continue
-        if basename[-3:] == ".py":
+        if basename[:8] == "__init__":
+            modname = dirname
+            dirname = ""
+        elif basename[-3:] == ".py":
             modname = basename[:-3]
         elif basename[-4:] in [".pyc", ".pyo"]:
             modname = basename[:-4]
