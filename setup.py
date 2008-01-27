@@ -43,7 +43,8 @@ if __name__ == "__main__":
 			    "%s/overlord" % NAME,
 			    "%s/overlord/cmd_modules" % NAME,
                             "%s/minion/modules" % NAME,
-                            "%s/minion/modules/netapp" % NAME
+                            "%s/minion/modules/netapp" % NAME,
+                            "%s/minion/modules/netapp/vol" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (initpath, ["init-scripts/certmaster"]),
