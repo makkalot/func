@@ -6,7 +6,6 @@ SSH_USER = 'root'
 class GenericSSHError(Exception): pass
 class NetappCommandError(Exception): pass
 class NetappMissingParam(Exception): pass
-class NetappNotImplementedError(Exception): pass
 
 def ssh(host, cmdargs, input=None, user=SSH_USER):
     cmdline = [SSH, "-o forwardagent=no", "%s@%s" % (user, host)]
