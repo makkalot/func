@@ -21,7 +21,7 @@ class Clone(func_module.FuncModule):
     # Update these if need be.
     version = "0.0.1"
     api_version = "0.0.1"
-    description = "Interface to the 'vol' command"
+    description = "Interface to the 'vol clone' command"
 
     def create(self, filer, args):
         """

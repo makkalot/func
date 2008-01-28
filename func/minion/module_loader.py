@@ -80,11 +80,12 @@ def load_modules(blacklist=None):
 
         try:
             # Auto-detect and load all FuncModules
+            logger.debug("Trying to load modues.%s" % mod_imp_name)
             blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
             for obj in dir(blip):
                 attr = getattr(blip, obj)
                 if isclass(attr) and issubclass(attr, func_module.FuncModule):
-                    logger.debug("Loading %s module" % attr)
+                    logger.debug("Loading %s module flibby" % attr)
                     mods[mod_imp_name] = attr()
 
         except ImportError, e:
