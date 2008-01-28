@@ -3,12 +3,13 @@ import subprocess
 
 SSH = '/usr/bin/ssh'
 SSH_USER = 'root'
+SSH_OPTS = '-o forwardagent=no'
 class GenericSSHError(Exception): pass
 class NetappCommandError(Exception): pass
 class NetappMissingParam(Exception): pass
 
 def ssh(host, cmdargs, input=None, user=SSH_USER):
-    cmdline = [SSH, "-o forwardagent=no", "%s@%s" % (user, host)]
+    cmdline = [SSH, SSH_OPTS, "%s@%s" % (user, host)]
     cmdline.extend(cmdargs)
 
     cmd = subprocess.Popen(cmdline,
