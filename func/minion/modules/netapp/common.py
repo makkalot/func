@@ -2,13 +2,13 @@ import re
 import subprocess 
 
 SSH = '/usr/bin/ssh'
-
+SSH_USER = 'root'
 class GenericSSHError(Exception): pass
 class NetappCommandError(Exception): pass
 class NetappMissingParam(Exception): pass
 class NetappNotImplementedError(Exception): pass
 
-def ssh(user, host, cmdargs, input=None):
+def ssh(host, cmdargs, input=None, user=SSH_USER):
     cmdline = [SSH, "-o forwardagent=no", "%s@%s" % (user, host)]
     cmdline.extend(cmdargs)
 

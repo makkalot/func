@@ -34,7 +34,7 @@ class Clone(func_module.FuncModule):
         cmd_opts = ['vol', 'create']
         cmd_opts.extend([args['name'], args['aggr'], args['size']])
 
-        output = ssh('root', filer, cmd_opts)
+        output = ssh(filer, cmd_opts)
         return check_output(regex, output)
     
     def split(self, filer, args):

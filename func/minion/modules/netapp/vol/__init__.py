@@ -33,7 +33,7 @@ class Vol(func_module.FuncModule):
         cmd_opts = ['vol', 'create']
         cmd_opts.extend([args['name'], args['aggr'], args['size']])
 
-        output = ssh('root', filer, cmd_opts)
+        output = ssh(filer, cmd_opts)
         return check_output(regex, output)
     
     def destroy(self, filer, args):
@@ -46,7 +46,7 @@ class Vol(func_module.FuncModule):
         cmd_opts = ['vol', 'destroy']
         cmd_opts.extend([args['name']])
 
-        output = ssh('root', filer, cmd_opts, 'y')
+        output = ssh(filer, cmd_opts, 'y')
         return check_output(regex, output)
 
     def offline(self, filer, args):
@@ -59,7 +59,7 @@ class Vol(func_module.FuncModule):
         cmd_opts = ['vol', 'offline']
         cmd_opts.extend([args['name']])
 
-        output = ssh('root', filer, cmd_opts)
+        output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
     def online(self, filer, args):
@@ -72,7 +72,7 @@ class Vol(func_module.FuncModule):
         cmd_opts = ['vol', 'online']
         cmd_opts.extend([args['name']])
 
-        output = ssh('root', filer, cmd_opts)
+        output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
     def status(self, filer, args):
@@ -91,13 +91,13 @@ class Vol(func_module.FuncModule):
         cmd_opts = ['vol', 'size', args['name']]
         
         if len(args.keys()) == 1:
-            output = ssh('root', filer, cmd_opts)
+            output = ssh(filer, cmd_opts)
             check_output(stat_regex, output)
             return output.split()[-1][:-1]
         else:
             param_check(args, ['delta'])
             cmd_opts.append('%+d%s' % (int(args['delta'][:-1]), args['delta'][-1]))
-            output = ssh('root', filer, cmd_opts)
+            output = ssh(filer, cmd_opts)
             return check_output(resize_regex, output)
 
     def options(self, filer, args):
