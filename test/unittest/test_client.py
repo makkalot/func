@@ -288,23 +288,23 @@ class TestSystem(BaseTest):
         pass
 
 
-
-class TestAsyncTest(BaseTest):
-    module = "async.test"
-    nforks=4
-    async=True
-    def test_sleep_async(self):
-        job_id = self.client.test.sleep(5)
-        print "job_id", job_id
-        (return_code, results) = self.client.job_status(job_id)
-#        self.assert_on_fault(results)
-        print "return_code", return_code
-        print "results", results
-
-    def test_add_async(self):
-        job_id = self.client.test.add(1,5)
-        print "job_id", job_id
-        (return_code, results) = self.client.job_status(job_id)
-#        self.assert_on_fault(results)
-        print "return_code", return_code
-        print "results", results
+#import time
+#class TestAsyncTest(BaseTest):
+#    module = "async.test"
+#    nforks=1
+#    async=True
+#    def test_sleep_async(self):
+#        job_id = self.client.test.sleep(5)
+#        print "job_id", job_id
+#        time.sleep(5)
+#        (return_code, results) = self.client.job_status(job_id)
+#        print "return_code", return_code
+#        print "results", results
+#
+#    def test_add_async(self):
+#        job_id = self.client.test.add(1,5)
+#        print "job_id", job_id
+#        time.sleep(6)
+#        (return_code, results) = self.client.job_status(job_id)
+#        print "return_code", return_code
+       # print "results", results
