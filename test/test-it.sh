@@ -22,7 +22,10 @@ RPM_PATH=`pwd`
 BUILD=Y
 
 # do we do a fresh pull from git to build
-BUILD_FROM_FRESH_CHECKOUT=Y
+BUILD_FROM_FRESH_CHECKOUT=N
+
+# do we build/uninstall via rpms?
+INSTALL_VIA_RPMS=N
 
 # should we backup existing func pki setup, since
 # we are going to be deleting it from the normal spot?
@@ -57,6 +60,8 @@ check_out_code()
 
 build_rpm()
 {
+
+    
     PKG=$1
     BRT=$2
     echo;echo;echo
@@ -82,19 +87,28 @@ build_rpm()
     fi
 }
 
-uninstall_the_func()
+uninstall_the_func_rpm()
 {
+        msg "Removing the func rpm, if there is one"
 	# just one package for now, easy enough
 	rpm -e func
 }
 
-install_the_func()
+install_the_func_rpm()
 {
+        msg "Installing the func rpm"
 	rpm -Uvh $RPM_PATH/rpms/func*
 	STATUS=$?
 	# do something with the status	
 }
 
+
+install_the_func()
+{
+    msg "Installing func directly"
+    pushd $1
+    make install 
+}
 
 find_the_func()
 {
@@ -229,22 +243,30 @@ if [ "$BUILD" == "Y" ] ; then
 		check_out_code
 	else
 		# assume we are running from the test dir
-		BUILD_PATH="`pwd`/../../"
+		BUILD_PATH="`pwd`/../"
 	fi
 	
-	# FIXME: red hat specifc
-	build_rpm func $BUILD_PATH
 
-	#if we are building, then we should remove the installed
-	# versiones as well, and install the new
-	uninstall_the_func
+	if [ "$INSTALL_VIA_RPMS" == "Y" ] ; then
+	    # FIXME: red hat specifc
+	    build_rpm func $BUILD_PATH
 
-	install_the_func
+	    #if we are building, then we should remove the installed
+	    # versiones as well, and install the new
+	    uninstall_the_func_rpm
+
+	    install_the_func_rpm
+       else
+	    uninstall_the_func_rpm
+	    install_the_func $BUILD_PATH
+       fi
 fi
 
 # see if func is install
 # see if funcd is install
-find_the_func
+if [ "$INSTALL_VIA_RPMS" == "Y" ] ; then
+    find_the_func
+fi
 
 if [ "$BACKUP_FUNC_PKI" == "Y" ] ; then
 	backup_the_secret_of_the_func
