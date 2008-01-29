@@ -29,12 +29,13 @@ from func.commonconfig import FuncdConfig
 from func import logger
 from func import certs
 import func.jobthing as jobthing
+import utils
 
 # our modules
 import AuthedXMLRPCServer
 import codes
 import module_loader
-import utils
+import func.utils as futils
 
 
 
@@ -132,11 +133,11 @@ class FuncApiMethod:
         except codes.FuncException, e:
             self.__log_exc()
             (t, v, tb) = sys.exc_info()
-            rc = utils.nice_exception(t,v,tb)
+            rc = futils.nice_exception(t,v,tb)
         except:
             self.__log_exc()
             (t, v, tb) = sys.exc_info()
-            rc = utils.nice_exception(t,v,tb)
+            rc = futils.nice_exception(t,v,tb)
         self.logger.debug("Return code for %s: %s" % (self.__name, rc))
 
         return rc
@@ -226,7 +227,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
                 return jobthing.minion_async_run(self.get_dispatch_method, method, params)
         except:
             (t, v, tb) = sys.exc_info()
-            rc = utils.nice_exception(t, v, tb)
+            rc = futils.nice_exception(t, v, tb)
             return rc
 
     def auth_cb(self, request, client_address):
@@ -266,7 +267,7 @@ def main(argv):
     """
 
     if "daemon" in sys.argv or "--daemon" in sys.argv:
-        utils.daemonize("/var/run/funcd.pid")
+        futils.daemonize("/var/run/funcd.pid")
     else:
         print "serving...\n"
 
