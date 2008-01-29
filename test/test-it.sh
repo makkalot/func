@@ -228,12 +228,16 @@ test_funcd()
 
 run_async_test()
 {
+    msg "Running async_test.py to test async/forking"
+    pushd $BUILD_PATH/test
     python async_test.py
 
 }
 
 run_unittests()
 {
+    msg "Running the unittest suite"
+    pushd $BUILD_PATH/test/unittest
     nosetests -v -w unittest/
     
 }
@@ -294,6 +298,7 @@ sign_the_certmaster_certs
 
 
 test_funcd
+
 
 
 if [ "$RUN_UNITTEST" == "Y" ] ; then
