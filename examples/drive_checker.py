@@ -5,14 +5,15 @@
 # ===============================================
 
 import func.overlord.client as fc
+import func.utils as utils
 
 info = fc.Client("*").smart.info()
 failures = 0
 
 for (host,details) in info.iteritems():
 
-    if type(details) != list:
-        print "%s had an error : %s" % (host,str(details))
+    if utils.is_error(details):
+        print "%s had an error : %s" % (host,details[1:3])
         break
 
     (rc, list_of_output) = details

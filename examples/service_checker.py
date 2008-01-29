@@ -21,7 +21,6 @@
 import sys
 import func.overlord.client as fc
 
-
 if __name__ == '__main__':
     try:
         service = sys.argv[1]

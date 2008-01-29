@@ -57,6 +57,8 @@ def __tester(async,test):
            time.sleep(1)
    else:
        print Client("*",nforks=10,async=False).test.sleep(5)
+       print Client("*",nforks=10,async=False).test.bork(5)
+       print Client("*",nforks=1,async=False).test.bork(5)
 
 for t in TESTS:
     __tester(True,t)

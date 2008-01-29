@@ -25,7 +25,7 @@ import command
 import groups
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
-
+import func.utils as utils
 
 # ===================================
 # defaults
@@ -132,7 +132,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None, async=False, noexceptions=True):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -153,7 +153,6 @@ class Client(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async       = async
-        self.noexceptions= noexceptions
         
         self.servers  = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
@@ -234,12 +233,11 @@ class Client(object):
                 if self.interactive:
                     print retval
             except Exception, e:
-                retval = e
+                (t, v, tb) = sys.exc_info()
+                retval = utils.nice_exception(t,v,tb)
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
-                if self.noglob and not self.noexceptions:
-                    raise(e)
 
             if self.noglobs:
                 return retval

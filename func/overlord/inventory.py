@@ -21,8 +21,8 @@ import sys
 import pprint
 import xmlrpclib
 from func.minion import sub_process
-
 import func.overlord.client as func_client
+import func.utils as utils
 
 DEFAULT_TREE = "/var/lib/func/inventory/"
 
@@ -80,19 +80,21 @@ class FuncInventory(object):
        
         # call all remote info methods and handle them
         if options.verbose:
-            # print "- DEBUG: %s" % host_methods
             print "- scanning ..."
         # for (host, modules) in host_modules.iteritems():
 
         for (host, methods) in host_methods.iteritems():
- 
+
+            if utils.is_error(methods):
+                print "-- connection refused: %s" % host 
+                break 
+
             for each_method in methods:
 
-
-                if type(each_method) == int:
-                    if self.options.verbose:
-                        print "-- connection refused: %s" % host
-                    break
+                #if type(each_method) == int:
+                #    if self.options.verbose:
+                #        print "-- connection refused: %s" % host
+                #    break
 
                 (module_name, method_name) = each_method.split(".")
 

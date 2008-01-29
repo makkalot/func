@@ -16,16 +16,12 @@ import sys
 import traceback
 import xmlrpclib
 
-REMOTE_CANARY = "***REMOTE_ERROR***"
+REMOTE_ERROR = "REMOTE_ERROR"
 
-# this is kind of handy, so keep it around for now
-# but we really need to fix out server side logging and error
-# reporting so we don't need it
 def trace_me():
     x = traceback.extract_stack()
     bar = string.join(traceback.format_list(x))
     return bar
-
 
 def daemonize(pidfile=None):
     """
@@ -41,41 +37,27 @@ def daemonize(pidfile=None):
     os.umask(0)
     pid = os.fork()
 
-
     if pid > 0:
         if pidfile is not None:
             open(pidfile, "w").write(str(pid))
         sys.exit(0)
 
-def remove_exceptions(results):
-    """
-    Used by forkbomb/jobthing to avoid storing exceptions in database
-    because you know those don't serialize so well :)
-    # FIXME: this needs cleanup
-    """
+def nice_exception(etype, evalue, etb):
+    etype = str(etype)
+    lefti = etype.index("'") + 1
+    righti = etype.rindex("'")
+    nicetype = etype[lefti:righti]
+    nicestack = string.join(traceback.format_list(traceback.extract_tb(etb)))
+    return [ REMOTE_ERROR, nicetype, str(evalue), nicestack ] 
 
-    if results is None:
-        return REMOTE_CANARY
-
-    if str(results).startswith("<Fault"):
-        return REMOTE_CANARY
-
-    if type(results) == xmlrpclib.Fault:
-        return REMOTE_CANARY
-    
-    if type(results) == dict:
-        new_results = {}
-        for x in results.keys():
-            value = results[x]
-            if str(value).find("<Fault") == -1:
-                # there are interesting issues with the way it is imported and type()
-                # so that is why this hack is here.  type(x) != xmlrpclib.Fault appears to miss some things
-                new_results[x] = value
-            else:
-                new_results[x] = REMOTE_CANARY
-        return new_results
-
-    return results
+def is_error(result):
+    if type(result) != list:
+        return False
+    if len(result) == 0:
+        return False
+    if result[0] == REMOTE_ERROR:
+        return True
+    return False
 
 
-
+              

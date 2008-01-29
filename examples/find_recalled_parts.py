@@ -4,6 +4,7 @@
 # ===============================================
 
 import func.overlord.client as fc
+import func.utils as utils
 
 bad = open("./part_data.txt").read().split()
 
@@ -11,8 +12,8 @@ info = fc.Client("*").hardware.hal_info()
 
 for (host,details) in info.iteritems():
 
-    if type(details) != dict:
-        print "%s had an error : %s" % (host,str(details))
+    if utils.is_error(details):
+        print "%s had an error : %s" % (host,details[1:3])
         break
 
     for (device, full_output) in details.iteritems():
