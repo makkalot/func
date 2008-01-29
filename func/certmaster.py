@@ -39,7 +39,7 @@ class CertMaster(object):
 
         fqdn = socket.getfqdn()
         host = socket.gethostname()
-        if fdqn.find(host) != -1:
+        if fqdn.find(host) != -1:
             usename = fqdn
         else: 
             usename = host

@@ -22,7 +22,7 @@ RPM_PATH=`pwd`
 BUILD=Y
 
 # do we do a fresh pull from git to build
-BUILD_FROM_FRESH_CHECKOUT=Y
+BUILD_FROM_FRESH_CHECKOUT=N
 
 # should we backup existing func pki setup, since
 # we are going to be deleting it from the normal spot?

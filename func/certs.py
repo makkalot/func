@@ -50,7 +50,7 @@ def make_csr(pkey, dest=None, cn=None):
     else:
         fqdn = socket.getfqdn()
         host = socket.gethostname()
-        if fdqn.find(host) != -1:        
+        if fqdn.find(host) != -1:        
             subj.CN = fqdn
         else: 
             subj.CN = host
