@@ -5,7 +5,7 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 MESSAGESPOT=po/messages.pot
 
 TOPDIR = $(shell pwd)
-DIRS	= func docs scripts
+DIRS	= func docs scripts test test/unittest
 PYDIRS	= func scripts
 EXAMPLEDIR = examples
 INITDIR	= init-scripts
