@@ -31,6 +31,27 @@ INSTALL_VIA_RPMS=N
 # we are going to be deleting it from the normal spot?
 BACKUP_FUNC_PKI="N"
 
+# do we want to run the unit tests as well
+RUN_UNITTESTS="Y"
+# you can put conf stuff in test-it.conf 
+# so you don't have to worry about checking in config stuff
+if [ -f "test-it.conf" ] ; then
+    source test-it.conf
+fi
+
+
+show_config()
+{
+    echo "BUILD_PATH=$BUILD_PATH"
+    echo "RPM_PATH=$RPM_PATH"
+    echo "BUILD=$BUILD"
+    echo "BUILD_FROM_FRESH_CHECKOUT=$BUILD_FROM_FRESH_CHECKOUT"
+    echo "INSTALL_VIA_RPMS=$INSTALL_VIA_RPMS"
+    echo "BACKUP_FUNC_PKL=$BACKUP_FUNC_PKI"
+    echo "RUN_UNITTESTS=$RUN_UNITTESTS"
+
+}
+
 rm -rf $RPM_PATH/rpms
 rm -rf $RPM_PATH/srpms
 rm -rf $RPM_PATH/tars
@@ -186,27 +207,6 @@ sign_the_certmaster_certs()
 }
 
 
-pound_on_the_threads()
-{
-    msg "Trying to poke at the threads a bit"
-    THREAD_COUNT=5
-    for i in $MINION_CERTS
-    do
-	for Q in `seq 1 $THREAD_COUNT`
-	do
-	    # background these so they run more or less in parallel to
-	    # each minion
-	    echo "test add $Q 6" for $i
-	    func $i call test add "$Q" "6" &
-	done
-    done
-
-    # this is kind of dumb and ugly, but it gives a change for all the
-    # connections to complete before we shut the server down
-    sleep 10
-
-}
-
 # just some random "poke at func and make sure it works stuff"
 test_funcd()
 {
@@ -237,6 +237,13 @@ run_unittests()
     nosetests -v -w unittest/
     
 }
+
+
+
+# start doing stuff
+
+show_config
+
 
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
@@ -288,9 +295,10 @@ sign_the_certmaster_certs
 
 test_funcd
 
-pound_on_the_threads
 
-run_unittests
+if [ "$RUN_UNITTEST" == "Y" ] ; then
+    run_unittests
+fi
 
 run_async_test
 
