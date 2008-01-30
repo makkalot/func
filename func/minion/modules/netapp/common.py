@@ -13,7 +13,7 @@
 ##
 
 import re
-import subprocess 
+import sub_process 
 
 SSH = '/usr/bin/ssh'
 SSH_USER = 'root'
@@ -26,11 +26,11 @@ def ssh(host, cmdargs, input=None, user=SSH_USER):
     cmdline = [SSH, SSH_OPTS, "%s@%s" % (user, host)]
     cmdline.extend(cmdargs)
 
-    cmd = subprocess.Popen(cmdline,
+    cmd = sub_process.Popen(cmdline,
                            executable=SSH,
-                           stdin=subprocess.PIPE,
-                           stdout=subprocess.PIPE, 
-                           stderr=subprocess.PIPE,
+                           stdin=sub_process.PIPE,
+                           stdout=sub_process.PIPE, 
+                           stderr=sub_process.PIPE,
                            shell=False)
 
     (out, err) = cmd.communicate(input)
