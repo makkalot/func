@@ -1,7 +1,7 @@
 ##
 ## NetApp Filer 'Vol' Module
 ##
-## Copyright 2007, Red Hat, Inc
+## Copyright 2008, Red Hat, Inc
 ## John Eckersberg <jeckersb@redhat.com>
 ##
 ## This software may be freely redistributed under the terms of the GNU
