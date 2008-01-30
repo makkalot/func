@@ -117,9 +117,3 @@ class Vol(func_module.FuncModule):
         TODO: Document me ...
         """
         pass
-
-    def split(self, filer, args):
-        """
-        TODO: Document me ...
-        """
-        pass
