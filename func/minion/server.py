@@ -29,12 +29,13 @@ from func.commonconfig import FuncdConfig
 from func import logger
 from func import certs
 import func.jobthing as jobthing
+import utils
 
 # our modules
 import AuthedXMLRPCServer
 import codes
 import module_loader
-import utils
+import func.utils as futils
 
 
 
@@ -131,11 +132,12 @@ class FuncApiMethod:
             rc = self.__method(*args)
         except codes.FuncException, e:
             self.__log_exc()
-            rc = e
+            (t, v, tb) = sys.exc_info()
+            rc = futils.nice_exception(t,v,tb)
         except:
-            self.logger.debug("Not a Func-specific exception")
             self.__log_exc()
-            raise
+            (t, v, tb) = sys.exc_info()
+            rc = futils.nice_exception(t,v,tb)
         self.logger.debug("Return code for %s: %s" % (self.__name, rc))
 
         return rc
@@ -218,11 +220,15 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         sub_hash = peer_cert.subject_name_hash()
         self.audit_logger.log_call(ip, cn, sub_hash, method, params)
 
-        if not async_dispatch:
-            return self.get_dispatch_method(method)(*params)
-        else:
-            meth = self.get_dispatch_method(method)
-            return jobthing.minion_async_run(meth, params)
+        try:
+            if not async_dispatch:
+                return self.get_dispatch_method(method)(*params)
+            else:
+                return jobthing.minion_async_run(self.get_dispatch_method, method, params)
+        except:
+            (t, v, tb) = sys.exc_info()
+            rc = futils.nice_exception(t, v, tb)
+            return rc
 
     def auth_cb(self, request, client_address):
         peer_cert = request.get_peer_certificate()
@@ -261,7 +267,7 @@ def main(argv):
     """
 
     if "daemon" in sys.argv or "--daemon" in sys.argv:
-        utils.daemonize("/var/run/funcd.pid")
+        futils.daemonize("/var/run/funcd.pid")
     else:
         print "serving...\n"
 

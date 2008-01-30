@@ -48,7 +48,12 @@ def make_csr(pkey, dest=None, cn=None):
     if cn:
         subj.CN = cn
     else:
-        subj.CN = socket.getfqdn()
+        fqdn = socket.getfqdn()
+        host = socket.gethostname()
+        if fqdn.find(host) != -1:        
+            subj.CN = fqdn
+        else: 
+            subj.CN = host
     subj.emailAddress = 'root@%s' % subj.CN       
         
     req.set_pubkey(pkey)

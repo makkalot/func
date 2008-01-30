@@ -24,14 +24,13 @@ import tempfile
 import fcntl
 import forkbomb
 import utils
+import traceback
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
 JOB_ID_ASYNC_PARTIAL = 3
 JOB_ID_ASYNC_FINISHED = 4
-
-REMOTE_ERROR = utils.REMOTE_CANARY
 
 # how long to retain old job records in the job id database
 RETAIN_INTERVAL = 60 * 60    
@@ -86,9 +85,6 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
         __purge_old_jobs(storage)
 
     if write:
-        results = utils.remove_exceptions(results)
-        # print "DEBUG: status=%s" % status
-        # print "DEBUG: results=%s" % results
         storage[str(jobid)] = (status, results)
         rc = jobid
     elif not purge:
@@ -119,7 +115,6 @@ def batch_run(server, process_server, nforks):
     job_id = time.time()
     pid = os.fork()
     if pid != 0:
-        #print "DEBUG: UPDATE STATUS: r1: %s" % job_id
         __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
@@ -131,12 +126,14 @@ def batch_run(server, process_server, nforks):
         __update_status(job_id, JOB_ID_ASYNC_PARTIAL, results)
         sys.exit(0)
 
-def minion_async_run(function_ref, args):
+def minion_async_run(retriever, method, args):
     """
     This is a simpler invocation for minion side async usage.
     """
     # to avoid confusion of job id's (we use the same job database)
     # minion jobs contain the string "minion".  
+
+
     job_id = "%s-minion" % time.time()
     pid = os.fork()
     if pid != 0:
@@ -145,19 +142,13 @@ def minion_async_run(function_ref, args):
     else:
         __update_status(job_id, JOB_ID_RUNNING,  -1)
         try:
-            results = function_ref(*args)
+            function_ref = retriever(method)
+            rc = function_ref(*args)
         except Exception, e:
-            # FIXME: we need to make sure this is logged
-            # NOTE: we need a return here, else the async engine won't get any results
-            # so that is the reason for the catch
-            # FIXME: it would be nice to store the string data from the exception here so that the caller
-            # can read the exception data, however we can't store the exception directly in the DB.
-            # some care must be made to also make this not suck for the user of the API,
-            # when they are iterating over batch results, so they can tell good data from exceptions that
-            # are represented as strings.  Ideally, reconstructing the exceptions back into objects would be shiny
-            # but if we go there I will need more caffeine first. 
-            __update_status(job_id, JOB_ID_FINISHED, REMOTE_ERROR)
-        __update_status(job_id, JOB_ID_FINISHED, results)
+            (t, v, tb) = sys.exc_info()
+            rc = utils.nice_exception(t,v,tb)
+
+        __update_status(job_id, JOB_ID_FINISHED, rc)
         sys.exit(0)
 
 def job_status(jobid, client_class=None):
@@ -179,21 +170,19 @@ def job_status(jobid, client_class=None):
 
         partial_results = {}
 
-        # print "DEBUG: partial results for batch task: %s" % interim_results
 
+        some_missing = False
         for host in interim_results.keys():
 
             minion_job = interim_results[host]
             client = client_class(host, noglobs=True, async=False)
             minion_result = client.jobs.job_status(minion_job)
-            # print "DEBUG: background task on minion (%s) has status %s" % (minion_job, minion_result)
 
             (minion_interim_rc, minion_interim_result) = minion_result
 
-            some_missing = False
             if minion_interim_rc not in [ JOB_ID_RUNNING ]:
                 if minion_interim_rc in [ JOB_ID_LOST_IN_SPACE ]:
-                    partial_results[host] = REMOTE_ERROR
+                    partial_results[host] = [ utils.REMOTE_ERROR, "lost job" ]
                 else:
                     partial_results[host] = minion_interim_result
             else: 

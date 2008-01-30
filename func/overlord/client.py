@@ -25,7 +25,7 @@ import command
 import groups
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
-
+import func.utils as utils
 
 # ===================================
 # defaults
@@ -62,6 +62,23 @@ class CommandAutomagic(object):
         return self.clientref.run(module,method,args,nforks=self.nforks)
 
 
+def get_groups():    
+    group_class = groups.Groups()
+    return group_class.get_groups()
+
+
+def get_hosts_by_groupgoo(groups, groupgoo):
+    group_gloobs = groupgoo.split(':')
+    hosts = []
+    for group_gloob in group_gloobs:
+        if not group_gloob[0] == "@":
+            continue
+        if groups.has_key(group_gloob[1:]):
+            hosts = hosts + groups[group_gloob[1:]]
+        else:            
+            print "group %s not defined" % each_gloob
+    return hosts
+
 # ===================================
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
@@ -83,22 +100,15 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
         else:
             return spec
 
-    group_class = groups.Groups()
-    group_dict = group_class.get_groups()
+    group_dict = get_groups()
 
     all_hosts = []
     all_certs = []
     seperate_gloobs = spec.split(";")
-    new_hosts = []
+    
+    new_hosts = get_hosts_by_groupgoo(group_dict, spec)
 
-    # we notate groups with @foo annotation, so look for that in the hostnamegoo
-    for each_gloob in seperate_gloobs:
-        if each_gloob[0] == '@':
-            if group_dict.has_key(each_gloob[1:]):
-                new_hosts = new_hosts + group_dict[each_gloob[1:]]
-            else:
-                print "group %s not defined" % each_gloob
-
+    seperate_gloobs = spec.split(";")
     seperate_gloobs = seperate_gloobs + new_hosts
     for each_gloob in seperate_gloobs:
         actual_gloob = "%s/%s.cert" % (config.certroot, each_gloob)
@@ -132,7 +142,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None, async=False, noexceptions=True):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -153,7 +163,6 @@ class Client(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async       = async
-        self.noexceptions= noexceptions
         
         self.servers  = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
 
@@ -234,12 +243,11 @@ class Client(object):
                 if self.interactive:
                     print retval
             except Exception, e:
-                retval = e
+                (t, v, tb) = sys.exc_info()
+                retval = utils.nice_exception(t,v,tb)
                 if self.interactive:
                     sys.stderr.write("remote exception on %s: %s\n" %
                         (server, str(e)))
-                if self.noglob and not self.noexceptions:
-                    raise(e)
 
             if self.noglobs:
                 return retval

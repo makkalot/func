@@ -36,7 +36,15 @@ CERTMASTER_LISTEN_PORT = 51235
 class CertMaster(object):
     def __init__(self, conf_file):
         self.cfg = read_config(conf_file, CMConfig)
-        mycn = '%s-CA-KEY' % socket.getfqdn()
+
+        fqdn = socket.getfqdn()
+        host = socket.gethostname()
+        if fqdn.find(host) != -1:
+            usename = fqdn
+        else: 
+            usename = host
+
+        mycn = '%s-CA-KEY' % usename
         self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
         self.ca_cert_file = '%s/funcmaster.crt' % self.cfg.cadir
         try:

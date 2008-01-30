@@ -22,11 +22,35 @@ RPM_PATH=`pwd`
 BUILD=Y
 
 # do we do a fresh pull from git to build
-BUILD_FROM_FRESH_CHECKOUT=Y
+BUILD_FROM_FRESH_CHECKOUT=N
+
+# do we build/uninstall via rpms?
+INSTALL_VIA_RPMS=N
 
 # should we backup existing func pki setup, since
 # we are going to be deleting it from the normal spot?
 BACKUP_FUNC_PKI="N"
+
+# do we want to run the unit tests as well
+RUN_UNITTESTS="Y"
+# you can put conf stuff in test-it.conf 
+# so you don't have to worry about checking in config stuff
+if [ -f "test-it.conf" ] ; then
+    source test-it.conf
+fi
+
+
+show_config()
+{
+    echo "BUILD_PATH=$BUILD_PATH"
+    echo "RPM_PATH=$RPM_PATH"
+    echo "BUILD=$BUILD"
+    echo "BUILD_FROM_FRESH_CHECKOUT=$BUILD_FROM_FRESH_CHECKOUT"
+    echo "INSTALL_VIA_RPMS=$INSTALL_VIA_RPMS"
+    echo "BACKUP_FUNC_PKL=$BACKUP_FUNC_PKI"
+    echo "RUN_UNITTESTS=$RUN_UNITTESTS"
+
+}
 
 rm -rf $RPM_PATH/rpms
 rm -rf $RPM_PATH/srpms
@@ -57,6 +81,8 @@ check_out_code()
 
 build_rpm()
 {
+
+    
     PKG=$1
     BRT=$2
     echo;echo;echo
@@ -82,19 +108,28 @@ build_rpm()
     fi
 }
 
-uninstall_the_func()
+uninstall_the_func_rpm()
 {
+        msg "Removing the func rpm, if there is one"
 	# just one package for now, easy enough
 	rpm -e func
 }
 
-install_the_func()
+install_the_func_rpm()
 {
+        msg "Installing the func rpm"
 	rpm -Uvh $RPM_PATH/rpms/func*
 	STATUS=$?
 	# do something with the status	
 }
 
+
+install_the_func()
+{
+    msg "Installing func directly"
+    pushd $1
+    make install 
+}
 
 find_the_func()
 {
@@ -172,27 +207,6 @@ sign_the_certmaster_certs()
 }
 
 
-pound_on_the_threads()
-{
-    msg "Trying to poke at the threads a bit"
-    THREAD_COUNT=5
-    for i in $MINION_CERTS
-    do
-	for Q in `seq 1 $THREAD_COUNT`
-	do
-	    # background these so they run more or less in parallel to
-	    # each minion
-	    echo "test add $Q 6" for $i
-	    func $i call test add "$Q" "6" &
-	done
-    done
-
-    # this is kind of dumb and ugly, but it gives a change for all the
-    # connections to complete before we shut the server down
-    sleep 10
-
-}
-
 # just some random "poke at func and make sure it works stuff"
 test_funcd()
 {
@@ -214,37 +228,56 @@ test_funcd()
 
 run_async_test()
 {
+    msg "Running async_test.py to test async/forking"
+    pushd $BUILD_PATH/test
     python async_test.py
 
 }
 
 run_unittests()
 {
+    msg "Running the unittest suite"
+    pushd $BUILD_PATH/test/unittest
     nosetests -v -w unittest/
     
 }
+
+
+
+# start doing stuff
+
+show_config
+
 
 if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
 		check_out_code
 	else
 		# assume we are running from the test dir
-		BUILD_PATH="`pwd`/../../"
+		BUILD_PATH="`pwd`/../"
 	fi
 	
-	# FIXME: red hat specifc
-	build_rpm func $BUILD_PATH
 
-	#if we are building, then we should remove the installed
-	# versiones as well, and install the new
-	uninstall_the_func
+	if [ "$INSTALL_VIA_RPMS" == "Y" ] ; then
+	    # FIXME: red hat specifc
+	    build_rpm func $BUILD_PATH
 
-	install_the_func
+	    #if we are building, then we should remove the installed
+	    # versiones as well, and install the new
+	    uninstall_the_func_rpm
+
+	    install_the_func_rpm
+       else
+	    uninstall_the_func_rpm
+	    install_the_func $BUILD_PATH
+       fi
 fi
 
 # see if func is install
 # see if funcd is install
-find_the_func
+if [ "$INSTALL_VIA_RPMS" == "Y" ] ; then
+    find_the_func
+fi
 
 if [ "$BACKUP_FUNC_PKI" == "Y" ] ; then
 	backup_the_secret_of_the_func
@@ -266,9 +299,11 @@ sign_the_certmaster_certs
 
 test_funcd
 
-pound_on_the_threads
 
-run_unittests
+
+if [ "$RUN_UNITTEST" == "Y" ] ; then
+    run_unittests
+fi
 
 run_async_test
 
