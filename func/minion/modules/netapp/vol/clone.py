@@ -1,7 +1,7 @@
 ##
 ## NetApp Filer 'vol.clone' Module
 ##
-## Copyright 2007, Red Hat, Inc
+## Copyright 2008, Red Hat, Inc
 ## John Eckersberg <jeckersb@redhat.com>
 ##
 ## This software may be freely redistributed under the terms of the GNU
@@ -27,12 +27,11 @@ class Clone(func_module.FuncModule):
         """
         TODO: Document me ...
         """
-        return True
-        regex = """Creation of volume .* has completed."""
-        param_check(args, ['name', 'aggr', 'size'])
+        regex = """Creation of clone volume .* has completed."""
+        param_check(args, ['name', 'parent', 'snapshot'])
         
-        cmd_opts = ['vol', 'create']
-        cmd_opts.extend([args['name'], args['aggr'], args['size']])
+        cmd_opts = ['vol', 'clone', 'create']
+        cmd_opts.extend([args['name'], '-b', args['parent'], args['snapshot']])
 
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
@@ -41,5 +40,14 @@ class Clone(func_module.FuncModule):
         """
         TODO: Document me ...
         """
-        return True
+        # only worry about 'start' now, I don't terribly care to automate the rest
+        regex = """Clone volume .* will be split from its parent."""
+        param_check(args, ['name'])
+
+        cmd_opts = ['vol', 'clone', 'split', 'start', args['name']]
+
+        output = ssh(filer, cmd_opts)
+        return check_output(regex, output)
+
+
 
