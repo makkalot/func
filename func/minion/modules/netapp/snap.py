@@ -23,33 +23,25 @@ class Snap(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Interface to the 'snap' command"
 
-    def create(self, filer, args):
+    def create(self, filer, vol, snap):
         """
         TODO: Document me ...
         """
         regex = """creating snapshot..."""
-        param_check(args, ['volname', 'snapname'])
-        
-        cmd_opts = ['snap', 'create']
-        cmd_opts.extend([args['volname'], args['snapname']])
-
+        cmd_opts = ['snap', 'create', vol, snap]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
-    def delete(self, filer, args):
+    def delete(self, filer, args, vol, snap):
         """
         TODO: Document me ...
         """
         regex = """deleting snapshot..."""
-        param_check(args, ['volname', 'snapname'])
-        
-        cmd_opts = ['snap', 'delete']
-        cmd_opts.extend([args['volname'], args['snapname']])
-
+        cmd_opts = ['snap', 'delete', vol, snap]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
     
-    def list(self, filer, args):
+    def list(self, filer, vol):
         """
         TODO: Document me ...
         """

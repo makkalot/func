@@ -23,29 +23,22 @@ class Clone(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Interface to the 'vol' command"
 
-    def create(self, filer, args):
+    def create(self, filer, vol, parent, snap):
         """
         TODO: Document me ...
         """
         regex = """Creation of clone volume .* has completed."""
-        param_check(args, ['name', 'parent', 'snapshot'])
-        
-        cmd_opts = ['vol', 'clone', 'create']
-        cmd_opts.extend([args['name'], '-b', args['parent'], args['snapshot']])
-
+        cmd_opts = ['vol', 'clone', 'create', vol, '-b', parent, snap]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
     
-    def split(self, filer, args):
+    def split(self, filer, vol):
         """
         TODO: Document me ...
         """
         # only worry about 'start' now, I don't terribly care to automate the rest
         regex = """Clone volume .* will be split from its parent."""
-        param_check(args, ['name'])
-
-        cmd_opts = ['vol', 'clone', 'split', 'start', args['name']]
-
+        cmd_opts = ['vol', 'clone', 'split', 'start', vol]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
