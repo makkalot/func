@@ -82,9 +82,13 @@ class Vol(func_module.FuncModule):
             else:
                 current_vol['status'].extend([foo for foo in tokens if '=' not in foo])
                 current_vol['options'].extend([foo for foo in tokens if '=' in foo])
+        vols.append(current_vol)
 
         if vol:
-            return [foo for foo in vols if foo['name'] == vol][0]
+            try:
+                return [foo for foo in vols if foo['name'] == vol][0]
+            except:
+                raise NetappCommandError, "No such volume: %s" % vol
         else:
             return vols
 
