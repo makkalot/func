@@ -93,7 +93,7 @@ case "$1" in
         $1
         ;;
     status)
-        status $PROCESS
+        STATUS $PROCESS
         RETVAL=$?
         ;;
     condrestart)
