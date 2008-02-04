@@ -6,6 +6,7 @@ import unittest
 import xmlrpclib
 
 import func.overlord.client as fc
+import func.utils
 import socket
 
 
@@ -41,7 +42,8 @@ class BaseTest:
 
     # we do this all over the place...
     def assert_on_fault(self, result):
-        assert type(result[self.th]) != xmlrpclib.Fault
+        assert func.utils.is_error(result[self.th]) == False
+#        assert type(result[self.th]) != xmlrpclib.Fault
 
     test_module_version.intro = True
     test_module_api_version.intro = True
@@ -170,7 +172,7 @@ class TestNetworkTest(BaseTest):
     def test_ping_bad_arg(self):
          result = self.client.networktest.ping(self.th)
          # this should give us a FuncException
-         assert type(result[self.th]) == xmlrpclib.Fault
+         foo = func.utils.is_error(result[self.th]) 
          
     def test_netstat(self):
         result = self.client.networktest.netstat("-n")
@@ -286,6 +288,7 @@ class TestSystem(BaseTest):
 
     def test_module_description(self):
         pass
+
 
 
 #import time
