@@ -138,8 +138,8 @@ install_the_func_rpm()
 
 install_the_func()
 {
-    msg "Installing func directly"
-    pushd $1
+    msg "Installing func directly from $1 $BUILD_PATH"
+    pushd $1/func
     make install 
 }
 
@@ -241,7 +241,7 @@ test_funcd()
 run_async_test()
 {
     msg "Running async_test.py to test async/forking"
-    pushd $BUILD_PATH/test
+    pushd $BUILD_PATH/func/test
     python async_test.py
 
 }
@@ -249,7 +249,7 @@ run_async_test()
 run_unittests()
 {
     msg "Running the unittest suite"
-    pushd $BUILD_PATH/test/unittest
+    pushd $BUILD_PATH/func/test
     nosetests -v -w unittest/
     
 }
