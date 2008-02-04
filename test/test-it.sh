@@ -315,7 +315,7 @@ test_funcd
 
 
 
-if [ "$RUN_UNITTEST" == "Y" ] ; then
+if [ "$RUN_UNITTESTS" == "Y" ] ; then
     run_unittests
 fi
 
