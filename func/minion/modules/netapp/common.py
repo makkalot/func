@@ -20,7 +20,6 @@ SSH_USER = 'root'
 SSH_OPTS = '-o forwardagent=no'
 class GenericSSHError(Exception): pass
 class NetappCommandError(Exception): pass
-class NetappMissingParam(Exception): pass
 
 def ssh(host, cmdargs, input=None, user=SSH_USER):
     cmdline = [SSH, SSH_OPTS, "%s@%s" % (user, host)]
@@ -34,16 +33,11 @@ def ssh(host, cmdargs, input=None, user=SSH_USER):
                            shell=False)
 
     (out, err) = cmd.communicate(input)
-    
+
     if cmd.wait() != 0:
         raise GenericSSHError, err
     else:
         return out + err
-
-def param_check(args, required):
-    for r in required:
-        if not args.has_key(r):
-            raise NetappMissingParam, r
 
 def check_output(regex, output):
     #strip newlines

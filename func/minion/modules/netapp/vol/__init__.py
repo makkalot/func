@@ -23,82 +23,91 @@ class Vol(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Interface to the 'vol' command"
 
-    def create(self, filer, args):
+    def create(self, filer, vol, aggr, size):
         """
         TODO: Document me ...
         """
         regex = """Creation of volume .* has completed."""
-        param_check(args, ['name', 'aggr', 'size'])
-        
-        cmd_opts = ['vol', 'create']
-        cmd_opts.extend([args['name'], args['aggr'], args['size']])
-
+        cmd_opts = ['vol', 'create', vol, aggr, size]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
     
-    def destroy(self, filer, args):
+    def destroy(self, filer, vol):
         """
         TODO: Document me ...
         """
         regex = """Volume .* destroyed."""
-        param_check(args, ['name'])
-        
-        cmd_opts = ['vol', 'destroy']
-        cmd_opts.extend([args['name']])
-
-        output = ssh(filer, cmd_opts, 'y')
+        cmd_opts = ['vol', 'destroy', vol, '-f']
+        output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
-    def offline(self, filer, args):
+    def offline(self, filer, vol):
         """
         TODO: Document me ...
         """
         regex = """Volume .* is now offline."""
-        param_check(args, ['name'])
-        
-        cmd_opts = ['vol', 'offline']
-        cmd_opts.extend([args['name']])
-
+        cmd_opts = ['vol', 'offline', vol]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
-    def online(self, filer, args):
+    def online(self, filer, vol):
         """
         TODO: Document me ...
         """
         regex = """Volume .* is now online."""
-        param_check(args, ['name'])
-        
-        cmd_opts = ['vol', 'online']
-        cmd_opts.extend([args['name']])
-
+        cmd_opts = ['vol', 'online', vol]
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
-    def status(self, filer, args):
+    def status(self, filer, vol=None):
         """
         TODO: Document me ...
         """
-        pass
+        cmd_opts = ['vol', 'status']
+        output = ssh(filer, cmd_opts)
 
-    def size(self, filer, args):
+        output = output.replace(',', ' ')
+        lines = output.split('\n')[1:]
+
+        vols = []
+        current_vol = {}
+        for line in lines:
+            tokens = line.split()
+            if len(tokens) >= 2 and tokens[1] in ('online', 'offline', 'restricted'):
+                if current_vol: vols.append(current_vol)
+                current_vol = {'name': tokens[0], 
+                               'state': tokens[1],
+                               'status': [foo for foo in tokens[2:] if '=' not in foo],
+                               'options': [foo for foo in tokens[2:] if '=' in foo]}
+            else:
+                current_vol['status'].extend([foo for foo in tokens if '=' not in foo])
+                current_vol['options'].extend([foo for foo in tokens if '=' in foo])
+        vols.append(current_vol)
+
+        if vol:
+            try:
+                return [foo for foo in vols if foo['name'] == vol][0]
+            except:
+                raise NetappCommandError, "No such volume: %s" % vol
+        else:
+            return vols
+
+    def size(self, filer, vol, delta=None):
         """
         TODO: Document me ...
         """
         stat_regex = """vol size: Flexible volume .* has size .*."""
         resize_regex = """vol size: Flexible volume .* size set to .*."""
-        param_check(args, ['name'])
-        cmd_opts = ['vol', 'size', args['name']]
+        cmd_opts = ['vol', 'size', vol]
         
-        if len(args.keys()) == 1:
+        if delta:
+            cmd_opts.append(delta)
+            output = ssh(filer, cmd_opts)
+            return check_output(resize_regex, output)
+        else:
             output = ssh(filer, cmd_opts)
             check_output(stat_regex, output)
             return output.split()[-1][:-1]
-        else:
-            param_check(args, ['delta'])
-            cmd_opts.append('%+d%s' % (int(args['delta'][:-1]), args['delta'][-1]))
-            output = ssh(filer, cmd_opts)
-            return check_output(resize_regex, output)
 
     def options(self, filer, args):
         """
