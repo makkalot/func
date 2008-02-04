@@ -32,7 +32,7 @@ class Snap(func_module.FuncModule):
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
-    def delete(self, filer, args, vol, snap):
+    def delete(self, filer, vol, snap):
         """
         TODO: Document me ...
         """
