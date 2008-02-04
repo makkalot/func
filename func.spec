@@ -74,6 +74,12 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/func/*.py*
 %dir %{python_sitelib}/func/minion/modules
 %{python_sitelib}/func/minion/modules/*.py*
+
+# we need to make the spec and setup.py find modules
+# in deep dirs automagically
+%{python_sitelib}/func/minion/modules/*/*.py*
+%{python_sitelib}/func/minion/modules/*/*/*.py*
+
 %dir /var/log/func
 %dir /var/lib/func
 %dir /var/lib/func/certmaster
@@ -125,6 +131,9 @@ fi
 
 
 %changelog
+* Mon Feb 4 2008 Adrian Likins <alikins@redhat.com> - 0.0.15-1
+- catch some deeper minion modules as well
+
 * Sun Jan 13 2008 Steve 'Ashcrow' Milner <smilner@redhat.como> - 0.0.14-6
 - Added in func-create-module for scripts.
 

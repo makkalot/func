@@ -46,8 +46,8 @@ if __name__ == "__main__":
                             # FIXME if there's a clean/easy way to recursively
                             # find modules then by all means do it, for now
                             # this will work.
-                            "%s/minion/modules/netapp" % NAME,
-                            "%s/minion/modules/netapp/vol" % NAME
+                            "%s/minion/modules.netapp" % NAME,
+                            "%s/minion/modules.netapp.vol" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (initpath, ["init-scripts/certmaster"]),
