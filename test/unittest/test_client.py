@@ -40,15 +40,35 @@ class BaseTest:
         result = mod.module_description()
         self.assert_on_fault(result)
 
+    def test_module_list_methods(self):
+        mod = getattr(self.client, self.module)
+        result = mod.list_methods()
+        self.assert_on_fault(result)
+
+    def test_module_inventory(self):
+        mod = getattr(self.client, self.module)
+        result = mod.list_methods()
+        res = result[self.th]
+
+        # not all modules have an inventory, so check for it
+        # FIXME: not real happy about having to call list method for
+        #        every module, but it works for now -akl
+        if "inventory" in res:
+            result = mod.inventory()
+        self.assert_on_fault(result)
+
+
     # we do this all over the place...
     def assert_on_fault(self, result):
         assert func.utils.is_error(result[self.th]) == False
 #        assert type(result[self.th]) != xmlrpclib.Fault
 
+    # attrs set so we can skip these via nosetest
     test_module_version.intro = True
     test_module_api_version.intro = True
     test_module_description.intro = True
-
+    test_module_list_methods.into = True
+    test_module_module_intentory = True
 
 class TestTest(BaseTest):
     module = "test"
