@@ -67,8 +67,8 @@ class BaseTest:
     test_module_version.intro = True
     test_module_api_version.intro = True
     test_module_description.intro = True
-    test_module_list_methods.into = True
-    test_module_module_intentory = True
+    test_module_list_methods.intro = True
+    test_module_inventory.intro = True
 
 class TestTest(BaseTest):
     module = "test"
