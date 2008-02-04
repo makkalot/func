@@ -42,6 +42,7 @@ if __name__ == "__main__":
 	        	    "%s/minion" % NAME,
 			    "%s/overlord" % NAME,
 			    "%s/overlord/cmd_modules" % NAME,
+                            "%s/overlord/modules" % NAME,
                             "%s/minion/modules" % NAME,
                             # FIXME if there's a clean/easy way to recursively
                             # find modules then by all means do it, for now
