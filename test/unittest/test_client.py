@@ -93,10 +93,12 @@ class TestCommand(BaseTest):
         assert result[self.th][1] == "foo"
 
     def test_rpm(self):
-        result = self.client.command.run("rpm -q func")
+        # looksing for some package that should be there, rh specific
+        # ish at the moment
+        result = self.client.command.run("rpm -q filesystem")
 
         self.assert_on_fault(result)
-        assert result[self.th][1].split("-")[0] == "func"
+        assert result[self.th][1].split("-")[0] == "filesystem"
 
 
 
@@ -160,8 +162,8 @@ class TestFileTracker(BaseTest):
         result = self.client.filetracker.track(self.fn)
         result = self.client.filetracker.inventory(False)
         self.assert_on_fault(result)
-        assert result[self.th][0][0] == "/etc/hosts"
-        assert result[self.th][0][3] == 0
+        assert self.fn in result[self.th][0]
+#        assert result[self.th][0][3] == 0
 
     def test_untrack(self):
         result = self.client.filetracker.track(self.fn)
