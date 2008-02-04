@@ -96,7 +96,9 @@ class FuncInventory(object):
                 #        print "-- connection refused: %s" % host
                 #    break
 
-                (module_name, method_name) = each_method.split(".")
+                tokens = each_method.split(".")
+                module_name = ".".join(tokens[:-1])
+                method_name = tokens[-1]
 
                 if not "all" in filtered_module_list and not module_name in filtered_module_list:
                     continue

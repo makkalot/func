@@ -132,60 +132,31 @@ fi
 
 
 %changelog
-* Mon Feb 4 2008 Adrian Likins <alikins@redhat.com> - 0.0.15-1
+* Mon Feb 4 2008 Michael DeHaan <mdehaan@redhat.com> - 0.16-1
+- bump version for release
+- fixing versions in previous changelogs
+
+* Mon Feb 4 2008 Adrian Likins <alikins@redhat.com> - 0.15-1
 - catch some deeper minion modules as well
 
-* Sun Jan 13 2008 Steve 'Ashcrow' Milner <smilner@redhat.como> - 0.0.14-6
+* Sun Jan 13 2008 Steve 'Ashcrow' Milner <smilner@redhat.como> - 0.14-6
 - Added in func-create-module for scripts.
 
-* Tue Dec 18 2007 Adrian Likins <alikins@redhat.com> - 0.0.14-5
+* Tue Dec 18 2007 Adrian Likins <alikins@redhat.com> - 0.14-5
 - add /var/lib/ dirs to spec file
 
-* Thu Dec 13 2007 Eli Criffield <elicriffield@gmail.com> - 0.0.14-4
+* Thu Dec 13 2007 Eli Criffield <elicriffield@gmail.com> - 0.14-4
 - changes for suse integration 
 
-* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.14-2
+* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.14-2
 - python egg section added for F9 and later
 
-* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.14-1
+* Tue Dec 11 2007 Michael DeHaan <mdehaan@redhat.com> - 0.14-1
 - new release to mirrors
 
-* Fri Oct 26 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-3
+* Fri Oct 26 2007 Michael DeHaan <mdehaan@redhat.com> - 0.13-3
 - Misc fixes per Fedora package-review
 
-* Wed Oct 24 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.13-2
+* Wed Oct 24 2007 Michael DeHaan <mdehaan@redhat.com> - 0.13-2
 - packaged func-inventory and associated manpage
 - release bump for Fedora submission
-
-* Thu Oct 18 2007 Seth Vidal <skvidal at fedoraproject.org> - 0.0.12-1
-- change out minion-acl.conf for minion-acl.d
-
-* Mon Oct 8 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
-- add cmd_modules
-
-* Fri Sep 28 2007 Adrian Likins <alikins@redhat.com> - 0.0.12-1
-- remove rhpl deps
-
-* Fri Sep 28 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.12-1
-- bump version and get ready for first public release
-- add BuildRequires python-devel
-- add logrotate config
-
-* Thu Sep 27 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-7
-- removed unnecessary yum-utils Require
-
-* Wed Sep 26 2007 Jesus Rodriguez <jesusr@redhat.com> - 0.0.11-5
-- fixed Requires to include pyOpenSSL for use by certmaster
-
-* Tue Sep 25 2007 Michael DeHaan <mdehaan@redhat.com> - 0.0.11-4
-- Added manpage documentation 
-- Renamed minion config file
-
-* Tue Sep 25 2007 Robin Norwood <rnorwood@redhat.com> - 0.0.11-3
-- Change server -> minion and client -> overlord
-
-* Thu Sep 20 2007 James Bowes <jbowes@redhat.com> - 0.0.11-2
-- Clean up some speclint warnings
-
-* Thu Sep 20 2007 Adrian Likins <alikins@redhat.com> - 0.0.11-1
-- initial release (this one goes to .11)
