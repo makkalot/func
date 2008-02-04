@@ -78,6 +78,16 @@ check_out_code()
 }
 
 
+copy_code_to_buildroot()
+{
+
+    msg "Copying current build dir to $BUILD_PATH"
+    rm -rf $BUILD_PATH
+    mkdir -p $BUILD_PATH/func/
+    cp -var ../* $BUILD_PATH/func
+
+}
+
 
 build_rpm()
 {
@@ -90,7 +100,9 @@ build_rpm()
     echo "Building $PKG in $BRT"
     echo "======================================"
     echo
+    echo $BUILD_PATH/$PKG
     pushd $BUILD_PATH/$PKG
+    echo "BRT" $BRT "PKK" $PKG
     make clean
     make rpms
     if [ $? != 0 ]; then
@@ -253,8 +265,10 @@ if [ "$BUILD" == "Y" ] ; then
 	if [ "$BUILD_FROM_FRESH_CHECKOUT" == "Y" ] ; then
 		check_out_code
 	else
-		# assume we are running from the test dir
-		BUILD_PATH="`pwd`/../"
+		# assume we want to build a copy of the current
+	        # source tree, we copy it else where and build
+                # so we dont 'splode any thing with the build process
+	        copy_code_to_buildroot
 	fi
 	
 
