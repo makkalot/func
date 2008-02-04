@@ -76,7 +76,7 @@ def get_hosts_by_groupgoo(groups, groupgoo):
         if groups.has_key(group_gloob[1:]):
             hosts = hosts + groups[group_gloob[1:]]
         else:            
-            print "group %s not defined" % each_gloob
+            print "group %s not defined" % group_gloob
     return hosts
 
 # ===================================
