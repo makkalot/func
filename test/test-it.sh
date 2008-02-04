@@ -84,7 +84,7 @@ copy_code_to_buildroot()
     msg "Copying current build dir to $BUILD_PATH"
     rm -rf $BUILD_PATH
     mkdir -p $BUILD_PATH/func/
-    cp -var ../* $BUILD_PATH/func
+    cp -var $BASE_DIR/ $BUILD_PATH
 
 }
 
@@ -257,6 +257,21 @@ run_unittests()
 
 
 # start doing stuff
+
+# this is really ugly, but we are doing lots of weird path
+# stuff at various points and kind of just want to make this
+# "just work"...
+
+if [ -f "func.spec" ] ; then
+    # we are running from the top level dir
+    BASE_DIR=`pwd`
+elif [ -f "test-it.sh" ] ; then
+    BASE_DIR="`pwd`/../"
+else
+    echo "You need to run this from the base func dir or the test/ dir"
+    exit 1
+fi
+
 
 show_config
 
