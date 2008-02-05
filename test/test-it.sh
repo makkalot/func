@@ -84,7 +84,7 @@ copy_code_to_buildroot()
     msg "Copying current build dir to $BUILD_PATH"
     rm -rf $BUILD_PATH
     mkdir -p $BUILD_PATH/func/
-    cp -var $BASE_DIR/ $BUILD_PATH
+    cp -var $BASE_DIR/* $BUILD_PATH/func
 
 }
 
