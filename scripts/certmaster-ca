@@ -46,7 +46,7 @@ def main(args):
         errorprint('Must be root to run certmaster-ca')
         return 1
         
-    cm = func.certmaster.CertMaster('/etc/func/certmaster.conf')
+    cm = func.certmaster.CertMaster()
     
     (opts, args) = parseargs(args)
 
@@ -84,17 +84,7 @@ def main(args):
             return 1
         
         for hn in args:
-            csrglob = '%s/%s.csr' % (cm.cfg.csrroot, hn)
-            csrs = glob.glob(csrglob)
-            certglob = '%s/%s.cert' % (cm.cfg.certroot, hn)
-            certs = glob.glob(certglob)
-            if not csrs and not certs:
-                errorprint('No match for %s to clean up' % hn)
-                continue
-            
-            for fn in csrs + certs:
-                print 'Cleaning out %s for host matching %s' % (fn, hn)
-                os.unlink(fn)
+            cm.remove_this_host(hn)
         
         return 0
 

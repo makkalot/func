@@ -17,6 +17,7 @@
 from OpenSSL import crypto
 import socket
 import os
+import utils
 
 def_country = 'UN'
 def_state = 'FC'
@@ -48,12 +49,7 @@ def make_csr(pkey, dest=None, cn=None):
     if cn:
         subj.CN = cn
     else:
-        fqdn = socket.getfqdn()
-        host = socket.gethostname()
-        if fqdn.find(host) != -1:        
-            subj.CN = fqdn
-        else: 
-            subj.CN = host
+        subj.CN = utils.get_hostname() 
     subj.emailAddress = 'root@%s' % subj.CN       
         
     req.set_pubkey(pkey)

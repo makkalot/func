@@ -15,6 +15,7 @@ import string
 import sys
 import traceback
 import xmlrpclib
+import socket
 
 REMOTE_ERROR = "REMOTE_ERROR"
 
@@ -49,6 +50,15 @@ def nice_exception(etype, evalue, etb):
     nicetype = etype[lefti:righti]
     nicestack = string.join(traceback.format_list(traceback.extract_tb(etb)))
     return [ REMOTE_ERROR, nicetype, str(evalue), nicestack ] 
+
+def get_hostname():
+    fqdn = socket.getfqdn()
+    host = socket.gethostname()
+    if fqdn.find(host) != -1:
+        return fqdn
+    else:
+        return host
+
 
 def is_error(result):
     if type(result) != list:
