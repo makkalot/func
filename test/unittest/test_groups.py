@@ -5,6 +5,12 @@
 import func.overlord.client as fc
 
 
+class GroupBuilder(object):
+    def __init__(self):
+        pass
+
+    
+
 
 class TestGroups(object):
 
@@ -16,7 +22,10 @@ class TestGroups(object):
         result = fc.get_groups()
         print result
 
-    def test_get_hosts_by_groupgoo(self):
-        group_dict = fc.get_groups()
-        hosts = fc.get_hosts_by_groupgoo(group_dict, "@blippy")
-        print hosts
+# FIXME: comment this out till I setup a way to test with a speciic
+#        test config -akl
+
+#    def test_get_hosts_by_groupgoo(self):
+#        group_dict = fc.get_groups()
+#        hosts = fc.get_hosts_by_groupgoo(group_dict, "@blippy")
+#        print hosts
