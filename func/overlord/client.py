@@ -15,6 +15,7 @@
 
 import sys
 import glob
+import os
 
 from func.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
@@ -26,6 +27,7 @@ import groups
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
 import func.utils as utils
+from func.CommonErrors import *
 
 # ===================================
 # defaults
@@ -142,7 +144,7 @@ def isServer(server_string):
 class Client(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None, async=False):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -165,15 +167,40 @@ class Client(object):
         self.async       = async
         
         self.servers  = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
-
-        # default cert/ca/key is the same as the certmaster ca - need to
-        # be able to change that on the cli
-        self.key = '%s/funcmaster.key' % self.config.cadir
-        self.cert = '%s/funcmaster.crt' % self.config.cadir
-        # yes, they're the same, that's the point
+    
+        if init_ssl:
+            self.setup_ssl()
+            
+    def setup_ssl(self, client_key=None, client_cert=None, ca=None):
+        # defaults go:
+          # certmaster key, cert, ca
+          # funcd key, cert, ca
+          # raise FuncClientError
+        ol_key = '%s/funcmaster.key' % self.config.cadir
+        ol_crt = '%s/funcmaster.crt' % self.config.cadir
+        # maybe /etc/pki/func is a variable somewhere?
+        fd_key = '/etc/pki/func/%s.pem' % myname
+        fd_crt = '/etc/pki/func/%s.cert' % myname
         self.ca = '%s/funcmaster.crt' % self.config.cadir
+                
+        if os.access(client_key, os.R_OK) and os.access(client_cert, os.R_OK)\
+                        and os.access(ca, os.R_OK):
+            self.key = client_key
+            self.cert = client_cert
+            self.ca = ca
+        # otherwise fall through our defaults
+        elif os.access(ol_key, os.R_OK) and os.access(ol_crt, os.R_OK):
+            self.key = ol_key
+            self.cert = ol_crt
+        elif os.access(fd_key, os.R_OK) and os.access(fd_crt, os.R_OK):
+            self.key = fd_key
+            self.cert = fd_crt
+        else:
+            raise Func_Client_Exception, 'Cannot read ssl credentials: ssl, cert, ca'
+            
 
-
+        
+    
     def __getattr__(self, name):
         """
         This getattr allows manipulation of the object as if it were

@@ -14,6 +14,7 @@
 #
 # Copyright 2005 Dan Williams <dcbw@redhat.com> and Red Hat, Inc.
 
+from exceptions import Exception
 
 def canIgnoreSSLError(e):
     """
@@ -58,3 +59,11 @@ def canIgnoreSocketError(e):
         return True
 
     return False
+
+class Func_Client_Exception(Exception):
+    def __init__(self, value=None):
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        return "%s" %(self.value,)
+
