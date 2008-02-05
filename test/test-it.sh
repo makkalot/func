@@ -81,10 +81,10 @@ check_out_code()
 copy_code_to_buildroot()
 {
 
-    msg "Copying current build dir to $BUILD_PATH"
+    msg "Copying current build dir  $BASE_DIR to $BUILD_PATH/func"
     rm -rf $BUILD_PATH
     mkdir -p $BUILD_PATH/func/
-    cp -var $BASE_DIR/* $BUILD_PATH/func
+    cp -ar $BASE_DIR/* $BUILD_PATH/func
 
 }
 
