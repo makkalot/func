@@ -178,16 +178,17 @@ class Client(object):
           # raise FuncClientError
         ol_key = '%s/funcmaster.key' % self.config.cadir
         ol_crt = '%s/funcmaster.crt' % self.config.cadir
+        myname = utils.get_hostname()
         # maybe /etc/pki/func is a variable somewhere?
         fd_key = '/etc/pki/func/%s.pem' % myname
         fd_crt = '/etc/pki/func/%s.cert' % myname
         self.ca = '%s/funcmaster.crt' % self.config.cadir
-                
-        if os.access(client_key, os.R_OK) and os.access(client_cert, os.R_OK)\
-                        and os.access(ca, os.R_OK):
-            self.key = client_key
-            self.cert = client_cert
-            self.ca = ca
+        if client_key and client_cert and ca:        
+            if (os.access(client_key, os.R_OK) and os.access(client_cert, os.R_OK)
+                            and os.access(ca, os.R_OK)):
+                self.key = client_key
+                self.cert = client_cert
+                self.ca = ca
         # otherwise fall through our defaults
         elif os.access(ol_key, os.R_OK) and os.access(ol_crt, os.R_OK):
             self.key = ol_key
