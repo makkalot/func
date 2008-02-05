@@ -250,7 +250,6 @@ class TestService(BaseTest):
         running_data = self.client.service.get_running()[self.th]
         result = self.client.service.status(running_data[0][0])
         self.assert_on_fault(result)
-        assert result[self.th] == 0
 
         #FIXME: whats a good way to test starting/stoping services without
         #       doing bad things? -akl
