@@ -39,12 +39,7 @@ class CertMaster(object):
     def __init__(self, conf_file=CERTMASTER_CONFIG):
         self.cfg = read_config(conf_file, CMConfig)
 
-        fqdn = socket.getfqdn()
-        host = socket.gethostname()
-        if fqdn.find(host) != -1:
-            usename = fqdn
-        else: 
-            usename = host
+        usename = utils.get_hostname()
 
         mycn = '%s-CA-KEY' % usename
         self.ca_key_file = '%s/funcmaster.key' % self.cfg.cadir
