@@ -23,6 +23,7 @@ from OpenSSL import crypto
 import sha
 import glob
 import socket
+import exceptions
 
 #from func.server import codes
 import certs
@@ -32,9 +33,10 @@ from config import read_config
 from commonconfig import CMConfig
 
 CERTMASTER_LISTEN_PORT = 51235
+CERTMASTER_CONFIG = "/etc/func/certmaster.conf"
 
 class CertMaster(object):
-    def __init__(self, conf_file):
+    def __init__(self, conf_file=CERTMASTER_CONFIG):
         self.cfg = read_config(conf_file, CMConfig)
 
         fqdn = socket.getfqdn()
@@ -157,7 +159,21 @@ class CertMaster(object):
             hn = hn[:-4]
             hosts.append(hn)
         return hosts
-    
+   
+    def remove_this_cert(self, hn):
+        """ removes cert for hostname using unlink """
+        cm = self
+        csrglob = '%s/%s.csr' % (cm.cfg.csrroot, hn)
+        csrs = glob.glob(csrglob)
+        certglob = '%s/%s.cert' % (cm.cfg.certroot, hn)
+        certs = glob.glob(certglob)
+        if not csrs and not certs:
+            # FIXME: should be an exception?
+            print 'No match for %s to clean up' % hn
+            return
+        for fn in csrs + certs:
+            print 'Cleaning out %s for host matching %s' % (fn, hn)
+            os.unlink(fn)         
             
     def sign_this_csr(self, csr):
         """returns the path to the signed cert file"""
@@ -181,7 +197,7 @@ class CertMaster(object):
             try:
                 csrreq = crypto.load_certificate_request(crypto.FILETYPE_PEM, csr_buf)                
             except crypto.Error, e:
-                print 'Bad CSR: %s' % csr
+                raise exceptions.Exception("Bad CSR: %s" % csr)
                 
         else: # assume we got a bare csr req
             csrreq = csr
