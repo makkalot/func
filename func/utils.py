@@ -45,9 +45,12 @@ def daemonize(pidfile=None):
 
 def nice_exception(etype, evalue, etb):
     etype = str(etype)
-    lefti = etype.index("'") + 1
-    righti = etype.rindex("'")
-    nicetype = etype[lefti:righti]
+    try:
+        lefti = etype.index("'") + 1
+        righti = etype.rindex("'")
+        nicetype = etype[lefti:righti]
+    except:
+        nicetype = etype
     nicestack = string.join(traceback.format_list(traceback.extract_tb(etb)))
     return [ REMOTE_ERROR, nicetype, str(evalue), nicestack ] 
 
