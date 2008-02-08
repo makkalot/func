@@ -32,10 +32,6 @@ import sys
 import glob
 import subprocess
 
-# don't let koji poll for status
-# NOTE: EPEL still uses plague
-os.env["BUILD_FLAGS"] == "--nowait"
-
 def run(cmd,failok=False):
    """
    Wrapper around subprocess
@@ -43,7 +39,7 @@ def run(cmd,failok=False):
    print "running: %s" % cmd
    rc = subprocess.call(cmd, shell=True)
    print "rc: %s" % rc
-   if failok and not rc:
+   if not failok and not rc == 0:
        croak("aborting")
 
 
@@ -142,7 +138,7 @@ for x in PROCESS_RELEASES:
     print "cd into %s" % releasedir
     os.chdir(releasedir)
     rc = run("make tag")
-    rc = run("make build",failok=True)
+    rc = run("BUILD_FLAGS=\"--nowait\" make build",failok=True)
 
 print "---------------------------------------------"
 print "all done, assuming you didn't see anything weird"
