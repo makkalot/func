@@ -132,6 +132,9 @@ fi
 
 
 %changelog
+* Fri Feb 8 2008 Michael DeHaan <mdehaan@redhat.com> - 0.17-1
+- bugfix release
+
 * Mon Feb 4 2008 Michael DeHaan <mdehaan@redhat.com> - 0.16-1
 - bump version for release
 - fixing versions in previous changelogs
