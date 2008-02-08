@@ -119,6 +119,8 @@ class FuncLibvirtConnection(object):
         state = self.find_vm(vmid).info()[0]
         return VIRT_STATE_NAME_MAP.get(state,"unknown")
 
+    def nodeinfo(self):
+        return self.conn.getInfo()
 
 
 class Virt(func_module.FuncModule):
@@ -155,6 +157,21 @@ class Virt(func_module.FuncModule):
             }
         return info
 
+    def nodeinfo(self):
+        self.__get_conn()
+        info = dict()
+        data = self.conn.nodeinfo()
+        info = {
+            "cpumodel"     : str(data[0]),
+            "phymemory"    : str(data[1]),
+            "cpus"         : str(data[2]),
+            "cpumhz"       : str(data[3]),
+            "numanodes"    : str(data[4]),
+            "sockets"      : str(data[5]),
+            "cpucores"     : str(data[6]),
+            "cputhreads"   : str(data[7])
+        }
+        return info
 
     def list_vms(self):
         self.conn = self.__get_conn()
