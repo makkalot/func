@@ -64,22 +64,22 @@ class CommandAutomagic(object):
         return self.clientref.run(module,method,args,nforks=self.nforks)
 
 
-def get_groups():    
-    group_class = groups.Groups()
-    return group_class.get_groups()
+#def get_groups():    
+#    group_class = groups.Groups()
+#    return group_class.get_groups()
 
 
-def get_hosts_by_groupgoo(groups, groupgoo):
-    group_gloobs = groupgoo.split(':')
-    hosts = []
-    for group_gloob in group_gloobs:
-        if not group_gloob[0] == "@":
-            continue
-        if groups.has_key(group_gloob[1:]):
-            hosts = hosts + groups[group_gloob[1:]]
-        else:            
-            print "group %s not defined" % group_gloob
-    return hosts
+#def get_hosts_by_groupgoo(groups, groupgoo):
+#    group_gloobs = groupgoo.split(':')
+#    hosts = []
+#    for group_gloob in group_gloobs:
+#        if not group_gloob[0] == "@":
+#            continue
+#        if groups.has_key(group_gloob[1:]):
+#            hosts = hosts + groups[group_gloob[1:]]
+#        else:            
+#            print "group %s not defined" % group_gloob
+#    return hosts
 
 # ===================================
 # this is a module level def so we can use it and isServer() from
@@ -102,13 +102,13 @@ def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=Fals
         else:
             return spec
 
-    group_dict = get_groups()
+    group_class = groups.Groups()
 
     all_hosts = []
     all_certs = []
     seperate_gloobs = spec.split(";")
     
-    new_hosts = get_hosts_by_groupgoo(group_dict, spec)
+    new_hosts = group_class.get_hosts_by_groupgoo(spec)
 
     seperate_gloobs = spec.split(";")
     seperate_gloobs = seperate_gloobs + new_hosts

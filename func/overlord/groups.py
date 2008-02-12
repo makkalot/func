@@ -83,6 +83,18 @@ class Groups(object):
     def get_groups(self):
         return self.groups
 
+    def get_hosts_by_groupgoo(self, groupgoo):
+        group_gloobs = groupgoo.split(':')
+        hosts = []
+        for group_gloob in group_gloobs:
+            if not group_gloob[0] == "@":
+                continue
+            if self.groups.has_key(group_gloob[1:]):
+                hosts = hosts + self.groups[group_gloob[1:]]
+            else:            
+                print "group %s not defined" % group_gloob
+        return hosts
+
 
 
 def main():
