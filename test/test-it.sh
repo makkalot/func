@@ -23,6 +23,9 @@ BUILD=Y
 
 # do we do a fresh pull from git to build
 BUILD_FROM_FRESH_CHECKOUT=N
+# do we use the master repo, or clone localy
+# you really need to change both of these
+CLONE_LOCAL_REPO=Y
 
 # do we build/uninstall via rpms?
 INSTALL_VIA_RPMS=N
@@ -72,7 +75,15 @@ check_out_code()
     rm -rf $BUILD_PATH
     mkdir -p $BUILD_PATH
     pushd $BUILD_PATH
-    git clone git://git.fedorahosted.org/func.git
+
+    GIT_REPO="git://git.fedorahosted.org/func.git"
+    if [ "$CLONE_LOCAL_REPO" == "Y" ] ; then
+	msg "Building from a checkout of the local git repo"
+	git clone $BASE_DIR
+    else
+	msg "Building from a checkout from $GIT_REPO"
+	git clone $GIT_REPO
+    fi
     echo $?
     popd
 }
