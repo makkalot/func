@@ -21,6 +21,9 @@ performing various remote operations and gathering data.
 "func" can address multiple machines at the same time by specifying
 their names with globs, which follow shell glob syntax.
 
+Groups of machines can also be specified in /etc/func/groups. To invoke
+func on a group of machines specifying "@groupname". 
+
 See the project homepage (below) for a list of modules available
 and a more in-depth description of what each of them do.
 
