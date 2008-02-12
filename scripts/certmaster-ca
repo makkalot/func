@@ -84,7 +84,7 @@ def main(args):
             return 1
         
         for hn in args:
-            cm.remove_this_host(hn)
+            cm.remove_this_cert(hn)
         
         return 0
 
