@@ -30,7 +30,10 @@ import os
 class Groups(object):
 
     def __init__(self, filename="/etc/func/groups"):
-        self.filename = filename
+
+        self.filename = "/etc/func/groups"
+        if filename:
+            self.filename = filename
         self.group_names = {}
         self.groups = {}
         self.__parse()
@@ -41,7 +44,6 @@ class Groups(object):
         self.cp.read(self.filename)
 
         for section in self.cp.sections():
-            self.add_group(section)
             options = self.cp.options(section)
             for option in options:
                 if option == "host":
@@ -53,9 +55,6 @@ class Groups(object):
     def show(self):
         print self.cp.sections()
         print self.groups
-
-    def add_group(self, group):
-        pass
 
     def __parse_hoststrings(self, hoststring):
         hosts = []

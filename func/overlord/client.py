@@ -84,61 +84,66 @@ class CommandAutomagic(object):
 # ===================================
 # this is a module level def so we can use it and isServer() from
 # other modules with a Client class
-def expand_servers(spec, port=51234, noglobs=None, verbose=None, just_fqdns=False):
-    """
-    Given a regex/blob of servers, expand to a list
-    of server ids.
-    """
 
+class Minions(object):
+    def __init__(self, spec, port=51234, 
+                 noglobs=None, verbose=None,
+                 just_fqdns=False, groups_file=None):
 
-    # FIXME: we need to refactor expand_servers, it seems to do
-    # weird things, reload the config and groups config everytime it's
-    # called for one, which may or may not be bad... -akl
-    config  = read_config(CONFIG_FILE, CMConfig)
+        self.spec = spec
+        self.port = port
+        self.noglobs = noglobs
+        self.verbose = verbose
+        self.just_fqdns = just_fqdns
 
-    if noglobs:
-        if not just_fqdns:
-            return [ "https://%s:%s" % (spec, port) ]
-        else:
-            return spec
+        self.config = read_config(CONFIG_FILE, CMConfig)
+        self.group_class = groups.Groups(filename=groups_file)
+        
+        self.all_hosts = []
+        self.all_certs = []
+        self.all_urls = []
 
-    group_class = groups.Groups()
+    def _get_new_hosts(self):
+        self.new_hosts = self.group_class.get_hosts_by_groupgoo(self.spec)
 
-    all_hosts = []
-    all_certs = []
-    seperate_gloobs = spec.split(";")
-    
-    new_hosts = group_class.get_hosts_by_groupgoo(spec)
+    def _get_all_hosts(self):
+        seperate_gloobs = self.spec.split(";")
+        seperate_gloobs = seperate_gloobs + self.new_hosts
+        for each_gloob in seperate_gloobs:
+            actual_gloob = "%s/%s.cert" % (self.config.certroot, each_gloob)
+            certs = glob.glob(actual_gloob)
+            for cert in certs:
+                self.all_certs.append(cert)
+                host = cert.replace(self.config.certroot,"")[1:-5]
+                self.all_hosts.append(host)
 
-    seperate_gloobs = spec.split(";")
-    seperate_gloobs = seperate_gloobs + new_hosts
-    for each_gloob in seperate_gloobs:
-        actual_gloob = "%s/%s.cert" % (config.certroot, each_gloob)
-        certs = glob.glob(actual_gloob)
-        for cert in certs:
-            all_certs.append(cert)
-            host = cert.replace(config.certroot,"")[1:-5]
-            all_hosts.append(host)
+    def get_urls(self):
+        self._get_new_hosts()
+        self._get_all_hosts()
+        for host in self.all_hosts:
+            if not self.just_fqdns:
+                self.all_urls.append("https://%s:%s" % (host, self.port))
+            else:
+                self.all_urls.append(host)  
+        
+        if self.verbose and len(self.all_urls) == 0:
+            sys.stderr.write("no hosts matched\n")
 
-    all_urls = []
-    for x in all_hosts:
-        if not just_fqdns:
-            all_urls.append("https://%s:%s" % (x, port))
-        else:
-            all_urls.append(x)
+        return self.all_urls
 
-    if verbose and len(all_urls) == 0:
-        sys.stderr.write("no hosts matched\n")
+    # FIXME: hmm, dont like this bit of the api... -al;
+    def is_minion(self):
+        self.get_urls()
+        if len(self.all_urls) > 0:
+            return True
+        return False
 
-    return all_urls
 
 
 # does the hostnamegoo actually expand to anything?
-def isServer(server_string):
-    servers = expand_servers(server_string)
-    if len(servers) > 0:
-        return True
-    return False
+def is_minion(minion_string):
+    minions = Minions(minion_string)
+    return minions.is_minion()
 
 
 class Client(object):
@@ -166,7 +171,8 @@ class Client(object):
         self.nforks      = nforks
         self.async       = async
         
-        self.servers  = expand_servers(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
+        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
+        self.minions = self.minions_class.get_urls()
     
         if init_ssl:
             self.setup_ssl()
@@ -289,20 +295,23 @@ class Client(object):
             if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
                 if not self.async:
-                    results = forkbomb.batch_run(self.servers, process_server, nforks)
+                    results = forkbomb.batch_run(self.minions, process_server, nforks)
                 else:
-                    results = jobthing.batch_run(self.servers, process_server, nforks)
+                    results = jobthing.batch_run(self.minions, process_server, nforks)
             else:
                 # no need to go through the fork code, we can do this directly
                 results = {}
-                for x in self.servers:
+                for x in self.minions:
                     (nkey,nvalue) = process_server(0, 0, x)
                     results[nkey] = nvalue    
         else:
             # globbing is not being used, but still need to make sure
             # URI is well formed.
-            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
-            results = process_server(0, 0, expanded)
+#            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
+            expanded_minions = Minions(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)
+            minions = expanded_minions.get_urls()[0]
+            print minions
+            results = process_server(0, 0, minions)
 
         return results
 

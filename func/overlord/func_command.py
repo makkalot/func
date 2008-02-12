@@ -55,10 +55,10 @@ class FuncCommandLine(command.Command):
         if len(args) < 2:
             print "see the func manpage for usage"
             sys.exit(411)
-        server_string = args[0]
+        minion_string = args[0]
         # try to be clever about this for now
-        if client.isServer(server_string) or self._isGlob(server_string):
-            self.server_spec = server_string
+        if client.is_minion(minion_string) or self._isGlob(minion_string):
+            self.server_spec = minion_string
             args.pop(0)
         # if it doesn't look like server, assume it
         # is a sub command? that seems wrong, what about
