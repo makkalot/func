@@ -17,39 +17,79 @@
 #
 # Author(s): Luke Macken <lmacken@redhat.com>
 
+import pam
 import logging
 
-from model import *
-from turbogears.identity.saprovider import *
+from turbogears import identity
 
 log = logging.getLogger(__name__)
 
-visit_identity_class = None
+class User(object):
+    def __init__(self, username):
+        self.user_id = username
+        self.user_name = username
+        self.display_name = username
 
-class PAMIdentityProvider(SqlAlchemyIdentityProvider):
+class Identity:
+
+    def __init__(self, visit_key=None, username=None):
+        self.username = username
+        self.visit_key = visit_key
+        self.expired = False
+
+    def _get_user(self):
+        try:
+            return self._user
+        except AttributeError:
+            return None
+        if not self.visit_key:
+            self._user = None
+            return None
+        self._user = User(self.username)
+        return self._user
+    user = property(_get_user)
+
+    def _get_anonymous(self):
+        return not self.username
+    anonymous = property(_get_anonymous)
+
+
+    def logout(self):
+        if not self.visit_key:
+            return
+        self.expired = True
+        anon = Identity(None,None)
+        identity.set_current_identity(anon)
+
+
+class PAMIdentityProvider:
     """
         IdentityProvider that authenticates users against PAM.
     """
+    users = {}
+
     def validate_identity(self, user_name, password, visit_key):
         if not self.validate_password(user_name, password):
             log.warning("Invalid password for %s" % user_name)
             return None
-
         log.info("Login successful for %s" % user_name)
-
-        try:
-            link = VisitIdentity.by_visit_key(visit_key)
-            #link.user_id = user.id
-            log.debug("Found visit!")
-        except Exception, e:
-            log.debug("Cannot find visit")
-            link = VisitIdentity(visit_key=visit_key, user_id=user_name)
-            print "Exception: %s" % str(e)
-
-        return SqlAlchemyIdentity(visit_key, user)
+        user = Identity(visit_key, user_name)
+        self.users[visit_key] = user
+        return user
 
     def validate_password(self,user_name, password):
-        import pam
-        log.debug("Authenticating user '%s' against PAM" % user_name)
-        assert pam
         return pam.authenticate(user_name, password)
+
+    def load_identity(self, visit_key):
+        if self.users.has_key(visit_key):
+            if self.users[visit_key].expired:
+                del self.users[visit_key]
+                return None
+            return self.users[visit_key]
+        return None
+
+    def anonymous_identity(self):
+        return Identity(None)
+
+    def create_provider_model(self):
+        pass
