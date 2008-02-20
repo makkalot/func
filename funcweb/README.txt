@@ -9,10 +9,14 @@ proof-of-concept and should not be used in a production environment.
 Running
 =======
 
-    # yum install TurboGears python-genshi python-elixir
+ 1) Setup func.  https://fedorahosted.org/func/wiki/InstallAndSetupGuide
+    Be sure to setup a non-root user to run the func client, so you don't have
+    to run funcweb as root.
+
+    # yum install TurboGears python-genshi
     $ python setup.py egg_info
     $ tg-admin sql create
-    # ./start-funcweb.py
+    $ ./start-funcweb.py
 
 Connect to http://localhost:8080
 
