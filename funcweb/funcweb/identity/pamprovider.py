@@ -17,6 +17,16 @@
 #
 # Author(s): Luke Macken <lmacken@redhat.com>
 
+"""
+This module contains an Identity Provider used by TurboGears to authenticate
+users against PAM.  It utilizes the pam.py module written by Chris AtLee.
+http://pypi.python.org/pypi/pam/0.1.2
+
+To utilize, simply define the following in your app.cfg:
+
+    identity.provider = 'pam'
+"""
+
 import pam
 import logging
 
