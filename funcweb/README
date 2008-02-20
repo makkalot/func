@@ -13,23 +13,18 @@ Running
     Be sure to setup a non-root user to run the func client, so you don't have
     to run funcweb as root.
 
+ 2) Install the necessary software
+
     # yum install TurboGears python-genshi
+
+ 3) Setup and run funcweb
+
     $ python setup.py egg_info
-    $ tg-admin sql create
     $ ./start-funcweb.py
 
-Connect to http://localhost:8080
+ 4) Use funcweb
 
-Creating a new user
-===================
-
-Currently funcweb only allows connections from 127.0.0.1 and from authenticated
-users.  So if you wish to grant other people access to your funcweb instance,
-you can create new users easily:
-
-    $ tg-admin shell
-    >>> user = User(user_name='name', password='password')
-    >>> ^D
+    Connect to http://localhost:8080
 
 Authors
 =======
