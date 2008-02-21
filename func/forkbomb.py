@@ -20,8 +20,6 @@ import bsddb
 import sys
 import tempfile
 import fcntl
-import utils
-import xmlrpclib
 
 DEFAULT_FORKS = 4
 DEFAULT_CACHE_DIR = "/var/lib/func"

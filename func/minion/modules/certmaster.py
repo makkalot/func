@@ -13,10 +13,6 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-# other modules
-import sub_process
-import codes
-
 # our modules
 import func_module
 from func import certmaster as certmaster

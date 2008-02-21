@@ -20,11 +20,9 @@ import time   # for testing only
 import shelve
 import bsddb
 import sys
-import tempfile
 import fcntl
 import forkbomb
 import utils
-import traceback
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1

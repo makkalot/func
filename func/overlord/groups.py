@@ -24,7 +24,6 @@
 
 
 import ConfigParser
-import os
 
 
 class Groups(object):

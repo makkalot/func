@@ -14,7 +14,6 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-import codes
 from func import jobthing
 import func_module
 
