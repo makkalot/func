@@ -56,6 +56,10 @@ class CheckAction(client.command.Command):
         print "* FQDN is detected as %s, verify that is correct" % hostname
         self.check_iptables()
 
+        if not os.getuid() == 0:
+           print "* root is required to run these setup tests"
+           return
+
         if self.check_minion:
 
            # check that funcd is running
@@ -65,9 +69,6 @@ class CheckAction(client.command.Command):
            self.check_talk_to_certmaster()
            
         if self.check_certmaster:
-
-           # check UID
-           # FIXME: todo
 
            # check that certmasterd is running
            self.check_service("certmasterd")
@@ -79,7 +80,27 @@ class CheckAction(client.command.Command):
            # FIXME: TODO
 
            # construct a client handle and see if any hosts are reachable 
+           self.server_spec = self.parentCommand.server_spec
 
+           client_obj = client.Client(
+               self.server_spec,
+               port=self.port,
+               interactive=False,
+               verbose=False,
+               config=self.config
+           )
+           results = client_obj.test.add(1,2)
+           hosts = results.keys()
+           if len(hosts) == 0:
+               print "* no systems have signed certs"
+           else:
+               failed = 0
+               for x in hosts:
+                   if results[x] != 3:
+                       failed = failed+1 
+               if failed != 0:
+                   print "* unable to connect to %s registered minions from overlord" % failed
+                   print "* run func '*' ping to check status"
 
            # see if any of our certs have expired
 
@@ -106,7 +127,7 @@ class CheckAction(client.command.Command):
         cert_dir = config.cert_dir
         # FIXME: don't hardcode port
         master_uri = "http://%s:51235/" % config.certmaster
-        print "* minion is set to talk to host '%s' for certs in /etc/func/minion.conf" % config.certmaster
+        print "* this minion is configured in /etc/func/minion.conf to talk to host '%s' for certs, verify that is correct" % config.certmaster
         # this will be a 501, unsupported GET, but we should be
         # able to tell if we can make contact
         connect_ok = True
