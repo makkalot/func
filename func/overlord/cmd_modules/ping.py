@@ -1,5 +1,5 @@
 """
-copyfile command line
+ping minions to see whether they are up.
 
 Copyright 2007, Red Hat, Inc
 Michael DeHaan <mdehaan@redhat.com>

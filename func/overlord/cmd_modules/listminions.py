@@ -1,5 +1,6 @@
 """
-copyfile command line
+list minions provides a command line way to see what certs are
+registered.
 
 Copyright 2007, Red Hat, Inc
 see AUTHORS

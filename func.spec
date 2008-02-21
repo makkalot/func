@@ -3,7 +3,7 @@
 
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
 
-Summary: Remote config, monitoring, and management api
+Summary: Remote management framework
 Name: func
 Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
@@ -29,7 +29,7 @@ Url: https://hosted.fedoraproject.org/projects/func/
 
 %description
 
-func is a remote api for mangement, configation, and monitoring of systems.
+func is a remote api for mangement, configuration, and monitoring of systems.
 
 %prep
 %setup -q
