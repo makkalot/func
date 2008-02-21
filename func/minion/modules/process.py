@@ -72,7 +72,7 @@ class ProcessModule(func_module.FuncModule):
         import os
         our_pid=os.getpid()
         results = []
-        have_smaps=0
+        global have_pss
         have_pss=0
 
         def kernel_ver():
@@ -85,79 +85,83 @@ class ProcessModule(func_module.FuncModule):
         kv=kernel_ver()
 
         def getMemStats(pid):
-            """ return Rss,Pss,Shared (note Private = Rss-Shared) """
+            """ return Private,Shared """
+            global have_pss
+            Private_lines=[]
             Shared_lines=[]
             Pss_lines=[]
             pagesize=os.sysconf("SC_PAGE_SIZE")/1024 #KiB
             Rss=int(open("/proc/"+str(pid)+"/statm").readline().split()[1])*pagesize
             if os.path.exists("/proc/"+str(pid)+"/smaps"): #stat
-                global have_smaps
-                have_smaps=1
                 for line in open("/proc/"+str(pid)+"/smaps").readlines(): #open
-                    #Note in smaps Shared+Private = Rss above
-                    #The Rss in smaps includes video card mem etc.
                     if line.startswith("Shared"):
                         Shared_lines.append(line)
+                    elif line.startswith("Private"):
+                        Private_lines.append(line)
                     elif line.startswith("Pss"):
-                        global have_pss
                         have_pss=1
                         Pss_lines.append(line)
                 Shared=sum([int(line.split()[1]) for line in Shared_lines])
-                Pss=sum([int(line.split()[1]) for line in Pss_lines])
+                Private=sum([int(line.split()[1]) for line in Private_lines])
+                #Note Shared + Private = Rss above
+                #The Rss in smaps includes video card mem etc.
+                if have_pss:
+                    pss_adjust=0.5 #add 0.5KiB as this average error due to trunctation
+                    Pss=sum([float(line.split()[1])+pss_adjust for line in Pss_lines])
+                    Shared = Pss - Private
             elif (2,6,1) <= kv <= (2,6,9):
-                Pss=0
                 Shared=0 #lots of overestimation, but what can we do?
+                Private = Rss
             else:
-                Pss=0
                 Shared=int(open("/proc/"+str(pid)+"/statm").readline().split()[2])*pagesize
-            return (Rss, Pss, Shared)
+                Private = Rss - Shared
+            return (Private, Shared)
+
+        def getCmdName(pid):
+            cmd = file("/proc/%d/status" % pid).readline()[6:-1]
+            exe = os.path.basename(os.path.realpath("/proc/%d/exe" % pid))
+            if exe.startswith(cmd):
+                cmd=exe #show non truncated version
+                #Note because we show the non truncated name
+                #one can have separated programs as follows:
+                #584.0 KiB +   1.0 MiB =   1.6 MiB    mozilla-thunder (exe -> bash)
+                # 56.0 MiB +  22.2 MiB =  78.2 MiB    mozilla-thunderbird-bin
+            return cmd
 
         cmds={}
         shareds={}
         count={}
         for pid in os.listdir("/proc/"):
             try:
-                pid = int(pid) #note Thread IDs not listed in /proc/
-                if pid ==our_pid: continue
+                pid = int(pid) #note Thread IDs not listed in /proc/ which is good
+                if pid == our_pid: continue
             except:
                 continue
-            cmd = file("/proc/%d/status" % pid).readline()[6:-1]
             try:
-                exe = os.path.basename(os.path.realpath("/proc/%d/exe" % pid))
-                if exe.startswith(cmd):
-                    cmd=exe #show non truncated version
-                    #Note because we show the non truncated name
-                    #one can have separated programs as follows:
-                    #584.0 KiB + 1.0 MiB = 1.6 MiB mozilla-thunder (exe -> bash)
-                    #56.0 MiB + 22.2 MiB = 78.2 MiB mozilla-thunderbird-bin
+                cmd = getCmdName(pid)
             except:
                 #permission denied or
                 #kernel threads don't have exe links or
                 #process gone
                 continue
             try:
-                rss, pss, shared = getMemStats(pid)
-                private = rss-shared
-                #Note shared is always a subset of rss (trs is not always)
+                private, shared = getMemStats(pid)
             except:
                 continue #process gone
             if shareds.get(cmd):
-                if pss: #add shared portion of PSS together
-                    shareds[cmd]+=pss-private
+                if have_pss: #add shared portion of PSS together
+                    shareds[cmd]+=shared
                 elif shareds[cmd] < shared: #just take largest shared val
                     shareds[cmd]=shared
             else:
-                if pss:
-                    shareds[cmd]=pss-private
-                else:
-                    shareds[cmd]=shared
+                shareds[cmd]=shared
             cmds[cmd]=cmds.setdefault(cmd,0)+private
             if count.has_key(cmd):
                count[cmd] += 1
             else:
                count[cmd] = 1
 
-        #Add max shared mem for each program
+        #Add shared mem for each program
         total=0
         for cmd in cmds.keys():
             cmds[cmd]=cmds[cmd]+shareds[cmd]
