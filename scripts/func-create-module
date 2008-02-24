@@ -10,6 +10,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+"""
+Creates a boilerplate minion module.
+"""
+
 
 TEMPLATE = """\
 #
@@ -25,6 +29,7 @@ TEMPLATE = """\
 
 import func_module
 
+
 class %s(func_module.FuncModule):
 
     # Update these if need be.
@@ -34,6 +39,7 @@ class %s(func_module.FuncModule):
 
 %s
 """
+
 
 METHOD_TEMPLATE = '''\
     def %s(self):
@@ -58,22 +64,38 @@ def populate_template(author_name, author_email, module_name, desc, methods):
                        author_email, module_name, desc, actual_methods[:-2])
 
 
+
+def get_email():
+    """
+    Get and return a valid email address.
+    """
+    import re
+
+    regx = "^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$"
+    while True:
+        author_email = raw_input("Email: ")
+        if re.match(regx, author_email) != None:
+            break
+        print "Please enter a valid email!"
+    return author_email
+
+
 if __name__ == '__main__':
-    module_name = raw_input("Module Name: ").capitalize()
-    desc = raw_input("Description: ")
-    author_name = raw_input("Author: ")
-    author_email = raw_input("Email: ")
-    methods = []
+    MODULE_NAME = raw_input("Module Name: ").capitalize()
+    DESC = raw_input("Description: ")
+    AUTHOR_NAME = raw_input("Author: ")
+    AUTHOR_EMAIL = get_email()
+    METHODS = []
     print "\nLeave blank to finish."
     while True:
-        method = raw_input("Method: ")
-        if method == '':
+        METHOD = raw_input("Method: ")
+        if METHOD == '':
             break
-        methods.append(method)
+        METHODS.append(METHOD)
     # Write it out to a file
-    file_name = "%s.py" % module_name.lower()
-    file_obj = open(file_name, "w")
-    file_obj.write(populate_template(author_name, author_email, 
-                                     module_name, desc, methods))
-    file_obj.close()
-    print "Your module is ready to be hacked on. Wrote out to %s." % file_name
+    FILE_NAME = "%s.py" % MODULE_NAME.lower()
+    FILE_OBJ = open(FILE_NAME, "w")
+    FILE_OBJ.write(populate_template(AUTHOR_NAME, AUTHOR_EMAIL, 
+                                  MODULE_NAME, DESC, METHODS))
+    FILE_OBJ.close()
+    print "Your module is ready to be hacked on. Wrote out to %s." % FILE_NAME
