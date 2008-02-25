@@ -1,5 +1,6 @@
 """
-copyfile command line
+list minions provides a command line way to see what certs are
+registered.
 
 Copyright 2007, Red Hat, Inc
 see AUTHORS
@@ -42,10 +43,13 @@ class ListMinions(client.command.Command):
                                    verbose=self.options.verbose,
                                    config=self.config)
 
-        servers = client_obj.servers
-        print servers
+        results = client_obj.test.add(1,2)
+        servers = results.keys()
+        servers.sort()
+
+        # print servers
         for server in servers:
             # just cause I hate regex'es -akl
-            host = server.split(':')[-2]
-            host = host.split('/')[-1]
-            print host
+            # host = server.split(':')[-2]
+            # host = host.split('/')[-1]
+            print server

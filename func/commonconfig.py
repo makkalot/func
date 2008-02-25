@@ -1,4 +1,4 @@
-from config import BaseConfig, BoolOption, IntOption, Option
+from config import BaseConfig, BoolOption, Option
 
 class CMConfig(BaseConfig):
     listen_addr = Option('')

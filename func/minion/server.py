@@ -17,7 +17,6 @@ import SimpleXMLRPCServer
 import string
 import sys
 import traceback
-import socket
 import fnmatch
 
 from gettext import textdomain

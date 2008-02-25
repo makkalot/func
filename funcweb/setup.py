@@ -68,6 +68,14 @@ setup(
         'console_scripts': [
             'start-funcweb = funcweb.commands:start',
         ],
+
+        'turbogears.identity.provider' : [
+            'pam = funcweb.identity.pamprovider:PAMIdentityProvider'
+        ],
+
+        'turbogears.visit.manager' : [
+            'funcvisit = funcweb.identity.visit:FuncWebVisitManager'
+        ],
     },
     # Uncomment next line and create a default.cfg file in your project dir
     # if you want to package a default configuration in your egg.

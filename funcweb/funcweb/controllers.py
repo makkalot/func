@@ -7,8 +7,7 @@ from func.overlord.client import Client
 class Root(controllers.RootController):
 
     @expose(template="funcweb.templates.minions")
-    @identity.require(identity.Any(
-        identity.from_host("127.0.0.1"), identity.not_anonymous()))
+    @identity.require(identity.not_anonymous())
     def minions(self, glob='*'):
         """ Return a list of our minions that match a given glob """
         fc = Client(glob)
@@ -17,8 +16,7 @@ class Root(controllers.RootController):
     index = minions # start with our minion view, for now
 
     @expose(template="funcweb.templates.minion")
-    @identity.require(identity.Any(
-        identity.from_host("127.0.0.1"), identity.not_anonymous()))
+    @identity.require(identity.not_anonymous())
     def minion(self, name, module=None, method=None):
         """ Display module or method details for a specific minion.
 
@@ -42,8 +40,7 @@ class Root(controllers.RootController):
 
 
     @expose(template="funcweb.templates.run")
-    @identity.require(identity.Any(
-        identity.from_host("127.0.0.1"), identity.not_anonymous()))
+    @identity.require(identity.not_anonymous())
     def run(self, minion="*", module=None, method=None, arguments=''):
         fc = Client(minion)
         results = getattr(getattr(fc, module), method)(*arguments.split())

@@ -105,6 +105,7 @@ class Minions(object):
 
     def _get_new_hosts(self):
         self.new_hosts = self.group_class.get_hosts_by_groupgoo(self.spec)
+        return self.new_hosts
 
     def _get_all_hosts(self):
         seperate_gloobs = self.spec.split(";")
@@ -116,6 +117,12 @@ class Minions(object):
                 self.all_certs.append(cert)
                 host = cert.replace(self.config.certroot,"")[1:-5]
                 self.all_hosts.append(host)
+        return self.all_hosts
+
+    def get_all_hosts(self):
+        self._get_new_hosts()
+        self._get_all_hosts()
+        return self.all_hosts
 
     def get_urls(self):
         self._get_new_hosts()

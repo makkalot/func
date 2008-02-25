@@ -14,7 +14,6 @@ import os
 import string
 import sys
 import traceback
-import xmlrpclib
 import socket
 
 REMOTE_ERROR = "REMOTE_ERROR"

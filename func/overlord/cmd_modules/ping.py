@@ -1,5 +1,5 @@
 """
-copyfile command line
+ping minions to see whether they are up.
 
 Copyright 2007, Red Hat, Inc
 Michael DeHaan <mdehaan@redhat.com>
@@ -52,8 +52,8 @@ class Ping(client.command.Command):
         # because this is mainly an interactive command, expand the server list and make seperate connections.
         # to make things look more speedy.
 
-        servers = client.expand_servers(self.server_spec, port=self.options.port, noglobs=None, 
-                                        verbose=self.options.verbose, just_fqdns=True)
+        minion_set = client.Minions(self.server_spec, port=self.options.port)
+        servers = minion_set.get_all_hosts()
 
         for server in servers:
 
