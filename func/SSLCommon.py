@@ -30,7 +30,6 @@ def our_verify(connection, x509, errNum, errDepth, preverifyOK):
 
 
 def CreateSSLContext(pkey, cert, ca_cert):
-    print pkey, cert, ca_cert
     for f in pkey, cert, ca_cert:
         if f and not os.access(f, os.R_OK):
             print "%s does not exist or is not readable." % f
