@@ -3,8 +3,8 @@ from config import BaseConfig, BoolOption, IntOption, Option
 class CMConfig(BaseConfig):
     listen_addr = Option('')
     cadir = Option('/etc/pki/func/ca')
-    certroot =  Option('/var/lib/func/certmaster/certs')
-    csrroot = Option('/var/lib/func/certmaster/csrs')
+    certroot =  Option('/var/lib/certmaster/certmaster/certs')
+    csrroot = Option('/var/lib/certmaster/certmaster/csrs')
     autosign = BoolOption(False)
 
 
