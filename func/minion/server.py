@@ -25,6 +25,7 @@ I18N_DOMAIN = "func"
 
 from func.config import read_config
 from func.commonconfig import FuncdConfig
+from certmaster.commonconfig import CMConfig
 from func import logger
 from func import certs
 import func.jobthing as jobthing
@@ -48,8 +49,12 @@ class XmlRpcInterface(object):
         Constructor.
         """
 
-        config_file = '/etc/func/minion.conf'
+        cm_config_file = '/etc/certmaster/minion.conf'
+        print CMConfig
+        self.cm_config = read_config(cm_config_file, CMConfig)
+        config_file = "/etc/func/minion.conf"
         self.config = read_config(config_file, FuncdConfig)
+
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
@@ -174,9 +179,9 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         XmlRpcInterface.__init__(self)
         hn = utils.get_hostname()
-        self.key = "%s/%s.pem" % (self.config.cert_dir, hn)
-        self.cert = "%s/%s.cert" % (self.config.cert_dir, hn)
-        self.ca = "%s/ca.cert" % self.config.cert_dir
+        self.key = "%s/%s.pem" % (self.cm_config.cert_dir, hn)
+        self.cert = "%s/%s.cert" % (self.cm_config.cert_dir, hn)
+        self.ca = "%s/ca.cert" % self.cm_config.cert_dir
         
         self._our_ca = certs.retrieve_cert_from_file(self.ca)
         
