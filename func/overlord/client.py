@@ -189,13 +189,15 @@ class Client(object):
           # certmaster key, cert, ca
           # funcd key, cert, ca
           # raise FuncClientError
-        ol_key = '%s/funcmaster.key' % self.config.cadir
-        ol_crt = '%s/funcmaster.crt' % self.config.cadir
+        ol_key = '%s/certmaster.key' % self.config.cadir
+        ol_crt = '%s/certmaster.crt' % self.config.cadir
         myname = utils.get_hostname()
+
+        # FIXME: should be config -akl?
         # maybe /etc/pki/func is a variable somewhere?
-        fd_key = '/etc/pki/func/%s.pem' % myname
-        fd_crt = '/etc/pki/func/%s.cert' % myname
-        self.ca = '%s/funcmaster.crt' % self.config.cadir
+        fd_key = '/etc/pki/certmaster/%s.pem' % myname
+        fd_crt = '/etc/pki/certmaster/%s.cert' % myname
+        self.ca = '%s/certmaster.crt' % self.config.cadir
         if client_key and client_cert and ca:        
             if (os.access(client_key, os.R_OK) and os.access(client_cert, os.R_OK)
                             and os.access(ca, os.R_OK)):
