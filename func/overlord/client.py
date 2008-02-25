@@ -17,7 +17,7 @@ import sys
 import glob
 import os
 
-from func.commonconfig import CMConfig
+from certmaster.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
 
 import sslclient
