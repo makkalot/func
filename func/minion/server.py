@@ -50,7 +50,6 @@ class XmlRpcInterface(object):
         """
 
         cm_config_file = '/etc/certmaster/minion.conf'
-        print CMConfig
         self.cm_config = read_config(cm_config_file, CMConfig)
         config_file = "/etc/func/minion.conf"
         self.config = read_config(config_file, FuncdConfig)
