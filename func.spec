@@ -13,6 +13,7 @@ License: GPLv2+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
+Requires: certmaster >= 0.1
 BuildRequires: python-devel
 %if %is_suse
 BuildRequires: gettext-devel
@@ -51,18 +52,14 @@ rm -fr $RPM_BUILD_ROOT
 %endif
 %{_bindir}/funcd
 %{_bindir}/func
-%{_bindir}/certmaster
-%{_bindir}/certmaster-ca
 %{_bindir}/func-inventory
 %{_bindir}/func-create-module
 /etc/init.d/funcd
-/etc/init.d/certmaster
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/minion-acl.d/
-%dir %{_sysconfdir}/pki/%{name}
+%dir %{_sysconfdir}/pki/%{name}/
 %dir /etc/func/modules/
 %config(noreplace) /etc/func/minion.conf
-%config(noreplace) /etc/func/certmaster.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
@@ -83,33 +80,26 @@ rm -fr $RPM_BUILD_ROOT
 
 %dir /var/log/func
 %dir /var/lib/func
-%dir /var/lib/func/certmaster
 %doc AUTHORS README LICENSE
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/func-inventory.1.gz
 %{_mandir}/man1/funcd.1.gz
-%{_mandir}/man1/certmaster.1.gz
-%{_mandir}/man1/certmaster-ca.1.gz
 
 
 %post
 # for suse 
 if [ -x /usr/lib/lsb/install_initd ]; then
   /usr/lib/lsb/install_initd /etc/init.d/funcd
-  /usr/lib/lsb/install_initd /etc/init.d/certmaster
 # for red hat distros
 elif [ -x /sbin/chkconfig ]; then
   /sbin/chkconfig --add funcd
-  /sbin/chkconfig --add certmaster
 # or, the old fashioned way
 else
    for i in 2 3 4 5; do
         ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/S99funcd
-        ln -sf /etc/init.d/certmaster /etc/rc.d/rc${i}.d/S99certmaster
    done
    for i in 1 6; do
         ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/S99funcd
-        ln -sf /etc/init.d/certmaster /etc/rc.d/rc${i}.d/S99certmaster
    done
 fi
 exit 0
@@ -117,21 +107,20 @@ exit 0
 %preun
 if [ "$1" = 0 ] ; then
   /etc/init.d/funcd stop  > /dev/null 2>&1
-  /etc/init.d/certmaster stop  > /dev/null 2>&1
   if [ -x /usr/lib/lsb/remove_initd ]; then
     /usr/lib/lsb/remove_initd /etc/init.d/funcd
-    /usr/lib/lsb/remove_initd /etc/init.d/certmaster
   elif [ -x /sbin/chkconfig ]; then
     /sbin/chkconfig --del funcd
-    /sbin/chkconfig --del certmaster
   else
     rm -f /etc/rc.d/rc?.d/???funcd
-    rm -f /etc/rc.d/rc?.d/???certmaster
   fi
 fi
 
 
 %changelog
+* Wed Feb 13 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
+- split off certmaster
+
 * Fri Feb 8 2008 Michael DeHaan <mdehaan@redhat.com> - 0.17-1
 - bugfix release
 
