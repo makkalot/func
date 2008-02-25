@@ -28,7 +28,6 @@ from func.commonconfig import FuncdConfig
 from func import logger
 from func import certs
 import func.jobthing as jobthing
-import utils
 
 # our modules
 import AuthedXMLRPCServer
@@ -36,6 +35,8 @@ import codes
 import module_loader
 import func.utils as futils
 
+from certmaster import utils
+from certmaster import requester
 
 
 class XmlRpcInterface(object):
@@ -271,7 +272,7 @@ def main(argv):
         print "serving...\n"
 
     try:
-        utils.create_minion_keys()
+        requester.request_cert()
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
