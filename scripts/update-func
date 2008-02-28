@@ -1,0 +1,125 @@
+#!/usr//bin/python
+
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Library General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# 2008 Adrian Likins <alikins@redhat.com>
+
+# script to migrate pre func/certmaster 0.17 to the split func/certmaster 
+# locations and formats from 0.17 and later versions
+
+
+import os
+import subprocess
+
+from func import commonconfig
+from func import config
+
+from certmaster import commonconfig as cm_commonconfig
+from certmaster import config as cm_config
+
+# files that have moved
+#
+#  minion certs moved from /etc/pki/func to /etc/pki/certmaster
+#  overlord certs moved /var/lib/func/certmaster to /var/lib/certmaster/certmaster
+#
+# /etc/func/minion.conf still exists, but parts of config moved to /etc/certmaster/minion.conf
+
+
+FUNC_MINION_CONF="/etc/func/minion.conf"
+CERTMASTER_MINION_CONF="/etc/certmaster/minion.conf"
+
+FUNC_MINION_CERT_DIR="/etc/pki/func/"
+CERTMASTER_MINION_CERT_DIR="/etc/pki/certmaster"
+
+CERTMASTER_CONF="/etc/certmaster/certmaster.conf"
+
+
+FUNC_CERTMASTER_CERT_DIR="/var/lib/func/certmaster/"
+CERTMASTER_CERT_DIR="/var/lib/certmaster/"
+
+
+def list_files(files):
+    for filename in files:
+        if os.access(filename, os.R_OK):
+            print filename, os.stat(filename)
+        else:
+            print "%s not found" % filename
+
+
+list_files([FUNC_MINION_CONF, CERTMASTER_MINION_CONF, FUNC_MINION_CERT_DIR,            
+            CERTMASTER_MINION_CERT_DIR, FUNC_CERTMASTER_CERT_DIR,CERTMASTER_CERT_DIR])
+
+ 
+def func_minion_has_cert_info(fmc_content):
+    for line in fmc_content:
+        match  = line.find("cert_dir")
+        if match != -1 and match == 0:
+             return True
+    return False
+
+def certmaster_minion_has_cert_info(cmc_content):
+    for line in cmc_content:
+        match  = line.find("cert_dir")
+        if match != -1 and match == 0:
+             return True
+    return False
+
+
+def migrate_minion_conf_settings():
+    # ugh, do I really want to parse these files? 
+    # guess I kind of have to...
+    fc = config.read_config(FUNC_MINION_CONF, commonconfig.FuncdConfig)
+
+
+    cmc = cm_config.read_config(CERTMASTER_CONF, cm_commonconfig.CMConfig)
+    cm_mc = cm_config.read_config(CERTMASTER_MINION_CONF, cm_commonconfig.MinionConfig)
+
+
+    cmc.cert_dir = fc.cert_dir
+    cmc.certmaster = fc.certmaster
+
+    cm_mc.cert_dir = fc.cert_dir
+    cm_mc.certmaster = fc.certmaster
+
+ #   print "cmc 2", cmc
+ #   print "cm_mc 2", cm_mc
+
+    cmc.write(open(CERTMASTER_CONF, 'w'))
+    cm_mc.write(open(CERTMASTER_MINION_CONF, 'w'))
+
+
+if os.access(FUNC_MINION_CONF, os.R_OK):
+    if os.access(CERTMASTER_MINION_CONF, os.R_OK):
+        fmc_content = open(FUNC_MINION_CONF, 'r').readlines()
+        cmc_content = open(CERTMASTER_MINION_CONF, 'r').readlines()
+
+#        if func_minion_has_cert_info(fmc_content) and not certmaster_minion_has_cert_info(cmc_content):
+        if func_minion_has_cert_info(fmc_content):
+            migrate_minion_conf_settings()
+                
+
+if os.access(FUNC_MINION_CERT_DIR, os.R_OK):
+    print "copying files from %s to %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR)
+    output = subprocess.Popen(["cp", "-var", FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
+    print output
+
+if os.access(CERTMASTER_CERT_DIR, os.R_OK):
+    print "copyying files from %s to %s" % (FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR)
+    output = subprocess.Popen(["cp", "-var", FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
+    print output
+                                                                                                                                  
+
+
+
+
