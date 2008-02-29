@@ -57,8 +57,8 @@ def list_files(files):
             print "%s not found" % filename
 
 
-list_files([FUNC_MINION_CONF, CERTMASTER_MINION_CONF, FUNC_MINION_CERT_DIR,            
-            CERTMASTER_MINION_CERT_DIR, FUNC_CERTMASTER_CERT_DIR,CERTMASTER_CERT_DIR])
+#list_files([FUNC_MINION_CONF, CERTMASTER_MINION_CONF, FUNC_MINION_CERT_DIR,            
+#            CERTMASTER_MINION_CERT_DIR, FUNC_CERTMASTER_CERT_DIR,CERTMASTER_CERT_DIR])
 
  
 def func_minion_has_cert_info(fmc_content):
@@ -82,6 +82,18 @@ def migrate_minion_conf_settings():
     fc = config.read_config(FUNC_MINION_CONF, commonconfig.FuncdConfig)
 
 
+    # see if we have edited this file before
+    fc_f = open(FUNC_MINION_CONF, "r")
+    fc_c = fc_f.readlines()
+    obs = False
+    for line in fc_c:
+        match = line.find("obsolete =")
+        if match != -1 and match == 0:
+            obs = True
+
+    if obs  == True:
+        return
+
     cmc = cm_config.read_config(CERTMASTER_CONF, cm_commonconfig.CMConfig)
     cm_mc = cm_config.read_config(CERTMASTER_MINION_CONF, cm_commonconfig.MinionConfig)
 
@@ -92,9 +104,18 @@ def migrate_minion_conf_settings():
     cm_mc.cert_dir = fc.cert_dir
     cm_mc.certmaster = fc.certmaster
 
- #   print "cmc 2", cmc
- #   print "cm_mc 2", cm_mc
+    # there doesnt' seem to be an obvious way to
+    # add something to a config obj/file without
+    # changing the corresponding config class, 
+    # so this is a kluge
+    fc_f = open(FUNC_MINION_CONF, "a+")
+    fc_f.write("obsolete = 1\n")
+    fc_f.close()
 
+
+#    print "fc", fc
+#    print "dir(fc)", dir(fc)
+ 
     cmc.write(open(CERTMASTER_CONF, 'w'))
     cm_mc.write(open(CERTMASTER_MINION_CONF, 'w'))
 
@@ -110,14 +131,14 @@ if os.access(FUNC_MINION_CONF, os.R_OK):
                 
 
 if os.access(FUNC_MINION_CERT_DIR, os.R_OK):
-    print "copying files from %s to %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR)
+#    print "copying files from %s to %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR)
     output = subprocess.Popen(["cp", "-var", FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
-    print output
+#    print output
 
 if os.access(CERTMASTER_CERT_DIR, os.R_OK):
-    print "copyying files from %s to %s" % (FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR)
+#    print "copyying files from %s to %s" % (FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR)
     output = subprocess.Popen(["cp", "-var", FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
-    print output
+#    print output
                                                                                                                                   
 
 
