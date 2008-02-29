@@ -18,7 +18,7 @@ if __name__ == "__main__":
         etcmodpath = "/etc/%s/modules" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
-	certdir    = "/var/lib/%s/certmaster" % NAME
+	varpath    = "/var/lib/%s/" % NAME
         pkipath    = "/etc/pki/%s" % NAME
         rotpath    = "/etc/logrotate.d"
         aclpath    = "%s/minion-acl.d" % etcpath
@@ -31,7 +31,6 @@ if __name__ == "__main__":
                 license = "GPL",
 		scripts = [
                      "scripts/funcd", "scripts/func", 
-                     "scripts/certmaster", "scripts/certmaster-ca",
                      "scripts/func-inventory",
                      "scripts/func-create-module",
                 ],
@@ -51,20 +50,15 @@ if __name__ == "__main__":
                             "%s/minion/modules.netapp.vol" % NAME
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
-                              (initpath, ["init-scripts/certmaster"]),
                               (etcpath,  ["etc/minion.conf"]),
-                              (etcpath,  ["etc/certmaster.conf"]),
-                              (etcmodpath, []),
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
-                              (manpath,  ["docs/certmaster.1.gz"]),
-                              (manpath,  ["docs/certmaster-ca.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
-			      (certdir,  []),
-			      (etcpath,  []),
+			      (etcmodpath,  []),
 			      (pkipath,  []),
+			      (varpath,  []),
 			      (aclpath,  [])
                 ],
                 description = SHORT_DESC,
