@@ -25,17 +25,20 @@ I18N_DOMAIN = "func"
 
 from func.config import read_config
 from func.commonconfig import FuncdConfig
+from certmaster.commonconfig import CMConfig
 from func import logger
 from func import certs
 import func.jobthing as jobthing
-import utils
 
 # our modules
 import AuthedXMLRPCServer
 import codes
 import module_loader
 import func.utils as futils
+import func.minion.utils as fmutils
 
+from certmaster import utils
+from certmaster import requester
 
 
 class XmlRpcInterface(object):
@@ -46,8 +49,11 @@ class XmlRpcInterface(object):
         Constructor.
         """
 
-        config_file = '/etc/func/minion.conf'
+        cm_config_file = '/etc/certmaster/minion.conf'
+        self.cm_config = read_config(cm_config_file, CMConfig)
+        config_file = "/etc/func/minion.conf"
         self.config = read_config(config_file, FuncdConfig)
+
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
@@ -172,9 +178,9 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         XmlRpcInterface.__init__(self)
         hn = utils.get_hostname()
-        self.key = "%s/%s.pem" % (self.config.cert_dir, hn)
-        self.cert = "%s/%s.cert" % (self.config.cert_dir, hn)
-        self.ca = "%s/ca.cert" % self.config.cert_dir
+        self.key = "%s/%s.pem" % (self.cm_config.cert_dir, hn)
+        self.cert = "%s/%s.cert" % (self.cm_config.cert_dir, hn)
+        self.ca = "%s/ca.cert" % self.cm_config.cert_dir
         
         self._our_ca = certs.retrieve_cert_from_file(self.ca)
         
@@ -234,7 +240,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         return peer_cert.get_subject().CN
     
     def _check_acl(self, cert, ip, method, params):
-        acls = utils.get_acls_from_config(acldir=self.config.acl_dir)
+        acls = fmutils.get_acls_from_config(acldir=self.config.acl_dir)
         
         # certmaster always gets to run things
         ca_cn = self._our_ca.get_subject().CN
@@ -271,7 +277,7 @@ def main(argv):
         print "serving...\n"
 
     try:
-        utils.create_minion_keys()
+        requester.request_cert()
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
