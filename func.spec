@@ -102,6 +102,10 @@ else
         ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/S99funcd
    done
 fi
+
+# upgrade old installs if needed
+/usr/bin/update-func
+
 exit 0
 
 %preun
