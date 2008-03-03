@@ -31,9 +31,11 @@ if __name__ == "__main__":
                 url = "https://hosted.fedoraproject.org/projects/func/",
                 license = "GPL",
 		scripts = [
-                     "scripts/funcd", "scripts/func", 
+                     "scripts/funcd",
+		     "scripts/func", 
                      "scripts/func-inventory",
                      "scripts/func-create-module",
+		     "scripts/update-func",
                 ],
 		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME
