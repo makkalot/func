@@ -54,6 +54,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func
 %{_bindir}/func-inventory
 %{_bindir}/func-create-module
+%{_bindir}/update-func
 /etc/init.d/funcd
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/minion-acl.d/
@@ -121,7 +122,11 @@ if [ "$1" = 0 ] ; then
 fi
 
 
+
 %changelog
+* Mon Mar 03 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
+- run update-func from the %post
+
 * Wed Feb 13 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
 - split off certmaster
 
