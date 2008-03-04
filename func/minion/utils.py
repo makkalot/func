@@ -22,7 +22,7 @@ import glob
 import codes
 from func import certs
 from func.config import read_config
-from func.commonconfig import FuncdConfig
+from certmaster.commonconfig import MinionConfig
 from func import logger
 
 # "localhost" is a lame hostname to use for a key, so try to get
@@ -44,10 +44,10 @@ def get_hostname():
         return hostname
 
 
-    config_file = '/etc/func/minion.conf'
-    config = read_config(config_file, FuncdConfig)
+    config_file = '/etc/certmaster/minion.conf'
+    minion_config = read_config(config_file, MinionConfig)
 
-    server = config.certmaster
+    server = minion_config.certmaster
     port = 51235
 
     try:
