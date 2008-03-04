@@ -122,12 +122,12 @@ class CheckAction(client.command.Command):
               print "* iptables may be running, ensure 51234 is unblocked"
 
     def check_talk_to_certmaster(self):
-        config_file = '/etc/func/minion.conf'
+        config_file = '/etc/certmaster/minion.conf'
         config = read_config(config_file, FuncdConfig)
         cert_dir = config.cert_dir
         # FIXME: don't hardcode port
         master_uri = "http://%s:51235/" % config.certmaster
-        print "* this minion is configured in /etc/func/minion.conf to talk to host '%s' for certs, verify that is correct" % config.certmaster
+        print "* this minion is configured in /etc/certmaster/minion.conf to talk to host '%s' for certs, verify that is correct" % config.certmaster
         # this will be a 501, unsupported GET, but we should be
         # able to tell if we can make contact
         connect_ok = True

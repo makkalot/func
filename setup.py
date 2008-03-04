@@ -18,9 +18,8 @@ if __name__ == "__main__":
         etcmodpath = "/etc/%s/modules" % NAME
         initpath   = "/etc/init.d/"
         logpath    = "/var/log/%s/" % NAME
-	certdir    = "/var/lib/certmaster/"
-	pkidir     = "/etc/pki/%s" % NAME
-	libdir     = "/var/lib/%s" % NAME
+	varpath    = "/var/lib/%s/" % NAME
+        pkipath    = "/etc/pki/%s" % NAME
         rotpath    = "/etc/logrotate.d"
         aclpath    = "%s/minion-acl.d" % etcpath
         setup(
@@ -54,16 +53,14 @@ if __name__ == "__main__":
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (etcpath,  ["etc/minion.conf"]),
-                              (etcmodpath, []),
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
-			      (libdir,   []),
-			      (certdir,  []),
-			      (pkidir,   []),
-			      (etcpath,  []),
+			      (etcmodpath,  []),
+			      (pkipath,  []),
+			      (varpath,  []),
 			      (aclpath,  [])
                 ],
                 description = SHORT_DESC,
