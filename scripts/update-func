@@ -21,6 +21,7 @@
 
 import os
 import subprocess
+import ConfigParser
 
 from func import commonconfig
 from func import config
@@ -76,6 +77,19 @@ def certmaster_minion_has_cert_info(cmc_content):
     return False
 
 
+
+# dumb
+def read_config(config_file, key):
+    cfg = ConfigParser.SafeConfigParser()
+    cfg.read(config_file)
+    
+    try:
+        return cfg.get("main", key)
+    except ConfigParser.NoOptionError:
+        return None
+    
+
+
 def migrate_minion_conf_settings():
     # ugh, do I really want to parse these files? 
     # guess I kind of have to...
@@ -86,36 +100,50 @@ def migrate_minion_conf_settings():
     fc_f = open(FUNC_MINION_CONF, "r")
     fc_c = fc_f.readlines()
     obs = False
-    for line in fc_c:
-        match = line.find("obsolete =")
-        if match != -1 and match == 0:
-            obs = True
+
+
+    # we can't rely on the new config class to read the old config
+    # files, so we do it the old fashioned way
+    if read_config(FUNC_MINION_CONF, "obsolete"):
+        obs = True
 
     if obs  == True:
         return
 
+    
     cmc = cm_config.read_config(CERTMASTER_CONF, cm_commonconfig.CMConfig)
     cm_mc = cm_config.read_config(CERTMASTER_MINION_CONF, cm_commonconfig.MinionConfig)
 
 
-    cmc.cert_dir = fc.cert_dir
-    cmc.certmaster = fc.certmaster
+    cert_dir = read_config(FUNC_MINION_CONF, "cert_dir")
 
-    cm_mc.cert_dir = fc.cert_dir
-    cm_mc.certmaster = fc.certmaster
+    if cert_dir:
+        cmc.cert_dir = cert_dir
+        cm_mc.cert_dir = cert_dir
+
+    cert_master = read_config(FUNC_MINION_CONF, "certmaster")
+
+    if cert_master:
+        cmc.certmaster = cert_master
+        cm_mc.certmaster = cert_master
+
+
+    
+    # also, the config class we current use config.py:BaseConfig kind of sucks
+    # for migration stuff. Basically, we can't read values that aren't defined,
+    # we can't right stuff that isnt define, etc. 
+
 
     # there doesnt' seem to be an obvious way to
     # add something to a config obj/file without
     # changing the corresponding config class, 
     # so this is a kluge
+
     fc_f = open(FUNC_MINION_CONF, "a+")
     fc_f.write("obsolete = 1\n")
     fc_f.close()
 
 
-#    print "fc", fc
-#    print "dir(fc)", dir(fc)
- 
     cmc.write(open(CERTMASTER_CONF, 'w'))
     cm_mc.write(open(CERTMASTER_MINION_CONF, 'w'))
 
