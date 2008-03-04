@@ -93,17 +93,13 @@ def read_config(config_file, key):
 def migrate_minion_conf_settings():
     # ugh, do I really want to parse these files? 
     # guess I kind of have to...
-    fc = config.read_config(FUNC_MINION_CONF, commonconfig.FuncdConfig)
-
 
     # see if we have edited this file before
     fc_f = open(FUNC_MINION_CONF, "r")
-    fc_c = fc_f.readlines()
-    obs = False
-
 
     # we can't rely on the new config class to read the old config
     # files, so we do it the old fashioned way
+    obs = False
     if read_config(FUNC_MINION_CONF, "obsolete"):
         obs = True
 
@@ -117,9 +113,10 @@ def migrate_minion_conf_settings():
 
     cert_dir = read_config(FUNC_MINION_CONF, "cert_dir")
 
-    if cert_dir:
-        cmc.cert_dir = cert_dir
-        cm_mc.cert_dir = cert_dir
+#    # don't migrate the default, just use the new default
+#    if cert_dir and cert_dir != "/etc/pki/func":
+#        cmc.cert_dir = cert_dir
+#        cm_mc.cert_dir = cert_dir
 
     cert_master = read_config(FUNC_MINION_CONF, "certmaster")
 
@@ -127,8 +124,6 @@ def migrate_minion_conf_settings():
         cmc.certmaster = cert_master
         cm_mc.certmaster = cert_master
 
-
-    
     # also, the config class we current use config.py:BaseConfig kind of sucks
     # for migration stuff. Basically, we can't read values that aren't defined,
     # we can't right stuff that isnt define, etc. 
@@ -158,10 +153,14 @@ if os.access(FUNC_MINION_CONF, os.R_OK):
             migrate_minion_conf_settings()
                 
 
-if os.access(FUNC_MINION_CERT_DIR, os.R_OK):
-#    print "copying files from %s to %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR)
-    output = subprocess.Popen(["cp", "-var", FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
-#    print output
+# if we've configure a non default cert dir, migrate it to the new default location
+# note that we do no migrate the old config settings. basically, everyone gets moved to
+# the new default cert dir. 
+cert_dir = read_config(FUNC_MINION_CONF, "cert_dir")
+if os.access(cert_dir, os.R_OK):
+#    print "copying files from %s to %s" % (cert_dir, CERTMASTER_MINION_CERT_DIR)
+    output = subprocess.Popen(["cp", "-var", cert_dir, CERTMASTER_MINION_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
+#    print "foo", output
 
 if os.access(CERTMASTER_CERT_DIR, os.R_OK):
 #    print "copyying files from %s to %s" % (FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR)
