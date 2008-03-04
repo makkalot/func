@@ -182,6 +182,9 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         self.cert = "%s/%s.cert" % (self.cm_config.cert_dir, hn)
         self.ca = "%s/ca.cert" % self.cm_config.cert_dir
         
+        print "self.key", self.key
+        print "self.cert", self.cert
+        print "self.ca", self.ca
         self._our_ca = certs.retrieve_cert_from_file(self.ca)
         
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
