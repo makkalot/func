@@ -43,6 +43,9 @@ CERTMASTER_MINION_CONF="/etc/certmaster/minion.conf"
 FUNC_MINION_CERT_DIR="/etc/pki/func/"
 CERTMASTER_MINION_CERT_DIR="/etc/pki/certmaster/"
 
+
+# the file gets moved on package update, so check the rpm update
+FUNC_CERTMASTER_CONF="/etc/func/certmaster.conf"
 CERTMASTER_CONF="/etc/certmaster/certmaster.conf"
 
 
@@ -51,16 +54,19 @@ CERTMASTER_CERT_DIR="/var/lib/certmaster/"
 
 
 
-def func_minion_has_cert_info(fmc_content):
+def func_minion_has_cert_info():
+    fmc_content = open(FUNC_MINION_CONF, 'r').readlines()
+#    cmc_content = open(CERTMASTER_MINION_CONF, 'r').readlines()
     for line in fmc_content:
         match  = line.find("cert_dir")
         if match != -1 and match == 0:
              return True
     return False
 
-def certmaster_minion_has_cert_info(cmc_content):
+def func_certmaster_has_info(option):
+    cmc_content = open(FUNC_CERTMASTER_CONF, 'r').readlines()
     for line in cmc_content:
-        match  = line.find("cert_dir")
+        match  = line.find(option)
         if match != -1 and match == 0:
              return True
     return False
@@ -85,27 +91,38 @@ def migrate_minion_conf_settings():
 
 #    print "migrating settings"
     # see if we have edited this file before
-    fc_f = open(FUNC_MINION_CONF, "r")
 
-    # we can't rely on the new config class to read the old config
-    # files, so we do it the old fashioned way
-    migrated = False
-    if read_config(FUNC_MINION_CONF, "migrated"):
-        migrated = True
-
-    if migrated  == True:
-        return
-
-    
     cmc = cm_config.read_config(CERTMASTER_CONF, cm_commonconfig.CMConfig)
     cm_mc = cm_config.read_config(CERTMASTER_MINION_CONF, cm_commonconfig.MinionConfig)
 
+    if func_minion_has_cert_info():
+        fc_f = open(FUNC_MINION_CONF, "r")
 
-    cert_master = read_config(FUNC_MINION_CONF, "certmaster")
+        # we can't rely on the new config class to read the old config
+        # files, so we do it the old fashioned way
+        migrated = False
+        if read_config(FUNC_MINION_CONF, "migrated"):
+            migrated = True
+            
+        if migrated == False:
+            cert_master = read_config(FUNC_MINION_CONF, "certmaster")
 
-    if cert_master:
-        cmc.certmaster = cert_master
-        cm_mc.certmaster = cert_master
+            if cert_master:
+                cmc.certmaster = cert_master
+                cm_mc.certmaster = cert_master
+
+
+    if func_certmaster_has_info("listen_addr"):
+        #migrate settings from funcs certmater config to the new certmaster.conf
+        list_addr = read_config(FUNC_CERTMASTER_CONF, "listen_addr")
+        if list_addr:
+            cmc.listen_addr = list_addr
+
+    if func_certmaster_has_info("autosign"):
+        autosign = read_config(FUNC_CERTMASTER_CONF, "autosign")
+        if autosign:
+            cmc.autosign = autosign
+
 
     # also, the config class we current use config.py:BaseConfig kind of sucks
     # for migration stuff. Basically, we can't read values that aren't defined,
@@ -132,8 +149,8 @@ if os.access(FUNC_MINION_CONF, os.R_OK):
         cmc_content = open(CERTMASTER_MINION_CONF, 'r').readlines()
 
 #        if func_minion_has_cert_info(fmc_content) and not certmaster_minion_has_cert_info(cmc_content):
-        if func_minion_has_cert_info(fmc_content):
-            migrate_minion_conf_settings()
+#        if func_minion_has_cert_info(fmc_content):
+        migrate_minion_conf_settings()
                 
 
 # if we've configure a non default cert dir, migrate it to the new default location
