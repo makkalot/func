@@ -53,10 +53,8 @@ FUNC_CERTMASTER_CERT_DIR="/var/lib/func/certmaster/"
 CERTMASTER_CERT_DIR="/var/lib/certmaster/"
 
 
-
 def func_minion_has_cert_info():
     fmc_content = open(FUNC_MINION_CONF, 'r').readlines()
-#    cmc_content = open(CERTMASTER_MINION_CONF, 'r').readlines()
     for line in fmc_content:
         match  = line.find("cert_dir")
         if match != -1 and match == 0:
@@ -71,27 +69,17 @@ def func_certmaster_has_info(option):
              return True
     return False
 
-
-
-# dumb
 def read_config(config_file, key):
     cfg = ConfigParser.SafeConfigParser()
     cfg.read(config_file)
-    
     try:
         return cfg.get("main", key)
     except ConfigParser.NoOptionError:
         return None
-    
-
 
 def migrate_minion_conf_settings():
-    # ugh, do I really want to parse these files? 
-    # guess I kind of have to...
 
-#    print "migrating settings"
     # see if we have edited this file before
-
     cmc = cm_config.read_config(CERTMASTER_CONF, cm_commonconfig.CMConfig)
     cm_mc = cm_config.read_config(CERTMASTER_MINION_CONF, cm_commonconfig.MinionConfig)
 
@@ -147,35 +135,40 @@ if os.access(FUNC_MINION_CONF, os.R_OK):
     if os.access(CERTMASTER_MINION_CONF, os.R_OK):
         fmc_content = open(FUNC_MINION_CONF, 'r').readlines()
         cmc_content = open(CERTMASTER_MINION_CONF, 'r').readlines()
-
-#        if func_minion_has_cert_info(fmc_content) and not certmaster_minion_has_cert_info(cmc_content):
-#        if func_minion_has_cert_info(fmc_content):
         migrate_minion_conf_settings()
                 
 
 # if we've configure a non default cert dir, migrate it to the new default location
 # note that we do no migrate the old config settings. basically, everyone gets moved to
 # the new default cert dir. 
+
 cert_dir = read_config(FUNC_MINION_CONF, "cert_dir")
+
 if cert_dir:
     FUNC_MINION_CERT_DIR = cert_dir
 
 if os.access(FUNC_MINION_CERT_DIR, os.R_OK):
-#    print "copying files from %s/* to %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR)
-#    output = subprocess.Popen(["cp", "-var", "%s/*" % FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
-    output = subprocess.Popen("cp -var %s/* %s" % (FUNC_MINION_CERT_DIR, CERTMASTER_MINION_CERT_DIR), shell=True,  stdout=subprocess.PIPE).communicate()[0]
-#    print "foo", output
 
-if os.access(CERTMASTER_CERT_DIR, os.R_OK):
-#    print "copyying files from %s to %s" % (FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR)
-    output = subprocess.Popen(["cp", "-var", FUNC_CERTMASTER_CERT_DIR, CERTMASTER_CERT_DIR], stdout=subprocess.PIPE).communicate()[0]
-#    print output
+    output = subprocess.Popen("cp -var %s/* %s" % (
+        FUNC_MINION_CERT_DIR, 
+        CERTMASTER_MINION_CERT_DIR
+    ), shell=True,  stdout=subprocess.PIPE).communicate()[0]
+
+if os.access(FUNC_CERTMASTER_CERT_DIR, os.R_OK):
+
+    output = subprocess.Popen([
+        "cp", 
+        "-var", 
+        FUNC_CERTMASTER_CERT_DIR, 
+        CERTMASTER_CERT_DIR
+    ], stdout=subprocess.PIPE).communicate()[0]
                
 if os.access("/etc/pki/certmaster/ca/funcmaster.crt", os.R_OK):
-    os.rename("/etc/pki/certmaster/ca/funcmaster.crt", "/etc/pki/certmaster/ca/certmaster.crt")
-    os.rename("/etc/pki/certmaster/ca/funcmaster.key", "/etc/pki/certmaster/ca/certmaster.key")                                                                                                                   
 
-
+    os.rename("/etc/pki/certmaster/ca/funcmaster.crt", 
+              "/etc/pki/certmaster/ca/certmaster.crt")
+    os.rename("/etc/pki/certmaster/ca/funcmaster.key", 
+              "/etc/pki/certmaster/ca/certmaster.key")                                                                                                                   
 
 
 
