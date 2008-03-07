@@ -62,6 +62,8 @@ def func_minion_has_cert_info():
     return False
 
 def func_certmaster_has_info(option):
+    if not os.path.exists(FUNC_CERTMASTER_CONF):
+        return False
     cmc_content = open(FUNC_CERTMASTER_CONF, 'r').readlines()
     for line in cmc_content:
         match  = line.find(option)
