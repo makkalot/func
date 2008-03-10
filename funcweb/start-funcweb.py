@@ -7,10 +7,16 @@ directory. When the project is installed, easy_install will create a
 proper start script.
 """
 
+import os
 import sys
 from funcweb.commands import start, ConfigurationError
 
 if __name__ == "__main__":
+    if not os.path.exists("funcweb.egg-info"):
+        argv = sys.argv
+        sys.argv = ["setup", "egg_info"]
+        import setup
+        sys.argv = argv
     try:
         start()
     except ConfigurationError, exc:
