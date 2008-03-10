@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from turbogears import controllers, expose, flash, identity, redirect
-from func.overlord.client import Client
+from func.overlord.client import Client, Minions
 
 class Root(controllers.RootController):
 
@@ -10,8 +10,7 @@ class Root(controllers.RootController):
     @identity.require(identity.not_anonymous())
     def minions(self, glob='*'):
         """ Return a list of our minions that match a given glob """
-        fc = Client(glob)
-        return dict(minions=fc.system.list_methods())
+        return dict(minions=Minions(glob).get_all_hosts())
 
     index = minions # start with our minion view, for now
 
