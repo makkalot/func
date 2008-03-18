@@ -69,6 +69,22 @@ msg()
 }
 
 
+check_out_repo()
+{
+    echo "BASE_DIR: $BASE_DIR"
+    REPO=$1
+    if [ "$CLONE_LOCAL_REPO" == "Y" ] ; then
+	msg "Building from a checkout of the local git repo"
+	git clone $BASE_DIR/$REPO
+    else
+	msg "Building from a checkout from $GIT_REPO"
+	git clone "git://git.fedorahosted.org/$REPO.git"
+    fi
+
+
+}
+
+
 check_out_code()
 {
     echo "Build path is $BUILD_PATH"
@@ -76,15 +92,8 @@ check_out_code()
     mkdir -p $BUILD_PATH
     pushd $BUILD_PATH
 
-    GIT_REPO="git://git.fedorahosted.org/func.git"
-    if [ "$CLONE_LOCAL_REPO" == "Y" ] ; then
-	msg "Building from a checkout of the local git repo"
-	git clone $BASE_DIR
-    else
-	msg "Building from a checkout from $GIT_REPO"
-	git clone $GIT_REPO
-    fi
-    echo $?
+    check_out_repo func 
+    check_out_repo certmaster 
     popd
 }
 
@@ -92,11 +101,18 @@ check_out_code()
 copy_code_to_buildroot()
 {
 
-    msg "Copying current build dir  $BASE_DIR to $BUILD_PATH/func"
     rm -rf $BUILD_PATH
-    mkdir -p $BUILD_PATH/func/
-    cp -ar $BASE_DIR/* $BUILD_PATH/func
 
+    msg "Copying current build dir  $BASE_DIR/func to $BUILD_PATH/func"
+    rm -rf $BUILD_PATH
+
+    ls -lart $BASE_DIR
+    mkdir -p $BUILD_PATH/func/
+    cp -ar $BASE_DIR/func/* $BUILD_PATH/func
+
+    msg "Copying current build dir  $BASE_DIR/certmaster to $BUILD_PATH/certmaster"
+    mkdir -p $BUILD_PATH/certmaster/
+    cp -ar $BASE_DIR/certmaster/* $BUILD_PATH/certmaster
 }
 
 
@@ -113,7 +129,7 @@ build_rpm()
     echo
     echo $BUILD_PATH/$PKG
     pushd $BUILD_PATH/$PKG
-    echo "BRT" $BRT "PKK" $PKG
+    echo "BRT" $BRT "PKG" $PKG "BUILD_PATH/PKG" $BUILD_PATH/$PKG
     make clean
     make rpms
     if [ $? != 0 ]; then
@@ -131,18 +147,24 @@ build_rpm()
     fi
 }
 
-uninstall_the_func_rpm()
+uninstall_the_rpms()
 {
-        msg "Removing the func rpm, if there is one"
+        msg "Removing the func and certmaster rpms, if there is one"
 	# just one package for now, easy enough
 	rpm -e func
+	rpm -e certmater
 }
 
-install_the_func_rpm()
+install_the_rpms()
 {
-        msg "Installing the func rpm"
+        msg "Installing the certmaster rpm"
+	rpm -Uvh $RPM_PATH/rpms/certmaster*
+	STATUS=$?
+	
+	msg "Installing the func rpm"
 	rpm -Uvh $RPM_PATH/rpms/func*
 	STATUS=$?
+
 	# do something with the status	
 }
 
@@ -152,6 +174,9 @@ install_the_func()
     msg "Installing func directly from $1 $BUILD_PATH"
     pushd $1/func
     make install 
+
+    pushd $1/certmaster
+    make install
 }
 
 find_the_func()
@@ -273,11 +298,11 @@ run_unittests()
 # stuff at various points and kind of just want to make this
 # "just work"...
 
-if [ -f "func.spec" ] ; then
+if [ -f "func.spec" ] || [ -f "certmaster.spec" ]; then
     # we are running from the top level dir
-    BASE_DIR=`pwd`
-elif [ -f "test-it.sh" ] ; then
     BASE_DIR="`pwd`/../"
+elif [ -f "test-it.sh" ] ; then
+    BASE_DIR="`pwd`/../../"
 else
     echo "You need to run this from the base func dir or the test/ dir"
     exit 1
@@ -301,14 +326,16 @@ if [ "$BUILD" == "Y" ] ; then
 	if [ "$INSTALL_VIA_RPMS" == "Y" ] ; then
 	    # FIXME: red hat specifc
 	    build_rpm func $BUILD_PATH
+	    build_rpm certmaster $BUILD_PATH
 
 	    #if we are building, then we should remove the installed
 	    # versiones as well, and install the new
-	    uninstall_the_func_rpm
+	    uninstall_the_rpms
+	    
 
-	    install_the_func_rpm
+	    install_the_rpms
        else
-	    uninstall_the_func_rpm
+	    uninstall_the_rpms
 	    install_the_func $BUILD_PATH
        fi
 fi
