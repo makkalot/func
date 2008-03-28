@@ -284,6 +284,31 @@ class TestYum(BaseTest):
         result = self.overlord.yumcmd.check_update()
         self.assert_on_fault(result)
 
+class TestIptables(BaseTest):
+    module = "iptables"
+
+    def test_dump(self):
+        result = self.overlord.iptables.dump()
+
+        # at the moment, we dont set anything up
+        # to verify, so this is just a basic
+        # "does it crash" test
+
+    def test_policy(self):
+        result = self.overlord.iptables.policy()
+
+
+class TestIptablesPort(BaseTest):
+    module = "iptables.port"
+
+    def test_inventory(self):
+        results = self.overlord.iptables.port.inventory()
+        # doesnt have an inventory, so er... -akl
+
+        
+        
+        
+
 class TestSystem(BaseTest):
     module = "system"
     def test_list_methods(self):

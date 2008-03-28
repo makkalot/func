@@ -1,5 +1,4 @@
 
-DIRS		= netapp iptables
 PYFILES		= $(wildcard *.py)
 
 PYCHECKER       = /usr/bin/pychecker
