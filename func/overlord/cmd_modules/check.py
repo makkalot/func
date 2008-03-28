@@ -82,14 +82,15 @@ class CheckAction(client.command.Command):
            # construct a client handle and see if any hosts are reachable 
            self.server_spec = self.parentCommand.server_spec
 
-           client_obj = client.Client(
+           overlord_obj = client.Overlord(
                self.server_spec,
                port=self.port,
                interactive=False,
                verbose=False,
                config=self.config
-           )
-           results = client_obj.test.add(1,2)
+               )
+           
+           results = overlord_obj.test.add(1,2)
            hosts = results.keys()
            if len(hosts) == 0:
                print "* no systems have signed certs"

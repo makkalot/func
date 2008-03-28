@@ -48,13 +48,13 @@ class ShowHardware(client.command.Command):
 
         self.server_spec = self.parentCommand.parentCommand.server_spec
         
-        client_obj = client.Client(self.server_spec,
-                                   port=self.port,
-                                   interactive=False,
-                                   verbose=self.options.verbose,
-                                   config=self.config)
+        overlord_obj = client.Overlord(self.server_spec,
+                                     port=self.port,
+                                     interactive=False,
+                                     verbose=self.options.verbose,
+                                     config=self.config)
         
-        results = client_obj.run("hardware", "info", [])
+        results = overlord_obj.run("hardware", "info", [])
 
         # if the user 
         top_options = ["port","verbose"]

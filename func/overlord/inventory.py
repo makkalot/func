@@ -76,7 +76,7 @@ class FuncInventory(object):
         self.git_setup(options)
 
         # see what modules each host provides (as well as what hosts we have)
-        host_methods = func_client.Client(options.server_spec).system.list_methods()
+        host_methods = func_client.Overlord(options.server_spec).system.list_methods()
        
         # call all remote info methods and handle them
         if options.verbose:
@@ -106,8 +106,8 @@ class FuncInventory(object):
                 if not "all" in filtered_function_list and not method_name in filtered_function_list:
                     continue
                
-                client = func_client.Client(host,noglobs=True) # ,noglobs=True)
-                results = getattr(getattr(client,module_name),method_name)()
+                overlord = func_client.Overlord(host,noglobs=True) # ,noglobs=True)
+                results = getattr(getattr(overlord,module_name),method_name)()
                 if self.options.verbose:
                     print "-- %s: running: %s %s" % (host, module_name, method_name)
                 self.save_results(options, host, module_name, method_name, results)

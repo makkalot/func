@@ -29,7 +29,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Get the information from the systems
-    info = fc.Client("*").service.status(service)
+    info = fc.Overlord("*").service.status(service)
     for (host, details) in info.iteritems():
         status = "OFF"
         if details == 0:

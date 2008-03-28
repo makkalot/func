@@ -37,13 +37,13 @@ class ListMinions(client.command.Command):
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec
 
-        client_obj = client.Client(self.server_spec,
-                                   port=self.port,
-                                   interactive=False,
-                                   verbose=self.options.verbose,
-                                   config=self.config)
+        overlord_obj = client.Overlord(self.server_spec,
+                                     port=self.port,
+                                     interactive=False,
+                                     verbose=self.options.verbose,
+                                     config=self.config)
 
-        results = client_obj.test.add(1,2)
+        results = overlord_obj.test.add(1,2)
         servers = results.keys()
         servers.sort()
 

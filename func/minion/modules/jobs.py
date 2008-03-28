@@ -1,5 +1,5 @@
 ## (Largely internal) module for access to asynchoronously dispatched
-## module job ID's.  The Func Client() module wraps most of this usage
+## module job ID's.  The Func Overlord() module wraps most of this usage
 ## so it's not entirely relevant to folks using the CLI or Func API
 ## directly.
 ##

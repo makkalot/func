@@ -57,10 +57,13 @@ class Ping(client.command.Command):
 
         for server in servers:
 
-            client_obj = client.Client(server,port=self.options.port,interactive=False,
-                                       verbose=self.options.verbose,config=self.config, noglobs=True)
+            overlord_obj = client.Overlord(server,port=self.options.port,
+                                           interactive=False,
+                                           verbose=self.options.verbose,
+                                           config=self.config, noglobs=True)
 
-            results = client_obj.run("test", "ping", [])
+            results = overlord_obj.run("test", "ping", [])
+	    print "results", results, type(results)
             if results == 1:
                 print "[ ok ... ] %s" % server
             else:

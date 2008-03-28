@@ -2,7 +2,7 @@ import logging
 log = logging.getLogger(__name__)
 
 from turbogears import controllers, expose, flash, identity, redirect
-from func.overlord.client import Client, Minions
+from func.overlord.client import Overlord, Minions
 
 class Root(controllers.RootController):
 
@@ -24,7 +24,7 @@ class Root(controllers.RootController):
         methods.  If a method is supplied, it will display a method execution
         form.
         """
-        fc = Client(name)
+        fc = Overlord(name)
         if not module: # list all modules
             modules = fc.system.list_modules()
             return dict(modules=modules)
@@ -41,7 +41,7 @@ class Root(controllers.RootController):
     @expose(template="funcweb.templates.run")
     @identity.require(identity.not_anonymous())
     def run(self, minion="*", module=None, method=None, arguments=''):
-        fc = Client(minion)
+        fc = Overlord(minion)
         results = getattr(getattr(fc, module), method)(*arguments.split())
         cmd = "%s.%s.%s(%s)" % (minion, module, method, arguments)
         return dict(cmd=cmd, results=results)

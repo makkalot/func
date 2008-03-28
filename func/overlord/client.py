@@ -83,7 +83,7 @@ class CommandAutomagic(object):
 
 # ===================================
 # this is a module level def so we can use it and isServer() from
-# other modules with a Client class
+# other modules with a Overlord class
 
 class Minions(object):
     def __init__(self, spec, port=51234, 
@@ -153,7 +153,9 @@ def is_minion(minion_string):
     return minions.is_minion()
 
 
-class Client(object):
+
+
+class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True):
@@ -225,9 +227,9 @@ class Client(object):
 
         So, it enables stuff like this:
 
-        Client("*.example.org").yum.install("foo")
+        Overlord("*.example.org").yum.install("foo")
 
-        # WARNING: any missing values in Client's source will yield
+        # WARNING: any missing values in Overlord's source will yield
         # strange errors with this engaged.  Be aware of that.
         """
 
@@ -239,7 +241,7 @@ class Client(object):
         """
         Use this to acquire status from jobs when using run with async client handles
         """
-        return jobthing.job_status(jobid, client_class=Client)
+        return jobthing.job_status(jobid, client_class=Overlord)
 
     # -----------------------------------------------
 
@@ -250,7 +252,7 @@ class Client(object):
         returns.
 
         The returns may include exception objects.
-        If Client() was constructed with noglobs=True, the return is instead
+        If Overlord() was constructed with noglobs=True, the return is instead
         just a single value, not a hash.
         """
 
@@ -352,3 +354,11 @@ class Client(object):
             if x > max:
                 max = x
         return max
+
+
+class Client(Overlord):
+    def __init__(self, *args, **kwargs):
+        Overlord.__init__(self, *args, **kwargs)
+        # we can remove this if folks want -akl 
+        print "Client() class is deprecated, please use the Overlord() class."
+        

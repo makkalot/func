@@ -77,8 +77,8 @@ class Call(client.command.Command):
 
         if self.options.rawprint:
             return data
-            
-        return pprint.pformat(data)
+
+        return  pprint.pformat(data)
 
     def do(self, args):
 
@@ -103,9 +103,13 @@ class Call(client.command.Command):
         # or some sort of shared datastruct?
         self.server_spec = self.parentCommand.server_spec
 
-        client_obj = client.Client(self.server_spec,port=self.port,interactive=True,
-            verbose=self.verbose, config=self.config, nforks=self.options.forks)
-        results = client_obj.run(self.module, self.method, self.method_args)
+        overlord_obj = client.Overlord(self.server_spec,port=self.port,
+                                     interactive=True,
+                                     verbose=self.verbose,
+                                     config=self.config,
+                                     nforks=self.options.forks)
+        results = overlord_obj.run(self.module, self.method, self.method_args)
+
 
         # TO DO: add multiplexer support
         # probably as a higher level module.

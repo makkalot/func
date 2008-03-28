@@ -22,32 +22,32 @@ class BaseTest:
         pass
 
     def setUp(self):
-        self.client = fc.Client(self.th,
-                                nforks=self.nforks,
-                                async=self.async)
+        self.overlord = fc.Overlord(self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
 
     def test_module_version(self):
-        mod = getattr(self.client, self.module)
+        mod = getattr(self.overlord, self.module)
         result = mod.module_version()
         self.assert_on_fault(result)
 
     def test_module_api_version(self):
-        mod = getattr(self.client, self.module)
+        mod = getattr(self.overlord, self.module)
         result = mod.module_api_version()        
         self.assert_on_fault(result)
 
     def test_module_description(self):
-        mod = getattr(self.client, self.module)
+        mod = getattr(self.overlord, self.module)
         result = mod.module_description()
         self.assert_on_fault(result)
 
     def test_module_list_methods(self):
-        mod = getattr(self.client, self.module)
+        mod = getattr(self.overlord, self.module)
         result = mod.list_methods()
         self.assert_on_fault(result)
 
     def test_module_inventory(self):
-        mod = getattr(self.client, self.module)
+        mod = getattr(self.overlord, self.module)
         result = mod.list_methods()
         res = result[self.th]
 
@@ -74,12 +74,12 @@ class BaseTest:
 class TestTest(BaseTest):
     module = "test"
     def test_add(self):
-        result = self.client.test.add(1,5)
+        result = self.overlord.test.add(1,5)
         self.assert_on_fault(result)
         assert result[self.th] == 6
 
     def test_add_string(self):
-        result = self.client.test.add("foo", "bar")
+        result = self.overlord.test.add("foo", "bar")
         self.assert_on_fault(result)
         assert result[self.th] == "foobar"
 
@@ -88,7 +88,7 @@ class TestTest(BaseTest):
 class TestCommand(BaseTest):
     module = "command"
     def test_echo(self):
-        result = self.client.command.run("echo -n foo")
+        result = self.overlord.command.run("echo -n foo")
 
         self.assert_on_fault(result)
         assert result[self.th][1] == "foo"
@@ -96,7 +96,7 @@ class TestCommand(BaseTest):
     def test_rpm(self):
         # looksing for some package that should be there, rh specific
         # ish at the moment
-        result = self.client.command.run("rpm -q filesystem")
+        result = self.overlord.command.run("rpm -q filesystem")
 
         self.assert_on_fault(result)
         assert result[self.th][1].split("-")[0] == "filesystem"
@@ -117,7 +117,7 @@ class TestCopyfile(BaseTest):
         self.create_a_file()
         fb = open(self.fn,"r").read()
         data = xmlrpclib.Binary(fb)
-        result = self.client.copyfile.copyfile(self.dest_fn, data)
+        result = self.overlord.copyfile.copyfile(self.dest_fn, data)
         self.assert_on_fault(result)
         assert result[self.th]  == 0
         
@@ -126,8 +126,8 @@ class TestCopyfile(BaseTest):
         self.create_a_file()
         fb = open(self.fn,"r").read()
         data = xmlrpclib.Binary(fb)
-        result = self.client.copyfile.copyfile(self.dest_fn, data)
-        result = self.client.copyfile.checksum(self.dest_fn)
+        result = self.overlord.copyfile.copyfile(self.dest_fn, data)
+        result = self.overlord.copyfile.checksum(self.dest_fn)
         self.assert_on_fault(result)
         assert result[self.th] == "b36a8040e44c16605d7784cdf1b3d9ed04ea7f55"
         
@@ -135,42 +135,42 @@ class TestCopyfile(BaseTest):
 class TestHardware(BaseTest):
     module = "hardware"
     def test_inventory(self):
-        result = self.client.hardware.inventory()
+        result = self.overlord.hardware.inventory()
         self.assert_on_fault(result)
 
     def test_halinfo(self):
-        result = self.client.hardware.hal_info()
+        result = self.overlord.hardware.hal_info()
         self.assert_on_fault(result)
 
     def test_info(self):
-        result = self.client.hardware.info()
+        result = self.overlord.hardware.info()
         self.assert_on_fault(result)
 
 
     def test_info_no_devices(self):
-        result = self.client.hardware.info(False)
+        result = self.overlord.hardware.info(False)
         self.assert_on_fault(result)
 
 class TestFileTracker(BaseTest):
     fn = "/etc/hosts"
     module = "filetracker"
     def test_track(self):
-        result = self.client.filetracker.track(self.fn)
+        result = self.overlord.filetracker.track(self.fn)
         assert result[self.th] == 1
         self.assert_on_fault(result)
 
     def test_inventory(self):
-        result = self.client.filetracker.track(self.fn)
-        result = self.client.filetracker.inventory(False)
+        result = self.overlord.filetracker.track(self.fn)
+        result = self.overlord.filetracker.inventory(False)
         self.assert_on_fault(result)
         assert self.fn in result[self.th][0]
 #        assert result[self.th][0][3] == 0
 
     def test_untrack(self):
-        result = self.client.filetracker.track(self.fn)
-        result = self.client.filetracker.untrack(self.fn)
+        result = self.overlord.filetracker.track(self.fn)
+        result = self.overlord.filetracker.untrack(self.fn)
         self.assert_on_fault(result)
-        result_inv = self.client.filetracker.inventory(False)
+        result_inv = self.overlord.filetracker.inventory(False)
         tracked_files = result_inv[self.th]
         for i in tracked_files:
             if i[0] == self.fn:
@@ -180,7 +180,7 @@ class TestFileTracker(BaseTest):
 class TestMount(BaseTest):
     module = "mount"
     def test_mount_list(self):
-        result = self.client.mount.list()
+        result = self.overlord.mount.list()
         self.assert_on_fault(result)
 
     # INSERT some clever way to test mount here
@@ -189,43 +189,43 @@ class TestMount(BaseTest):
 class TestNetworkTest(BaseTest):
     module = "networktest"
     def test_ping(self):
-        result = self.client.networktest.ping(self.th, "-c", "2")
+        result = self.overlord.networktest.ping(self.th, "-c", "2")
         self.assert_on_fault(result)
 
     def test_ping_bad_arg(self):
-         result = self.client.networktest.ping(self.th)
+         result = self.overlord.networktest.ping(self.th)
          # this should give us a FuncException
          foo = func.utils.is_error(result[self.th]) 
          
     def test_netstat(self):
-        result = self.client.networktest.netstat("-n")
+        result = self.overlord.networktest.netstat("-n")
         self.assert_on_fault(result)
 
     def test_traceroute(self):
-        result = self.client.networktest.traceroute(self.th)
+        result = self.overlord.networktest.traceroute(self.th)
         self.assert_on_fault(result)
 
     def test_dig(self):
-        result = self.client.networktest.dig("redhat.com")
+        result = self.overlord.networktest.dig("redhat.com")
         self.assert_on_fault(result)
 
     def test_isportopen_closed_port(self):
-        result = self.client.networktest.isportopen(self.th, 34251)
+        result = self.overlord.networktest.isportopen(self.th, 34251)
         self.assert_on_fault(result)
 
     def test_isportopen_open_port(self):
-        result = self.client.networktest.isportopen(self.th, 51234)
+        result = self.overlord.networktest.isportopen(self.th, 51234)
         self.assert_on_fault(result)
 
 
 class TestProcess(BaseTest):
     module = "process"
     def test_info(self):
-        result = self.client.process.info()
+        result = self.overlord.process.info()
         self.assert_on_fault(result)
 
     def test_mem(self):
-        result = self.client.process.mem()
+        result = self.overlord.process.mem()
         self.assert_on_fault(result)
 
     # FIXME: how to test kill/pkill? start a process with
@@ -235,20 +235,20 @@ class TestProcess(BaseTest):
 class TestService(BaseTest):
     module = "service"
     def test_inventory(self):
-        result = self.client.service.inventory()
+        result = self.overlord.service.inventory()
         self.assert_on_fault(result)
     
     def test_get_enabled(self):
-        result = self.client.service.get_enabled()
+        result = self.overlord.service.get_enabled()
         self.assert_on_fault(result)
 
     def test_get_running(self):
-        result = self.client.service.get_running()
+        result = self.overlord.service.get_running()
         self.assert_on_fault(result)
 
     def test_get_status(self):
-        running_data = self.client.service.get_running()[self.th]
-        result = self.client.service.status(running_data[0][0])
+        running_data = self.overlord.service.get_running()[self.th]
+        result = self.overlord.service.status(running_data[0][0])
         self.assert_on_fault(result)
 
         #FIXME: whats a good way to test starting/stoping services without
@@ -257,46 +257,46 @@ class TestService(BaseTest):
 class TestRpm(BaseTest):
     module = "rpms"
     def test_inventory(self):
-        result = self.client.rpms.inventory()
+        result = self.overlord.rpms.inventory()
         self.assert_on_fault(result)
 
 
 class TestSmart(BaseTest):
     module = "smart"
     def test_info(self):
-        result = self.client.smart.info()
+        result = self.overlord.smart.info()
         self.assert_on_fault(result)
     
 
 class TestSysctl(BaseTest):
     module = "sysctl"
     def test_list(self):
-        result = self.client.sysctl.list()
+        result = self.overlord.sysctl.list()
         self.assert_on_fault(result)
 
     def test_get(self):
-        result = self.client.sysctl.get("kernel.max_lock_depth")
+        result = self.overlord.sysctl.get("kernel.max_lock_depth")
         self.assert_on_fault(result)
 
 class TestYum(BaseTest):
     module = "yumcmd"
     def test_check_update(self):
-        result = self.client.yumcmd.check_update()
+        result = self.overlord.yumcmd.check_update()
         self.assert_on_fault(result)
 
 class TestSystem(BaseTest):
     module = "system"
     def test_list_methods(self):
-        result = self.client.system.list_methods()
+        result = self.overlord.system.list_methods()
         self.assert_on_fault(result)
 
     
     def test_listMethods(self):
-        result = self.client.system.listMethods()
+        result = self.overlord.system.listMethods()
         self.assert_on_fault(result)
     
     def test_list_modules(self):
-        result = self.client.system.list_modules()
+        result = self.overlord.system.list_modules()
         self.assert_on_fault(result)
 
 
@@ -319,17 +319,17 @@ class TestSystem(BaseTest):
 #    nforks=1
 #    async=True
 #    def test_sleep_async(self):
-#        job_id = self.client.test.sleep(5)
+#        job_id = self.overlord.test.sleep(5)
 #        print "job_id", job_id
 #        time.sleep(5)
-#        (return_code, results) = self.client.job_status(job_id)
+#        (return_code, results) = self.overlord.job_status(job_id)
 #        print "return_code", return_code
 #        print "results", results
 #
 #    def test_add_async(self):
-#        job_id = self.client.test.add(1,5)
+#        job_id = self.overlord.test.add(1,5)
 #        print "job_id", job_id
 #        time.sleep(6)
-#        (return_code, results) = self.client.job_status(job_id)
+#        (return_code, results) = self.overlord.job_status(job_id)
 #        print "return_code", return_code
        # print "results", results

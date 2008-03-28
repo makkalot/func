@@ -7,7 +7,7 @@
 import func.overlord.client as fc
 import func.utils as utils
 
-info = fc.Client("*").smart.info()
+info = fc.Overlord("*").smart.info()
 failures = 0
 
 for (host,details) in info.iteritems():

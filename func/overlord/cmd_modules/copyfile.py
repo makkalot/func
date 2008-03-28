@@ -49,11 +49,11 @@ class CopyFile(client.command.Command):
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec
 
-        client_obj = client.Client(self.server_spec,
-                                   port=self.port,
-                                   interactive=False,
-                                   verbose=self.options.verbose,
-                                   config=self.config)
+        overlord_obj = client.Overlord(self.server_spec,
+                                       port=self.port,
+                                       interactive=False,
+                                       verbose=self.options.verbose,
+                                       config=self.config)
 
         
         try:
@@ -69,5 +69,5 @@ class CopyFile(client.command.Command):
 
     
         data = xmlrpclib.Binary(fb)
-        results = client_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
+        results = overlord_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
                                                           mode, uid, gid])

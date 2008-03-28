@@ -8,7 +8,7 @@ import func.utils as utils
 
 bad = open("./part_data.txt").read().split()
 
-info = fc.Client("*").hardware.hal_info()
+info = fc.Overlord("*").hardware.hal_info()
 
 for (host,details) in info.iteritems():
 
