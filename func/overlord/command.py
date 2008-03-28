@@ -15,7 +15,6 @@ import optparse
 import sys
 
 from func.config import read_config, CONFIG_FILE
-from func.overlord import client
 
 from certmaster.commonconfig import CMConfig
 
