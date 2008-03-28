@@ -19,11 +19,11 @@ import pprint
 import stat
 import xmlrpclib
 
-from func.overlord import command
+from func.overlord import base_command
 from func.overlord import client
 
 
-class Ping(client.command.BaseCommand):
+class Ping(base_command.BaseCommand):
     name = "ping"
     usage = "see what func minions are up/accessible"
 

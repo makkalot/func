@@ -17,10 +17,9 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import optparse
 import os
 
-from func.overlord import command
-from func.overlord import client
+from func.overlord import base_command
 
-class ListMinions(client.command.BaseCommand):
+class ListMinions(base_command.BaseCommand):
     name = "list_minions"
     usage = "show known minions"
 

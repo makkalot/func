@@ -17,12 +17,12 @@ import optparse
 import pprint
 import xmlrpclib
 
-from func.overlord import command
 from func.overlord import client
+from func.overlord import base_command
 
 DEFAULT_FORKS = 1
 
-class Call(client.command.BaseCommand):
+class Call(base_command.BaseCommand):
     name = "call"
     usage = "call module method name arg1 arg2..."
     def addOptions(self):
@@ -51,7 +51,7 @@ class Call(client.command.BaseCommand):
     def parse(self, argv):
         self.argv = argv
 
-        return command.BaseCommand.parse(self, argv)
+        return base_command.BaseCommand.parse(self, argv)
         
 
     def format_return(self, data):

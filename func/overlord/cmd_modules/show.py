@@ -17,11 +17,10 @@ import optparse
 import pprint
 import xmlrpclib
 
-from func.overlord import command
-from func.overlord import client
+from func.overlord import base_command
 
 
-class ShowHardware(client.command.BaseCommand):
+class ShowHardware(base_command.BaseCommand):
     name = "hardware"
     usage = "show hardware details"
 
@@ -37,7 +36,7 @@ class ShowHardware(client.command.BaseCommand):
     
     def parse(self, argv):
         self.argv = argv
-        return command.Command.parse(self,argv)
+        return base_command.BaseCommand.parse(self,argv)
 
     def do(self,args):
 
@@ -62,7 +61,7 @@ class ShowHardware(client.command.BaseCommand):
                     print minion_data[arg]
 
 
-class Show(client.command.BaseCommand):
+class Show(base_command.BaseCommand):
     name = "show"
     usage = "various simple report stuff"
     subCommandClasses = [ShowHardware]
@@ -79,7 +78,7 @@ class Show(client.command.BaseCommand):
     def parse(self, argv):
         self.argv = argv
 
-        return command.Command.parse(self, argv)
+        return base_command.BaseCommand.parse(self, argv)
         
 
     def do(self, args):

@@ -19,11 +19,11 @@ import pprint
 import stat
 import xmlrpclib
 
-from func.overlord import command
+from func.overlord import base_command
 from func.overlord import client
 
 
-class CopyFile(client.command.BaseCommand):
+class CopyFile(base_command.BaseCommand):
     name = "copyfile"
     usage = "copy a file to a client"
 
@@ -42,7 +42,7 @@ class CopyFile(client.command.BaseCommand):
         self.verbose = self.options.verbose
 
     def do(self, args):
-        self.server_spec = self.parentClass.server_spec
+        self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
         
         try:
