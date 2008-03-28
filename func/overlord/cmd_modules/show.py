@@ -20,10 +20,8 @@ import xmlrpclib
 from func.overlord import command
 from func.overlord import client
 
-DEFAULT_PORT = 51234
 
-
-class ShowHardware(client.command.Command):
+class ShowHardware(client.command.BaseCommand):
     name = "hardware"
     usage = "show hardware details"
 
@@ -32,14 +30,11 @@ class ShowHardware(client.command.Command):
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
-        self.parser.add_option("-p", "--port", dest="port")
-
+    
 
     def handleOptions(self, options):
-        self.port = DEFAULT_PORT
-        if self.options.port:
-            self.port = self.options.port
-
+        pass
+    
     def parse(self, argv):
         self.argv = argv
         return command.Command.parse(self,argv)
@@ -47,14 +42,9 @@ class ShowHardware(client.command.Command):
     def do(self,args):
 
         self.server_spec = self.parentCommand.parentCommand.server_spec
+        self.getOverlord()
         
-        overlord_obj = client.Overlord(self.server_spec,
-                                     port=self.port,
-                                     interactive=False,
-                                     verbose=self.options.verbose,
-                                     config=self.config)
-        
-        results = overlord_obj.run("hardware", "info", [])
+        results = self.overlord_obj.run("hardware", "info", [])
 
         # if the user 
         top_options = ["port","verbose"]
@@ -72,21 +62,18 @@ class ShowHardware(client.command.Command):
                     print minion_data[arg]
 
 
-class Show(client.command.Command):
+class Show(client.command.BaseCommand):
     name = "show"
     usage = "various simple report stuff"
     subCommandClasses = [ShowHardware]
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
-        self.parser.add_option("-p", "--port", dest="port",
-                               default=DEFAULT_PORT)
 
     def handleOptions(self, options):
         self.options = options
 
         self.verbose = options.verbose
-        self.port = options.port
 
 
     def parse(self, argv):

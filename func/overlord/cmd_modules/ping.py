@@ -22,11 +22,8 @@ import xmlrpclib
 from func.overlord import command
 from func.overlord import client
 
-# FIXME: this really should not be in each sub module.
-DEFAULT_PORT = 51234
 
-
-class Ping(client.command.Command):
+class Ping(client.command.BaseCommand):
     name = "ping"
     usage = "see what func minions are up/accessible"
 
@@ -37,14 +34,12 @@ class Ping(client.command.Command):
         # FIXME: verbose and port should be added globally to all sub modules
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
-        self.parser.add_option("-p", "--port", dest="port",
-                               default=DEFAULT_PORT)
 
     def handleOptions(self, options):
         """
         Nothing to do here...
         """
-        pass
+        self.verbose = self.options.verbose
 
     def do(self, args):
         self.server_spec = self.parentCommand.server_spec
@@ -52,15 +47,16 @@ class Ping(client.command.Command):
         # because this is mainly an interactive command, expand the server list and make seperate connections.
         # to make things look more speedy.
 
-        minion_set = client.Minions(self.server_spec, port=self.options.port)
+        minion_set = client.Minions(self.server_spec, port=self.port)
         servers = minion_set.get_all_hosts()
 
         for server in servers:
 
-            overlord_obj = client.Overlord(server,port=self.options.port,
+            overlord_obj = client.Overlord(server,port=self.port,
                                            interactive=False,
-                                           verbose=self.options.verbose,
-                                           config=self.config, noglobs=True)
+                                           verbose=self.verbose,
+                                           config=self.config,
+                                           noglobs=True)
 
             results = overlord_obj.run("test", "ping", [])
 	    print "results", results, type(results)

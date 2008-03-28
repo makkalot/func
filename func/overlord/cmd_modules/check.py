@@ -25,24 +25,22 @@ from func.minion import sub_process
 from func.config import read_config
 from certmaster.commonconfig import MinionConfig
 
-# FIXME: don't hardcode this here
-DEFAULT_PORT = 51234
 
-class CheckAction(client.command.Command):
+class CheckAction(client.command.BaseCommand):
     name = "check"
     usage = "check func for possible setup problems"
 
     def addOptions(self):
         self.parser.add_option("-c", "--certmaster", action="store_true", help="check the certmaster configuration on this box")
         self.parser.add_option("-m", "--minion", action="store_true", help="check the minion configuration on this box")
-
+        self.parser.add_option("-v", "--verbose", dest="verbose", action="store_true")
 
     def handleOptions(self, options):
         # FIXME: all through the code we have this constant in each
         # file, need to make this common.
-        self.port = DEFAULT_PORT
         self.check_certmaster = options.certmaster
-        self.check_minion     = options.minion  
+        self.check_minion     = options.minion
+        self.verbose          = options.verbose
 
     def do(self, args):
 
@@ -79,18 +77,10 @@ class CheckAction(client.command.Command):
            # see if we have signed any certs
            # FIXME: TODO
 
-           # construct a client handle and see if any hosts are reachable 
            self.server_spec = self.parentCommand.server_spec
-
-           overlord_obj = client.Overlord(
-               self.server_spec,
-               port=self.port,
-               interactive=False,
-               verbose=False,
-               config=self.config
-               )
+           self.getOverlord()
            
-           results = overlord_obj.test.add(1,2)
+           results = self.overlord_obj.test.add(1,2)
            hosts = results.keys()
            if len(hosts) == 0:
                print "* no systems have signed certs"

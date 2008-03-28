@@ -15,6 +15,8 @@ import optparse
 import sys
 
 from func.config import read_config, CONFIG_FILE
+from func.overlord import client
+
 from certmaster.commonconfig import CMConfig
 
 class CommandHelpFormatter(optparse.IndentedHelpFormatter):
@@ -252,6 +254,7 @@ class Command:
         self.stderr.write("Unknown command '%s'.\n" % command)
         return 1
 
+
     def outputHelp(self):
         """
         Output help information.
@@ -285,3 +288,24 @@ class Command:
         while c.parentCommand:
             c = c.parentCommand
         return c
+
+DEFAULT_PORT = 51234
+class BaseCommand(Command):
+    """ wrapper class for commands with some convience functions, namely
+    getOverlord() for getting a overlord client api handle"""
+
+    interactive = False
+    verbose=0
+    port=DEFAULT_PORT
+    def getOverlord(self):
+        if not getattr(self, "server_spec"):
+            self.server_spec = self.parentCommand.server_spec
+    
+
+        self.overlord_obj = client.Overlord(self.server_spec,
+                                       port=self.port,
+                                       interactive=self.interactive,
+                                       verbose=self.verbose,
+                                       config=self.config)
+
+        

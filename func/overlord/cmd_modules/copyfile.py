@@ -22,9 +22,8 @@ import xmlrpclib
 from func.overlord import command
 from func.overlord import client
 
-DEFAULT_PORT = 51234
 
-class CopyFile(client.command.Command):
+class CopyFile(client.command.BaseCommand):
     name = "copyfile"
     usage = "copy a file to a client"
 
@@ -38,23 +37,13 @@ class CopyFile(client.command.Command):
                                action="store_true")
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
-        self.parser.add_option("-p", "--port", dest="port")
 
     def handleOptions(self, options):
-        self.port = DEFAULT_PORT
-        if self.options.port:
-            self.port = self.options.port
-
+        self.verbose = self.options.verbose
 
     def do(self, args):
-        self.server_spec = self.parentCommand.server_spec
-
-        overlord_obj = client.Overlord(self.server_spec,
-                                       port=self.port,
-                                       interactive=False,
-                                       verbose=self.options.verbose,
-                                       config=self.config)
-
+        self.server_spec = self.parentClass.server_spec
+        self.getOverlord()
         
         try:
             fb = open(self.options.filename, "r").read()
@@ -69,5 +58,5 @@ class CopyFile(client.command.Command):
 
     
         data = xmlrpclib.Binary(fb)
-        results = overlord_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
-                                                          mode, uid, gid])
+        results = self.overlord_obj.run("copyfile", "copyfile", [self.options.remotepath, data,
+                                                                 mode, uid, gid])

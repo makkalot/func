@@ -19,9 +19,8 @@ import os
 
 from func.overlord import command
 from func.overlord import client
-DEFAULT_PORT = 51234
 
-class ListMinions(client.command.Command):
+class ListMinions(client.command.BaseCommand):
     name = "list_minions"
     usage = "show known minions"
 
@@ -30,20 +29,16 @@ class ListMinions(client.command.Command):
                                action="store_true")
 
     def handleOptions(self, options):
-        self.port = DEFAULT_PORT
         if options.verbose:
             self.verbose = self.options.verbose
+
     
     def do(self, args):
+
         self.server_spec = self.parentCommand.server_spec
+        self.getOverlord()
 
-        overlord_obj = client.Overlord(self.server_spec,
-                                     port=self.port,
-                                     interactive=False,
-                                     verbose=self.options.verbose,
-                                     config=self.config)
-
-        results = overlord_obj.test.add(1,2)
+        results = self.overlord_obj.test.add(1,2)
         servers = results.keys()
         servers.sort()
 
