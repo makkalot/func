@@ -94,7 +94,7 @@ class Iptables(func_module.FuncModule):
 
     def reject_to(self, ip):
         """
-        Drop all outgoing traffic to IP. Example:
+        Reject all outgoing traffic to IP. Example:
           > func '*' call iptables reject_to 192.168.0.10
         """
         clear_all("-D OUTPUT -d %s -j ACCEPT" % ip)

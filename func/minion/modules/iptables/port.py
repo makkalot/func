@@ -22,7 +22,7 @@ class Port(func_module.FuncModule):
 
     def drop_from(self, port, ip="0.0.0.0", prot="tcp", dir="dst"):
         """
-        Drop all traffic comming from/to PORT. Arguments:
+        Drop all incomming traffic from/to selected port. Arguments:
          * port - destination/source port
          * ip - source IP
          * prot - protocol (e.g. tcp/udp)
@@ -30,7 +30,7 @@ class Port(func_module.FuncModule):
         Examples:
          * Drop all incoming traffic to local TCP port 80:
            > func '*' call iptables.port drop_from 80
-         * Drop incomming traffic to local UDP port 53 from 192.168.0.0/24:
+         * Drop all incomming traffic to local UDP port 53 from 192.168.0.0/24:
            > func '*' call iptables.port drop_from 80 192.168.0.0/24 udp 
         """
         dir=parse_dir(dir)
@@ -40,16 +40,16 @@ class Port(func_module.FuncModule):
 
     def reject_from(self, port, ip="0.0.0.0", prot="tcp", dir="dst"):
         """
-        Drop all traffic comming from/to PORT. Arguments:
+        Reject all outgoing traffic from/to port. Arguments:
          * port - destination/source port
          * ip - source IP
          * prot - protocol (e.g. tcp/udp)
          * dir - direction, "dst" for matching destination port or "src" for matching source port
         Examples:
-         * Drop all incoming traffic to local TCP port 80:
-           > func '*' call iptables.port drop_from 80
-         * Drop incomming traffic to local UDP port 53 from 192.168.0.0/24:
-           > func '*' call iptables.port drop_from 80 192.168.0.0/24 udp 
+         * Reject all incoming traffic to local TCP port 80:
+           > func '*' call iptables.port reject_from 80
+         * Reject incomming traffic to local UDP port 53 from 192.168.0.0/24:
+           > func '*' call iptables.port reject_from 80 192.168.0.0/24 udp 
         """
         dir=parse_dir(dir)
         clear_all("-D INPUT -p %s --%sport %s -s %s -j ACCEPT" % (prot, dir, port, ip) )
@@ -58,7 +58,7 @@ class Port(func_module.FuncModule):
 
     def accept_from(self, port, ip="0.0.0.0", prot="tcp", dir="dst"):
         """
-        Accept all traffic comming from/to PORT. Arguments:
+        Accept all incomming traffic from/to port. Arguments:
          * port - destination/source port
          * ip - source IP
          * prot - protocol (e.g. tcp/udp)
@@ -76,7 +76,7 @@ class Port(func_module.FuncModule):
 
     def drop_to(self, port, ip="0.0.0.0", prot="tcp", dir="dst"):
         """
-        Drop all outgoing traffic going from/to PORT. Arguments:
+        Drop all outgoing traffic going from/to port. Arguments:
          * port - destination/source port
          * ip - destination IP
          * prot - protocol (e.g. tcp/udp)
@@ -94,16 +94,16 @@ class Port(func_module.FuncModule):
 
     def reject_to(self, port, ip="0.0.0.0", prot="tcp", dir="dst"):
         """
-        Drop all outgoing traffic going from/to PORT. Arguments:
+        Reject all outgoing traffic going from/to PORT. Arguments:
          * port - destination/source port
          * ip - destination IP
          * prot - protocol (e.g. tcp/udp)
          * dir - direction, "dst" for matching destination port or "src" for matching source port
         Examples:
-         * Drop outgoing traffic to TCP port 80 on 192.168.0.1:
-           > func '*' call iptables.port drop_to 80 192.168.0.1
-         * Drop outgoing traffic from UDP port 53 to 192.168.0.0/24:
-           > func '*' call iptables.port drop_to 53 192.168.0.0/24 udp src
+         * Reject outgoing traffic to TCP port 80 on 192.168.0.1:
+           > func '*' call iptables.port reject_to 80 192.168.0.1
+         * Reject outgoing traffic from UDP port 53 to 192.168.0.0/24:
+           > func '*' call iptables.port reject_to 53 192.168.0.0/24 udp src
         """
         dir=parse_dir(dir)
         clear_all("-D OUTPUT -p %s --%sport %s -d %s -j ACCEPT" % (prot, dir, port, ip) )
