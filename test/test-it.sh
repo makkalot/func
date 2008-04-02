@@ -50,7 +50,7 @@ show_config()
     echo "BUILD=$BUILD"
     echo "BUILD_FROM_FRESH_CHECKOUT=$BUILD_FROM_FRESH_CHECKOUT"
     echo "INSTALL_VIA_RPMS=$INSTALL_VIA_RPMS"
-    echo "BACKUP_FUNC_PKL=$BACKUP_FUNC_PKI"
+    echo "BACKUP_FUNC_PKI=$BACKUP_FUNC_PKI"
     echo "RUN_UNITTESTS=$RUN_UNITTESTS"
 
 }
@@ -219,16 +219,15 @@ backup_the_secret_of_the_func()
 	# whatever, this should probably be some standard date format
 	# but I just wanted something sans spaces
 	DATE=`date  "+%F_%R"`
-	tar -c /etc/pki/func/*  /var/lib/func/* > func-pki-backup-$DATE.tar
-	
+	tar -c /etc/pki/func/* /var/lib/certmaster/* > func-pki-backup-$DATE.tar
 }
 
 #yes, I'm in a funny variable naming mood, I'll change them
 #later
 no_more_secrets()
 {
-	rm -rf /etc/pki/func/*
-	rm -rf /var/lib/func/certmaster/*
+    rm -rf /etc/pki/certmaster/*
+    rm -rf /var/lib/certmaster/*
 }
 
 find_certmaster_certs()
