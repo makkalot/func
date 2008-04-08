@@ -37,6 +37,9 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-j", "--json", dest="json",
                                help="output return data using JSON",
                                action="store_true")
+        self.parser.add_option("-p", "--pickle", dest="pickle",
+                               help="output return data in python pickle format",
+                               action="store_true")
         self.parser.add_option("-f", "--forks", dest="forks",
                                help="how many parallel processes?  (default 1)",
                                default=DEFAULT_FORKS)
@@ -65,7 +68,6 @@ class Call(base_command.BaseCommand):
         if self.options.json:
             try:
                 import simplejson
-                print "blargh\n\n"
                 return simplejson.dumps(data)
             except ImportError:
                 print "WARNING: json support not found, install python-simplejson"
@@ -74,6 +76,9 @@ class Call(base_command.BaseCommand):
         if self.options.rawprint:
             return data
 
+        if self.options.pickle:
+            import pickle
+            return pickle.dumps(data)
 
         return  pprint.pformat(data)
 
