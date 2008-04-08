@@ -65,6 +65,7 @@ class Call(base_command.BaseCommand):
         if self.options.json:
             try:
                 import simplejson
+                print "blargh\n\n"
                 return simplejson.dumps(data)
             except ImportError:
                 print "WARNING: json support not found, install python-simplejson"
@@ -72,6 +73,7 @@ class Call(base_command.BaseCommand):
 
         if self.options.rawprint:
             return data
+
 
         return  pprint.pformat(data)
 
@@ -99,7 +101,7 @@ class Call(base_command.BaseCommand):
         #        self.getOverlord()
 
 
-        self.interactive = True
+        self.interactive = False
         
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
@@ -111,4 +113,8 @@ class Call(base_command.BaseCommand):
         # probably as a higher level module.
 
         # dump the return code stuff atm till we figure out the right place for it
-        return self.format_return(results)
+        foo =  self.format_return(results)
+        print foo
+
+        # nothing really makes use of this atm -akl
+        return foo
