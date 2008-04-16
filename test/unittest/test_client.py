@@ -83,6 +83,51 @@ class TestTest(BaseTest):
         self.assert_on_fault(result)
         assert result[self.th] == "foobar"
 
+    def test_sleep(self):
+        result = self.overlord.test.sleep(1)
+        self.assert_on_fault(result)
+
+    def _echo_test(self, data):
+        result = self.overlord.test.echo(data)
+        self.assert_on_fault(result)
+        assert result[self.th] == data
+        
+    # this tests are basically just to test the basic
+    # marshalling/demarshaling bits
+    def test_echo_int(self):
+        self._echo_test(1)
+
+    def test_echo_string(self):
+        self._echo_test("caneatcheese")
+
+    def test_echo_array(self):
+        self._echo_test([1, 2, "three", "fore", "V",])
+
+    def test_echo_hash(self):
+        self._echo_test({"one":1, "too":2, "III":3, "many":8, "lots":12312})
+
+    def test_echo_bool_false(self):
+        self._echo_test(False)
+
+    def test_echo_bool_true(self):
+        self._echo_test(True)
+
+    def test_echo_float(self):
+        self._echo_test(123.456)
+
+    def test_echo_binary(self):
+        blob = "348dshke354ts0d9urgk"
+        import xmlrpclib
+        data = xmlrpclib.Binary(blob)
+        self._echo_test(data)
+
+    def test_echo_date(self):
+        import datetime
+        dt = datetime.datetime(1974, 1, 5, 11, 59 ,0,0, None)
+        import xmlrpclib
+        data = xmlrpclib.DateTime(dt)
+        self._echo_test(data)
+
 
 
 class TestCommand(BaseTest):

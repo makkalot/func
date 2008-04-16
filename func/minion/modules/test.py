@@ -27,3 +27,9 @@ class Test(func_module.FuncModule):
         Testing remote exception handling is useful
         """
         raise exceptions.Exception("khhhhhhaaaaaan!!!!!!")
+
+    def echo(self, data):
+        """
+        Returns whatever was passed into it
+        """
+        return data
