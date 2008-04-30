@@ -36,6 +36,7 @@ import codes
 import module_loader
 import func.utils as futils
 import func.minion.utils as fmutils
+import func.minion.acls as acls_mod
 
 from certmaster import utils
 from certmaster import requester
@@ -183,6 +184,8 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         self.ca = "%s/ca.cert" % self.cm_config.cert_dir
         
         self._our_ca = certs.retrieve_cert_from_file(self.ca)
+
+        self.acls = acls_mod.Acls(acldir=self.config.acl_dir)
         
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,
@@ -214,7 +217,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
             async_dispatch = True
             method = method.replace("async.","",1)
 
-        if not self._check_acl(peer_cert, ip, method, params):
+        if not self.acls.check(self._our_ca, peer_cert, ip, method, params):
             raise codes.AccessToMethodDenied
             
         # Recognize ipython's tab completion calls
@@ -239,31 +242,6 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         peer_cert = request.get_peer_certificate()
         return peer_cert.get_subject().CN
     
-    def _check_acl(self, cert, ip, method, params):
-        acls = fmutils.get_acls_from_config(acldir=self.config.acl_dir)
-        
-        # certmaster always gets to run things
-        ca_cn = self._our_ca.get_subject().CN
-        ca_hash = self._our_ca.subject_name_hash()
-        ca_key = '%s-%s' % (ca_cn, ca_hash)
-        acls[ca_key] = ['*']
-
-        cn = cert.get_subject().CN
-        sub_hash = cert.subject_name_hash()
-        if acls:
-            allow_list = []
-            hostkey = '%s-%s' % (cn, sub_hash)
-            # search all the keys, match to 'cn-subhash'
-            for hostmatch in acls.keys():
-                if fnmatch.fnmatch(hostkey, hostmatch):
-                    allow_list.extend(acls[hostmatch])
-            # go through the allow_list and make sure this method is in there
-            for methodmatch in allow_list:
-                if fnmatch.fnmatch(method, methodmatch):
-                    return True
-                    
-        return False
-
 
 def main(argv):
 
