@@ -185,7 +185,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         
         self._our_ca = certs.retrieve_cert_from_file(self.ca)
 
-        self.acls = acls_mod.Acls(acldir=self.config.acl_dir)
+        self.acls = acls_mod.Acls(config=self.config)
         
         AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
                                                           self.key, self.cert,

@@ -20,3 +20,4 @@ from config import BaseConfig, BoolOption, Option
 class FuncdConfig(BaseConfig):
     log_level = Option('INFO')
     acl_dir = Option('/etc/func/minion-acl.d')
+    certmaster_overrides_acls = BoolOption(True)
