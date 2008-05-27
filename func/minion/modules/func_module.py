@@ -88,4 +88,4 @@ class FuncModule(object):
         @param meth_name: the name of the method
         @retun : list or None
         """
-        pass
+        return None
