@@ -90,7 +90,7 @@ class FuncModule(object):
         @retun : list or None
         """
         #is it a tuple ?
-        meth_name = method_name[0]
+        #meth_name = meth_name[0]
 
         if not self.__is_public_valid_method(name):
             return {}
