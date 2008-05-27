@@ -34,7 +34,8 @@ class FuncModule(object):
             "module_version" : self.__module_version,
             "module_api_version" : self.__module_api_version,
             "module_description" : self.__module_description,
-            "list_methods"       : self.__list_methods
+            "list_methods"       : self.__list_methods,
+            "get_method_args"    : self.__get_method_args,
         }
 
     def __init_log(self):
@@ -88,4 +89,24 @@ class FuncModule(object):
         @param meth_name: the name of the method
         @retun : list or None
         """
-        return None
+        if not self.__is_public_valid_method(name):
+            return {}
+
+        arg_names = inspect.getargspec(getattr(self,name))
+        #arg_names[0] is argument names
+        #arg_names[1] is *arg
+        #arg_names[2] is **kwarg
+        #arg_names[3] are defaults
+
+        name_dict =[other_args for other_args in arg_names[1:3] if other_args]
+        arg_names = arg_names[0] or []
+        
+        #if we have self lets remove it 
+        for rem in arg_names:
+            if rem=="self":
+                arg_names.remove(rem)
+                break
+        
+        final_dict={}
+        final_dict[name]=arg_names+name_dict
+        return final_dict
