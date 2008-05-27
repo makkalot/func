@@ -89,6 +89,9 @@ class FuncModule(object):
         @param meth_name: the name of the method
         @retun : list or None
         """
+        #is it a tuple ?
+        meth_name = method_name[0]
+
         if not self.__is_public_valid_method(name):
             return {}
 
