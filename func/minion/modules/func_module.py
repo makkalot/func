@@ -81,16 +81,15 @@ class FuncModule(object):
                     return True
         return False
 
-    def __get_method_args(self,meth_name):
+    def __get_method_args(self,name):
         """
         Gives a list of arguments for particular given
         method_name
 
-        @param meth_name: the name of the method
+        @param name: the name of the method
         @retun : list or None
         """
         #is it a tuple ?
-        #meth_name = meth_name[0]
 
         if not self.__is_public_valid_method(name):
             return {}
