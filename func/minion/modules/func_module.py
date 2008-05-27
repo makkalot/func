@@ -79,4 +79,13 @@ class FuncModule(object):
                 attr != 'register_rpc':
                     return True
         return False
-        
+
+    def __get_method_args(self,meth_name):
+        """
+        Gives a list of arguments for particular given
+        method_name
+
+        @param meth_name: the name of the method
+        @retun : list or None
+        """
+        pass
