@@ -87,11 +87,14 @@ class FuncModule(object):
         method_name
 
         @param name: the name of the method
-        @retun : list or None
+        @retun : dict(name:[arg1,arg2...]) or {}
         """
-        #is it a tuple ?
-
+        
         if not self.__is_public_valid_method(name):
+            return {}
+
+        #we dont need them actually
+        if name in self.__base_methods.keys():
             return {}
 
         arg_names = inspect.getargspec(getattr(self,name))
