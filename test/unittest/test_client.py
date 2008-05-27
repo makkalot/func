@@ -46,6 +46,14 @@ class BaseTest:
         result = mod.list_methods()
         self.assert_on_fault(result)
 
+    def test_module_get_method_args(self):
+        mod = getattr(self.overlord,self.module)
+        result = mod.list_methods()
+        
+        for meth in result.values()[0]:
+            arg_result=mod.get_method_args(meth)
+            self.assert_on_fault(arg_result)
+
     def test_module_inventory(self):
         mod = getattr(self.overlord, self.module)
         result = mod.list_methods()
@@ -70,6 +78,7 @@ class BaseTest:
     test_module_description.intro = True
     test_module_list_methods.intro = True
     test_module_inventory.intro = True
+    test_module_get_method_args.intro = True
 
 class TestTest(BaseTest):
     module = "test"
@@ -381,6 +390,8 @@ class TestSystem(BaseTest):
     def test_module_description(self):
         pass
 
+    def test_module_get_method_args(self):
+        pass
 
 
 #import time
