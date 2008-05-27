@@ -58,8 +58,7 @@ class FuncModule(object):
         """
         handlers = {}
         for attr in dir(self):
-            if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and \
-                    attr != 'register_rpc':
+            if self.__is_public_valid_method(attr):
                 handlers[attr] = getattr(self, attr)
         return handlers
 
@@ -74,3 +73,10 @@ class FuncModule(object):
 
     def __module_description(self):
         return self.description
+
+    def __is_public_valid_method(self,attr):
+        if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and\
+                attr != 'register_rpc':
+                    return True
+        return False
+        
