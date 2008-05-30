@@ -67,7 +67,7 @@ class ArgCompatibility(object):
 
         # we will use it everytime so not make lookups
         the_type = argument_dict['type']
-        from itertools import chain
+        from itertools import chain #may i use chain ?
 
         for key,value in argument_dict.iteritems():
             
@@ -113,6 +113,8 @@ class ArgCompatibility(object):
             for argument in self.__args_to_check[method].itervalues():
                 self._is_basic_types_compatible(argument)
                 self._is_type_options_compatible(argument)
+
+        return True
 
 
 ###The Exception classes here 
