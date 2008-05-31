@@ -28,4 +28,5 @@ class BaseCommand(command.Command):
                                             port=self.port,
                                             interactive=self.interactive,
                                             verbose=self.verbose,
-                                            config=self.config)
+                                            config=self.config,
+                                            async=self.options.async)
