@@ -52,6 +52,9 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-n", "--nopoll", dest="nopoll",
                                help="Don't wait for async results",
                                action="store_true")
+        self.parser.add_option("-s", "--sort", dest="sort",
+                               help="In async mode, wait for all results and print them sorted.",
+                               action="store_true")
 
     def handleOptions(self, options):
         self.options = options
@@ -135,10 +138,11 @@ class Call(base_command.BaseCommand):
                         time.sleep(0.1)
                     elif return_code == jobthing.JOB_ID_ASYNC_FINISHED:
                         async_done = True
-                        partial = self.print_partial_results(partial, async_results)
+                        partial = self.print_partial_results(partial, async_results, self.options.sort)
                         return 0
                     elif return_code == jobthing.JOB_ID_ASYNC_PARTIAL:
-                        partial = self.print_partial_results(partial, async_results)
+                        if not self.options.sort:
+                            partial = self.print_partial_results(partial, async_results)
                     else:
                         sys.stderr.write("Async error")
                         return 0
@@ -153,10 +157,13 @@ class Call(base_command.BaseCommand):
         # nothing really makes use of this atm -akl
         return foo
 
-    def print_partial_results(self, old, new):
+    def print_partial_results(self, old, new, sort=0):
         diff = dict([(k, v) for k, v in new.iteritems() if k not in old])
         if len(diff) > 0:
-            for res in diff.iteritems():
-                print "2:",self.format_return(res)
+            iter=diff.iteritems()
+            if sort:
+                iter=sorted(iter)
+            for res in iter:
+                print self.format_return(res)
             return new
         return old
