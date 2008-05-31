@@ -13,17 +13,25 @@
 #tester module for ArgCompatibility
 from func.minion.modules.func_arg import ArgCompatibility
 
-class ArgCompatibilityTest:
+class TestArgCompatibility:
    
     def setUp(self):
         #create the simple object 
-        ac = ArgCompatibility(self.dummy_arg_getter())
-        print self.dummy_arg_getter()
+        self.ac = ArgCompatibility(self.dummy_arg_getter())
+
+    def test_arg_compatibility(self):
+        """
+        Testing the method argument compatiblity
+        """
+        result = self.ac.validate_all()
+        #self.assert_on_fault(result)
+        assert result == True
 
     def dummy_arg_getter(self):
         """
         A simple method to test the stuff we have written for 
         arg compatiblity. I just return a dict with proper stuff
+        Should more an more tests here to see if didnt miss something
         """
         return {
             'hifunc':{
@@ -50,16 +58,9 @@ class ArgCompatibilityTest:
                                 
                 'some_string':{
                     'type':'string',
-                    'validato': "^[a-zA-Z]$",} # validator is a re string for those whoo need better validation...
+                    'validator': "^[a-zA-Z]$",} # validator is a re string for those whoo need better validation...
                         
               }
               }
 
-    def test_arg_compatibility(self):
-        """
-        Simple test
-        """
-        result = self.ac.validate_all()
-        #self.assert_on_fault(result)
-        assert result == False
-
+   
