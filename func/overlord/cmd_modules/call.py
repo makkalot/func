@@ -52,8 +52,11 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-n", "--nopoll", dest="nopoll",
                                help="Don't wait for async results",
                                action="store_true")
-        self.parser.add_option("-s", "--sort", dest="sort",
+        self.parser.add_option("", "--sort", dest="sort",
                                help="In async mode, wait for all results and print them sorted.",
+                               action="store_true")
+        self.parser.add_option("-s", "--jobstatus", dest="jobstatus",
+                               help="Do not run any job, just check for status.",
                                action="store_true")
 
     def handleOptions(self, options):
@@ -124,12 +127,19 @@ class Call(base_command.BaseCommand):
         self.getOverlord()
         
 
-        results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        if not self.options.jobstatus:
+            results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        else:
+            (return_code, async_results) = self.overlord_obj.job_status(float(self.module))
+            res = self.format_return((return_code, async_results))
+            print res
+            return 0
 
         if self.options.async:
             partial = {}
             if self.options.nopoll:
-                print "JOB_ID", results
+                print "JOB_ID:", pprint.pformat(results)
+                return 0
             else:
                 async_done = False
                 while not async_done:
