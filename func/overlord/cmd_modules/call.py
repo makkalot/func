@@ -133,13 +133,13 @@ class Call(base_command.BaseCommand):
             (return_code, async_results) = self.overlord_obj.job_status(float(self.module))
             res = self.format_return((return_code, async_results))
             print res
-            return 0
+            return async_results
 
         if self.options.async:
             partial = {}
             if self.options.nopoll:
                 print "JOB_ID:", pprint.pformat(results)
-                return 0
+                return results
             else:
                 async_done = False
                 while not async_done:
@@ -149,7 +149,7 @@ class Call(base_command.BaseCommand):
                     elif return_code == jobthing.JOB_ID_ASYNC_FINISHED:
                         async_done = True
                         partial = self.print_partial_results(partial, async_results, self.options.sort)
-                        return 0
+                        return partial
                     elif return_code == jobthing.JOB_ID_ASYNC_PARTIAL:
                         if not self.options.sort:
                             partial = self.print_partial_results(partial, async_results)
@@ -165,7 +165,7 @@ class Call(base_command.BaseCommand):
         print foo
 
         # nothing really makes use of this atm -akl
-        return foo
+        return results
 
     def print_partial_results(self, old, new, sort=0):
         diff = dict([(k, v) for k, v in new.iteritems() if k not in old])
