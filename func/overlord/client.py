@@ -321,7 +321,7 @@ class Overlord(object):
 #            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
             expanded_minions = Minions(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)
             minions = expanded_minions.get_urls()[0]
-            print minions
+#            print minions
             results = process_server(0, 0, minions)
 
         return results
