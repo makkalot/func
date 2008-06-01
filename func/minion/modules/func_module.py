@@ -118,7 +118,7 @@ class FuncModule(object):
         """
 
         # to know they didnt implement it
-        return {'hey':'how'}
+        return {}
     
     def __is_all_args_registered(self,name):
         """
