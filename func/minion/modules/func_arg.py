@@ -13,7 +13,7 @@
 class ArgCompatibility(object):
     """ 
     That class is going to test if the module that was created by module
-    writer if he/she obeys to the rules we put before
+    writer if he/she obeys to the rules we put here
     """
 
     #these are the common options can be used with all types
@@ -36,19 +36,19 @@ class ArgCompatibility(object):
 
     def __init__(self,get_args_result):
         """
-        The constructor initilized by the get_method_args()
+        The constructor initilized by the get_method_args()(the dict to test)
         @param : get_args_result : The dict with all method related info
         """
         self.__args_to_check = get_args_result
         
         #what options does each of the basic_types have :
         self.__valid_args={
-                'int':('range','min','max'),
-                'string':('options','min_length','max_length','validator'),
+                'int':('range','min','max',),
+                'string':('options','min_length','max_length','validator',),
                 'boolean':(),
                 'float':(),
-                'hash':('validator'),
-                'iterable':('validator'),
+                'hash':('validator',),
+                'iterable':('validator',),
             }
 
 
@@ -123,7 +123,7 @@ class ArgCompatibility(object):
 class IncompatibleTypesException(Exception):
     """
     Raised when we assign some values that breaksour rules 
-    @see ArgCompatibility class for allowe situations
+    @see ArgCompatibility class for allowed situations
     """
     def __init__(self, value=None):
         Exception.__init__(self)
