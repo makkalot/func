@@ -95,7 +95,6 @@ class FuncModule(object):
         if not tmp_arg_dict:
             return {}
 
-        #or go ahead
         #see if user tried to register an not implemented method :)
         for method in tmp_arg_dict.keys():
             if not hasattr(self,method):

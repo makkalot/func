@@ -14,7 +14,8 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
 #    th = socket.gethostname()
-    th = socket.getfqdn()
+    maho ="hard.evlan.com" 
+    th = socket.getfqdn(maho)
     nforks=1
     async=False
 
@@ -48,11 +49,8 @@ class BaseTest:
 
     def test_module_get_method_args(self):
         mod = getattr(self.overlord,self.module)
-        result = mod.list_methods()
-        
-        for meth in result.values()[0]:
-            arg_result=mod.get_method_args(meth)
-            self.assert_on_fault(arg_result)
+        arg_result=mod.get_method_args()
+        self.assert_on_fault(arg_result)
 
     def test_module_inventory(self):
         mod = getattr(self.overlord, self.module)
