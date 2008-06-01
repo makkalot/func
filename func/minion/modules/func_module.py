@@ -81,16 +81,45 @@ class FuncModule(object):
                     return True
         return False
 
-    def get_method_args(self,name):
+    def __get_method_args(self):
         """
         Gets arguments with their formats according to ArgCompatibility
         class' rules.
 
-        @param :name The name of the method 
         @return : dict with args or Raise Exception if something wrong
         happens
         """
-        pass
+        tmp_arg_dict = self.__register_method_args()
+
+        #if it is not implemeted then return empty stuff 
+        if not tmp_arg_dict:
+            return {}
+
+        #or go ahead
+        #see if user tried to register an not implemented method :)
+        for method in tmp_arg_dict.keys():
+            if not hasattr(self,method):
+                raise NonExistingMethodRegistered("%s is not in %s "%(method,self.__class__.__name__))
+        
+        #create argument validation instance
+        self.arg_comp = ArgCompatibility(tmp_arg_dict)
+        #see if the options that were used are OK..
+        self.arg_comp.validate_all()
+
+        return tmp_arg_dict 
+
+    def __register_method_args(self):
+        """
+        That is the method where users should override in their
+        modules according to be able to send their method arguments
+        to the Overlord. If they dont have it nothing breaks
+        just that one in the base class is called
+
+        @return : empty {}
+        """
+
+        # to know they didnt implement it
+        return {}
     
     def __is_all_args_registered(self,name):
         """
