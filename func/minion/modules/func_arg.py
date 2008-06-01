@@ -138,5 +138,13 @@ class NonExistingMethodRegistered(IncompatibleTypesException):
     """
     pass
 
+class UnregisteredMethodArgument(IncompatibleTypesException):
+    """
+    That exception is to try to remove the errors that user may
+    do during method registration process. If a argument is missed
+    to be registerted in the method that exception is Raised!
+    """
+    pass
+
 
 

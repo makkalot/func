@@ -15,7 +15,7 @@ import inspect
 from func import logger
 from func.config import read_config
 from func.commonconfig import FuncdConfig
-
+from func.minion.modules.func_arg import * #the arg getter stuff
 
 class FuncModule(object):
 
@@ -81,16 +81,26 @@ class FuncModule(object):
                     return True
         return False
 
-    def __get_method_args(self,name):
+    def get_method_args(self,name):
         """
-        Gives a list of arguments for particular given
-        method_name
+        Gets arguments with their formats according to ArgCompatibility
+        class' rules.
 
-        @param name: the name of the method
+        @param :name The name of the method 
+        @return : dict with args or Raise Exception if something wrong
+        happens
+        """
+        pass
+    
+    def __is_all_args_registered(self,name):
+        """
+        Checks if module writer has made some mistakes about 
+        argument registering
+
+        @param name: the name of the method with arguments registered in it
         @retun : dict(name:[arg1,arg2...]) or {}
         """
-         #we dont need them actually
-        
+         #FIXME tobe rewritten
         if name in self.__base_methods.keys():
             return {}
         
