@@ -24,7 +24,6 @@ class TestArgCompatibility:
         Testing the method argument compatiblity
         """
         result = self.ac.validate_all()
-        #self.assert_on_fault(result)
         assert result == True
 
     def dummy_arg_getter(self):
@@ -45,21 +44,47 @@ class TestArgCompatibility:
                 
                 'platform':{
                     'type':'string',
-                    'min_length':50,
+                    'min_length':5,
                     'max_length':100,
-                    'options':('fedora8','fedora9','some_other'),'description':"Hey im a fedora fan"
+                    'options':('fedora8','fedora9','some_other'),'description':"Hey im a fedora fan",
+                    'default':'fedora8',
                         },
                 
                 'is_independent':{
                     'type':'boolean',
                     'default' :False,
-                    'description':'Are you independent ?'
+                    'description':'Are you independent ?',
+                    'optional':False
                     },
                                 
                 'some_string':{
                     'type':'string',
-                    'validator': "^[a-zA-Z]$",} # validator is a re string for those whoo need better validation...
-                        
+                    'validator': "^[a-zA-Z]$",
+                    'description':'String to be validated',
+                    'default':'makkalot',
+                    'optional':False}, # validator is a re string for those whoo need better validation,so when we have options there is no need to use validator and reverse is True
+                #to define also a float we dont need it actually but maybe useful for the UI stuff.
+                'some_float':{
+                    'type':'float',
+                    'description':'The float point value',
+                    'default':33.44,
+                    'optional':False
+                    },
+
+                'some_iterable':{
+                    'type':'iterable',
+                    'description':'The value and description for *arg',
+                    'optional':True, #that is where it makes sense
+                    'validator':'^[0-9]+$',#maybe useful to say it is to be a number for example
+                    },
+
+                'some_hash':{
+                    'type':'hash',
+                    'description':'The value and description for **kwarg',
+                    'optional':True, #of course it is,
+                    'validator':'^[a-z]*$',#only for values not keys
+                    
+                    }
               }
               }
 
