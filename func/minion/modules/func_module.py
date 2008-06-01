@@ -15,7 +15,7 @@ import inspect
 from func import logger
 from func.config import read_config
 from func.commonconfig import FuncdConfig
-from func.minion.modules.func_arg import * #the arg getter stuff
+from func.minion.func_arg import * #the arg getter stuff
 
 class FuncModule(object):
 
