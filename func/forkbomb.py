@@ -75,8 +75,8 @@ def __bucketize(pool, slots):
     buckets = {}
     count = 0
     for key in pool:
-        count = count + 1
         slot = count % slots
+        count = count + 1
         if not buckets.has_key(slot):
             buckets[slot] = [] 
         buckets[slot].append(key)
