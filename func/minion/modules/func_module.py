@@ -77,7 +77,7 @@ class FuncModule(object):
 
     def __is_public_valid_method(self,attr):
         if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and\
-                attr != 'register_rpc':
+                attr != 'register_rpc' and attr!='register_method_args':
                     return True
         return False
 
@@ -89,7 +89,7 @@ class FuncModule(object):
         @return : dict with args or Raise Exception if something wrong
         happens
         """
-        tmp_arg_dict = self.__register_method_args()
+        tmp_arg_dict = self.register_method_args()
 
         #if it is not implemeted then return empty stuff 
         if not tmp_arg_dict:
@@ -107,7 +107,7 @@ class FuncModule(object):
 
         return tmp_arg_dict 
 
-    def __register_method_args(self):
+    def register_method_args(self):
         """
         That is the method where users should override in their
         modules according to be able to send their method arguments

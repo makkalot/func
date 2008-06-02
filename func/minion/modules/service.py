@@ -87,7 +87,7 @@ class Service(func_module.FuncModule):
                 results.append((tokens[0], tokens[-1].replace("...","")))
         return results
 
-    def __register_method_args(self):
+    def register_method_args(self):
         """
         Implementing the argument getter
         """
