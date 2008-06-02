@@ -86,3 +86,29 @@ class Service(func_module.FuncModule):
                 tokens = line.split()
                 results.append((tokens[0], tokens[-1].replace("...","")))
         return results
+
+    def __register_method_args(self):
+        """
+        Implementing the argument getter
+        """
+
+        #service_name options they are same so use only one
+        service_name =  {
+                'type':'string',
+                'description':'The name of the running services',
+                'validator':'^[a-z]+$'}
+
+        return {
+                'get_running':{},
+                'get_enabled':{},
+                'inventory':{},
+                'status':{
+                    'service_name':service_name,   
+                    },
+                'reload':{'service_name':service_name},
+                'restart':{'service_name':service_name},
+                'stop':{'service_name':service_name},
+                'start':{'service_name':service_name},
+
+
+                }
