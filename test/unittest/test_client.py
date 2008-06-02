@@ -14,8 +14,7 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
 #    th = socket.gethostname()
-    maho ="hard.evlan.com" 
-    th = socket.getfqdn(maho)
+    th = socket.getfqdn()
     nforks=1
     async=False
 
