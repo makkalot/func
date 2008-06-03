@@ -29,6 +29,7 @@ JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
 JOB_ID_ASYNC_PARTIAL = 3
 JOB_ID_ASYNC_FINISHED = 4
+JOB_ID_REMOTE_ERROR = 5
 
 # how long to retain old job records in the job id database
 RETAIN_INTERVAL = 60 * 60    
@@ -176,7 +177,11 @@ def job_status(jobid, client_class=None):
             client = client_class(host, noglobs=True, async=False)
             minion_result = client.jobs.job_status(minion_job)
 
-            (minion_interim_rc, minion_interim_result) = minion_result
+            if type(minion_result) != tuple:
+                minion_interim_rc = JOB_ID_REMOTE_ERROR
+                minion_interim_result = minion_result
+            else:
+                (minion_interim_rc, minion_interim_result) = minion_result
 
             if minion_interim_rc not in [ JOB_ID_RUNNING ]:
                 if minion_interim_rc in [ JOB_ID_LOST_IN_SPACE ]:
