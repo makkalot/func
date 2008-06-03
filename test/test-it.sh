@@ -152,7 +152,7 @@ uninstall_the_rpms()
         msg "Removing the func and certmaster rpms, if there is one"
 	# just one package for now, easy enough
 	rpm -e func
-	rpm -e certmater
+	rpm -e certmaster
 }
 
 install_the_rpms()
