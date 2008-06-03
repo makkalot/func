@@ -11,7 +11,7 @@
 ##
 
 #tester module for ArgCompatibility
-from func.minion.modules.func_arg import ArgCompatibility
+from func.minion.func_arg import ArgCompatibility
 
 class TestArgCompatibility:
    
