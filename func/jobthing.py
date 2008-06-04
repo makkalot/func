@@ -23,6 +23,7 @@ import sys
 import fcntl
 import forkbomb
 import utils
+import signal
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
@@ -134,6 +135,7 @@ def minion_async_run(retriever, method, args):
 
 
     job_id = "%s-minion" % time.time()
+    signal.signal(signal.SIGCHLD, 0)
     pid = os.fork()
     if pid != 0:
         __update_status(job_id, JOB_ID_RUNNING, -1)
