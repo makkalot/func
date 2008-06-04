@@ -101,7 +101,7 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
 
     return rc
 
-def batch_run(server, process_server, nforks):
+def batch_run(pool, callback, nforks):
     """
     This is the method used by the overlord side usage of jobthing.
     Minion side usage will use minion_async_run instead.
@@ -120,7 +120,7 @@ def batch_run(server, process_server, nforks):
         # kick off the job
         # I don't thing it's needed - kaa
         #__update_status(job_id, JOB_ID_RUNNING, -1)
-        results = forkbomb.batch_run(server, process_server, nforks)
+        results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
         __update_status(job_id, JOB_ID_ASYNC_PARTIAL, results)
