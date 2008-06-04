@@ -118,7 +118,8 @@ def batch_run(server, process_server, nforks):
         return job_id
     else:
         # kick off the job
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
+        # I don't thing it's needed - kaa
+        #__update_status(job_id, JOB_ID_RUNNING, -1)
         results = forkbomb.batch_run(server, process_server, nforks)
         
         # we now have a list of job id's for each minion, kill the task
@@ -139,7 +140,8 @@ def minion_async_run(retriever, method, args):
         __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
+        # I don't thing it's needed - kaa
+        #__update_status(job_id, JOB_ID_RUNNING,  -1)
         try:
             function_ref = retriever(method)
             rc = function_ref(*args)
