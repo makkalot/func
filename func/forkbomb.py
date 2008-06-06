@@ -75,8 +75,8 @@ def __bucketize(pool, slots):
     buckets = {}
     count = 0
     for key in pool:
-        count = count + 1
         slot = count % slots
+        count = count + 1
         if not buckets.has_key(slot):
             buckets[slot] = [] 
         buckets[slot].append(key)
@@ -130,9 +130,9 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     the workload over nfork forks.  Temporary files used during the
     operation will be created in cachedir and subsequently deleted.    
     """
-    if nforks <= 1:
+    if nforks < 1:
        # modulus voodoo gets crazy otherwise and bad things happen
-       nforks = 2
+       nforks = 1
     shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)
