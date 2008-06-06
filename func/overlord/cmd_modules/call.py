@@ -146,11 +146,11 @@ class Call(base_command.BaseCommand):
                     (return_code, async_results) = self.overlord_obj.job_status(results)
                     if return_code == jobthing.JOB_ID_RUNNING:
                         time.sleep(0.1)
-                    elif return_code == jobthing.JOB_ID_ASYNC_FINISHED:
+                    elif return_code == jobthing.JOB_ID_FINISHED:
                         async_done = True
                         partial = self.print_partial_results(partial, async_results, self.options.sort)
                         return partial
-                    elif return_code == jobthing.JOB_ID_ASYNC_PARTIAL:
+                    elif return_code == jobthing.JOB_ID_PARTIAL:
                         if not self.options.sort:
                             partial = self.print_partial_results(partial, async_results)
                     else:
