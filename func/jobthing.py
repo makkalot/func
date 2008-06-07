@@ -18,7 +18,7 @@ import os
 import random # for testing only
 import time   # for testing only
 import shelve
-import bsddb
+import dbm
 import sys
 import fcntl
 import forkbomb
@@ -66,10 +66,10 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
         os.makedirs(dir)
     filename = os.path.join(dir,"status-%s" % os.getuid()) 
 
-    internal_db = bsddb.btopen(filename, 'c', 0644 )
-    handle = open(filename,"r")
+    handle = open(filename,"w")
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-    storage = shelve.BsdDbShelf(internal_db)
+    internal_db = dbm.open(filename, 'c', 0644 )
+    storage = shelve.Shelf(internal_db)
 
 
     if clear:

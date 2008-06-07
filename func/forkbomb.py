@@ -16,7 +16,7 @@ import os
 import random # for testing only
 import time   # for testing only
 import shelve
-import bsddb
+import dbm
 import sys
 import tempfile
 import fcntl
@@ -39,10 +39,10 @@ def __access_buckets(filename,clear,new_key=None,new_value=None):
     modifying it as required.
     """
 
-    internal_db = bsddb.btopen(filename, 'c', 0644 )
-    handle = open(filename,"r")
+    handle = open(filename,"w")
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-    storage = shelve.BsdDbShelf(internal_db)
+    internal_db = dbm.open(filename, 'c', 0644 )
+    storage = shelve.Shelf(internal_db)
 
     if clear:
         storage.clear()
@@ -138,7 +138,14 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     buckets = __bucketize(pool, nforks)
     __forkbomb(0,buckets,callback,shelf_file)
     rc = __access_buckets(shelf_file,False,None)
-    os.remove(shelf_file)
+
+    try: #it's only cleanup so don't care if the files disapeared
+        os.remove(shelf_file)
+        os.remove(shelf_file+".pag")
+        os.remove(shelf_file+".dir")
+    except OSError:
+        pass
+
     return rc
 
 def __test(nforks=4,sample_size=20):
