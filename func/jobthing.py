@@ -135,9 +135,18 @@ def minion_async_run(retriever, method, args):
     pid = os.fork()
     if pid != 0:
         __update_status(job_id, JOB_ID_RUNNING, -1)
+        os.waitpid(pid, 0)
         return job_id
     else:
         __update_status(job_id, JOB_ID_RUNNING,  -1)
+
+        # daemonize!
+        os.umask(077)
+        os.chdir('/')
+        os.setsid()
+        if os.fork():
+            os._exit(0)
+
         try:
             function_ref = retriever(method)
             rc = function_ref(*args)
@@ -146,7 +155,7 @@ def minion_async_run(retriever, method, args):
             rc = utils.nice_exception(t,v,tb)
 
         __update_status(job_id, JOB_ID_FINISHED, rc)
-        sys.exit(0)
+        os._exit(0)
 
 def job_status(jobid, client_class=None):
  
