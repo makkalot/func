@@ -29,4 +29,5 @@ class BaseCommand(command.Command):
                                             interactive=self.interactive,
                                             verbose=self.verbose,
                                             config=self.config,
-                                            async=self.options.async)
+                                            async=self.options.async,
+                                            nforks=self.options.forks)
