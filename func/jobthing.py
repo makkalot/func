@@ -132,14 +132,12 @@ def minion_async_run(retriever, method, args):
 
 
     job_id = "%s-minion" % time.time()
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
         os.waitpid(pid, 0)
         return job_id
     else:
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
-
         # daemonize!
         os.umask(077)
         os.chdir('/')
