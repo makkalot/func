@@ -93,7 +93,7 @@ class TestArgCompatibility:
                     },
 
                 'some_iterable':{
-                    'type':'iterable',
+                    'type':'list',
                     'description':'The value and description for *arg',
                     'optional':True, #that is where it makes sense
                     'validator':'^[0-9]+$',#maybe useful to say it is to be a number for example
