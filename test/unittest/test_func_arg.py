@@ -25,6 +25,25 @@ class TestArgCompatibility:
         """
         result = self.ac.validate_all()
         assert result == True
+        
+        self.ac = ArgCompatibility(self.dummy_no_getter())
+        result = self.ac.validate_all()
+        assert result == True
+        
+        self.ac = ArgCompatibility(self.dummy_empty_args())
+        result = self.ac.validate_all()
+        assert result == True
+    
+    def dummy_no_getter(self):
+        return {}
+
+    def dummy_empty_args(self):
+        return{
+                'myfunc':{
+                    'args':{},
+                    'description':'Cool methods here'
+                    }
+                }
 
     def dummy_arg_getter(self):
         """
@@ -34,19 +53,21 @@ class TestArgCompatibility:
         """
         return {
             'hifunc':{
-                
+               
+                'args':{
                 'app':{
                     'type':'int',
-                    'range':(0,100),
+                    'range':[0,100],
                     'optional':False,
                     'default' : 12
                     },
                 
                 'platform':{
                     'type':'string',
-                    'min_length':5,
-                    'max_length':100,
-                    'options':('fedora8','fedora9','some_other'),'description':"Hey im a fedora fan",
+                    'min_length':4,
+                    'max_length':33,
+                    'options':["fedora","redhat","ubuntu"],
+                    'description':"Hey im a fedora fan",
                     'default':'fedora8',
                         },
                 
@@ -80,12 +101,16 @@ class TestArgCompatibility:
 
                 'some_hash':{
                     'type':'hash',
-                    'description':'The value and description for **kwarg',
+                    'description':"Dummy desc here",
                     'optional':True, #of course it is,
-                    'validator':'^[a-z]*$',#only for values not keys
+                    'validator':"^[a-z]*$",#only for values not keys
                     
                     }
+                },
+                'description':"The dummy method description",
               }
               }
+
+
 
    
