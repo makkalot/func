@@ -99,16 +99,18 @@ class Service(func_module.FuncModule):
                 'validator':'^[a-z]+$'}
 
         return {
-                'get_running':{},
-                'get_enabled':{},
-                'inventory':{},
-                'status':{
+                'get_running':{'args':{}},
+                'get_enabled':{'args':{}},
+                'inventory':{'args':{}},
+                'status':{'args':{
                     'service_name':service_name,   
                     },
-                'reload':{'service_name':service_name},
-                'restart':{'service_name':service_name},
-                'stop':{'service_name':service_name},
-                'start':{'service_name':service_name},
+                    'description':'Getting the status of the service_name'
+                    },
+                'reload':{'args':{'service_name':service_name}},
+                'restart':{'args':{'service_name':service_name}},
+                'stop':{'args':{'service_name':service_name}},
+                'start':{'args':{'service_name':service_name}},
 
 
                 }
