@@ -47,9 +47,9 @@ class ArgCompatibility(object):
                 'int':('range','min','max',),
                 'string':('options','min_length','max_length','validator',),
                 'boolean':(),
-                'float':(),
+                'float':('range','min','max'),
                 'hash':('validator',),
-                'iterable':('validator',),
+                'list':('validator',),
             }
 
 
