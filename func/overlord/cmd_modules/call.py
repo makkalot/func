@@ -16,9 +16,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import optparse
 import pprint
 import xmlrpclib
+import time
 
 from func.overlord import client
 from func.overlord import base_command
+
+import func.jobthing as jobthing
 
 DEFAULT_FORKS = 1
 
@@ -43,6 +46,18 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-f", "--forks", dest="forks",
                                help="how many parallel processes?  (default 1)",
                                default=DEFAULT_FORKS)
+        self.parser.add_option("-a", "--async", dest="async",
+                               help="Use async calls?  (default 0)",
+                               action="store_true")
+        self.parser.add_option("-n", "--nopoll", dest="nopoll",
+                               help="Don't wait for async results",
+                               action="store_true")
+        self.parser.add_option("", "--sort", dest="sort",
+                               help="In async mode, wait for all results and print them sorted.",
+                               action="store_true")
+        self.parser.add_option("-s", "--jobstatus", dest="jobstatus",
+                               help="Do not run any job, just check for status.",
+                               action="store_true")
 
     def handleOptions(self, options):
         self.options = options
@@ -112,7 +127,35 @@ class Call(base_command.BaseCommand):
         self.getOverlord()
         
 
-        results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        if not self.options.jobstatus:
+            results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        else:
+            (return_code, async_results) = self.overlord_obj.job_status(float(self.module))
+            res = self.format_return((return_code, async_results))
+            print res
+            return async_results
+
+        if self.options.async:
+            partial = {}
+            if self.options.nopoll:
+                print "JOB_ID:", pprint.pformat(results)
+                return results
+            else:
+                async_done = False
+                while not async_done:
+                    (return_code, async_results) = self.overlord_obj.job_status(results)
+                    if return_code == jobthing.JOB_ID_RUNNING:
+                        time.sleep(0.1)
+                    elif return_code == jobthing.JOB_ID_ASYNC_FINISHED:
+                        async_done = True
+                        partial = self.print_partial_results(partial, async_results, self.options.sort)
+                        return partial
+                    elif return_code == jobthing.JOB_ID_ASYNC_PARTIAL:
+                        if not self.options.sort:
+                            partial = self.print_partial_results(partial, async_results)
+                    else:
+                        sys.stderr.write("Async error")
+                        return 0
 
         # TO DO: add multiplexer support
         # probably as a higher level module.
@@ -122,4 +165,15 @@ class Call(base_command.BaseCommand):
         print foo
 
         # nothing really makes use of this atm -akl
-        return foo
+        return results
+
+    def print_partial_results(self, old, new, sort=0):
+        diff = dict([(k, v) for k, v in new.iteritems() if k not in old])
+        if len(diff) > 0:
+            iter=diff.iteritems()
+            if sort:
+                iter=sorted(iter)
+            for res in iter:
+                print self.format_return(res)
+            return new
+        return old

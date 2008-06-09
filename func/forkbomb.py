@@ -75,8 +75,8 @@ def __bucketize(pool, slots):
     buckets = {}
     count = 0
     for key in pool:
-        count = count + 1
         slot = count % slots
+        count = count + 1
         if not buckets.has_key(slot):
             buckets[slot] = [] 
         buckets[slot].append(key)
@@ -136,7 +136,7 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)
-    __forkbomb(1,buckets,callback,shelf_file)
+    __forkbomb(0,buckets,callback,shelf_file)
     rc = __access_buckets(shelf_file,False,None)
     os.remove(shelf_file)
     return rc
