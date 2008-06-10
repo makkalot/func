@@ -3,6 +3,7 @@
 #that same boring stuff for every added module !
 
 from turbogears.widgets.base import Widget,WidgetsList
+from turbogears import widgets
 
 class WidgetListFactory(object):
     """
@@ -19,8 +20,8 @@ class WidgetListFactory(object):
             'string':{
                 'default_value':"TextField",
                 'options':"SingleSelectField"},
-            'boolean':{'
-                default_value':"CheckBox"},
+            'boolean':{
+                'default_value':"CheckBox"},
             'float':{
                 'default_value':"TextField",
                 'range':"SingleSelectField"},
@@ -60,16 +61,20 @@ class WidgetListFactory(object):
                 if type_match!='default_value' and argument.has_key(type_match):
                     act_special = True
 
-            print key,argument
+           # print key,argument
 
             if act_special:
                 getattr(self,"__add_%s_widget")(argument['type']) #call the appropriate one 
             else:
-                temp_object = getattr(widgets,self.__convert_table[current_type]['default_value'])
+                temp_object = getattr(widgets,self.__convert_table[current_type]['default_value'])()
                 #add common options to it
                 self.__add_commons_to_object(temp_object,argument,key)
                 #add a new entry to final list
                 self.__widget_list[key]=temp_object
+                #print "That have the object :",getattr(self.__widget_list[key],"default")
+                del temp_object
+
+                #print "That have the object :",getattr(self.__widget_list["list_default"],"default")
     
     def __add_commons_to_object(self,object,argument,argument_name):
         """
@@ -84,13 +89,12 @@ class WidgetListFactory(object):
         """
         #firstly set the name of the argument 
         setattr(object,"name",argument_name)
+        
+        #print "The argument name is :",argument_name
+        #print "The argument options are :",argument
 
         if argument.has_key('default'):
             setattr(object,"default",argument["default"])
-        if argument.has_key('optional') and argument['optional']:
-            setattr(object,'is_required',False)
-        else:
-            setattr(object,'is_required',True)
         if argument.has_key('description'):
             setattr(object,'help_text',argument['description'])
 
