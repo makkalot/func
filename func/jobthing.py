@@ -18,7 +18,7 @@ import os
 import random # for testing only
 import time   # for testing only
 import shelve
-import bsddb
+import dbm
 import sys
 import fcntl
 import forkbomb
@@ -68,10 +68,10 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
         os.makedirs(dir)
     filename = os.path.join(dir,"status-%s" % os.getuid()) 
 
-    internal_db = bsddb.btopen(filename, 'c', 0644 )
-    handle = open(filename,"r")
+    handle = open(filename,"w")
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-    storage = shelve.BsdDbShelf(internal_db)
+    internal_db = dbm.open(filename, 'c', 0644 )
+    storage = shelve.Shelf(internal_db)
 
 
     if clear:
@@ -118,8 +118,7 @@ def batch_run(pool, callback, nforks):
         return job_id
     else:
         # kick off the job
-        # I don't thing it's needed - kaa
-        #__update_status(job_id, JOB_ID_RUNNING, -1)
+        __update_status(job_id, JOB_ID_RUNNING,  -1)
         results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
@@ -135,14 +134,19 @@ def minion_async_run(retriever, method, args):
 
 
     job_id = "%s-minion" % time.time()
-    signal.signal(signal.SIGCHLD, 0)
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
+        os.waitpid(pid, 0)
         return job_id
     else:
-        # I don't thing it's needed - kaa
-        #__update_status(job_id, JOB_ID_RUNNING,  -1)
+        # daemonize!
+        os.umask(077)
+        os.chdir('/')
+        os.setsid()
+        if os.fork():
+            os._exit(0)
+
         try:
             function_ref = retriever(method)
             rc = function_ref(*args)
@@ -151,7 +155,7 @@ def minion_async_run(retriever, method, args):
             rc = utils.nice_exception(t,v,tb)
 
         __update_status(job_id, JOB_ID_FINISHED, rc)
-        sys.exit(0)
+        os._exit(0)
 
 def job_status(jobid, client_class=None):
  
@@ -180,9 +184,9 @@ def job_status(jobid, client_class=None):
             client = client_class(host, noglobs=True, async=False)
             minion_result = client.jobs.job_status(minion_job)
 
-            if type(minion_result) != tuple:
+            if type(minion_result) != list or len(minion_result)!=2:
                 minion_interim_rc = JOB_ID_REMOTE_ERROR
-                minion_interim_result = minion_result
+                minion_interim_result = minion_result[:3]
             else:
                 (minion_interim_rc, minion_interim_result) = minion_result
 
