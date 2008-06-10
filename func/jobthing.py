@@ -23,13 +23,13 @@ import sys
 import fcntl
 import forkbomb
 import utils
+import signal
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
-JOB_ID_ASYNC_PARTIAL = 3
-JOB_ID_ASYNC_FINISHED = 4
-JOB_ID_REMOTE_ERROR = 5
+JOB_ID_PARTIAL = 3
+JOB_ID_REMOTE_ERROR = 4
 
 # how long to retain old job records in the job id database
 RETAIN_INTERVAL = 60 * 60    
@@ -101,7 +101,7 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
 
     return rc
 
-def batch_run(server, process_server, nforks):
+def batch_run(pool, callback, nforks):
     """
     This is the method used by the overlord side usage of jobthing.
     Minion side usage will use minion_async_run instead.
@@ -118,11 +118,12 @@ def batch_run(server, process_server, nforks):
         return job_id
     else:
         # kick off the job
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
-        results = forkbomb.batch_run(server, process_server, nforks)
+        # I don't thing it's needed - kaa
+        #__update_status(job_id, JOB_ID_RUNNING, -1)
+        results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
-        __update_status(job_id, JOB_ID_ASYNC_PARTIAL, results)
+        __update_status(job_id, JOB_ID_PARTIAL, results)
         sys.exit(0)
 
 def minion_async_run(retriever, method, args):
@@ -134,12 +135,14 @@ def minion_async_run(retriever, method, args):
 
 
     job_id = "%s-minion" % time.time()
+    signal.signal(signal.SIGCHLD, 0)
     pid = os.fork()
     if pid != 0:
         __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
+        # I don't thing it's needed - kaa
+        #__update_status(job_id, JOB_ID_RUNNING,  -1)
         try:
             function_ref = retriever(method)
             rc = function_ref(*args)
@@ -159,13 +162,13 @@ def job_status(jobid, client_class=None):
    
     got_status = __get_status(jobid)
 
-    # if the status comes back as JOB_ID_ASYNC_PARTIAL what we have is actually a hash
+    # if the status comes back as JOB_ID_PARTIAL what we have is actually a hash
     # of hostname/minion-jobid pairs.  Instantiate a client handle for each and poll them
     # for their actual status, filling in only the ones that are actually done.
 
     (interim_rc, interim_results) = got_status
 
-    if interim_rc == JOB_ID_ASYNC_PARTIAL:
+    if interim_rc == JOB_ID_PARTIAL:
 
         partial_results = {}
 
@@ -192,9 +195,9 @@ def job_status(jobid, client_class=None):
                 some_missing = True
 
         if some_missing:
-            return (JOB_ID_ASYNC_PARTIAL, partial_results)
+            return (JOB_ID_PARTIAL, partial_results)
         else:
-            return (JOB_ID_ASYNC_FINISHED, partial_results)
+            return (JOB_ID_FINISHED, partial_results)
 
     else:
         return got_status
