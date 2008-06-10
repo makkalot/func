@@ -4,6 +4,7 @@ from turbogears import testutil
 from funcweb.controllers import Root
 import cherrypy
 
+from funcweb.widget_automation import WidgetListFactory
 cherrypy.root = Root()
 
 class TestWidgetListFactory(unittest.TestCase):
@@ -16,32 +17,24 @@ class TestWidgetListFactory(unittest.TestCase):
         pass
 
     def test_default_args(self):
-        """
-        Simple test to see if all arguments are assigned into
-        input widget objects
-        """
         compare_with = self.get_test_default_args()
         widget_list=self.widget_factory.get_widgetlist()
+        
+        #print "The widget list is like :",widget_list
 
-        for argument_name,argument_options in compare_with:
-            assert widget_list.has_key(argument) == True
-
+        for argument_name,argument_options in compare_with.iteritems():
+            assert widget_list.has_key(argument_name) == True
+            #print "The argument name is :",argument_name
             #because some of them dont have it like boolean
             if argument_options.has_key('default'):
                 assert argument_options['default'] == getattr(widget_list[argument_name],'default')
 
-            #if it is optional it should ne is_required = True
-            assert not argument_options['optional']== getattr(widget_list[argument_name],'is_required')
-
-            assert argument_options['description']==getattr(widget_list[argument_name],'help_text')
+            if argument_options.has_key("description"):
+                assert argument_options['description']==getattr(widget_list[argument_name],'help_text')
 
         #that should be enough
 
     def get_test_default_args(self):
-        """
-        Simple testing case to see if have all the 
-        things working properly ...
-        """
         return {
                 'string_default':{
                     'type':'string',
@@ -57,26 +50,26 @@ class TestWidgetListFactory(unittest.TestCase):
                    },
                 #no sense to have default
                 'boolean_default':{
-                    'type':'boolean'
+                    'type':'boolean',
                     'optional':False,
                     'description':'default description'
                    },
                 'float_default':{
-                    'type':'float'
+                    'type':'float',
                     'default':'default float',
                     'optional':False,
                     'description':'default description'
                    
                     },
                 'hash_default':{
-                    'type':'hash'
+                    'type':'hash',
                     'default':'default hash',
                     'optional':False,
                     'description':'default description'
                    
                     },
                 'list_default':{
-                    'type':'list'
+                    'type':'list',
                     'default':'default list',
                     'optional':False,
                     'description':'default description'
