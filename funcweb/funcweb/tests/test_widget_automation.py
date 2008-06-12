@@ -20,7 +20,7 @@ class TestWidgetListFactory(unittest.TestCase):
         compare_with = self.get_test_default_args()
         widget_list=self.widget_factory.get_widgetlist()
         
-        #print "The widget list is like :",widget_list
+        print "The widget list is like :",widget_list
 
         for argument_name,argument_options in compare_with.iteritems():
             assert widget_list.has_key(argument_name) == True
@@ -32,6 +32,9 @@ class TestWidgetListFactory(unittest.TestCase):
             if argument_options.has_key("description"):
                 assert argument_options['description']==getattr(widget_list[argument_name],'help_text')
 
+            if argument_options.has_key("options"):
+                assert argument_options['options'] == getattr(widget_list[argument_name],"options")
+            
         #that should be enough
 
     def get_test_default_args(self):
@@ -74,6 +77,14 @@ class TestWidgetListFactory(unittest.TestCase):
                     'optional':False,
                     'description':'default description'
                    
+                    },
+                #will be converted to dropdown
+                'special_string':{
+                    'type':'string',
+                    'default':'myfirst',
+                    'options':['myfirst','mysecond','mythird'],
+                    'optional':False,
+                    'description':'default dropdown list'
                     }
                 
                 }
