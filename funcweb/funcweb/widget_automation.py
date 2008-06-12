@@ -16,7 +16,7 @@ class WidgetListFactory(object):
     __convert_table={
             'int':{
                 'default_value':"TextField",
-                'range':"SingleSelectField"},
+                },
             'string':{
                 'default_value':"TextField",
                 'options':"SingleSelectField"},
@@ -24,13 +24,12 @@ class WidgetListFactory(object):
                 'default_value':"CheckBox"},
             'float':{
                 'default_value':"TextField",
-                'range':"SingleSelectField"},
+                },
             'hash':{
                 'default_value':"TextArea"},
             'list':{
                 'default_value':"TextArea"} 
             }
-
     #will contain the input widget created in that class
     __widget_list={}
 
@@ -64,7 +63,8 @@ class WidgetListFactory(object):
            # print key,argument
 
             if act_special:
-                getattr(self,"__add_%s_widget")(argument['type']) #call the appropriate one 
+                #calling for example __add_specialized_string(..)
+                getattr(self,"_%s__add_specialized_%s"%(self.__class__.__name__,current_type))(argument,key)
             else:
                 temp_object = getattr(widgets,self.__convert_table[current_type]['default_value'])()
                 #add common options to it
@@ -75,6 +75,27 @@ class WidgetListFactory(object):
                 del temp_object
 
                 #print "That have the object :",getattr(self.__widget_list["list_default"],"default")
+
+    def __add_specialized_string(self,argument,argument_name):
+        """
+        Specialized option adder, called when the type:string is used
+        with option 'options' so we should create a new SingleSelectField
+        that one canno be created like others because user should supply options
+        in the constructor of the SingleSelectField so it becomes a special one
+
+        @param : argument : the argument options,
+        @param : argument_name : the name of the argument also the name of the widget
+        @return : Nothing
+        """
+        
+        #allittle bit difficult to follow but that structure does
+        #temp_object = SingleSelectField() for example
+        
+        temp_object = getattr(widgets,self.__convert_table[argument['type']]['options'])(options = argument['options'])
+        self.__add_commons_to_object(temp_object,argument,argument_name)
+        #add a new entry to final list
+        self.__widget_list[argument_name]=temp_object
+        del temp_object
     
     def __add_commons_to_object(self,object,argument,argument_name):
         """
@@ -97,28 +118,7 @@ class WidgetListFactory(object):
             setattr(object,"default",argument["default"])
         if argument.has_key('description'):
             setattr(object,'help_text',argument['description'])
-
-
-    def __add_string_widget(self,arg_dict):
-        print "Called with act special"
-        pass
     
-    def __add_int_widget(self,arg_dict):
-        print "Called with act special"
-        pass
-    
-    def __add_boolean_widget(self,arg_dict):
-        print "Called with act special"
-        pass
-    
-    def __add_hash_widget(self,arg_dict):
-        print "Called with act special"
-        pass
-
-    def __add_list_widget(self,arg_dict):
-        print "Called with act special"
-        pass
-
     def get_widgetlist(self):
         """
         Return the final list back
