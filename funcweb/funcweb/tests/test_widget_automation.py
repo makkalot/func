@@ -4,7 +4,7 @@ from turbogears import testutil
 from funcweb.controllers import Root
 import cherrypy
 
-from funcweb.widget_automation import WidgetListFactory
+from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation
 cherrypy.root = Root()
 
 class TestWidgetListFactory(unittest.TestCase):
@@ -44,7 +44,13 @@ class TestWidgetListFactory(unittest.TestCase):
     
         for argument_name in compare_with.keys():
             assert hasattr(widget_list_object,argument_name) == True
-            #print getattr(widget_list_object,argument_name) 
+            #print getattr(widget_list_object,argument_name)
+
+
+    def test_remote_form(self):
+        widget_list_object = self.widget_factory.get_widgetlist_object()
+        remote_form = RemoteFormAutomation(widget_list_object)
+        #print remote_form
 
     def get_test_default_args(self):
         return {
