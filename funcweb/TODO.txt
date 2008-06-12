@@ -1,0 +1,17 @@
+Things to be done for funcweb (makkalot)
+
+    ? : not sure
+    - : not completed
+    + : completed
+    / : being implemented
+
+
+Widget Automation for Minion methods :
+    (+) Creating InputWidgets for method arguments
+    (+) Creating WidgetList with created InputWidgets
+    (/) Creating Validators for method arguments
+    (-)Combining Validators and WidgetList into a RemoteForm 
+    (/) Writing tests for the API
+
+New Ideas :
+    -????
