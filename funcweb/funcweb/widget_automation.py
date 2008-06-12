@@ -121,8 +121,25 @@ class WidgetListFactory(object):
     
     def get_widgetlist(self):
         """
-        Return the final list back
+        Return back a dictionay with argument_name : input_widget
+        pairs. That method may not be called directly,get_widgetlist_object
+        is better for using in web interface
         """
         #compute the list
         self.__add_general_widget()
         return self.__widget_list
+
+    def get_widgetlist_object(self):
+        """
+        Method return back the final widgetlist object
+        which is turbogears.widgets.WidgetsList
+        """
+        if len(self.__widget_list.keys())==0:
+            self.__add_general_widget() #not very efficient
+    
+        widget_list_object = widgets.WidgetsList()
+        for name,input_widget in self.__widget_list.iteritems():
+            setattr(widget_list_object,name,input_widget)
+
+        #get the object back
+        return widget_list_object 
