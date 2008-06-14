@@ -4,7 +4,8 @@ from turbogears import testutil
 from funcweb.controllers import Root
 import cherrypy
 
-from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation
+from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
+
 cherrypy.root = Root()
 
 class TestWidgetListFactory(unittest.TestCase):
@@ -42,8 +43,11 @@ class TestWidgetListFactory(unittest.TestCase):
         
         #print widget_list_object
     
+        all_fields = [getattr(field,"name") for field in widget_list_object]
+        #print all_fields
         for argument_name in compare_with.keys():
-            assert hasattr(widget_list_object,argument_name) == True
+            print argument_name
+            assert argument_name in all_fields
             #print getattr(widget_list_object,argument_name)
 
 
@@ -52,6 +56,27 @@ class TestWidgetListFactory(unittest.TestCase):
         remote_form = RemoteFormAutomation(widget_list_object)
         #print remote_form
 
+    def test_remote_form_factory(self):
+        from turbogears.view import load_engines
+        load_engines()
+       
+        # WidgetsList object
+        widget_list_object = self.widget_factory.get_widgetlist_object()
+        #print widget_list_object
+        remote_form = RemoteFormFactory(widget_list_object).get_remote_form()
+
+        #it is a key,value dict
+        widget_list=self.widget_factory.get_widgetlist()
+        #print widget_list
+        all_fields = [getattr(field,"name") for field in remote_form.fields]
+        #print all_fields
+        #will check if the remote form object hass all the names in it
+        for argument_name in widget_list.items():
+            argument_name in all_fields 
+
+
+        print remote_form.render()
+    
     def get_test_default_args(self):
         return {
                 'string_default':{
