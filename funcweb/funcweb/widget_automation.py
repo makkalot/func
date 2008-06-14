@@ -134,15 +134,19 @@ class WidgetListFactory(object):
         Method return back the final widgetlist object
         which is turbogears.widgets.WidgetsList
         """
+
+        #print self.__widget_list
         if len(self.__widget_list.keys())==0:
             self.__add_general_widget() #not very efficient
     
         widget_list_object = widgets.WidgetsList()
         for name,input_widget in self.__widget_list.iteritems():
-            setattr(widget_list_object,name,input_widget)
+            #it is a list indeed
+            widget_list_object.append(input_widget)
 
         #get the object back
-        return widget_list_object 
+        #print widget_list_object
+        return widget_list_object
 
 ####################################################################################################################
 from turbogears.widgets.base import CoreWD
@@ -158,13 +162,13 @@ class RemoteFormAutomation(CoreWD):
 
     template = """ 
     <div>
-        {for_widget.display()}
+       ${for_widget.display()}
         <div id="loading"></div>
         <div id="post_data"></div>
     </div>
     """
 
-    full_class_name = "turbogears.widgets.RemoteForm"
+    full_class_name = "funcweb.controllers.Root"
 
     def __init__(self,generated_fields,*args,**kwarg):
         """
@@ -180,7 +184,7 @@ class RemoteFormAutomation(CoreWD):
                 update = "post_data",
                 before='getElement(\'loading\').innerHTML=\'Submiting form!\';',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
-                action = "%s/post_form"%(self.full_class_name)
+                action = "/post_form"
         )
 
     def post_form(self,**kw):
@@ -190,3 +194,35 @@ class RemoteFormAutomation(CoreWD):
         return "I got that data from the remote minion form :<br/>%r"%kw
 
     post_form = expose()(post_form)
+
+####################################################################################################
+class RemoteFormFactory(object):
+    """
+    Gets the WidgetListFactory object
+    and return back a RemoteForm
+    """
+    #some values that may want to change later 
+    name = 'minion_form'
+    before='MochiKit.DOM.getElement(\'loading\').innerHTML=\'Submiting form!\';',
+    on_complete='MochiKit.DOM.getElement(\'loading\'  ).innerHTML=\'Done!\';',
+    update = "post_data"
+    submit_text = "Send Minion Form"
+    action = "/post_form"
+
+    def __init__(self,wlist_object):
+        self.wlist_object = wlist_object
+
+    def get_remote_form(self):
+        
+        #print self.wlist_object
+
+        return RemoteForm(
+                name = self.name,
+                fields = self.wlist_object,
+                before = self.before,
+                on_complete = self.on_complete,
+                update = self.update,
+                submit_text = self.submit_text,
+                action = self.action
+                )
+
