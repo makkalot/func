@@ -51,7 +51,7 @@ class Root(controllers.RootController):
 
     @expose(template="funcweb.templates.method_args")
     #@identity.require(identity.not_anonymous())
-    def method_display(self,minion="*",module="service",method="reload"):
+    def method_display(self,minion=None,module=None,method=None):
     
         fc = Overlord(minion)
         method_args = getattr(fc,module).get_method_args()
