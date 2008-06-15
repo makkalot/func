@@ -96,12 +96,15 @@ class FuncModule(object):
             return {}
 
         #see if user tried to register an not implemented method :)
-        for method in tmp_arg_dict.keys():
+        for method in tmp_arg_dict.iterkeys():
             if not hasattr(self,method):
                 raise NonExistingMethodRegistered("%s is not in %s "%(method,self.__class__.__name__))
         
         #create argument validation instance
         self.arg_comp = ArgCompatibility(tmp_arg_dict)
+        #see if all registered arguments are there
+        for method in tmp_arg_dict.iterkeys():
+            self.is_all_arguments_registered(self,method,tmp_arg_dict[method]['args'])
         #see if the options that were used are OK..
         self.arg_comp.validate_all()
 
