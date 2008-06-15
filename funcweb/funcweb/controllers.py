@@ -72,9 +72,10 @@ class Root(controllers.RootController):
 
         the_one = method_args[minion][method]['args']
         if the_one:
-            wlist_object = WidgetListFactory(the_one)
+            wlist_object = WidgetListFactory(the_one,minion=minion,module=module,method=method)
             wlist_object = wlist_object.get_widgetlist_object()
             #minion_form =RemoteFormFactory( wlist_object.get_widgetlist_object()).get_remote_form()
+            
             minion_form = RemoteFormAutomation(wlist_object)
 
             del wlist_object
@@ -118,7 +119,35 @@ class Root(controllers.RootController):
         """
         Data processing part
         """
-        return "I got that data from the remote minion form :<br/>%r"%kw
+        if kw.has_key('minion') and kw.has_key('module') and kw.has_key('method'):
+            #do the stuff here
+            #assign them because we need the rest so dont control everytime
+            #and dont make lookup everytime ...
+            minion = kw['minion']
+            del kw['minion']
+            module = kw['module']
+            del kw['module']
+            method = kw['method']
+            del kw['method']
+            
+            #everytime we do that should be a clever way for that ???
+            fc = Overlord(minion)
+            #get again the method args to get their order :
+            arguments=getattr(fc,module).get_method_args()
+            #so we know the order just allocate and put them there 
+            cmd_args=['']*(len(kw.keys()))
+            
+            for arg in kw.keys():
+                #wow what a lookup :)
+                index_of_arg = arguments[minion][method]['args'][arg]['order']
+                cmd_args[index_of_arg]=kw[arg]
+           
+            #now execute the stuff
+            result = getattr(getattr(fc,module),method)(*cmd_args)
+            return "The list to be executed is \n: %s"%str(result)
+
+        else:
+            return "Missing arguments sorry can not proceess the form"
 
 
     @expose()
