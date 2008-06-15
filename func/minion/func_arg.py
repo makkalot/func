@@ -17,7 +17,7 @@ class ArgCompatibility(object):
     """
 
     #these are the common options can be used with all types
-    __common_options = ('optional','default','description')
+    __common_options = ('optional','default','description','order')
     __method_options = ('description','args') #making method declarations more generic like method_name:{'args':{...},'description':"bla bla"}
 
     #basic types has types also
