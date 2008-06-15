@@ -103,6 +103,28 @@ class ArgCompatibility(object):
 
         return True
 
+    def is_all_arguments_registered(self,cls,method_name,arguments):
+        """
+        Method inspects the method arguments and checks if the user
+        has registered all the arguments succesfully and also adds a
+        'order' keyword to method arguments to 
+        """
+        import inspect
+        from itertools import chain
+        #get the arguments from real object we have [args],*arg,**kwarg,[defaults]
+        tmp_arguments=inspect.getargspec(getattr(cls,method_name))
+        check_args=[arg for arg in chain(tmp_arguments[0],tmp_arguments[1:3]) if arg and arg!='self']
+        print "The arguments taken from the inspect are :",check_args 
+        #the size may change of the hash so should a copy of it 
+        copy_arguments = arguments.copy()
+        for compare_arg in copy_arguments.iterkeys():
+            if not compare_arg in check_args:
+                raise ArgumentRegistrationError("The argument %s is not in the %s"%(compare_arg,method_name))
+            else:
+                #should set its ordering thing
+                arguments[compare_arg]['order']=check_args.index(compare_arg)
+
+        return True
 
     def validate_all(self):
         """
@@ -123,7 +145,6 @@ class ArgCompatibility(object):
         for method in self.__args_to_check.iterkeys():
             #here we got args or description part
             #check if user did submit something not in the __method_options
-            
             for method_option in self.__args_to_check[method].iterkeys():
                 if method_option not in self.__method_options:
                     raise IncompatibleTypesException("There is no option for method_name like %s,possible ones are : %s"%(method_option,str(self.__method_options)))
@@ -131,13 +152,15 @@ class ArgCompatibility(object):
                 if method_option == "args":
                     for argument in self.__args_to_check[method][method_option].itervalues():
                         #print argument
+                        #check if user registered all the args and add to them ordering option!
                         self._is_basic_types_compatible(argument)
                         self._is_type_options_compatible(argument)
 
         return True
 
 
-###The Exception classes here 
+###The Exception classes here they will be raised during the validation part
+###If a module passes all the tests it is ready tobe registered
 
 
 class IncompatibleTypesException(Exception):
@@ -167,4 +190,16 @@ class UnregisteredMethodArgument(IncompatibleTypesException):
     pass
 
 
+class NonExistingMethodRegistered(IncompatibleTypesException):
+    """
+    Raised when module writer registers a method that doesnt
+    exist in his/her module class (probably by mistake)
+    """
+    pass
 
+class ArgumentRegistrationError(IncompatibleTypesException):
+    """
+    When user forgets to register soem of the arguments in the list
+    or adds some argument that is not there 
+    """
+    pass
