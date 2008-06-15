@@ -104,7 +104,7 @@ class FuncModule(object):
         self.arg_comp = ArgCompatibility(tmp_arg_dict)
         #see if all registered arguments are there
         for method in tmp_arg_dict.iterkeys():
-            self.is_all_arguments_registered(self,method,tmp_arg_dict[method]['args'])
+            self.arg_comp.is_all_arguments_registered(self,method,tmp_arg_dict[method]['args'])
         #see if the options that were used are OK..
         self.arg_comp.validate_all()
 
