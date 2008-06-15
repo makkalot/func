@@ -30,6 +30,15 @@ class Root(controllers.RootController):
         if not module: # list all modules
             #just list those who have get_method_args
             modules = fc.system.list_modules()
+            display_modules = []
+            #FIXME slow really i know !
+            for module in modules.itervalues():
+                for mod in module:
+                    if getattr(fc,mod).get_method_args()[name]:
+                        display_modules.append(mod)
+            modules = {}
+            modules[name]=display_modules
+            
             return dict(modules=modules)
         else: # a module is specified
             if method: # minion.module.method specified; bring up execution form
