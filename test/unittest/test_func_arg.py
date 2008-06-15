@@ -33,7 +33,14 @@ class TestArgCompatibility:
         self.ac = ArgCompatibility(self.dummy_empty_args())
         result = self.ac.validate_all()
         assert result == True
-    
+   
+    def test_is_all_arguments_registered(self):
+        #create the dummy class
+        tc = FooClass()
+        arguments = tc.register_method()
+        assert self.ac.is_all_arguments_registered(tc,'foomethod',arguments['foomethod']['args'])==True
+        print arguments
+        
     def dummy_no_getter(self):
         return {}
 
@@ -112,5 +119,25 @@ class TestArgCompatibility:
               }
 
 
+class FooClass(object):
+    """
+    Sample class for testing the is_all_arguments_registered
+    method functionality ...
+    """
 
+    def foomethod(self,arg1,arg5,arg4,*arg,**kw):
+        pass
+
+    def register_method(self):
+        return{
+                'foomethod':{
+                    'args':{
+                        'arg1':{},
+                        'arg4':{},
+                        'arg5':{},
+                        'arg':{},
+                        'kw':{},
+                        }
+                    }
+                }
    
