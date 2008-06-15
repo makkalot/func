@@ -11,7 +11,7 @@ cherrypy.root = Root()
 class TestWidgetListFactory(unittest.TestCase):
     
     def setUp(self):
-        self.widget_factory = WidgetListFactory(self.get_test_default_args())
+        self.widget_factory = WidgetListFactory(self.get_test_default_args(),minion="myminion",module="mymodule",method="my_method")
     
         
     def tearDown(self):
