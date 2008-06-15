@@ -40,6 +40,7 @@ class TestArgCompatibility:
         arguments = tc.register_method()
         assert self.ac.is_all_arguments_registered(tc,'foomethod',arguments['foomethod']['args'])==True
         print arguments
+        assert self.ac.validate_all()==True
         
     def dummy_no_getter(self):
         return {}

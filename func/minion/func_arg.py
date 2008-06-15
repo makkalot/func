@@ -32,7 +32,8 @@ class ArgCompatibility(object):
             'max_length':0,
             'validator':'',
             'type':'',
-            'default':None #its type is unknown
+            'default':None, #its type is unknown,
+            'order':0
             }
 
     def __init__(self,get_args_result):
