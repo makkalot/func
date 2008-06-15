@@ -32,7 +32,7 @@ class WidgetListFactory(object):
             }
     #will contain the input widget created in that class
 
-    def __init__(self,argument_dict):
+    def __init__(self,argument_dict,minion=None,module=None,method=None):
         """
         Initiated with argument_dict of a method to return back
         a WidgetsList object to be placed into a form object
@@ -43,6 +43,11 @@ class WidgetListFactory(object):
 
         self.__argument_dict = argument_dict
         self.__widget_list={}
+
+        #these fields will be passed ass hidden so we need them
+        self.minion = minion
+        self.module = module
+        self.method = method
     
     def __add_general_widget(self):
 
@@ -75,6 +80,16 @@ class WidgetListFactory(object):
                 del temp_object
 
                 #print "That have the object :",getattr(self.__widget_list["list_default"],"default")
+
+        #adding the hidden fields (that part wass adde later can be made more generic)
+        if self.minion:
+            self.__widget_list['minion']= getattr(widgets,'HiddenField')(name="minion",value=self.minion,default=self.minion)
+        if self.module:
+            self.__widget_list['module']= getattr(widgets,'HiddenField')(name="module",value=self.module,default=self.module)
+        if self.method:
+            self.__widget_list['method']= getattr(widgets,'HiddenField')(name="method",value=self.method,default=self.method)
+
+
 
     def __add_specialized_string(self,argument,argument_name):
         """
