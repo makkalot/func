@@ -226,3 +226,28 @@ class RemoteFormFactory(object):
                 action = self.action
                 )
 
+class RemoteLinkFactory(CoreWD):
+    """
+    A rpc executer for the methods without arguments
+    """
+
+    name = "Minion Remote Link Executer"
+
+    template =""" 
+    <div>
+        ${for_widget.display()}
+        <div id="items">Minion Result</div>
+    </div>
+    """
+
+    def __init__(self,*args,**kwargs):
+        """The init part here"""
+        super(SomeRemoteLink,self).__init__(*args,**kwargs)
+        self.for_widget = LinkRemoteFunction(
+                name = "catexecuter",
+                action = "/catlister",
+                data = dict(give_all="all"),
+                update = "items"
+                )
+
+
