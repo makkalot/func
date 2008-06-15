@@ -14,7 +14,8 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
 #    th = socket.gethostname()
-    th = socket.getfqdn()
+    m = "acervirtual.evlan.com"
+    th = socket.getfqdn(m)
     nforks=1
     async=False
 
