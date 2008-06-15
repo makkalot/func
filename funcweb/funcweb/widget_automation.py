@@ -31,7 +31,6 @@ class WidgetListFactory(object):
                 'default_value':"TextArea"} 
             }
     #will contain the input widget created in that class
-    __widget_list={}
 
     def __init__(self,argument_dict):
         """
@@ -43,7 +42,8 @@ class WidgetListFactory(object):
         """
 
         self.__argument_dict = argument_dict
-
+        self.__widget_list={}
+    
     def __add_general_widget(self):
 
         #key is the argument_name and the argument are options

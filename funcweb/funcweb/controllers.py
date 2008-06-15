@@ -4,6 +4,7 @@ log = logging.getLogger(__name__)
 from turbogears import controllers, expose, flash, identity, redirect
 from func.overlord.client import Overlord, Minions
 from turbogears import mochikit
+from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
 
 class Root(controllers.RootController):
 
@@ -52,7 +53,7 @@ class Root(controllers.RootController):
     @expose(template="funcweb.templates.method_args")
     #@identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
-    
+   
         fc = Overlord(minion)
         method_args = getattr(fc,module).get_method_args()
         
@@ -60,15 +61,15 @@ class Root(controllers.RootController):
             print "Not registered method here"
             return dict(minion_form = None)
 
-        print method
         the_one = method_args[minion][method]['args']
         if the_one:
-
-            from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
             wlist_object = WidgetListFactory(the_one)
-            wlist_object=wlist_object.get_widgetlist_object()
-            minion_form =RemoteFormFactory(wlist_object).get_remote_form()
-            #minion_form = RemoteFormAutomation(wlist_object)
+            wlist_object = wlist_object.get_widgetlist_object()
+            #minion_form =RemoteFormFactory( wlist_object.get_widgetlist_object()).get_remote_form()
+            minion_form = RemoteFormAutomation(wlist_object)
+
+            del wlist_object
+            del the_one
             #print minion_form.fields
 
             #print minion_form
