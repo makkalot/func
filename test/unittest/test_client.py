@@ -14,8 +14,7 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
 #    th = socket.gethostname()
-    m = "acervirtual.evlan.com"
-    th = socket.getfqdn(m)
+    th = socket.getfqdn()
     nforks=1
     async=False
 
@@ -50,6 +49,7 @@ class BaseTest:
     def test_module_get_method_args(self):
         mod = getattr(self.overlord,self.module)
         arg_result=mod.get_method_args()
+        print arg_result
         self.assert_on_fault(arg_result)
 
     def test_module_inventory(self):
