@@ -34,6 +34,7 @@ class Root(controllers.RootController):
             #FIXME slow really i know !
             for module in modules.itervalues():
                 for mod in module:
+                    #if it is not empty
                     if getattr(fc,mod).get_method_args()[name]:
                         display_modules.append(mod)
             modules = {}
@@ -50,15 +51,6 @@ class Root(controllers.RootController):
                             tg_template="funcweb.templates.module")
 
 
-    @expose(template="funcweb.templates.run")
-    #@identity.require(identity.not_anonymous())
-    def run(self, minion="*", module=None, method=None, arguments=''):
-        fc = Overlord(minion)
-        results = getattr(getattr(fc, module), method)(*arguments.split())
-        cmd = "%s.%s.%s(%s)" % (minion, module, method, arguments)
-        return dict(cmd=cmd, results=results)
-
-
     @expose(template="funcweb.templates.method_args")
     #@identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
@@ -68,7 +60,7 @@ class Root(controllers.RootController):
         
         if not method_args.values():
             print "Not registered method here"
-            return dict(minion_form = None)
+            return dict(minion_form = None,minion=minion,module=module,method=method)
 
         the_one = method_args[minion][method]['args']
         if the_one:
@@ -83,9 +75,9 @@ class Root(controllers.RootController):
             #print minion_form.fields
 
             #print minion_form
-            return dict(minion_form=minion_form)
+            return dict(minion_form =minion_form,minion=minion,module=module,method=method)
         else:
-            return dict(minion_form = None)
+            return dict(minion_form = None,minion=minion,module=module,method=method)
 
 
     @expose(template="funcweb.templates.login")
@@ -148,6 +140,18 @@ class Root(controllers.RootController):
 
         else:
             return "Missing arguments sorry can not proceess the form"
+
+    @expose(template="funcweb.templates.method_args")
+    def execute_link(self,minion=None,module=None,method=None):
+        """
+        Method is fot those minion methods that dont accept any 
+        arguments so they provide only some information,executed
+        by pressing only the link !
+        """
+        fc = Overlord(minion)
+        result = getattr(getattr(fc,module),method)()
+        return str(result)
+
 
 
     @expose()
