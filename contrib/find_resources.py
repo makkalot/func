@@ -43,17 +43,17 @@ class FindResources(object):
                      dest="memory",
                      default="512",
                      help="the memory requirements in megabytes, default: '512'")
-        p.add_option("-d", "--disk",
-                     dest="disk",
-                     default="20",
-                     help="the disk storage requirements in gigabytes, default: '20'")
+        p.add_option("-a", "--arch",
+                     dest="arch",
+                     default="i386",
+                     help="the architecture requirements, default: 'i386'")
 
         (options, args) = p.parse_args(args)
         self.options = options
 
         # convert the memory and storage to integers for later comparisons
         memory = int(options.memory)
-        storage = int(options.disk)
+        arch = options.arch
 
         # see what hosts have enough RAM
         avail_hosts = {}
@@ -69,42 +69,34 @@ class FindResources(object):
             if (freemem-256) >= memory:
                 avail_hosts[host] = {'memory': freemem}
 
-        # figure out which of these machines have enough storage
-        for avail_host in avail_hosts.keys():
-            # see what hosts have the required storage
-            host_volume_groups = func_client.Client(avail_host).storage.vgs()
-           
-            for (host, vol_groups) in host_volume_groups.iteritems():
-                if utils.is_error(vol_groups):
-                    print "-- connection refused: %s" % host 
-                    continue
-
-                avail_vol_groups = []
-                for vol_group, attrs in vol_groups.iteritems():
-                    free_space = int(float(attrs['free'][:-1]))
-                    if free_space >= storage:
-                        avail_vol_groups.append((vol_group, free_space))
-                
-                if len(avail_vol_groups) > 0:
-                    avail_hosts[host]['space'] = dict(avail_vol_groups)
-                else:
-                    avail_hosts.pop(host)
-
         # Default the dest_host to nothing
         dest_host = None
 
+        # see what hosts have the right architecture
+        arch_hosts = {}
+        host_arch = func_client.Client(options.server_spec).command.run('uname -i')
+        for (host, output) in host_arch.iteritems():
+            if utils.is_error(output):
+                print "-- connection refused: %s" % host
+                continue
+
+            host_arch = output[1].rstrip()
+
+            # If the host_arch is 64 bit, allow 32 bit machines on it
+            if host_arch == arch or (host_arch == "x86_64" and arch == "i386"):
+                arch_hosts[host] = host
+
         if len(avail_hosts) > 0:
             # Find the host that is the closest memory match
+            # and matching architecture
             for (host, attrs) in avail_hosts.iteritems():
-                # Use a random volume group
-                vol_group = random.choice(attrs['space'].keys())
-
-                if not dest_host:
-                    dest_host = [host, vol_group, attrs['memory']]
-                else:
-                    if attrs['memory'] < dest_host[2]:
-                        # Use the better match
-                        dest_host = [host, vol_group, attrs['memory']]
+                if arch_hosts.has_key(host):
+                    if not dest_host:
+                        dest_host = [host, attrs['memory']]
+                    else:
+                        if attrs['memory'] < dest_host[1]:
+                            # Use the better match
+                            dest_host = [host, attrs['memory']]
 
         return dest_host
 
