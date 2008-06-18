@@ -11,6 +11,7 @@
     <script type="text/javascript" src="${tg.url('/static/javascript/jquery.js')}" />
     <link py:for="js in tg_js_head" py:strip="">${ET(js.display())}</link>
     <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
+    <script type="text/javascript" src="${tg.url('/static/javascript/ajax.js')}" />
 
     <link href="${tg.url('/static/images/favicon.ico')}"
       type="image/vnd.microsoft.icon" rel="shortcut icon" /> 
