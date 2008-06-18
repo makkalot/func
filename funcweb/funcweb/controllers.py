@@ -136,7 +136,7 @@ class Root(controllers.RootController):
            
             #now execute the stuff
             result = getattr(getattr(fc,module),method)(*cmd_args)
-            return "The list to be executed is \n: %s"%str(result)
+            return str(result)
 
         else:
             return "Missing arguments sorry can not proceess the form"
