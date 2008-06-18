@@ -177,7 +177,7 @@ class RemoteFormAutomation(CoreWD):
 
     template = """ 
     <div>
-       ${for_widget.display()}
+       ${for_widget.display(action='post_form')}
         <div id="loading"></div>
         <div id="post_data"></div>
     </div>
@@ -196,25 +196,17 @@ class RemoteFormAutomation(CoreWD):
         self.for_widget = RemoteForm(
                 fields = generated_fields,
                 name = "minion_form",
-                update = "post_data",
-                before='getElement(\'loading\').innerHTML=\'Submiting form!\';',
+                update = "col5",
+                before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'80\',height:\'80\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
-                action = "/post_form"
         )
-
-    def post_form(self,**kw):
-        """
-        Data processing part
-        """
-        return "I got that data from the remote minion form :<br/>%r"%kw
-
-    post_form = expose()(post_form)
 
 ####################################################################################################
 class RemoteFormFactory(object):
     """
     Gets the WidgetListFactory object
-    and return back a RemoteForm
+    and return back a RemoteForm the same as above
+    just for testing
     """
     #some values that may want to change later 
     name = 'minion_form'
