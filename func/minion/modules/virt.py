@@ -236,7 +236,7 @@ class Virt(func_module.FuncModule):
         if virt_path:
             koan_args.append("--virt-path=%s" % virt_path)
 
-        rc = sub_process.call(koan_args,shell=False)
+        rc = sub_process.call(koan_args,shell=False,close_fds=True)
         if rc == 0:
             return 0
         else:
