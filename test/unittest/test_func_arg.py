@@ -72,13 +72,20 @@ class TestArgCompatibility:
                 
                 'platform':{
                     'type':'string',
-                    'min_length':4,
-                    'max_length':33,
                     'options':["fedora","redhat","ubuntu"],
                     'description':"Hey im a fedora fan",
                     'default':'fedora8',
                         },
                 
+                'platform2':{
+                    'type':'string',
+                    'min_length':4,
+                    'max_length':33,
+                    'description':"Hey im a fedora fan",
+                    'default':'fedora8',
+                        },
+         
+
                 'is_independent':{
                     'type':'boolean',
                     'default' :False,

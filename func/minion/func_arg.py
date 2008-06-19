@@ -66,6 +66,15 @@ class ArgCompatibility(object):
         #did module writer add a key 'type'
         if not argument_dict.has_key('type') or not self.__valid_args.has_key(argument_dict['type']):
             raise IncompatibleTypesException("%s is not in valid options,possible ones are :%s"%(argument_dict['type'],str(self.__valid_args)))
+    
+        #we need some specialization about if user has defined options
+        #there is no need for using validator,min_lenght,max_length
+        if argument_dict.has_key('options'):
+            for arg_option in argument_dict.keys():
+                if arg_option!='options' and arg_option in self.__valid_args['string']:
+                    raise IncompatibleTypesException('The options keyword should be used alone in a string cant be used with min_length,max_length,validator together')
+        
+        #will add here a new for integers
 
         # we will use it everytime so not make lookups
         the_type = argument_dict['type']
