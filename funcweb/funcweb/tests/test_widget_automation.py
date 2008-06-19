@@ -1,12 +1,8 @@
 import unittest
 import turbogears
 from turbogears import testutil
-from funcweb.controllers import Root
-import cherrypy
 
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
-
-cherrypy.root = Root()
 
 class TestWidgetListFactory(unittest.TestCase):
     
