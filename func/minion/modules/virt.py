@@ -202,7 +202,7 @@ class Virt(func_module.FuncModule):
 
         return memory
 
-    def install(self, server_name, target_name, system=False, virt_name=None, virt_path=None):
+    def install(self, server_name, target_name, system=False, virt_name=None, virt_path=None, graphics=False):
 
         """
         Install a new virt system by way of a named cobbler profile.
@@ -235,6 +235,9 @@ class Virt(func_module.FuncModule):
 
         if virt_path:
             koan_args.append("--virt-path=%s" % virt_path)
+
+        if not graphics:
+            koan_args.append("--nogfx")
 
         rc = sub_process.call(koan_args,shell=False,close_fds=True)
         if rc == 0:
