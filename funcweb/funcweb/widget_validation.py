@@ -39,12 +39,12 @@ class WidgetSchemaFactory(object):
         
         if self.method_argument_dict[argument_name].has_key('range'):
             #because the range is [min,max] list the 0 is min 1 is the max
-            int_data_set['min_int']=self.method_argument_dict[argument_name]['range'][0]
-            int_data_set['max_int']=self.method_argument_dict[argument_name]['range'][1]
+            int_data_set['min']=self.method_argument_dict[argument_name]['range'][0]
+            int_data_set['max']=self.method_argument_dict[argument_name]['range'][1]
         if self.method_argument_dict[argument_name].has_key('min'):
-            int_data_set['min_int']=self.method_argument_dict[argument_name]['min']
+            int_data_set['min']=self.method_argument_dict[argument_name]['min']
         if self.method_argument_dict[argument_name].has_key('max'):
-            int_data_set['max_int']=self.method_argument_dict[argument_name]['max']
+            int_data_set['max']=self.method_argument_dict[argument_name]['max']
 
         #add the validator to the list
         if int_data_set:
@@ -135,29 +135,51 @@ class MinionIntValidator(validators.FancyValidator):
     
     """
     #automatically will be assigned
-    min_int = None
-    max_int = None
-    
-    def validate_python(self,value,state):
+    min = None
+    max = None
+
+    def _to_python(self,value,state):
         """
-        The actual validator
+        Will check just the type here and return
+        value to be validated in validate_python
         """
         try:
             value = int(value)
         except (ValueError, TypeError):
             raise validators.Invalid('The field should be integer',value,state)
-        #firstly run the supers one
-        if self.min_int and int(self.min_int):
-            if value < int(self.min_int):
-                raise validators.Invalid('The integer you entered should be bigger that %d'%(self.min_int),value,state)
+
+        return int(value)
         
-        if self.max_int and int(self.max_int):
-            if value > int(self.max_int):
-                raise validators.Invalid('The integer you entered exceeds the %d'%(self.max_int),value,state)
+    
+    def validate_python(self,value,state):
+        """
+        The actual validator
+        """
+       #firstly run the supers one
+        if self.min and self.min:
+            if value < self.min:
+                raise validators.Invalid('The number you entered should be bigger that %d'%(self.min),value,state)
+        
+        if self.max and self.max:
+            if value > self.max:
+                raise validators.Invalid('The number you entered exceeds the %d'%(self.max),value,state)
+
         
 ##################################################################
-class MinionFloatValidator(validators.FancyValidator):
-    pass
+class MinionFloatValidator(MinionIntValidator):
+    
+    def _to_python(self,value,state):
+        """
+        Will check just the type here and return
+        value to be validated in validate_python
+        """
+        try:
+            value = float(value)
+        except (ValueError, TypeError):
+            raise validators.Invalid('The field should be a float',value,state)
+
+        return float(value)
+ 
 
 class MinionListValidator(validators.FancyValidator):
     pass
