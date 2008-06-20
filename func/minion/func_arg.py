@@ -74,7 +74,17 @@ class ArgCompatibility(object):
                 if arg_option!='options' and arg_option in self.__valid_args['string']:
                     raise IncompatibleTypesException('The options keyword should be used alone in a string cant be used with min_length,max_length,validator together')
         
-        #will add here a new for integers
+        #if range keyword is used into a int argument the others shouldnt be there
+        if argument_dict.has_key('range'):
+            if len(argument_dict['range'])!=2:
+                raise IncompatibleTypesException('The range option should have 2 members [min,max]')
+            if not argument_dict['range'][0] < argument_dict['range'][1]:
+                raise IncompatibleTypesException('In the range option first member should be smaller than second [min,max]')
+            #check if another option was used there ...
+            for arg_option in argument_dict.keys():
+                if arg_option!='range' and arg_option in self.__valid_args['int']:
+                    raise IncompatibleTypesException('The options range should be used alone into a int argument')
+        
 
         # we will use it everytime so not make lookups
         the_type = argument_dict['type']
