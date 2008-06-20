@@ -37,6 +37,30 @@ class TestWidgetValidator(unittest.TestCase):
                 continue
         print "Happy tests !"
 
+    def test_int_validator(self):
+        wf = WidgetSchemaFactory(self.get_int_params())
+        schema_man=wf.get_ready_schema()
+        
+        for argument_name,arg_options in self.get_int_params().iteritems():  
+            #print argument_name
+            assert hasattr(schema_man,argument_name)==True
+            #print " ",argument_name," : ",getattr(schema_man,argument_name)
+            
+            #if the argument includes some range
+            if arg_options.has_key('range'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'max_int') == arg_options['range'][1]
+                assert getattr(getattr(schema_man,argument_name),'min_int') == arg_options['range'][0]
+            if arg_options.has_key('min'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'min_int') == arg_options['min']
+                
+            if arg_options.has_key('max'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'max_int') == arg_options['max']
+
+        print "Happy test!"
+
 
     def test_minion_int_validator(self):
         mv=MinionIntValidator(max_int = 44,min_int=2)
@@ -76,7 +100,6 @@ class TestWidgetValidator(unittest.TestCase):
                     'validator':'^[a-z]*$'
                     }
                     ,
-                #will be converted to dropdown
                 'min_max_string':{
                     'type':'string',
                     'default':'myfirst',
@@ -91,6 +114,28 @@ class TestWidgetValidator(unittest.TestCase):
                     'max_length':123,
                     'min_length':12,
                     'validator':'^[A-Z]+$'
+                    }
+                }
+  
+    def get_int_params(self):
+        return {
+                'int_default':{
+                    'type':'int',
+                    'default':2,
+                    'description':'default integer'
+                    },
+                 'min_max_int':{
+                    'type':'int',
+                    'default':12,
+                    'optional':False,
+                    'description':'default dropdown list',
+                    'max':12,
+                    'min':5
+                    },
+                'range_int':{
+                    'type':'int',
+                    'optional':False,
+                    'range':[1,55]
                     }
                 }
  
