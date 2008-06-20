@@ -97,7 +97,22 @@ class WidgetSchemaFactory(object):
         Gets the options of the float type and adds a
         new validator to validator_list
         """
-        pass
+
+        #the initializer for the float_validator
+        float_data_set = {}
+        
+        if self.method_argument_dict[argument_name].has_key('min'):
+            float_data_set['min']=self.method_argument_dict[argument_name]['min']
+        if self.method_argument_dict[argument_name].has_key('max'):
+            float_data_set['max']=self.method_argument_dict[argument_name]['max']
+
+        #add the validator to the list
+        if float_data_set:
+            self.validator_list[argument_name]=MinionFloatValidator(**float_data_set)
+        else:
+            self.validator_list[argument_name]=MinionFloatValidator()
+
+
 
     def _add_list_validator(self,argument_name):
         """
