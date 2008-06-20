@@ -1,7 +1,7 @@
 import unittest
 import turbogears
 from turbogears import testutil
-from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator
+from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator,MinionFloatValidator
 from turbogears import validators 
 
 class TestWidgetValidator(unittest.TestCase):
@@ -49,34 +49,34 @@ class TestWidgetValidator(unittest.TestCase):
             #if the argument includes some range
             if arg_options.has_key('range'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'max_int') == arg_options['range'][1]
-                assert getattr(getattr(schema_man,argument_name),'min_int') == arg_options['range'][0]
+                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['range'][1]
+                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['range'][0]
             if arg_options.has_key('min'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'min_int') == arg_options['min']
+                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['min']
                 
             if arg_options.has_key('max'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'max_int') == arg_options['max']
+                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
 
         print "Happy test!"
 
 
     def test_minion_int_validator(self):
-        mv=MinionIntValidator(max_int = 44,min_int=2)
+        mv=MinionIntValidator(max = 44,min=2)
         self.assertRaises(validators.Invalid,mv.to_python,100)
         self.assertRaises(validators.Invalid,mv.to_python,1)
         self.assertRaises(validators.Invalid,mv.to_python,'some_string')
         assert mv.to_python(21) == 21
         
         #dont use the min
-        mv=MinionIntValidator(max_int = 44)
+        mv=MinionIntValidator(max = 44)
         self.assertRaises(validators.Invalid,mv.to_python,100)
         assert mv.to_python(1)==1
         self.assertRaises(validators.Invalid,mv.to_python,'some_string')
         assert mv.to_python(21) == 21
         
-        mv=MinionIntValidator(min_int=12)
+        mv=MinionIntValidator(min=12)
         self.assertRaises(validators.Invalid,mv.to_python,10)
         assert mv.to_python(14)==14
         self.assertRaises(validators.Invalid,mv.to_python,'some_string')
@@ -85,7 +85,31 @@ class TestWidgetValidator(unittest.TestCase):
         mv=MinionIntValidator()
         assert mv.to_python(14)==14
         self.assertRaises(validators.Invalid,mv.to_python,'some_string')
+
+    def test_minion_float_validator(self):
+        mv=MinionFloatValidator(max = 44.0,min=2.0)
+        self.assertRaises(validators.Invalid,mv.to_python,100.0)
+        self.assertRaises(validators.Invalid,mv.to_python,1.0)
+        self.assertRaises(validators.Invalid,mv.to_python,'some_string')
+        assert mv.to_python(21.0) == 21.0
         
+        #dont use the min
+        mv=MinionFloatValidator(max = 44.0)
+        self.assertRaises(validators.Invalid,mv.to_python,100.0)
+        assert mv.to_python(1.0)==1.0
+        self.assertRaises(validators.Invalid,mv.to_python,'some_string')
+        assert mv.to_python(21.0) == 21.0
+        
+        mv=MinionFloatValidator(min=12.0)
+        self.assertRaises(validators.Invalid,mv.to_python,10.0)
+        assert mv.to_python(14.0)==14.0
+        self.assertRaises(validators.Invalid,mv.to_python,'some_string')
+        assert mv.to_python(21.0) == 21.0
+        
+        mv=MinionFloatValidator()
+        assert mv.to_python(14.0)==14.0
+        self.assertRaises(validators.Invalid,mv.to_python,'some_string')
+    
         
     def get_string_params(self):
         return {
@@ -124,7 +148,7 @@ class TestWidgetValidator(unittest.TestCase):
                     'default':2,
                     'description':'default integer'
                     },
-                 'min_max_int':{
+                 'min_max':{
                     'type':'int',
                     'default':12,
                     'optional':False,
@@ -138,4 +162,23 @@ class TestWidgetValidator(unittest.TestCase):
                     'range':[1,55]
                     }
                 }
+    
+    def get_float_params(self):
+        return {
+                'float_default':{
+                    'type':'float',
+                    'default':2.0,
+                    'description':'default float'
+                    },
+                 'min_max':{
+                    'type':'float',
+                    'default':11.0,
+                    'optional':False,
+                    'description':'default dropdown list',
+                    'max':12.0,
+                    'min':5.0
+                    },
+                }
+
+
  
