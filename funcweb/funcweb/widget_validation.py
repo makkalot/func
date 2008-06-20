@@ -108,7 +108,52 @@ class WidgetSchemaFactory(object):
 
         return final_schema
 
+########################################################################
+class MinionIntValidator(validators.FancyValidator):
 
+    """
+    Confirms that the input/output is of the proper type.
+    
+    Uses the parameters:
+    
+    subclass:
+        The class or a tuple of classes; the item must be an instance
+        of the class or a subclass.
+    type:
+        A type or tuple of types (or classes); the item must be of
+        the exact class or type.  Subclasses are not allowed.
+    
+    """
+    #automatically will be assigned
+    min_int = None
+    max_int = None
+    
+    def validate_python(self,value,state):
+        """
+        The actual validator
+        """
+        try:
+            value = int(value)
+        except (ValueError, TypeError):
+            raise validators.Invalid('The field should be integer',value,state)
+        #firstly run the supers one
+        if self.min_int and int(self.min_int):
+            if value < int(self.min_int):
+                raise validators.Invalid('The integer you entered should be bigger that %d'%(self.min_int),value,state)
+        
+        if self.max_int and int(self.max_int):
+            if value > int(self.max_int):
+                raise validators.Invalid('The integer you entered exceeds the %d'%(self.max_int),value,state)
+        
+##################################################################
+class MinionFloatValidator(validators.FancyValidator):
+    pass
+
+class MinionListValidator(validators.FancyValidator):
+    pass
+
+class MinionHashValidator(validators.FancyValidator):
+    pass
 
 
 if __name__ == "__main__":
