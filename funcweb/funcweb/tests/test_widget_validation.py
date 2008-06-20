@@ -60,6 +60,25 @@ class TestWidgetValidator(unittest.TestCase):
                 assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
 
         print "Happy test!"
+        
+    def test_float_validator(self):
+        wf = WidgetSchemaFactory(self.get_float_params())
+        schema_man=wf.get_ready_schema()
+        
+        for argument_name,arg_options in self.get_float_params().iteritems():  
+            #print argument_name
+            assert hasattr(schema_man,argument_name)==True
+            #print " ",argument_name," : ",getattr(schema_man,argument_name)
+            
+            if arg_options.has_key('min'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['min']
+                
+            if arg_options.has_key('max'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
+
+        print "Happy test!"
 
 
     def test_minion_int_validator(self):
