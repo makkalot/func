@@ -34,7 +34,26 @@ class WidgetSchemaFactory(object):
         Gets the options of the int type and adds a
         new validator to validator_list
         """
-        pass
+        #the initializer for the int_validator
+        int_data_set = {}
+        
+        if self.method_argument_dict[argument_name].has_key('range'):
+            #because the range is [min,max] list the 0 is min 1 is the max
+            int_data_set['min_int']=self.method_argument_dict[argument_name]['range'][0]
+            int_data_set['max_int']=self.method_argument_dict[argument_name]['range'][1]
+        if self.method_argument_dict[argument_name].has_key('min'):
+            int_data_set['min_int']=self.method_argument_dict[argument_name]['min']
+        if self.method_argument_dict[argument_name].has_key('max'):
+            int_data_set['max_int']=self.method_argument_dict[argument_name]['max']
+
+        #add the validator to the list
+        if int_data_set:
+            self.validator_list[argument_name]=MinionIntValidator(**int_data_set)
+        else:
+            self.validator_list[argument_name]=MinionIntValidator()
+
+
+
     
     def _add_string_validator(self,argument_name):
         """
@@ -112,16 +131,7 @@ class WidgetSchemaFactory(object):
 class MinionIntValidator(validators.FancyValidator):
 
     """
-    Confirms that the input/output is of the proper type.
-    
-    Uses the parameters:
-    
-    subclass:
-        The class or a tuple of classes; the item must be an instance
-        of the class or a subclass.
-    type:
-        A type or tuple of types (or classes); the item must be of
-        the exact class or type.  Subclasses are not allowed.
+    Confirms that the input/output is of the proper type of int.
     
     """
     #automatically will be assigned
