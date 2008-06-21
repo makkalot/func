@@ -1,7 +1,7 @@
 import unittest
 import turbogears
 from turbogears import testutil
-from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator,MinionFloatValidator
+from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator,MinionFloatValidator,MinionListValidator
 from turbogears import validators 
 
 class TestWidgetValidator(unittest.TestCase):
@@ -129,6 +129,21 @@ class TestWidgetValidator(unittest.TestCase):
         assert mv.to_python(14.0)==14.0
         self.assertRaises(validators.Invalid,mv.to_python,'some_string')
     
+    def test_minion_list_validator(self):
+        
+        #test default
+        mv = MinionListValidator()
+        assert mv.to_python(['fedora','debian','others']) == ['fedora','debian','others']
+        del mv
+
+        #test with regex
+        mv = MinionListValidator(regex_string='^[A-Z]+$',not_empty=True)
+        assert mv.to_python(['FEDORA','MACOSX']) == ['FEDORA','MACOSX']
+        self.assertRaises(validators.Invalid,mv.to_python,[])
+        self.assertRaises(validators.Invalid,mv.to_python,['hey_error'])
+
+
+        print "Happy testing !"
         
     def get_string_params(self):
         return {
@@ -196,6 +211,22 @@ class TestWidgetValidator(unittest.TestCase):
                     'description':'default dropdown list',
                     'max':12.0,
                     'min':5.0
+                    },
+                }
+        
+    def get_list_params(self):
+        return {
+                'list_default':{
+                    'type':'list',
+                    'default':'cooler',
+                    'description':'default list'
+                    },
+                 'list_regex':{
+                    'type':'list',
+                    'default':'hey',
+                    'optional':False,
+                    'description':'default regex list',
+                    'validator':'^[A-Z]$'
                     },
                 }
 
