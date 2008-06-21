@@ -90,11 +90,16 @@ class TestWidgetValidator(unittest.TestCase):
 
         print "Happy test!"
 
-    def test_list_validator(self):
-        wf = WidgetSchemaFactory(self.get_list_params())
+    def test_list_validator(self,the_type='list'):
+        if the_type == 'list':
+            testing_data = self.get_list_params()
+        else:
+            testing_data = self.get_hash_params()
+
+        wf = WidgetSchemaFactory(testing_data)
         schema_man=wf.get_ready_schema()
         
-        for argument_name,arg_options in self.get_list_params().iteritems():  
+        for argument_name,arg_options in testing_data.iteritems():  
             #print argument_name
             #should all the argument names really
             assert hasattr(schema_man,argument_name)==True
@@ -112,6 +117,8 @@ class TestWidgetValidator(unittest.TestCase):
         print "Happy test!"
 
 
+    def test_hash_validator(self):
+        self.test_list_validator(the_type = 'hash')
 
     def test_minion_int_validator(self):
         mv=MinionIntValidator(max = 44,min=2)

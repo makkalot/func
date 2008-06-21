@@ -129,7 +129,7 @@ class WidgetSchemaFactory(object):
 
 
 
-    def _add_list_validator(self,argument_name):
+    def _add_list_validator(self,argument_name,the_type='list'):
         """
         Gets the options of the list type and adds a
         new validator to validator_list
@@ -147,9 +147,16 @@ class WidgetSchemaFactory(object):
             list_data_set['regex_string'] = self.method_argument_dict[argument_name]['validator']
             
         if list_data_set:
-            self.validator_list[argument_name]=MinionListValidator(**list_data_set)
+            if the_type == 'list':
+                self.validator_list[argument_name]=MinionListValidator(**list_data_set)
+            else:
+                self.validator_list[argument_name]=MinionHashValidator(**list_data_set)
+
         else:
-            self.validator_list[argument_name]=MinionListValidator()
+            if the_type == 'list':
+                self.validator_list[argument_name]=MinionListValidator()
+            else:
+                self.validator_list[argument_name]=MinionHashValidator()
 
 
 
@@ -158,7 +165,7 @@ class WidgetSchemaFactory(object):
         Gets the options of the hash type and adds a
         new validator to validator_list
         """
-        pass
+        self._add_list_validator(argument_name,the_type = 'hash')
 
 
     def get_ready_schema(self):
