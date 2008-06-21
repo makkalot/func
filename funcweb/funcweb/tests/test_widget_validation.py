@@ -90,6 +90,28 @@ class TestWidgetValidator(unittest.TestCase):
 
         print "Happy test!"
 
+    def test_list_validator(self):
+        wf = WidgetSchemaFactory(self.get_list_params())
+        schema_man=wf.get_ready_schema()
+        
+        for argument_name,arg_options in self.get_list_params().iteritems():  
+            #print argument_name
+            #should all the argument names really
+            assert hasattr(schema_man,argument_name)==True
+            #print " ",argument_name," : ",getattr(schema_man,argument_name)
+            
+            if arg_options.has_key('validator'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert getattr(getattr(schema_man,argument_name),'regex_string') == arg_options['validator']
+
+            if arg_options.has_key('optional'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+
+
+        print "Happy test!"
+
+
 
     def test_minion_int_validator(self):
         mv=MinionIntValidator(max = 44,min=2)

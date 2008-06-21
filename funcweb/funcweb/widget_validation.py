@@ -134,7 +134,24 @@ class WidgetSchemaFactory(object):
         Gets the options of the list type and adds a
         new validator to validator_list
         """
-        pass
+        list_data_set = {}
+        
+        #is it optional
+        if self.method_argument_dict[argument_name].has_key('optional'):
+            if self.method_argument_dict[argument_name]['optional']:
+                list_data_set['not_empty']=False
+            else:
+                list_data_set['not_empty']=True
+                
+        if self.method_argument_dict[argument_name].has_key('validator'):
+            list_data_set['regex_string'] = self.method_argument_dict[argument_name]['validator']
+            
+        if list_data_set:
+            self.validator_list[argument_name]=MinionListValidator(**list_data_set)
+        else:
+            self.validator_list[argument_name]=MinionListValidator()
+
+
 
     def _add_hash_validator(self,argument_name):
         """
