@@ -195,9 +195,39 @@ class MinionFloatValidator(MinionIntValidator):
 
         return float(value)
  
-
+#################################################################
 class MinionListValidator(validators.FancyValidator):
-    pass
+    
+    regex_string = None
+
+    def _to_python(self,value,state):
+        """
+        Will check just the type here and return
+        value to be validated in validate_python
+        """
+        #will add more beautiful validation here after 
+        #integrate the complex widgets for lists and dicts
+        if self.not_empty:
+            if len(value)==0:
+                raise validators.Invalid('Empty list passed when not_empty is set',value,state)
+
+
+        tmp = []
+        if type(tmp) != type(value):
+            value = list(value)
+        value = [list_value.strip() for list_value in value]
+
+        return value
+
+    def validate_python(self,value,state):
+        import re
+        if self.regex_string:
+            compiled_regex = re.compile(self.regex_string)
+            for list_value in value:
+                if not re.match(compiled_regex,list_value):
+                    raise validators.Invalid('The %s doesnt match to the regex expression that was supplied'%list_value,value,state)
+
+        #there is no else for now :) 
 
 class MinionHashValidator(validators.FancyValidator):
     pass
