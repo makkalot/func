@@ -3,6 +3,7 @@ import turbogears
 from turbogears import testutil
 
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
+from funcweb.widget_validation import WidgetSchemaFactory
 
 class TestWidgetListFactory(unittest.TestCase):
     
@@ -48,8 +49,10 @@ class TestWidgetListFactory(unittest.TestCase):
 
 
     def test_remote_form(self):
+        schema_factory = WidgetSchemaFactory(self.get_test_default_args())
+        schema_validator=schema_factory.get_ready_schema()
         widget_list_object = self.widget_factory.get_widgetlist_object()
-        remote_form = RemoteFormAutomation(widget_list_object)
+        remote_form = RemoteFormAutomation(widget_list_object,schema_validator)
         #print remote_form
 
     def test_remote_form_factory(self):
@@ -71,7 +74,7 @@ class TestWidgetListFactory(unittest.TestCase):
             argument_name in all_fields 
 
 
-        print remote_form.render()
+        #print remote_form.render()
     
     def get_test_default_args(self):
         return {

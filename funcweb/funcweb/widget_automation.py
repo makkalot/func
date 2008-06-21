@@ -185,7 +185,7 @@ class RemoteFormAutomation(CoreWD):
 
     full_class_name = "funcweb.controllers.Root"
 
-    def __init__(self,generated_fields,*args,**kwarg):
+    def __init__(self,generated_fields,validator_schema,*args,**kwarg):
         """
         The constructor part same as normal one except
         it takes a WidgetsList object into generated_fields
@@ -195,6 +195,7 @@ class RemoteFormAutomation(CoreWD):
         super(RemoteFormAutomation,self).__init__(*args,**kwarg)
         self.for_widget = RemoteForm(
                 fields = generated_fields,
+                validator = validator_schema,
                 name = "minion_form",
                 update = "col5",
                 before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'80\',height:\'80\'}));',
