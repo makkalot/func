@@ -58,6 +58,11 @@ class TestWidgetValidator(unittest.TestCase):
             if arg_options.has_key('max'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
                 assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
+            
+            if arg_options.has_key('optional'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+
 
         print "Happy test!"
         
@@ -77,6 +82,11 @@ class TestWidgetValidator(unittest.TestCase):
             if arg_options.has_key('max'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
                 assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
+
+            if arg_options.has_key('optional'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+
 
         print "Happy test!"
 

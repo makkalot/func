@@ -37,6 +37,13 @@ class WidgetSchemaFactory(object):
         #the initializer for the int_validator
         int_data_set = {}
         
+        #the optional keyword
+        if self.method_argument_dict[argument_name].has_key('optional'):
+            if self.method_argument_dict[argument_name]['optional']:
+                int_data_set['not_empty']=False
+            else:
+                int_data_set['not_empty']=True
+                
         if self.method_argument_dict[argument_name].has_key('range'):
             #because the range is [min,max] list the 0 is min 1 is the max
             int_data_set['min']=self.method_argument_dict[argument_name]['range'][0]
@@ -101,6 +108,14 @@ class WidgetSchemaFactory(object):
         #the initializer for the float_validator
         float_data_set = {}
         
+        #is it optional
+        if self.method_argument_dict[argument_name].has_key('optional'):
+            if self.method_argument_dict[argument_name]['optional']:
+                float_data_set['not_empty']=False
+            else:
+                float_data_set['not_empty']=True
+         
+
         if self.method_argument_dict[argument_name].has_key('min'):
             float_data_set['min']=self.method_argument_dict[argument_name]['min']
         if self.method_argument_dict[argument_name].has_key('max'):
