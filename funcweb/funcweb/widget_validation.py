@@ -254,15 +254,52 @@ class MinionListValidator(validators.FancyValidator):
     def validate_python(self,value,state):
         import re
         if self.regex_string:
-            compiled_regex = re.compile(self.regex_string)
+            try:
+                compiled_regex = re.compile(self.regex_string)
+            except Exception,e:
+                raise validators.Invalid('The passed regex_string is not a valid expression'%self.regex_string,value,state)
+            
             for list_value in value:
-                if not re.match(compiled_regex,list_value):
+                if not re.match(compiled_regex,str(list_value)):
                     raise validators.Invalid('The %s doesnt match to the regex expression that was supplied'%list_value,value,state)
 
         #there is no else for now :) 
 
 class MinionHashValidator(validators.FancyValidator):
-    pass
+    
+    regex_string = None
+
+    def _to_python(self,value,state):
+        """
+        Will check just the type here and return
+        value to be validated in validate_python
+        """
+        #will add more beautiful validation here after 
+        #integrate the complex widgets for lists and dicts
+        if self.not_empty:
+            if len(value)==0:
+                raise validators.Invalid('Empty hash passed when not_empty is set',value,state)
+
+        #check the type firstly
+        tmp = {}
+        if type(tmp) != type(value):
+            raise validators.Invalid('The value passed to MinionHashValidator should be a dict object',value,state)
+        
+        #print value
+        return value
+
+    def validate_python(self,value,state):
+        #print value
+        import re
+        if self.regex_string:
+            try:
+                compiled_regex = re.compile(self.regex_string)
+            except Exception,e:
+                raise validators.Invalid('The passed regex_string is not a valid expression'%self.regex_string,value,state)
+            for dict_value in value.itervalues():
+                if not re.match(compiled_regex,str(dict_value)):
+                    raise validators.Invalid('The %s doesnt match to the regex expression that was supplied'%dict_value,value,state)
+
 
 
 if __name__ == "__main__":

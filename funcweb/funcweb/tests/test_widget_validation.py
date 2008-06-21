@@ -1,7 +1,7 @@
 import unittest
 import turbogears
 from turbogears import testutil
-from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator,MinionFloatValidator,MinionListValidator
+from funcweb.widget_validation import WidgetSchemaFactory,MinionIntValidator,MinionFloatValidator,MinionListValidator,MinionHashValidator
 from turbogears import validators 
 
 class TestWidgetValidator(unittest.TestCase):
@@ -173,10 +173,31 @@ class TestWidgetValidator(unittest.TestCase):
         assert mv.to_python(['FEDORA','MACOSX']) == ['FEDORA','MACOSX']
         self.assertRaises(validators.Invalid,mv.to_python,[])
         self.assertRaises(validators.Invalid,mv.to_python,['hey_error'])
+        self.assertRaises(validators.Invalid,mv.to_python,{})
+        del mv
 
 
         print "Happy testing !"
         
+    
+    def test_minion_hash_validator(self):
+        
+        #test default
+        mv = MinionHashValidator()
+        assert mv.to_python({'fedora':1,'debian':2,'others':3}) == {'fedora':1,'debian':2,'others':3}
+        del mv
+
+        #test with regex
+        mv = MinionHashValidator(regex_string='^[A-Z]+$',not_empty=True)
+        assert mv.to_python({'FEDORA':'FEDORA','MACOSX':'MACOSX'}) == {'FEDORA':'FEDORA','MACOSX':'MACOSX'}
+        self.assertRaises(validators.Invalid,mv.to_python,{})
+        self.assertRaises(validators.Invalid,mv.to_python,{'hey_error':12})
+        self.assertRaises(validators.Invalid,mv.to_python,"hwy")
+        del mv
+
+        print "Happy testing !"
+    
+
     def get_string_params(self):
         return {
                 'string_default':{
@@ -258,6 +279,22 @@ class TestWidgetValidator(unittest.TestCase):
                     'default':'hey',
                     'optional':False,
                     'description':'default regex list',
+                    'validator':'^[A-Z]$'
+                    },
+                }
+
+    def get_hash_params(self):
+        return {
+                'hash_default':{
+                    'type':'hash',
+                    'default':{'hey':12},
+                    'description':'default hash'
+                    },
+                 'hash_regex':{
+                    'type':'hash',
+                    'default':{'hey':12},
+                    'optional':False,
+                    'description':'default regex hash',
                     'validator':'^[A-Z]$'
                     },
                 }
