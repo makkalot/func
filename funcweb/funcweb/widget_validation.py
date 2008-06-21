@@ -29,6 +29,25 @@ class WidgetSchemaFactory(object):
             #for ex : _add_int_validator(some_arg)
             getattr(self,"_add_%s_validator"%(argument_values['type']))(argument_name)
 
+    def _add_boolean_validator(self,argument_name):
+        bool_data_set = {}
+        
+        #the optional keyword
+        if self.method_argument_dict[argument_name].has_key('optional'):
+            if self.method_argument_dict[argument_name]['optional']:
+                bool_data_set['not_empty']=False
+            else:
+                bool_data_set['not_empty']=True
+                
+        
+        if bool_data_set:
+            self.validator_list[argument_name]=validators.Bool(**bool_data_set)
+        else:
+            self.validator_list[argument_name]=validators.Bool()
+
+
+ 
+
     def _add_int_validator(self,argument_name):
         """
         Gets the options of the int type and adds a

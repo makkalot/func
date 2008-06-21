@@ -89,6 +89,25 @@ class TestWidgetValidator(unittest.TestCase):
 
 
         print "Happy test!"
+    
+    def test_bool_validator(self):
+        testing_data = self.get_bool_params()
+        wf = WidgetSchemaFactory(testing_data)
+        schema_man=wf.get_ready_schema()
+        
+        for argument_name,arg_options in testing_data.iteritems():  
+            #print argument_name
+            #should all the argument names really
+            assert hasattr(schema_man,argument_name)==True
+            #print " ",argument_name," : ",getattr(schema_man,argument_name)
+
+            if arg_options.has_key('optional'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+                
+        print "Happy test!"
+
+
 
     def test_list_validator(self,the_type='list'):
         if the_type == 'list':
@@ -303,6 +322,16 @@ class TestWidgetValidator(unittest.TestCase):
                     'optional':False,
                     'description':'default regex hash',
                     'validator':'^[A-Z]$'
+                    },
+                }
+        
+    def get_bool_params(self):
+        return {
+                'bool_default':{
+                    'type':'boolean',
+                    'default':{'hey':12},
+                    'description':'default hash',
+                    'optional':False,
                     },
                 }
 
