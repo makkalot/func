@@ -134,7 +134,7 @@ class ArgCompatibility(object):
         #get the arguments from real object we have [args],*arg,**kwarg,[defaults]
         tmp_arguments=inspect.getargspec(getattr(cls,method_name))
         check_args=[arg for arg in chain(tmp_arguments[0],tmp_arguments[1:3]) if arg and arg!='self']
-        print "The arguments taken from the inspect are :",check_args 
+        #print "The arguments taken from the inspect are :",check_args 
         #the size may change of the hash so should a copy of it 
         copy_arguments = arguments.copy()
         for compare_arg in copy_arguments.iterkeys():
