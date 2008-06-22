@@ -1,12 +1,35 @@
 import logging
 log = logging.getLogger(__name__)
 
-from turbogears import controllers, expose, flash, identity, redirect
+from turbogears import controllers, expose, flash, identity, redirect, error_handler,validate
 from func.overlord.client import Overlord, Minions
-from turbogears import mochikit
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
+from funcweb.widget_validation import WidgetSchemaFactory
+
+# it is assigned into method_display on every request 
+global_form = None 
+
+def validate_decorator_updater(validator_value=None):
+    """
+    When we pass the global_form directly to 
+    turbogears.validate it is not updated on 
+    every request we should pass a callable
+    to trigger it ;)
+
+    @param :validator_value : Does nothing in the code
+    of validate it is passed but is irrelevant in our case
+    because we compute the global_form in the method_display
+
+    @return : the current form and schema to validate the
+    current input in cherrypy's request 
+    """
+    global global_form
+    return global_form
 
 class Root(controllers.RootController):
+    
+    
+    #will be reused for widget validation
 
     @expose(template="funcweb.templates.minions")
     #@identity.require(identity.not_anonymous())
@@ -54,7 +77,8 @@ class Root(controllers.RootController):
     @expose(template="funcweb.templates.method_args")
     #@identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
-   
+        
+        global global_form
         fc = Overlord(minion)
         method_args = getattr(fc,module).get_method_args()
         
@@ -62,22 +86,28 @@ class Root(controllers.RootController):
             print "Not registered method here"
             return dict(minion_form = None,minion=minion,module=module,method=method)
 
-        the_one = method_args[minion][method]['args']
-        if the_one:
-            wlist_object = WidgetListFactory(the_one,minion=minion,module=module,method=method)
+        minion_arguments = method_args[minion][method]['args']
+        if minion_arguments:
+            wlist_object = WidgetListFactory(minion_arguments,minion=minion,module=module,method=method)
             wlist_object = wlist_object.get_widgetlist_object()
-            #minion_form =RemoteFormFactory( wlist_object.get_widgetlist_object()).get_remote_form()
+            #create the validation parts for the remote form
+            wf = WidgetSchemaFactory(minion_arguments)
+            schema_man=wf.get_ready_schema()
+
+            #create the final form
+            minion_form = RemoteFormAutomation(wlist_object,schema_man)
+            global_form = minion_form.for_widget
+            #print global_form
+            #i use that when something goes wrong to check the problem better to stay here ;)
+            #self.minion_form =RemoteFormFactory(wlist_object,schema_man).get_remote_form()
             
-            minion_form = RemoteFormAutomation(wlist_object)
-
             del wlist_object
-            del the_one
-            #print minion_form.fields
+            del minion_arguments
 
-            #print minion_form
             return dict(minion_form =minion_form,minion=minion,module=module,method=method)
         else:
             return dict(minion_form = None,minion=minion,module=module,method=method)
+
 
 
     @expose(template="funcweb.templates.login")
@@ -106,13 +136,28 @@ class Root(controllers.RootController):
                     original_parameters=request.params,
                     forward_url=forward_url)
         
+    
+    @expose() 
+    def handle_minion_error(self,tg_errors=None):
+        """
+        The method checks the result from turbogears.validate
+        decorator so if it has the tg_errors we know that the
+        form validation is failed. That prevents the extra traffic
+        to be sent to the minions!
+        """
+        if tg_errors:
+            #print tg_errors
+            return str(tg_errors)
+        
+
     @expose(allow_json=True)
+    @error_handler(handle_minion_error)
+    @validate(form=validate_decorator_updater)
     def post_form(self,**kw):
         """
         Data processing part
         """
         if kw.has_key('minion') and kw.has_key('module') and kw.has_key('method'):
-            #do the stuff here
             #assign them because we need the rest so dont control everytime
             #and dont make lookup everytime ...
             minion = kw['minion']
@@ -140,7 +185,7 @@ class Root(controllers.RootController):
 
         else:
             return "Missing arguments sorry can not proceess the form"
-
+    
     @expose(template="funcweb.templates.method_args")
     def execute_link(self,minion=None,module=None,method=None):
         """
