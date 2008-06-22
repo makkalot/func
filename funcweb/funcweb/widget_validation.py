@@ -196,7 +196,8 @@ class WidgetSchemaFactory(object):
             self._add_validators()
 
         for vd_name,vd in self.validator_list.iteritems():
-            setattr(final_schema,vd_name,vd)
+            #setattr(final_schema,vd_name,vd)
+            getattr(final_schema,'fields')[vd_name]= vd
 
         return final_schema
 
