@@ -95,8 +95,9 @@ class Service(func_module.FuncModule):
         #service_name options they are same so use only one
         service_name =  {
                 'type':'string',
+                'optional':False,
                 'description':'The name of the running services',
-                'validator':'^[a-z]+$'}
+                'validator':'^[a-z\-\_0-9]+$'}
 
         return {
                 'get_running':{'args':{}},
