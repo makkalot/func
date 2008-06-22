@@ -112,13 +112,12 @@ def batch_run(pool, callback, nforks):
     """
    
     job_id = pprint.pformat(time.time())
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
         # kick off the job
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
         results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
