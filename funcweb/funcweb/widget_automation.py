@@ -210,15 +210,16 @@ class RemoteFormFactory(object):
     just for testing
     """
     #some values that may want to change later 
-    name = 'minion_form'
-    before='MochiKit.DOM.getElement(\'loading\').innerHTML=\'Submiting form!\';',
-    on_complete='MochiKit.DOM.getElement(\'loading\'  ).innerHTML=\'Done!\';',
-    update = "post_data"
+    name = "minion_form",
+    update = "col5",
+    before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'80\',height:\'80\'}));',
+    on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
     submit_text = "Send Minion Form"
     action = "/post_form"
 
-    def __init__(self,wlist_object):
+    def __init__(self,wlist_object,validator_schema):
         self.wlist_object = wlist_object
+        self.validator_schema = validator_schema
 
     def get_remote_form(self):
         
@@ -231,7 +232,8 @@ class RemoteFormFactory(object):
                 on_complete = self.on_complete,
                 update = self.update,
                 submit_text = self.submit_text,
-                action = self.action
+                action = self.action,
+                validator = self.validator_schema
                 )
 
 class RemoteLinkFactory(CoreWD):
