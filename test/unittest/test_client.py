@@ -13,7 +13,7 @@ import socket
 
 class BaseTest:
     # assume we are talking to localhost
-#    th = socket.gethostname()
+    # th = socket.gethostname()
     th = socket.getfqdn()
     nforks=1
     async=False
