@@ -15,7 +15,7 @@ import inspect
 from func import logger
 from func.config import read_config
 from func.commonconfig import FuncdConfig
-
+from func.minion.func_arg import * #the arg getter stuff
 
 class FuncModule(object):
 
@@ -34,7 +34,8 @@ class FuncModule(object):
             "module_version" : self.__module_version,
             "module_api_version" : self.__module_api_version,
             "module_description" : self.__module_description,
-            "list_methods"       : self.__list_methods
+            "list_methods"       : self.__list_methods,
+            "get_method_args"    : self.__get_method_args,
         }
 
     def __init_log(self):
@@ -58,8 +59,7 @@ class FuncModule(object):
         """
         handlers = {}
         for attr in dir(self):
-            if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and \
-                    attr != 'register_rpc':
+            if self.__is_public_valid_method(attr):
                 handlers[attr] = getattr(self, attr)
         return handlers
 
@@ -74,3 +74,52 @@ class FuncModule(object):
 
     def __module_description(self):
         return self.description
+
+    def __is_public_valid_method(self,attr):
+        if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and\
+                attr != 'register_rpc' and attr!='register_method_args':
+                    return True
+        return False
+
+    def __get_method_args(self):
+        """
+        Gets arguments with their formats according to ArgCompatibility
+        class' rules.
+
+        @return : dict with args or Raise Exception if something wrong
+        happens
+        """
+        tmp_arg_dict = self.register_method_args()
+
+        #if it is not implemeted then return empty stuff 
+        if not tmp_arg_dict:
+            return {}
+
+        #see if user tried to register an not implemented method :)
+        for method in tmp_arg_dict.iterkeys():
+            if not hasattr(self,method):
+                raise NonExistingMethodRegistered("%s is not in %s "%(method,self.__class__.__name__))
+        
+        #create argument validation instance
+        self.arg_comp = ArgCompatibility(tmp_arg_dict)
+        #see if all registered arguments are there
+        for method in tmp_arg_dict.iterkeys():
+            self.arg_comp.is_all_arguments_registered(self,method,tmp_arg_dict[method]['args'])
+        #see if the options that were used are OK..
+        self.arg_comp.validate_all()
+
+        return tmp_arg_dict 
+
+    def register_method_args(self):
+        """
+        That is the method where users should override in their
+        modules according to be able to send their method arguments
+        to the Overlord. If they dont have it nothing breaks
+        just that one in the base class is called
+
+        @return : empty {}
+        """
+
+        # to know they didnt implement it
+        return {}
+    

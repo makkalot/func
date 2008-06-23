@@ -128,6 +128,91 @@ class Port(func_module.FuncModule):
         clear_all("-D OUTPUT -p %s --%sport %s -d %s -j REJECT" % (prot, dir, port, ip) )
         return call_if_policy("OUTPUT", "DROP", "-I OUTPUT -p %s --%sport %s -d %s -j ACCEPT" % (prot, dir, port, ip) )
 
+    def register_method_args(self):
+        """
+        Export the methods and their definitons
+        """
+        #they are all same so just declare here
+        port={
+                'type':'string',
+                'optional':False,
+
+                }
+        ip={
+                'type':'string',
+                'optional':False,
+                'default':'0.0.0.0'
+                }
+        prot={
+                'type':'string',
+                'options':['tcp','udp','icmp','sctp'],
+                'default':'tcp',
+                'optional':False
+                }
+        dir={
+                'type':'string',
+                'default':'dst',
+                'options':['src','dst'],
+                'optional':False
+                }
+
+        return {
+                'drop_from':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        }
+                    },
+                'reject_from':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        
+                        }
+                    },
+                'accept_from':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        
+                        }
+                    },
+                'drop_to':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        
+                        }
+                    },
+                 'reject_to':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        
+                        }
+                    },
+                  'accept_to':{'args':
+                    {
+                        'ip':ip,
+                        'prot':prot,
+                        'dir':dir,
+                        'port':port
+                        
+                        }
+                    },
+               
+                }
+
 def parse_dir(dir):
     if (dir == "dst"):
         return "d"

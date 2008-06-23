@@ -2,18 +2,17 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:py="http://genshi.edgewall.org/"
       xmlns:xi="http://www.w3.org/2001/XInclude">
+
+
 <body>
   <div class="method">
     ${minion}.${module}.${method}
-
-    <form action="" method="GET" onsubmit="$('#results').hide().load('/run/${minion}/${module}/${method}/').show('slow'); return false;">
+    
+    <form action="" method="GET" onsubmit="myj('#results').hide().load('/run/${minion}/${module}/${method}/').show('slow'); return false;">
       <input type="text" name="arguments" id="methodargs" class="methodargs"/>
     </form>
     <div class="results" id="results" />
 
-    <script type="text/javascript">
-      $(document).ready($("#methodargs").focus());
-    </script>
   </div>
 </body>
 </html>

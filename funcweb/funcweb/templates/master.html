@@ -9,9 +9,9 @@
     <title py:content="'Your Title Goes Here'"></title>
 
     <script type="text/javascript" src="${tg.url('/static/javascript/jquery.js')}" />
-
-    <link py:for="js in tg_js_head" py:strip="">${XML(js)}</link>
-    <link py:for="css in tg_css" py:strip="">${XML(css)}</link>
+    <link py:for="js in tg_js_head" py:strip="">${ET(js.display())}</link>
+    <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
+    <script type="text/javascript" src="${tg.url('/static/javascript/ajax.js')}" />
 
     <link href="${tg.url('/static/images/favicon.ico')}"
       type="image/vnd.microsoft.icon" rel="shortcut icon" /> 
@@ -20,10 +20,16 @@
 
     <style type="text/css" media="screen">
       @import url("/static/css/style.css");
-    </style>
+  </style>
+
+  <script type="text/javascript">
+    jQuery._$ = MochiKit.DOM.getElement;
+    var myj = jQuery.noConflict();
+  </script> 
+  
   </head>
   <body py:match="body" py:attrs="select('@*')">
-    <div py:for="js in tg_js_bodytop" py:replace="XML(js.display())" />
+    <div py:for="js in tg_js_bodytop" py:replace="ET(js.display())" />
     <div class="wrapper">
       <div class="head">
         <h1><a href="http://fedorahosted.org/func">Func</a></h1>

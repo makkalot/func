@@ -13,7 +13,7 @@ import socket
 
 class BaseTest:
     # assume we are talking to localhost
-#    th = socket.gethostname()
+    # th = socket.gethostname()
     th = socket.getfqdn()
     nforks=1
     async=False
@@ -46,6 +46,12 @@ class BaseTest:
         result = mod.list_methods()
         self.assert_on_fault(result)
 
+    def test_module_get_method_args(self):
+        mod = getattr(self.overlord,self.module)
+        arg_result=mod.get_method_args()
+        print arg_result
+        self.assert_on_fault(arg_result)
+
     def test_module_inventory(self):
         mod = getattr(self.overlord, self.module)
         result = mod.list_methods()
@@ -70,6 +76,7 @@ class BaseTest:
     test_module_description.intro = True
     test_module_list_methods.intro = True
     test_module_inventory.intro = True
+    test_module_get_method_args.intro = True
 
 class TestTest(BaseTest):
     module = "test"
@@ -381,6 +388,8 @@ class TestSystem(BaseTest):
     def test_module_description(self):
         pass
 
+    def test_module_get_method_args(self):
+        pass
 
 
 #import time

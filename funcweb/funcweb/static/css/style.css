@@ -506,7 +506,7 @@ background-position:100% -24px;
 /*********** My Fedora Widget stuff *************/
 
 .col {
-  margin: 5px
+  margin: 10px
   padding: 0 0 2ex;
 }
 
@@ -642,7 +642,7 @@ background-position:100% -24px;
 
 .col {
   float: left;
-  margin: 5px;
+  margin: 30px;
   padding: 0 0 2ex; 
   padding-bottom: 32767px;
   margin-bottom: -32767px;  
@@ -677,6 +677,10 @@ background-position:100% -24px;
   
 }
 
+#col5 {
+  width: 200px;
+  margin-left: 500px;
+}
 .widget-list {
   /*display: table-cell;*/
 }
@@ -698,6 +702,8 @@ background-position:100% -24px;
   border-collapse: separate;
   background-color: white;
 }
+
+
 
 .widget h2 {
   border-width: 1px 1px 1px 1px;
