@@ -32,7 +32,7 @@ class Root(controllers.RootController):
     #will be reused for widget validation
 
     @expose(template="funcweb.templates.minions")
-    #@identity.require(identity.not_anonymous())
+    @identity.require(identity.not_anonymous())
     def minions(self, glob='*'):
         """ Return a list of our minions that match a given glob """
         return dict(minions=Minions(glob).get_all_hosts())
@@ -40,7 +40,7 @@ class Root(controllers.RootController):
     index = minions # start with our minion view, for now
 
     @expose(template="funcweb.templates.minion")
-    #@identity.require(identity.not_anonymous())
+    @identity.require(identity.not_anonymous())
     def minion(self, name="*", module=None, method=None):
         """ Display module or method details for a specific minion.
 
@@ -75,7 +75,7 @@ class Root(controllers.RootController):
 
 
     @expose(template="funcweb.templates.method_args")
-    #@identity.require(identity.not_anonymous())
+    @identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
         
         global global_form
@@ -138,6 +138,7 @@ class Root(controllers.RootController):
         
     
     @expose() 
+    @identity.require(identity.not_anonymous())
     def handle_minion_error(self,tg_errors=None):
         """
         The method checks the result from turbogears.validate
@@ -153,6 +154,7 @@ class Root(controllers.RootController):
     @expose(allow_json=True)
     @error_handler(handle_minion_error)
     @validate(form=validate_decorator_updater)
+    @identity.require(identity.not_anonymous())
     def post_form(self,**kw):
         """
         Data processing part
@@ -187,6 +189,7 @@ class Root(controllers.RootController):
             return "Missing arguments sorry can not proceess the form"
     
     @expose(template="funcweb.templates.method_args")
+    @identity.require(identity.not_anonymous())
     def execute_link(self,minion=None,module=None,method=None):
         """
         Method is fot those minion methods that dont accept any 
