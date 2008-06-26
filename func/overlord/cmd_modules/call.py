@@ -122,6 +122,8 @@ class Call(base_command.BaseCommand):
 
 
         self.interactive = False
+        self.async = self.options.async
+        self.forks = self.options.forks
         
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
