@@ -42,6 +42,10 @@ class CopyFile(base_command.BaseCommand):
         self.verbose = self.options.verbose
 
     def do(self, args):
+        if not args:
+            self.outputUsage()
+            return
+        
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
         
