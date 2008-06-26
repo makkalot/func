@@ -26,6 +26,7 @@ from func.overlord import client
 class Ping(base_command.BaseCommand):
     name = "ping"
     usage = "see what func minions are up/accessible"
+    summary = usage
 
     def addOptions(self):
         """

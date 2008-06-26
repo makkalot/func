@@ -135,6 +135,7 @@ class Command:
             for name, command in self.subCommands.items():
                 formatter.addCommand(name, command.summary or
                     command.description)
+            print formatter.format_description("")
 
         # expand %command for the bottom usage
         usage = self.usage or self.name
@@ -197,7 +198,6 @@ class Command:
 
         # handle pleas for help
         if args and args[0] == 'help':
-            self.debug('Asked for help, args %r' % args)
 
             # give help on current command if only 'help' is passed
             if len(args) == 1:

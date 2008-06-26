@@ -23,6 +23,7 @@ from func.overlord import base_command
 class ShowHardware(base_command.BaseCommand):
     name = "hardware"
     usage = "show hardware details"
+    summary = usage
 
     # FIXME: we might as well make verbose be in the subclass
     #      and probably an inc variable while we are at it

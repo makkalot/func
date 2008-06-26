@@ -28,6 +28,7 @@ DEFAULT_FORKS = 1
 class Call(base_command.BaseCommand):
     name = "call"
     usage = "call module method name arg1 arg2..."
+    summary = "allows a specific module and method to be called"
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")

@@ -22,6 +22,7 @@ from func.overlord import base_command
 class ListMinions(base_command.BaseCommand):
     name = "list_minions"
     usage = "show known minions"
+    summary = usage
 
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
