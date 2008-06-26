@@ -104,6 +104,11 @@ class Call(base_command.BaseCommand):
 
         # I kind of feel like we shouldn't be parsing args here, but I'm
         # not sure what the write place is -al;
+
+        if not args:
+            self.outputUsage()
+            return
+        
         self.module           = args[0]
         if len(args) > 1:
             self.method       = args[1]
