@@ -23,11 +23,13 @@ class BaseCommand(command.Command):
     interactive = False
     verbose=0
     port=DEFAULT_PORT
+    async=False
+    forks=1
     def getOverlord(self):
         self.overlord_obj = client.Overlord(self.server_spec,
                                             port=self.port,
                                             interactive=self.interactive,
                                             verbose=self.verbose,
                                             config=self.config,
-                                            async=self.options.async,
-                                            nforks=self.options.forks)
+                                            async=self.async,
+                                            nforks=self.forks)

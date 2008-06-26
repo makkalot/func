@@ -23,7 +23,7 @@ import sys
 import fcntl
 import forkbomb
 import utils
-import signal
+import pprint
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
@@ -111,14 +111,13 @@ def batch_run(pool, callback, nforks):
     operation will be created in cachedir and subsequently deleted.    
     """
    
-    job_id = time.time()
+    job_id = pprint.pformat(time.time())
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
         # kick off the job
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
         results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
@@ -133,7 +132,7 @@ def minion_async_run(retriever, method, args):
     # minion jobs contain the string "minion".  
 
 
-    job_id = "%s-minion" % time.time()
+    job_id = "%s-minion" % pprint.pformat(time.time())
     __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
