@@ -49,7 +49,6 @@ class BaseTest:
     def test_module_get_method_args(self):
         mod = getattr(self.overlord,self.module)
         arg_result=mod.get_method_args()
-        print arg_result
         self.assert_on_fault(arg_result)
 
     def test_module_inventory(self):
@@ -311,6 +310,37 @@ class TestRpm(BaseTest):
     def test_inventory(self):
         result = self.overlord.rpms.inventory()
         self.assert_on_fault(result)
+
+    def test_glob(self):
+        # if func is running, there should at least be python installed ;->
+        result = self.overlord.rpms.glob("python*", False)
+        self.assert_on_fault(result)
+
+    def test_glob_flatten(self):
+        result = self.overlord.rpms.glob("python*", True)
+        self.assert_on_fault(result)
+
+    def test_glob_nomatch(self):
+        # shouldn't be any rpms called "-" ;->
+        result = self.overlord.rpms.glob("-*")
+        self.assert_on_fault(result)
+
+    def test_glob_gpg_pubkey(self):
+        # gpg-pubkey packages are weird rpm virtual packages, and tend to do
+        # weird things, so try that too
+        result = self.overlord.rpms.glob("gpg-pubkey*")
+        self.assert_on_fault(result)
+
+    def test_glob_gpg_pubkey_no_flat(self):
+        # gpg-pubkey packages are weird rpm virtual packages, and tend to do
+        # weird things, so try that too
+        result = self.overlord.rpms.glob("gpg-pubkey*", False)
+        self.assert_on_fault(result)
+
+    def test_glob_match_all(self):
+        result = self.overlord.rpms.glob("*", False)
+        self.assert_on_fault(result)
+
 
 
 class TestSmart(BaseTest):

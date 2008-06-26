@@ -42,3 +42,28 @@ class RpmModule(func_module.FuncModule):
             else:
                 results.append([name, epoch, version, release, arch])
         return results
+
+    def glob(self, pattern, flatten=True):
+        """
+        Return a list of installed packages that match a pattern
+        """
+        ts = rpm.TransactionSet()
+        mi = ts.dbMatch()
+        results = []
+        if not mi:
+            return
+        mi.pattern('name', rpm.RPMMIRE_GLOB, pattern)
+        for hdr in mi:
+            name = hdr['name']
+            epoch = (hdr['epoch'] or 0)
+            version = hdr['version']
+            release = hdr['release']
+            # gpg-pubkeys have no arch
+            arch = (hdr['arch'] or "")
+
+            if flatten:
+                results.append("%s %s %s %s %s" % (name, epoch, version,
+                                                       release, arch))
+            else:
+                results.append([name, epoch, version, release, arch])
+        return results
