@@ -66,9 +66,30 @@ class MapperTool(object):
         if self.options.verbose:
             print "- built the following map:"
             print minion_hash
+        
+        if self.options.append:
+            try:
+                oldmap = file(DEFAULT_TREE, 'r')
+                old_hash = yaml.load(oldmap)
+                oldmap.close()
+            except e:
+                print "ERROR: old map could not be read, append failed"
+                sys.exit(-1)
+                
+            merged_map = {}
+            merged_map.update(old_hash)
+            merged_map.update(minion_hash)
+            
+            if self.options.verbose:
+                print "- appended new map to the following map:"
+                print old_hash
+                print "  resulting in:"
+                print merged_map
+            
+            minion_hash = merged_map
+        
+        if self.options.verbose:
             print "- writing to %s" % DEFAULT_TREE
         
-        if not self.options.append:
-            mapfile = file(DEFAULT_TREE, 'w')
-            yaml.dump(minion_hash,mapfile)
-        
+        mapfile = file(DEFAULT_TREE, 'w')
+        yaml.dump(minion_hash,mapfile)
