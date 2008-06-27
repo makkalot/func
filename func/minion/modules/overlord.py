@@ -10,6 +10,7 @@
 
 import func_module
 import func.overlord.client as fc
+from certmaster import certmaster as certmaster
 from func import utils
 
 class OverlordModule(func_module.FuncModule):
@@ -18,20 +19,23 @@ class OverlordModule(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Module for controlling minions that are also overlords."
 
-    def get_minions(self,get_only_alive=False):
+    def map_minions(self,get_only_alive=False):
         """
         Builds a recursive map of the minions currently assigned to this
         overlord
         """
         maphash = {}
         current_minions = []
-        ping_results = fc.Overlord("*").test.ping()
         if get_only_alive:
+            ping_results = fc.Overlord("*").test.ping()
             for minion in ping_results.keys():
                 if ping_results[minion] == 1: #if minion is alive
                     current_minions.append(minion) #add it to the list of current minions
         else:
-            current_minions = ping_results.keys()
+            cm = certmaster.CertMaster()
+            current_minions = cm.get_signed_certs()
         for current_minion in current_minions:
-            maphash[current_minion] = fc.Overlord(current_minion).overlord.get_minions()[current_minion]
+            maphash[current_minion] = fc.Overlord(current_minion).overlord.map_minions()[current_minion]
         return maphash
+        
+    
