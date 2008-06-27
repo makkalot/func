@@ -1,0 +1,8 @@
+#!/usr/bin/python
+
+import sys
+import distutils.sysconfig
+import func.overlord.mapper as mapper
+
+mapper = mapper.MapperTool()
+mapper.run(sys.argv)

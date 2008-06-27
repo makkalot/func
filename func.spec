@@ -13,6 +13,7 @@ License: GPLv2+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
+Requires: pyYaml
 Requires: certmaster >= 0.1
 BuildRequires: python-devel
 %if %is_suse
@@ -54,6 +55,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func
 %{_bindir}/func-inventory
 %{_bindir}/func-create-module
+%{_bindir}/func-build-map
 #%{_bindir}/update-func
 /etc/init.d/funcd
 %dir %{_sysconfdir}/%{name}
@@ -123,6 +125,9 @@ fi
 
 
 %changelog
+* Fri Jun 27 2008 Steve Salevan <ssalevan@redhat.com> - 0.19-1
+- Various bugfixes, adding in mapping/delegation tools
+
 * Mon Mar 03 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
 - split off certmaster
 

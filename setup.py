@@ -33,7 +33,8 @@ if __name__ == "__main__":
 		     "scripts/func", 
                      "scripts/func-inventory",
                      "scripts/func-create-module",
-		     # "scripts/update-func",
+		     "scripts/func-build-map"
+                     # "scripts/update-func",
                 ],
 		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME
