@@ -18,19 +18,20 @@ class OverlordModule(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Module for controlling minions that are also overlords."
 
-    def get_minions(self,current_minions):
+    def get_minions(self,get_only_alive=False):
         """
         Builds a recursive map of the minions currently assigned to this
         overlord
         """
         maphash = {}
+        current_minions = []
+        ping_results = fc.Overlord("*").test.ping()
+        if get_only_alive:
+            for minion in ping_results.keys():
+                if ping_results[minion] == 1: #if minion is alive
+                    current_minions.append(minion) #add it to the list of current minions
+        else:
+            current_minions = ping_results.keys()
         for current_minion in current_minions:
-            minionhash = {}
-            minions_directly_below = fc.Overlord(current_minion).certmaster.get_signed_certs()
-            for (minion,subminions) in minions_directly_below:
-                if len(subminions) == 0:
-                    minionhash[minion] = {}
-                else:
-                    minionhash[minion] = fc.Overlord(minion).overlord.get_minions(subminions)
-            maphash[current_minion] = minionhash
-        return {utils.get_hostname():maphash}
+            maphash[current_minion] = fc.Overlord(current_minion).overlord.get_minions()[current_minion]
+        return maphash
