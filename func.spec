@@ -99,7 +99,7 @@ else
         ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/S99funcd
    done
    for i in 1 6; do
-        ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/S99funcd
+        ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/k01funcd
    done
 fi
 
@@ -123,6 +123,10 @@ fi
 
 
 %changelog
+* Fri Jun 28 2008 Adrian Likins <alikins@redhat.com> - 0.18-2
+- fix fedora bug #441283 - typo in postinstall scriptlet
+  (the init.d symlinks for runlevels 1 and 6 were created wrong)
+
 * Mon Mar 03 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
 - split off certmaster
 
