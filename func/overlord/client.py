@@ -111,11 +111,11 @@ class Minions(object):
         seperate_gloobs = self.spec.split(";")
         seperate_gloobs = seperate_gloobs + self.new_hosts
         for each_gloob in seperate_gloobs:
-            actual_gloob = "%s/%s.cert" % (self.config.certroot, each_gloob)
+            actual_gloob = "%s/%s.%s" % (self.config.certroot, each_gloob, self.config.cert_extension)
             certs = glob.glob(actual_gloob)
             for cert in certs:
                 self.all_certs.append(cert)
-                host = cert.replace(self.config.certroot,"")[1:-5]
+                host = cert.replace(self.config.certroot,"")[1:-(len(self.config.cert_extension) + 1)]
                 self.all_hosts.append(host)
         return self.all_hosts
 
