@@ -9,12 +9,11 @@ class TestWidgetListFactory(unittest.TestCase):
     
     def setUp(self):
         self.widget_factory = WidgetListFactory(self.get_test_default_args(),minion="myminion",module="mymodule",method="my_method")
-    
-        
-    def tearDown(self):
-        pass
 
     def test_default_args(self):
+        """
+        Test to check the default args if they were assigned 
+        """
         compare_with = self.get_test_default_args()
         widget_list=self.widget_factory.get_widgetlist()
         
@@ -24,7 +23,7 @@ class TestWidgetListFactory(unittest.TestCase):
             assert widget_list.has_key(argument_name) == True
             #test the label 
             assert pretty_label(argument_name) == getattr(widget_list[argument_name],'label')
-            print getattr(widget_list[argument_name],'label')
+            #print getattr(widget_list[argument_name],'label')
 
             #print "The argument name is :",argument_name
             #because some of them dont have it like boolean
@@ -36,9 +35,38 @@ class TestWidgetListFactory(unittest.TestCase):
 
             if argument_options.has_key("options"):
                 assert argument_options['options'] == getattr(widget_list[argument_name],"options")
-            
-        #that should be enough
+    
+    def test_add_specialized_list(self):
+        """
+        Testing the internals of the special list widget 
+        """
+        pass
+
+    def test_add_specialized_hash(self):
+        """
+        Testing the internals of the special hash widget 
+        """ 
+        test_hash_data = self.get_test_default_args()['hash_default']
+        widget_list_object = self.widget_factory.get_widgetlist_object()
+        #not very efficient but works
+        #hash_widget_object should be a widgets.RepeatingFieldSet
+        hash_widget_object = [h_obj for h_obj in widget_list_object if getattr(h_obj,'name')=='hash_default'][0]
+       
+        #print hash_widget_object.fields
+        #check the key data
+        assert isinstance(hash_widget_object.fields[0],widgets.TextField) == True
+        assert getattr(hash_widget_object.fields[0],'name') == 'keyfield'
+        assert getattr(hash_widget_object.fields[0],'label') == 'Key Field'
+        #check the value data 
+        assert isinstance(hash_widget_object.fields[1],widgets.TextField) == True
+        assert getattr(hash_widget_object.fields[1],'name') == 'valuefield'
+        assert getattr(hash_widget_object.fields[1],'label') == 'Value Field'
+ 
+
     def test_get_widgetlist_object(self):
+        """
+        Test the final widgetlist object
+        """
         compare_with = self.get_test_default_args()
         widget_list_object = self.widget_factory.get_widgetlist_object()
         
@@ -47,7 +75,7 @@ class TestWidgetListFactory(unittest.TestCase):
         all_fields = [getattr(field,"name") for field in widget_list_object]
         #print all_fields
         for argument_name in compare_with.keys():
-            print argument_name
+            #print argument_name
             assert argument_name in all_fields
             #print getattr(widget_list_object,argument_name)
 
@@ -130,14 +158,16 @@ class TestWidgetListFactory(unittest.TestCase):
                     'type':'hash',
                     'default':'default hash',
                     'optional':False,
-                    'description':'default description'
+                    'description':'default description',
+                    'validator':'^[0-9]*$'
                    
                     },
                 'list_default':{
                     'type':'list',
                     'default':'default list',
                     'optional':False,
-                    'description':'default description'
+                    'description':'default description',
+                    'validator':'^[0-9]*$'
                    
                     },
                 #will be converted to dropdown
