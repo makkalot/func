@@ -22,6 +22,10 @@ class TestWidgetListFactory(unittest.TestCase):
 
         for argument_name,argument_options in compare_with.iteritems():
             assert widget_list.has_key(argument_name) == True
+            #test the label 
+            assert pretty_label(argument_name) == getattr(widget_list[argument_name],'label')
+            print getattr(widget_list[argument_name],'label')
+
             #print "The argument name is :",argument_name
             #because some of them dont have it like boolean
             if argument_options.has_key('default'):
