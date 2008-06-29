@@ -40,7 +40,16 @@ class TestWidgetListFactory(unittest.TestCase):
         """
         Testing the internals of the special list widget 
         """
-        pass
+        test_list_data = self.get_test_default_args()['list_default']
+        widget_list_object = self.widget_factory.get_widgetlist_object()
+        #not very efficient but works
+        #hash_widget_object should be a widgets.RepeatingFieldSet
+        hash_widget_object = [h_obj for h_obj in widget_list_object if getattr(h_obj,'name')=='list_default'][0]
+       
+        assert isinstance(hash_widget_object.fields[0],widgets.TextField) == True
+        assert getattr(hash_widget_object.fields[0],'name') == 'listfield'
+        assert getattr(hash_widget_object.fields[0],'label') == 'List Field'
+ 
 
     def test_add_specialized_hash(self):
         """
