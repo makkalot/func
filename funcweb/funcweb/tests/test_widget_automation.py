@@ -2,8 +2,8 @@ import unittest
 import turbogears
 from turbogears import testutil
 
-from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
-from funcweb.widget_validation import WidgetSchemaFactory
+from funcweb.widget_automation import *
+from funcweb.widget_validation import *
 
 class TestWidgetListFactory(unittest.TestCase):
     
@@ -58,11 +58,14 @@ class TestWidgetListFactory(unittest.TestCase):
     def test_remote_form_factory(self):
         from turbogears.view import load_engines
         load_engines()
-       
+      
+        schema_factory = WidgetSchemaFactory(self.get_test_default_args())
+        schema_validator=schema_factory.get_ready_schema()
+      
         # WidgetsList object
         widget_list_object = self.widget_factory.get_widgetlist_object()
         #print widget_list_object
-        remote_form = RemoteFormFactory(widget_list_object).get_remote_form()
+        remote_form = RemoteFormFactory(widget_list_object,schema_validator).get_remote_form()
 
         #it is a key,value dict
         widget_list=self.widget_factory.get_widgetlist()
@@ -75,6 +78,22 @@ class TestWidgetListFactory(unittest.TestCase):
 
 
         #print remote_form.render()
+
+    def test_pretty_label(self):
+        """
+        Testing the label converter util method
+        """
+        test_strings = ('service_name','some__other','cool-arg','somenormal','someweir*1*2*3*3')
+        #print  pretty_label(test_strings[0]) 
+        assert pretty_label(test_strings[0]) == 'Service Name'
+        #print  pretty_label(test_strings[1]) 
+        assert pretty_label(test_strings[1]) == 'Some Other'
+        #print  pretty_label(test_strings[2]) 
+        assert pretty_label(test_strings[2]) == 'Cool Arg'
+        #print  pretty_label(test_strings[3]) 
+        assert pretty_label(test_strings[3]) == 'Somenormal'
+        #print  pretty_label(test_strings[4]) 
+        assert pretty_label(test_strings[4]) == 'Someweir*1*2*3*3'
     
     def get_test_default_args(self):
         return {
