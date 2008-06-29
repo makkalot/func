@@ -83,11 +83,11 @@ class WidgetListFactory(object):
 
         #adding the hidden fields (that part wass adde later can be made more generic)
         if self.minion:
-            self.__widget_list['minion']= getattr(widgets,'HiddenField')(name="minion",value=self.minion,default=self.minion)
+            self.__widget_list['minion']= getattr(widgets,'HiddenField')(name="minion",default=self.minion)
         if self.module:
-            self.__widget_list['module']= getattr(widgets,'HiddenField')(name="module",value=self.module,default=self.module)
+            self.__widget_list['module']= getattr(widgets,'HiddenField')(name="module",default=self.module)
         if self.method:
-            self.__widget_list['method']= getattr(widgets,'HiddenField')(name="method",value=self.method,default=self.method)
+            self.__widget_list['method']= getattr(widgets,'HiddenField')(name="method",default=self.method)
 
 
 
@@ -129,7 +129,6 @@ class WidgetListFactory(object):
         """
         hash_repeat_data = {
                 'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
-                'label':'Di Field',
                 'fields': [
                     widgets.TextField(name="keyfield",label="Key Field"),
                     widgets.TextField(name="valuefield",label="Value Field")
@@ -161,7 +160,6 @@ class WidgetListFactory(object):
         list_repeat_data = {
                 'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
                 'name':'listrepeat',
-                'label':'List Field',
                 'fields' : [
                     widgets.TextField(name="listfield",label="List Field")
                     ],
@@ -189,6 +187,7 @@ class WidgetListFactory(object):
         """
         #firstly set the name of the argument 
         setattr(object,"name",argument_name)
+        setattr(object,"label",pretty_label(argument_name))
         
         #print "The argument name is :",argument_name
         #print "The argument options are :",argument
