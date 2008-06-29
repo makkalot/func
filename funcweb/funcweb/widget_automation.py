@@ -26,9 +26,9 @@ class WidgetListFactory(object):
                 'default_value':"TextField",
                 },
             'hash':{
-                'default_value':"RepeatingInputWidget"},
+                'type':"RepeatingFieldSet"},
             'list':{
-                'default_value':"RepeatingInputWidget"} 
+                'type':"RepeatingFieldSet"} 
             }
     #will contain the input widget created in that class
 
@@ -136,8 +136,9 @@ class WidgetListFactory(object):
                 }
         
         #create the RepeatingFieldSet object and add it to global list like you do for others
-        temp_object = getattr(widgets,self.__convert_table[argument['type']]['default'])(**hash_repeat_data)
-        #add the commno options
+        temp_object = getattr(widgets,self.__convert_table[argument['type']]['type'])(**hash_repeat_data)
+        #print temp_object.fields
+        #add the common options
         self.__add_commons_to_object(temp_object,argument,argument_name)
         #add a new entry to final list
         self.__widget_list[argument_name]=temp_object
@@ -159,14 +160,13 @@ class WidgetListFactory(object):
         """
         list_repeat_data = {
                 'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
-                'name':'listrepeat',
                 'fields' : [
                     widgets.TextField(name="listfield",label="List Field")
                     ],
                 }
         
         #create the RepeatingFieldSet object and add it to global list like you do for others
-        temp_object = getattr(widgets,self.__convert_table[argument['type']]['default'])(**hash_repeat_data)
+        temp_object = getattr(widgets,self.__convert_table[argument['type']]['type'])(**list_repeat_data)
         #add the commno options
         self.__add_commons_to_object(temp_object,argument,argument_name)
         #add a new entry to final list
