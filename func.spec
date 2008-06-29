@@ -60,6 +60,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{_sysconfdir}/%{name}/minion-acl.d/
 %dir /etc/func/modules/
 %config(noreplace) /etc/func/minion.conf
+%config(noreplace) /etc/func/async_methods.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
