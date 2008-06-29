@@ -26,9 +26,9 @@ class WidgetListFactory(object):
                 'default_value':"TextField",
                 },
             'hash':{
-                'default_value':"TextArea"},
+                'default_value':"RepeatingInputWidget"},
             'list':{
-                'default_value':"TextArea"} 
+                'default_value':"RepeatingInputWidget"} 
             }
     #will contain the input widget created in that class
 
@@ -112,6 +112,70 @@ class WidgetListFactory(object):
         self.__widget_list[argument_name]=temp_object
         del temp_object
     
+    def __add_specialized_hash(self,argument,argument_name):
+        """
+        Specialized option adder for hash, we need it to be diffferent
+        because the hash and list objects uses an advanced type of widgets
+        which make them to be able to add, remove fields during using the
+        web UI. It uses the RepeatingFieldSet which is able to contain the
+        other normal input widgets. It will have two fields (TextFields)
+        one for key : keyfield and other for value : valuefield
+        Also the validator addition is a little bit different and should 
+        be done in that method also ...
+
+        @param : argument : the argument options,
+        @param : argument_name : the name of the argument also the name of the widget
+        @return : Nothing
+        """
+        hash_repeat_data = {
+                'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
+                'label':'Di Field',
+                'fields': [
+                    widgets.TextField(name="keyfield",label="Key Field"),
+                    widgets.TextField(name="valuefield",label="Value Field")
+                    ],
+                }
+        
+        #create the RepeatingFieldSet object and add it to global list like you do for others
+        temp_object = getattr(widgets,self.__convert_table[argument['type']]['default'])(**hash_repeat_data)
+        #add the commno options
+        self.__add_commons_to_object(temp_object,argument,argument_name)
+        #add a new entry to final list
+        self.__widget_list[argument_name]=temp_object
+        del temp_object
+    
+
+
+
+    def __add_specialized_list(self,argument,argument_name):
+        """
+        Very similar to __add_specialized_hash except it has one field
+        that is repeated so that provides a dynamic numbers of fields into 
+        the web UI.
+        
+        TODO : combine the 2 methods into a one generic they are very similar 
+        @param : argument : the argument options,
+        @param : argument_name : the name of the argument also the name of the widget
+        @return : Nothing
+        """
+        list_repeat_data = {
+                'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
+                'name':'listrepeat',
+                'label':'List Field',
+                'fields' : [
+                    widgets.TextField(name="listfield",label="List Field")
+                    ],
+                }
+        
+        #create the RepeatingFieldSet object and add it to global list like you do for others
+        temp_object = getattr(widgets,self.__convert_table[argument['type']]['default'])(**hash_repeat_data)
+        #add the commno options
+        self.__add_commons_to_object(temp_object,argument,argument_name)
+        #add a new entry to final list
+        self.__widget_list[argument_name]=temp_object
+        del temp_object
+ 
+
     def __add_commons_to_object(self,object,argument,argument_name):
         """
         As it was thought all input widgets have the same
@@ -261,3 +325,22 @@ class RemoteLinkFactory(CoreWD):
                 )
 
 
+#############################################################################################
+def pretty_label(name_to_label):
+    """
+    Simple util method to show the labels better 
+    without __ things and other ugly looking stuff
+    """
+    tmp = None
+    split_tokens = ('__','_','-')
+    for st in split_tokens:
+        tmp = name_to_label.split(st)
+        if len(tmp)>1:
+            break
+
+    if tmp :
+        name_to_label = " ".join([s.capitalize() for s in tmp])
+    else:
+        name_to_label = name_to_label.capitalize()
+
+    return name_to_label
