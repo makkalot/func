@@ -261,7 +261,7 @@ class RemoteFormAutomation(CoreWD):
                 validator = validator_schema,
                 name = "minion_form",
                 update = "col5",
-                before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'80\',height:\'80\'}));',
+                before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'100\',height:\'100\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
         )
 
@@ -275,7 +275,7 @@ class RemoteFormFactory(object):
     #some values that may want to change later 
     name = "minion_form",
     update = "col5",
-    before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'80\',height:\'80\'}));',
+    before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'100\',height:\'100\'}));',
     on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
     submit_text = "Send Minion Form"
     action = "/post_form"
