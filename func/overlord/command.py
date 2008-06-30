@@ -97,7 +97,7 @@ class Command:
     aliases = None
     usage = None
     summary = None
-    description = None
+    description = "func is the command line interface for controlling func minions"
     parentCommand = None
     subCommands = None
     subCommandClasses = None
@@ -258,6 +258,7 @@ class Command:
         """
         Output help information.
         """
+
         self.parser.print_help(file=self.stderr)
 
     def outputUsage(self):
