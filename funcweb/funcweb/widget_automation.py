@@ -128,7 +128,7 @@ class WidgetListFactory(object):
         @return : Nothing
         """
         hash_repeat_data = {
-                'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
+                'template':"funcweb.templates.repeater_form",#may change that if someone doesnt like my design :)
                 'fields': [
                     widgets.TextField(name="keyfield",label="Key Field"),
                     widgets.TextField(name="valuefield",label="Value Field")
@@ -159,7 +159,7 @@ class WidgetListFactory(object):
         @return : Nothing
         """
         list_repeat_data = {
-                'template':"sampleapp.templates.repeater_form",#may change that if someone doesnt like my design :)
+                'template':"funcweb.templates.repeater_form",#may change that if someone doesnt like my design :)
                 'fields' : [
                     widgets.TextField(name="listfield",label="List Field")
                     ],
