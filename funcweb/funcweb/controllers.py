@@ -87,6 +87,11 @@ class Root(controllers.RootController):
             return dict(minion_form = None,minion=minion,module=module,method=method)
 
         minion_arguments = method_args[minion][method]['args']
+        #the description of the method we are going to display
+        if method_args[minion][method].has_key('description'):
+            description = method_args[minion][method]['description']
+        else:
+            description = None
         if minion_arguments:
             wlist_object = WidgetListFactory(minion_arguments,minion=minion,module=module,method=method)
             wlist_object = wlist_object.get_widgetlist_object()
@@ -104,9 +109,9 @@ class Root(controllers.RootController):
             del wlist_object
             del minion_arguments
 
-            return dict(minion_form =minion_form,minion=minion,module=module,method=method)
+            return dict(minion_form =minion_form,minion=minion,module=module,method=method,description=description)
         else:
-            return dict(minion_form = None,minion=minion,module=module,method=method)
+            return dict(minion_form = None,minion=minion,module=module,method=method,description = description)
 
 
 
