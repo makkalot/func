@@ -14,8 +14,7 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
     # th = socket.gethostname()
-    minion = "acervirtual.evlan.com"
-    th = socket.getfqdn(minion)
+    th = socket.getfqdn()
     nforks=1
     async=False
 
