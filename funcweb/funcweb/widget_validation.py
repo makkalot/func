@@ -266,6 +266,8 @@ class MinionListValidator(validators.FancyValidator):
         """
         #will add more beautiful validation here after 
         #integrate the complex widgets for lists and dicts
+        #print "Im in the list validator the value i recieved is : ",value
+
         if self.not_empty:
             if len(value)==0:
                 raise validators.Invalid('Empty list passed when not_empty is set',value,state)
@@ -274,9 +276,13 @@ class MinionListValidator(validators.FancyValidator):
         tmp = []
         if type(tmp) != type(value):
             value = list(value)
-        value = [list_value.strip() for list_value in value]
-
-        return value
+        
+        #concert the data to proper format 
+        final_list = []
+        for hash_data in value:
+            final_list.extend(hash_data.values())
+    
+        return final_list
 
     def validate_python(self,value,state):
         import re
@@ -303,17 +309,26 @@ class MinionHashValidator(validators.FancyValidator):
         """
         #will add more beautiful validation here after 
         #integrate the complex widgets for lists and dicts
+        print "Im in hash validator the value i recieved is ",value
+
         if self.not_empty:
             if len(value)==0:
                 raise validators.Invalid('Empty hash passed when not_empty is set',value,state)
+            
+        #concert the data to proper format 
+        final_hash = {}
+        for hash_data in value:
+            final_hash[hash_data['keyfield']] = hash_data['valuefield']
 
-        #check the type firstly
+    
+
+       #check the type firstly
         tmp = {}
-        if type(tmp) != type(value):
-            raise validators.Invalid('The value passed to MinionHashValidator should be a dict object',value,state)
+        if type(tmp) != type(final_hash):
+            raise validators.Invalid('The value passed to MinionHashValidator should be a dict object',final_hash,state)
         
         #print value
-        return value
+        return final_hash
 
     def validate_python(self,value,state):
         #print value
