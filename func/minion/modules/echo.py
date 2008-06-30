@@ -47,6 +47,12 @@ class EchoTest(func_module.FuncModule):
 
         return command
 
+    def run_boolean(self,command):
+        """
+        Run boolean
+        """
+        return command
+
     def register_method_args(self):
         """
         Implementing the argument getter
@@ -111,6 +117,15 @@ class EchoTest(func_module.FuncModule):
                             }
                         },
                     'description':'Returns back a hash'
+                    },
+                'run_boolean':{
+                    'args':
+                    {
+                        'command':{
+                            'type':'boolean',
+                            'optional':False
+                            }
+                        },
+                    'description':'Returns back a boolean'
                     }
-
                  }
