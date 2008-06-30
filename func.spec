@@ -123,6 +123,9 @@ fi
 
 
 %changelog
+* Mon Jun 30 2008 Michael DeHaan <mdehaan@redhat.com> - 0.20-1
+- new release, upstream changes
+
 * Fri Jun 28 2008 Adrian Likins <alikins@redhat.com> - 0.18-2
 - fix fedora bug #441283 - typo in postinstall scriptlet
   (the init.d symlinks for runlevels 1 and 6 were created wrong)
