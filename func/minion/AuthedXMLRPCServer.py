@@ -60,7 +60,6 @@ class BaseAuthedXMLRPCServer(SocketServer.ForkingMixIn):
         self.instance = None
 
     def get_authinfo(self, request, client_address):
-        print 'down here'
         if self.authinfo_callback:
             return self.authinfo_callback(request, client_address)
         return None
@@ -84,12 +83,11 @@ class AuthedXMLRPCServer(BaseAuthedXMLRPCServer, SSLCommon.BaseServer, SimpleXML
 
 
 ###########################################################
-# Testing stuff
+# Testing code only
 ###########################################################
 
 class ReqHandler:
     def ping(self, callerid, trynum):
-        print 'clearly not'
         print callerid
         print trynum
         return "pong %d / %d" % (callerid, trynum)
