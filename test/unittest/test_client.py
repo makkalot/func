@@ -14,7 +14,8 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
     # th = socket.gethostname()
-    th = socket.getfqdn()
+    minion = "acervirtual.evlan.com"
+    th = socket.getfqdn(minion)
     nforks=1
     async=False
 
@@ -358,8 +359,40 @@ class TestIptablesPort(BaseTest):
         # doesnt have an inventory, so er... -akl
 
         
+class TestEchoTest(BaseTest):
+    module = "echo"
+
+    def test_run_string(self):
+        result=self.overlord.echo.run_string("heyman")
+        self.assert_on_fault(result)
         
+    def test_run_int(self):
+        result=self.overlord.echo.run_int(12)
+        self.assert_on_fault(result)
         
+    def test_run_float(self):
+        result=self.overlord.echo.run_float(12.0)
+        self.assert_on_fault(result)
+        
+    def test_run_options(self):
+        result=self.overlord.echo.run_options("hehehh")
+        self.assert_on_fault(result)
+
+    def test_run_list(self):
+        result=self.overlord.echo.run_list(['one','two','three'])
+        self.assert_on_fault(result)
+
+    def test_run_hash(self):
+        result=self.overlord.echo.run_hash({'one':1,'two':2})
+        self.assert_on_fault(result)
+
+    def test_run_boolean(self):
+        result=self.overlord.echo.run_hash(True)
+        self.assert_on_fault(result)
+
+
+
+
 
 class TestSystem(BaseTest):
     module = "system"
