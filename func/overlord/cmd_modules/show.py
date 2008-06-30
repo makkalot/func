@@ -64,7 +64,8 @@ class ShowHardware(base_command.BaseCommand):
 
 class Show(base_command.BaseCommand):
     name = "show"
-    usage = "various simple report stuff"
+    usage = "show reports about minion info"
+    summary = usage
     subCommandClasses = [ShowHardware]
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",

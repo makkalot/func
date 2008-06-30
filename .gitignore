@@ -7,3 +7,7 @@ build
 MANIFEST
 rpm-build
 dist
+rpms/
+srpms/
+tars/
+test/test-it.conf*
