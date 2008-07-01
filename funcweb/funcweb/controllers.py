@@ -69,7 +69,17 @@ class Root(controllers.RootController):
                 return dict(minion=name, module=module, method=method,
                             tg_template="funcweb.templates.method")
             else: # return a list of methods for specified module
+                
+                #display the list only that is registered with register_method template !
+                registered_methods=getattr(fc,module).get_method_args()[name].keys()
                 modules = getattr(fc, module).list_methods()
+                for mods in modules.itervalues():
+                    from copy import copy
+                    cp_mods = copy(mods)
+                    for m in cp_mods:
+                        if not m in registered_methods:
+                            mods.remove(m)
+                print modules
                 return dict(modules=modules, module=module,
                             tg_template="funcweb.templates.module")
 
@@ -168,11 +178,8 @@ class Root(controllers.RootController):
             #assign them because we need the rest so dont control everytime
             #and dont make lookup everytime ...
             minion = kw['minion']
-            del kw['minion']
             module = kw['module']
-            del kw['module']
             method = kw['method']
-            del kw['method']
             
             #everytime we do that should be a clever way for that ???
             fc = Overlord(minion)
