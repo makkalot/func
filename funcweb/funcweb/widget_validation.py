@@ -309,7 +309,7 @@ class MinionHashValidator(validators.FancyValidator):
         """
         #will add more beautiful validation here after 
         #integrate the complex widgets for lists and dicts
-        print "Im in hash validator the value i recieved is ",value
+        #print "Im in hash validator the value i recieved is ",value
 
         if self.not_empty:
             if len(value)==0:
