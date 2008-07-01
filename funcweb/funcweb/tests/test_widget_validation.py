@@ -18,23 +18,22 @@ class TestWidgetValidator(unittest.TestCase):
 
         #do better test here
         for argument_name,arg_options in self.get_string_params().iteritems():
-            #print argument_name
-            assert hasattr(schema_man,argument_name)==True
+            #print getattr(schema_man,'fields')
+            assert getattr(schema_man,'fields').has_key(argument_name) == True
+            current_schema_object = getattr(schema_man,'fields')[argument_name]
             #not very efficient but it si just a test :)
-            if argument_name != 'string_mix':
-                for arg,value in arg_options.iteritems():
-                    #print getattr(schema_man,argument_name)
-                    if conversion_schema.has_key(arg):
-                        if hasattr(getattr(schema_man,argument_name),conversion_schema[arg]):
-                            #print arg,value
-                            #couldnt find a way to test it !??
-                            if arg != 'validator':
-                                assert getattr(getattr(schema_man,argument_name),conversion_schema[arg])==value
-                                #print getattr(getattr(schema_man,argument_name),conversion_schema[arg])
-            else:
-                #just print it to see what is inside because the test will be very hardcoded otherwise
-                #print getattr(schema_man,argument_name)
+            if argument_name == 'string_mix':
                 continue
+            if arg_options.has_key('max_length'):
+                assert  getattr(current_schema_object,'max') == arg_options['max_length']
+            if arg_options.has_key('min_length'):
+                assert  getattr(current_schema_object,'min') == arg_options['min_length']
+            if arg_options.has_key('validator'):
+                assert getattr(current_schema_object,'regex')
+            if arg_options.has_key('optional'):
+                #print " ",argument_name," : ",getattr(schema_man,argument_name)
+                assert not getattr(current_schema_object,'not_empty') == arg_options['optional']
+           
         print "Happy tests !"
 
     def test_int_validator(self):
@@ -43,25 +42,26 @@ class TestWidgetValidator(unittest.TestCase):
         
         for argument_name,arg_options in self.get_int_params().iteritems():  
             #print argument_name
-            assert hasattr(schema_man,argument_name)==True
+            assert getattr(schema_man,'fields').has_key(argument_name)==True
+            current_schema_object = getattr(schema_man,'fields')[argument_name]
             #print " ",argument_name," : ",getattr(schema_man,argument_name)
             
             #if the argument includes some range
             if arg_options.has_key('range'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['range'][1]
-                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['range'][0]
+                assert getattr(current_schema_object,'max') == arg_options['range'][1]
+                assert getattr(current_schema_object,'min') == arg_options['range'][0]
             if arg_options.has_key('min'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['min']
+                assert getattr(current_schema_object,'min') == arg_options['min']
                 
             if arg_options.has_key('max'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
+                assert getattr(current_schema_object,'max') == arg_options['max']
             
             if arg_options.has_key('optional'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+                assert not getattr(current_schema_object,'not_empty') == arg_options['optional']
 
 
         print "Happy test!"
@@ -72,20 +72,21 @@ class TestWidgetValidator(unittest.TestCase):
         
         for argument_name,arg_options in self.get_float_params().iteritems():  
             #print argument_name
-            assert hasattr(schema_man,argument_name)==True
+            assert getattr(schema_man,'fields').has_key(argument_name)==True
+            current_schema_object = getattr(schema_man,'fields')[argument_name]
             #print " ",argument_name," : ",getattr(schema_man,argument_name)
             
             if arg_options.has_key('min'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'min') == arg_options['min']
+                assert getattr(current_schema_object,'min') == arg_options['min']
                 
             if arg_options.has_key('max'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'max') == arg_options['max']
+                assert getattr(current_schema_object,'max') == arg_options['max']
 
             if arg_options.has_key('optional'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+                assert not getattr(current_schema_object,'not_empty') == arg_options['optional']
 
 
         print "Happy test!"
@@ -98,12 +99,14 @@ class TestWidgetValidator(unittest.TestCase):
         for argument_name,arg_options in testing_data.iteritems():  
             #print argument_name
             #should all the argument names really
-            assert hasattr(schema_man,argument_name)==True
+            assert getattr(schema_man,'fields').has_key(argument_name)==True
+            current_schema_object = getattr(schema_man,'fields')[argument_name]
+        
             #print " ",argument_name," : ",getattr(schema_man,argument_name)
 
             if arg_options.has_key('optional'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+                assert not getattr(current_schema_object,'not_empty') == arg_options['optional']
                 
         print "Happy test!"
 
@@ -121,16 +124,18 @@ class TestWidgetValidator(unittest.TestCase):
         for argument_name,arg_options in testing_data.iteritems():  
             #print argument_name
             #should all the argument names really
-            assert hasattr(schema_man,argument_name)==True
             #print " ",argument_name," : ",getattr(schema_man,argument_name)
-            
+            assert getattr(schema_man,'fields').has_key(argument_name)==True
+            current_schema_object = getattr(schema_man,'fields')[argument_name]
+        
+ 
             if arg_options.has_key('validator'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert getattr(getattr(schema_man,argument_name),'regex_string') == arg_options['validator']
+                assert getattr(current_schema_object,'regex_string') == arg_options['validator']
 
             if arg_options.has_key('optional'):
                 #print " ",argument_name," : ",getattr(schema_man,argument_name)
-                assert not getattr(getattr(schema_man,argument_name),'not_empty') == arg_options['optional']
+                assert not getattr(current_schema_object,'not_empty') == arg_options['optional']
 
 
         print "Happy test!"
@@ -191,14 +196,15 @@ class TestWidgetValidator(unittest.TestCase):
         
         #test default
         mv = MinionListValidator()
-        assert mv.to_python(['fedora','debian','others']) == ['fedora','debian','others']
+        [{'listfield': u'listone'}, {'listfield': u'listtwo'}]
+        assert mv.to_python([{'listfield': u'listone'}, {'listfield': u'listtwo'}]) == ['listone','listtwo']
         del mv
 
         #test with regex
         mv = MinionListValidator(regex_string='^[A-Z]+$',not_empty=True)
-        assert mv.to_python(['FEDORA','MACOSX']) == ['FEDORA','MACOSX']
+        assert mv.to_python([{'listfield': u'LISTONE'}, {'listfield': u'LISTTWO'}]) == ['LISTONE','LISTTWO']
         self.assertRaises(validators.Invalid,mv.to_python,[])
-        self.assertRaises(validators.Invalid,mv.to_python,['hey_error'])
+        self.assertRaises(validators.Invalid,mv.to_python,[{'listfield':'hey_error'}])
         self.assertRaises(validators.Invalid,mv.to_python,{})
         del mv
 
@@ -210,15 +216,15 @@ class TestWidgetValidator(unittest.TestCase):
         
         #test default
         mv = MinionHashValidator()
-        assert mv.to_python({'fedora':1,'debian':2,'others':3}) == {'fedora':1,'debian':2,'others':3}
+        assert mv.to_python([{'keyfield':'keyvalue','valuefield':'valuehere'}]) == {'keyvalue':'valuehere'}
         del mv
 
         #test with regex
         mv = MinionHashValidator(regex_string='^[A-Z]+$',not_empty=True)
-        assert mv.to_python({'FEDORA':'FEDORA','MACOSX':'MACOSX'}) == {'FEDORA':'FEDORA','MACOSX':'MACOSX'}
+        assert mv.to_python([{'keyfield':'FEDORA','valuefield':'MACOSX'}]) == {'FEDORA':'MACOSX'}
         self.assertRaises(validators.Invalid,mv.to_python,{})
-        self.assertRaises(validators.Invalid,mv.to_python,{'hey_error':12})
-        self.assertRaises(validators.Invalid,mv.to_python,"hwy")
+        self.assertRaises(validators.Invalid,mv.to_python,[{'keyfield':12,'valuefield':123}])
+        self.assertRaises(TypeError,mv.to_python,"hwy")
         del mv
 
         print "Happy testing !"
@@ -305,7 +311,7 @@ class TestWidgetValidator(unittest.TestCase):
                     'default':'hey',
                     'optional':False,
                     'description':'default regex list',
-                    'validator':'^[A-Z]$'
+                    'validator':'^[A-Z]+$'
                     },
                 }
 
@@ -321,7 +327,7 @@ class TestWidgetValidator(unittest.TestCase):
                     'default':{'hey':12},
                     'optional':False,
                     'description':'default regex hash',
-                    'validator':'^[A-Z]$'
+                    'validator':'^[A-Z]+$'
                     },
                 }
         
