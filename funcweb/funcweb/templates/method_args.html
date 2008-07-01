@@ -5,6 +5,7 @@
 
 <body>
     <div py:if="minion_form" id="men"> 
+        <p py:if="description">Description : ${description}</p>
         ${ET(minion_form.display(displays_on='genshi'))}
     </div>
     <div py:if="not minion_form" id="men">
