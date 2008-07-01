@@ -25,6 +25,8 @@ class BaseCommand(command.Command):
     port=DEFAULT_PORT
     async=False
     forks=1
+    delegate=False
+    mapfile=""
     def getOverlord(self):
         self.overlord_obj = client.Overlord(self.server_spec,
                                             port=self.port,
@@ -32,4 +34,6 @@ class BaseCommand(command.Command):
                                             verbose=self.verbose,
                                             config=self.config,
                                             async=self.async,
-                                            nforks=self.forks)
+                                            nforks=self.forks,
+                                            delegate=self.delegate,
+                                            mapfile=self.mapfile)

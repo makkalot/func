@@ -16,6 +16,7 @@
 import sys
 import glob
 import os
+import yaml
 
 from certmaster.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
@@ -158,7 +159,8 @@ def is_minion(minion_string):
 class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
+        delegate=False, mapfile=""):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -179,9 +181,19 @@ class Overlord(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async       = async
+        self.delegate    = delegate
+        self.mapfile     = mapfile
         
         self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
         self.minions = self.minions_class.get_urls()
+        
+        if self.delegate:
+            try:
+                mapstream = file(self.mapfile, 'r')
+                self.minionmap = yaml.load(mapstream)
+            except e:
+                sys.stderr.write("mapfile load failed, switching delegation off")
+                self.delegate = False
     
         if init_ssl:
             self.setup_ssl()
