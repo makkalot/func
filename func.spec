@@ -124,6 +124,9 @@ fi
 
 
 %changelog
+* Wed Jul 02 2008 Michael DeHaan <mdehaan@redhat.com> - 0.21-1
+- new release, upstream changes
+
 * Mon Jun 30 2008 Michael DeHaan <mdehaan@redhat.com> - 0.20-1
 - new release, upstream changes
 
