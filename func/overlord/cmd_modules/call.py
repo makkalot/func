@@ -17,13 +17,19 @@ import optparse
 import pprint
 import xmlrpclib
 import time
+import sys
 
 from func.overlord import client
 from func.overlord import base_command
+from func.config import read_config, BaseConfig, ListOption
 
 import func.jobthing as jobthing
 
 DEFAULT_FORKS = 1
+config_file = '/etc/func/async_methods.conf'
+
+class CallConfig(BaseConfig):
+    force_async = ListOption('')
 
 class Call(base_command.BaseCommand):
     name = "call"
@@ -126,6 +132,9 @@ class Call(base_command.BaseCommand):
         # or some sort of shared datastruct?
         #        self.getOverlord()
 
+        call_config = read_config(config_file, CallConfig)
+        if self.method and (self.module+"."+self.method in call_config.force_async):
+            self.options.async=True
 
         self.interactive = False
         self.async = self.options.async

@@ -60,7 +60,6 @@ class Ping(base_command.BaseCommand):
                                            noglobs=True)
 
             results = overlord_obj.run("test", "ping", [])
-	    # print "results", results, type(results)
             if results == 1:
                 print "[ ok ... ] %s" % server
             else:
