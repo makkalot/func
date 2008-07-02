@@ -65,8 +65,7 @@ class Root(controllers.RootController):
 
         If only the minion name is given, it will display a list of modules
         for that minion.  If a module is supplied, it will display a list of
-        methods.  If a method is supplied, it will display a method execution
-        form.
+        methods.
         """
         #if we have it in the cache
         if self.func_cache['minion_name'] == name:
@@ -137,6 +136,9 @@ class Root(controllers.RootController):
     @expose(template="funcweb.templates.method_args")
     @identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
+        """
+        That method generates the input widget for givent method.
+        """
         
         global global_form
         if self.func_cache['minion_name'] == minion:
@@ -188,6 +190,9 @@ class Root(controllers.RootController):
 
     @expose(template="funcweb.templates.login")
     def login(self, forward_url=None, previous_url=None, *args, **kw):
+        """
+        The login form for not registered users
+        """
         from cherrypy import request, response
         if not identity.current.anonymous \
             and identity.was_login_attempted() \
@@ -233,7 +238,10 @@ class Root(controllers.RootController):
     @identity.require(identity.not_anonymous())
     def post_form(self,**kw):
         """
-        Data processing part
+        Data processing part for methods that accept some inputs.
+        Method recieves the method arguments for minion method then
+        orders them into their original order and sends the xmlrpc
+        request to the minion !
         """
         if kw.has_key('minion') and kw.has_key('module') and kw.has_key('method'):
             #assign them because we need the rest so dont control everytime
@@ -301,5 +309,8 @@ class Root(controllers.RootController):
 
     @expose()
     def logout(self):
+        """
+        The logoout part 
+        """
         identity.current.logout()
         raise redirect("/")
