@@ -147,7 +147,7 @@ class Call(base_command.BaseCommand):
         if not self.options.jobstatus:
             results = self.overlord_obj.run(self.module, self.method, self.method_args)
         else:
-            (return_code, async_results) = self.overlord_obj.job_status(float(self.module))
+            (return_code, async_results) = self.overlord_obj.job_status(self.module)
             res = self.format_return((return_code, async_results))
             print res
             return async_results
