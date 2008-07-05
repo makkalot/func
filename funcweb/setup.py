@@ -14,6 +14,8 @@ if os.path.isdir('locales'):
     package_data.update(find_package_data(where='locales',
         exclude=('*.po',), only_in_packages=False))
 
+#adding to the virtual part of the apache
+etcpath    = "/etc/httpd/conf.d"
 setup(
     name="funcweb",
     version=version,
@@ -25,7 +27,6 @@ setup(
 
     install_requires=[
         "TurboGears >= 1.0.4.2",
-        "SQLAlchemy>=0.3.10",
     ],
     zip_safe=False,
     packages=packages,
@@ -79,5 +80,8 @@ setup(
     },
     # Uncomment next line and create a default.cfg file in your project dir
     # if you want to package a default configuration in your egg.
-    #data_files = [('config', ['default.cfg'])],
+    data_files = [
+            ('config', ['prod.cfg']),
+            (etcpath,['etc/funcweb.conf'])
+            ],
     )
