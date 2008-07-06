@@ -1,0 +1,115 @@
+#!/bin/sh
+#
+# funcwebd    Fedora Unified Network Control
+###################################
+
+# LSB header
+
+### BEGIN INIT INFO
+# Provides: funcwebd
+# Required-Start: network
+# Required-Stop:
+# Default-Start: 3 4 5
+# Default-Stop: 0 1 2 6
+# Short-Description: Fedora Unified Network Control
+# Description: Crazy simple, secure remote management.
+### END INIT INFO
+
+# chkconfig header
+
+# chkconfig: - 99 99 
+# description:  Crazy simple, secure remote management.
+#
+# processname: /usr/bin/funcwebd
+
+# Sanity checks.
+[ -x /usr/bin/funcwebd ] || exit 0
+
+SERVICE=funcwebd
+PROCESS=funcwebd
+DAEMON=/usr/bin/funcwebd
+CONFIG_ARGS="--daemon"
+
+
+FuncStatus()
+{
+  ps wt? | grep "$DAEMON" 2>&1 > /dev/null
+  if [ "x$?" = "x0" ]; then
+    RVAL=0
+    echo "$DAEMON is running"
+  else
+    RVAL=3
+    echo "$DAEMON is not running"
+  fi
+}
+
+if [ -f /lib/lsb/init-functions ]; then
+  . /lib/lsb/init-functions
+  alias START_DAEMON=start_daemon
+  alias STATUS=FuncStatus
+  alias LOG_SUCCESS=log_success_msg
+  alias LOG_FAILURE=log_failure_msg
+  alias LOG_WARNING=log_warning_msg
+elif [ -f /etc/init.d/functions ]; then
+  . /etc/init.d/functions
+  alias START_DAEMON=daemon
+  alias STATUS=status
+  alias LOG_SUCCESS=success
+  alias LOG_FAILURE=failure
+  alias LOG_WARNING=passed
+else
+  echo "Error: your platform is not supported by $0" > /dev/stderr
+  exit 1
+fi
+
+
+RETVAL=0
+
+start() {
+    echo -n $"Starting funcweb server"
+    START_DAEMON $PROCESS $CONFIG_ARGS
+    RETVAL=$?
+    echo
+    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
+    return $RETVAL
+}
+
+stop() {
+    echo -n $"Stopping funcweb server: "
+    killproc $PROCESS
+    RETVAL=$?
+    echo
+    if [ $RETVAL -eq 0 ]; then
+	rm -f /var/lock/subsys/$SERVICE
+        rm -f /var/run/$SERVICE.pid
+    fi
+}
+
+restart() {
+   stop
+   start
+}
+
+# See how we were called.
+case "$1" in
+    start|stop|restart)
+        $1
+        ;;
+    status)
+        STATUS $PROCESS
+        RETVAL=$?
+        ;;
+    condrestart)
+        [ -f /var/lock/subsys/$SERVICE ] && restart || :
+        ;;
+    reload)
+        echo "can't reload configuration, you have to restart it"
+        RETVAL=$?
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|restart|condrestart|reload}"
+        exit 1
+        ;;
+esac
+exit $RETVAL
+
