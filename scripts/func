@@ -16,6 +16,7 @@
 
 import sys
 import distutils.sysconfig
+from func.CommonErrors import Func_Client_Exception
 
 # sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
 
@@ -23,6 +24,10 @@ import func.overlord.func_command as func_command
 
 myname, argv = sys.argv[0], sys.argv[1:]
 cli = func_command.FuncCommandLine()
-cli.parse(argv)
+try:
+    cli.parse(argv)
+except Func_Client_Exception, e:
+    print "ERROR:", e
+    sys.exit(1)
 
 

@@ -24,6 +24,7 @@ import fcntl
 import forkbomb
 import utils
 import pprint
+from func.CommonErrors import *
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
@@ -65,10 +66,17 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
 
     dir = os.path.expanduser(CACHE_DIR)
     if not os.path.exists(dir):
-        os.makedirs(dir)
+        try:
+            os.makedirs(dir)
+        except IOError:
+            raise Func_Client_Exception, 'Cannot create directory for status files. '+\
+                  'Ensure you have permission to create %s directory' % dir
     filename = os.path.join(dir,"status-%s" % os.getuid()) 
 
-    handle = open(filename,"w")
+    try:
+        handle = open(filename,"w")
+    except IOError, e:
+        raise Func_Client_Exception, 'Cannot create status file. Ensure you have permission to write in %s directory' % dir
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
     internal_db = dbm.open(filename, 'c', 0644 )
     storage = shelve.Shelf(internal_db)

@@ -214,7 +214,8 @@ class Overlord(object):
             self.key = fd_key
             self.cert = fd_crt
         else:
-            raise Func_Client_Exception, 'Cannot read ssl credentials: ssl, cert, ca'
+            raise Func_Client_Exception, 'Cannot read ssl credentials: ssl, cert, ca. '+\
+                  'Ensure you have permission to read files in /etc/pki/certmaster/ directory.'
             
 
         
