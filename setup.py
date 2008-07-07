@@ -58,6 +58,7 @@ if __name__ == "__main__":
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
+                              (manpath,  ["docs/func-transmit.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
 			      (etcmodpath,  []),

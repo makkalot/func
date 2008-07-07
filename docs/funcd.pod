@@ -16,7 +16,7 @@ Modules and capabilities provided by funcd are specified at https://hosted.fedor
 
 See https://hosted.fedoraproject.org/projects/func/.  It's a Wiki.
 
-See also the manpages for "func", "certmaster", and "certmaster-ca".
+See also the manpages for "func", "certmaster", "certmaster-ca", and "func-transmit".
 
 =head1 AUTHOR
 
