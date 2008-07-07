@@ -60,7 +60,6 @@ rm -fr $RPM_BUILD_ROOT
 %endif
 
 #creating the directory structure
-%{_bindir}/funcwebd
 %dir %{python_sitelib}/funcweb/
 %dir %{python_sitelib}/funcweb/config
 %dir %{python_sitelib}/funcweb/templates
@@ -91,7 +90,7 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/funcweb/static/images/*.gif
 %{python_sitelib}/funcweb/static/javascript/*.js
 %{python_sitelib}/funcweb/identity/*.py*
-/usr/bin/start-funcweb
+/usr/bin/funcwebd
 %doc README
 
 %post
