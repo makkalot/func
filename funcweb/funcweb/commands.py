@@ -11,6 +11,7 @@ pkg_resources.require("TurboGears")
 
 import turbogears
 import cherrypy
+import func.utils as futils
 
 cherrypy.lowercase_api = True
 
@@ -56,5 +57,12 @@ def start():
         modulename="funcweb.config")
 
     from funcweb.controllers import Root
-
-    turbogears.start_server(Root())
+    
+    if exists("/etc/funcweb/prod.cfg"):
+        futils.daemonize("/var/run/funcwebd.pid")
+    #then start the server
+    try:
+        turbogears.start_server(Root())
+    except Exception,e:
+        print "Exception occured :",e
+        sys.exit(1)    
