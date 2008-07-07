@@ -6,11 +6,12 @@
 %define version 0.1
 Summary: Web GUI for FUNC API
 Name: funcweb
-Version: %{version}
-Release: 1
+Source1: version
+Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
+Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 License: GPLv2+
 Group: Applications/System
-Source0: funcweb-%{version}.tar.gz 
+Source0: %{name}-%{version}.tar.gz 
 
 #packages that are required
 Requires: python >= 2.3
@@ -78,18 +79,25 @@ rm -fr $RPM_BUILD_ROOT
 
 #the python files for funcweb
 %{python_sitelib}/funcweb/*.py*
+%{python_sitelib}/funcweb/Makefile
 %{python_sitelib}/funcweb/config/*.py*
 %{python_sitelib}/funcweb/config/*.cfg
 %{python_sitelib}/funcweb/templates/*.py*
 %{python_sitelib}/funcweb/templates/*.kid
 %{python_sitelib}/funcweb/templates/*.html
+%{python_sitelib}/funcweb/templates/Makefile
 %{python_sitelib}/funcweb/tests/*.py*
+%{python_sitelib}/funcweb/tests/Makefile
 %{python_sitelib}/funcweb/static/css/*.css
+%{python_sitelib}/funcweb/static/css/Makefile
 %{python_sitelib}/funcweb/static/images/*.png
 %{python_sitelib}/funcweb/static/images/*.ico
 %{python_sitelib}/funcweb/static/images/*.gif
+%{python_sitelib}/funcweb/static/images/Makefile
 %{python_sitelib}/funcweb/static/javascript/*.js
+%{python_sitelib}/funcweb/static/javascript/Makefile
 %{python_sitelib}/funcweb/identity/*.py*
+%{python_sitelib}/funcweb/identity/Makefile
 /usr/bin/funcwebd
 %doc README
 
