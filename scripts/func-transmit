@@ -47,7 +47,7 @@ async      = params.get('async', False)
 nforks     = params.get('nforks', 1)
 module     = params.get('module','unknown')
 method     = params.get('method','unknown')
-parameters = params.get('parameters', [])
+parameters = params.get('parameters', None)
 
 # make the call
 client = fc.Overlord(clients, async=async, nforks=nforks)
