@@ -33,7 +33,7 @@ parameters: "/bin/echo Hello World"
 import sys
 import distutils.sysconfig
 
-import cobbler.yaml as yaml # FIXME: need to subpackage this as part of Func
+import func.yaml as yaml # FIXME: need to subpackage this as part of Func
 import func.overlord.func_command as func_command
 import func.overlord.client as fc
 
