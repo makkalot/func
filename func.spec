@@ -54,6 +54,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func
 %{_bindir}/func-inventory
 %{_bindir}/func-create-module
+%{_bindir}/func-transmit
 #%{_bindir}/update-func
 /etc/init.d/funcd
 %dir %{_sysconfdir}/%{name}
@@ -124,6 +125,9 @@ fi
 
 
 %changelog
+* Mon Jul 07 2008 Michael DeHaan <mdehaan@redhat.com> - 0.22-1
+- packaged func-transmit script
+
 * Wed Jul 02 2008 Michael DeHaan <mdehaan@redhat.com> - 0.21-1
 - new release, upstream changes
 

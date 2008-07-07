@@ -1,0 +1,6 @@
+clients: "*"
+aysnc: False
+nforks: 1
+module: command
+method: run
+parameters: "/bin/echo Hello World"
