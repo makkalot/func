@@ -30,9 +30,6 @@ setup(
     author_email=email,
     url=url,
     license=license,
-    scripts =[
-        "scripts/funcwebd"
-        ],
     install_requires=[
         "TurboGears >= 1.0.4.2",
     ],
@@ -75,7 +72,7 @@ setup(
     test_suite='nose.collector',
     entry_points = {
         'console_scripts': [
-            'start-funcweb = funcweb.commands:start',
+            'funcwebd = funcweb.commands:start',
             ],
 
         'turbogears.identity.provider' : [
