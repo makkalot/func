@@ -1,0 +1,8 @@
+include version
+recursive-include etc *
+recursive-include init-scripts *
+recursive-include funcweb *
+include AUTHORS
+include LICENSE
+include README
+

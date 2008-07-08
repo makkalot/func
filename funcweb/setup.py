@@ -14,6 +14,14 @@ if os.path.isdir('locales'):
     package_data.update(find_package_data(where='locales',
         exclude=('*.po',), only_in_packages=False))
 
+#adding to the virtual part of the apache
+etcpath    = "/etc/httpd/conf.d"
+#having a manual part for funcweb may add more things there in the future
+self_etcpath    = "/etc/funcweb"
+#the init path for starting and stoping the server !
+initpath = "/etc/init.d"
+
+#the setup part
 setup(
     name="funcweb",
     version=version,
@@ -22,10 +30,8 @@ setup(
     author_email=email,
     url=url,
     license=license,
-
     install_requires=[
         "TurboGears >= 1.0.4.2",
-        "SQLAlchemy>=0.3.10",
     ],
     zip_safe=False,
     packages=packages,
@@ -66,8 +72,8 @@ setup(
     test_suite='nose.collector',
     entry_points = {
         'console_scripts': [
-            'start-funcweb = funcweb.commands:start',
-        ],
+            'funcwebd = funcweb.commands:start',
+            ],
 
         'turbogears.identity.provider' : [
             'pam = funcweb.identity.pamprovider:PAMIdentityProvider'
@@ -79,5 +85,9 @@ setup(
     },
     # Uncomment next line and create a default.cfg file in your project dir
     # if you want to package a default configuration in your egg.
-    #data_files = [('config', ['default.cfg'])],
+    data_files = [
+            (etcpath,['etc/funcweb.conf']),
+            (self_etcpath,['etc/prod.cfg']),
+            (initpath,['init-scripts/funcwebd'])
+            ],
     )

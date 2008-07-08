@@ -11,6 +11,7 @@ pkg_resources.require("TurboGears")
 
 import turbogears
 import cherrypy
+import func.utils as futils
 
 cherrypy.lowercase_api = True
 
@@ -30,17 +31,25 @@ def start():
     # is probably installed and we'll look first for a file called
     # 'prod.cfg' in the current directory and then for a default
     # config file called 'default.cfg' packaged in the egg.
-    if len(sys.argv) > 1:
+    if exists("/etc/funcweb/prod.cfg"):
+        print "I use the production ito the etc !"
+        configfile = "/etc/funcweb/prod.cfg"
+    
+    elif len(sys.argv) > 1:
+        print "We got something from the sys"
         configfile = sys.argv[1]
     elif exists(join(setupdir, "setup.py")):
+        print "I use the dev one into the dev dir"
         configfile = join(setupdir, "dev.cfg")
     elif exists(join(curdir, "prod.cfg")):
+        print "I use the prod one into the cur dir"
         configfile = join(curdir, "prod.cfg")
     else:
         try:
             configfile = pkg_resources.resource_filename(
               pkg_resources.Requirement.parse("funcweb"),
                 "config/default.cfg")
+            print "That is another default conf"
         except pkg_resources.DistributionNotFound:
             raise ConfigurationError("Could not find default configuration.")
 
@@ -48,5 +57,12 @@ def start():
         modulename="funcweb.config")
 
     from funcweb.controllers import Root
-
-    turbogears.start_server(Root())
+    
+    if exists("/etc/funcweb/prod.cfg"):
+        futils.daemonize("/var/run/funcwebd.pid")
+    #then start the server
+    try:
+        turbogears.start_server(Root())
+    except Exception,e:
+        print "Exception occured :",e
+        sys.exit(1)    
