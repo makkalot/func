@@ -25,6 +25,7 @@ import sslclient
 
 import command
 import groups
+import delegation_tools as dtools
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
 import func.utils as utils
@@ -89,13 +90,16 @@ class CommandAutomagic(object):
 class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
-                 just_fqdns=False, groups_file=None):
+                 just_fqdns=False, groups_file=None,
+                 delegate=False, minionmap={}):
 
         self.spec = spec
         self.port = port
         self.noglobs = noglobs
         self.verbose = verbose
         self.just_fqdns = just_fqdns
+        self.delegate = delegate
+        self.minionmap = minionmap
 
         self.config = read_config(CONFIG_FILE, CMConfig)
         self.group_class = groups.Groups(filename=groups_file)
@@ -160,7 +164,7 @@ class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
-        delegate=False, mapfile=""):
+        delegate=True, mapfile="/var/lib/func/inventory/map"):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -257,7 +261,26 @@ class Overlord(object):
 
     # -----------------------------------------------
 
-    def run(self, module, method, args, nforks=1):
+    def run(self, module, method, args, nforks=1, *extraargs, **kwargs):
+        """
+        Invoke a remote method on one or more servers.
+        Run returns a hash, the keys are server names, the values are the
+        returns.
+
+        The returns may include exception objects.
+        If Overlord() was constructed with noglobs=True, the return is instead
+        just a single value, not a hash.
+        """
+        
+        #if not self.delegate: #delegation is turned off
+        #    return self.run_nodelegate(module, method, args, nforks)
+        #print self.minionmap
+        return self.run_nodelegate(module,method,args,nforks)
+        
+        
+    # -----------------------------------------------
+
+    def run_nodelegate(self, module, method, args, nforks=1):
         """
         Invoke a remote method on one or more servers.
         Run returns a hash, the keys are server names, the values are the
@@ -313,7 +336,7 @@ class Overlord(object):
                 right = server.rfind(":")
                 server_name = server[left:right]
                 return (server_name, retval)
-
+        
         if not self.noglobs:
             if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
