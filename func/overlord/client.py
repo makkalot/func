@@ -37,6 +37,8 @@ from func.CommonErrors import *
 
 DEFAULT_PORT = 51234
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
+DEFAULT_MAPLOC = "/var/lib/func/inventory/map"
+DELEGATION_METH = "delegation.run"
 
 # ===================================
 
@@ -158,13 +160,11 @@ def is_minion(minion_string):
     return minions.is_minion()
 
 
-
-
 class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
-        delegate=True, mapfile="/var/lib/func/inventory/map"):
+        delegate=False, mapfile=DEFAULT_MAPLOC):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -261,7 +261,7 @@ class Overlord(object):
 
     # -----------------------------------------------
 
-    def run(self, module, method, args, nforks=1, *extraargs, **kwargs):
+    def run(self, module, method, args, nforks=1):
         """
         Invoke a remote method on one or more servers.
         Run returns a hash, the keys are server names, the values are the
@@ -272,15 +272,31 @@ class Overlord(object):
         just a single value, not a hash.
         """
         
-        #if not self.delegate: #delegation is turned off
-        #    return self.run_nodelegate(module, method, args, nforks)
-        #print self.minionmap
-        return self.run_nodelegate(module,method,args,nforks)
+        if not self.delegate: #delegation is turned off, so run normally
+            return self.run_direct(module, method, args, nforks)
+        
+        resulthash = {}
+        
+        #First we run everything that can be run directly beneath this overlord
+        resulthash.update(self.run_direct(module,method,args,nforks))
+        
+        #Next we get all call paths for minions not directly beneath this overlord
+        dele_paths = dtools.get_paths_for_glob(self.server_spec, self.minionmap)
+        non_single_paths = [path for path in dele_paths if len(path) > 1]
+        
+        for path in non_single_paths:
+            resulthash.update(self.run_direct(module,
+                                              method,
+                                              args,
+                                              nforks,
+                                              call_path=path))
+        
+        return resulthash
         
         
     # -----------------------------------------------
 
-    def run_nodelegate(self, module, method, args, nforks=1):
+    def run_direct(self, module, method, args, nforks=1, *extraargs, **kwargs):
         """
         Invoke a remote method on one or more servers.
         Run returns a hash, the keys are server names, the values are the
@@ -292,7 +308,11 @@ class Overlord(object):
         """
 
         results = {}
-
+        spec = ''
+        minionurls = []
+        use_delegate = False
+        delegation_path = []
+        
         def process_server(bucketnumber, buckets, server):
             
             conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
@@ -309,7 +329,10 @@ class Overlord(object):
                 # thats some pretty code right there aint it? -akl
                 # we can't call "call" on s, since thats a rpc, so
                 # we call gettatr around it.
-                meth = "%s.%s" % (module, method)
+                if use_delegate:
+                    meth = DELEGATION_METH #call delegation module
+                else:
+                    meth = "%s.%s" % (module, method)
 
                 # async calling signature has an "imaginary" prefix
                 # so async.abc.def does abc.def as a background task.
@@ -318,7 +341,10 @@ class Overlord(object):
                     meth = "async.%s" % meth
 
                 # this is the point at which we make the remote call.
-                retval = getattr(conn, meth)(*args[:])
+                if use_delegate:
+                    retval = getattr(conn, meth)(module, method, args, delegation_path)
+                else:
+                    retval = getattr(conn, meth)(*args[:])
 
                 if self.interactive:
                     print retval
@@ -337,24 +363,35 @@ class Overlord(object):
                 server_name = server[left:right]
                 return (server_name, retval)
         
+        if kwargs.has_key('call_path'): #we're delegating if this key exists
+            spec = kwargs['call_path'][0] #the sub-overlord directly beneath this one
+            minionobj = Minions(spec, port=self.port, verbose=self.verbose)
+            use_delegate = True #signal to process_server to call delegate method
+            delegation_path = kwargs['call_path'][1:len(kwargs['call_path'])]
+            minionurls = minionobj.get_urls() #the single-item url list to make async
+                                              #tools such as jobthing/forkbomb happy
+        else: #we're directly calling minions, so treat everything normally
+            spec = self.server_spec
+            minionurls = self.minions
+        
         if not self.noglobs:
             if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
                 if not self.async:
-                    results = forkbomb.batch_run(self.minions, process_server, nforks)
+                    results = forkbomb.batch_run(minionurls, process_server, nforks)
                 else:
-                    results = jobthing.batch_run(self.minions, process_server, nforks)
+                    results = jobthing.batch_run(minionurls, process_server, nforks)
             else:
                 # no need to go through the fork code, we can do this directly
                 results = {}
-                for x in self.minions:
+                for x in minionurls:
                     (nkey,nvalue) = process_server(0, 0, x)
                     results[nkey] = nvalue    
         else:
             # globbing is not being used, but still need to make sure
             # URI is well formed.
 #            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
-            expanded_minions = Minions(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)
+            expanded_minions = Minions(spec, port=self.port, noglobs=True, verbose=self.verbose)
             minions = expanded_minions.get_urls()[0]
 #            print minions
             results = process_server(0, 0, minions)

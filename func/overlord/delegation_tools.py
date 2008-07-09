@@ -151,5 +151,5 @@ if __name__ == "__main__":
         print "Element: %s, best path: %s" % (elem, get_shortest_path(elem,mymap))
         
     print "- And finally, with all duplicates removed:"
-    for elem in get_paths_for_glob('*',mymap):
+    for elem in get_paths_for_glob('*path*',mymap):
         print "Valid Path: %s" % elem
