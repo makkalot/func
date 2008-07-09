@@ -27,8 +27,8 @@ class DelegationModule(func_module.FuncModule):
         next_hop = delegation_path[0]
         overlord = fc.Overlord(next_hop)
         if len(delegation_path) == 1: #minion exists under this overlord
-            meth = "%s.%s" % (module, method)
-            return getattr(overlord,meth)(*args[:])
+            overlord_module = getattr(overlord,module)
+            return getattr(overlord_module,method)(*args[:])
         
         stripped_list = delegation_path[1:len(delegation_path)]
         delegation_results = overlord.delegation.run(module,method,args,stripped_list)

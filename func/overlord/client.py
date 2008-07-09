@@ -343,6 +343,8 @@ class Overlord(object):
                 # this is the point at which we make the remote call.
                 if use_delegate:
                     retval = getattr(conn, meth)(module, method, args, delegation_path)
+                    print retval
+                    print spec
                 else:
                     retval = getattr(conn, meth)(*args[:])
 
@@ -395,7 +397,10 @@ class Overlord(object):
             minions = expanded_minions.get_urls()[0]
 #            print minions
             results = process_server(0, 0, minions)
-
+        
+        if use_delegate:
+            return results[spec]
+        
         return results
 
    # -----------------------------------------------
