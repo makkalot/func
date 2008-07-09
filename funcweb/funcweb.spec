@@ -15,7 +15,7 @@ Source0: %{name}-%{version}.tar.gz
 
 #packages that are required
 Requires: python >= 2.3
-Requires: func >= 0.20
+#Requires: func >= 0.20
 Requires: certmaster >= 0.1
 Requires: mod_ssl >= 2.0
 Requires: httpd >= 2.0
@@ -71,8 +71,10 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/funcweb/static/javascript
 %dir %{python_sitelib}/funcweb/identity
 %dir %{_sysconfdir}/%{name}
+%dir /var/log/funcweb
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/funcweb.conf
 %config(noreplace) %{_sysconfdir}/%{name}/prod.cfg
+%config(noreplace) /etc/logrotate.d/funcweb_rotate
 
 #adding the server startup shutdown thing 
 /etc/init.d/funcwebd
