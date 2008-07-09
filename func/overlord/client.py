@@ -343,8 +343,6 @@ class Overlord(object):
                 # this is the point at which we make the remote call.
                 if use_delegate:
                     retval = getattr(conn, meth)(module, method, args, delegation_path)
-                    print retval
-                    print spec
                 else:
                     retval = getattr(conn, meth)(*args[:])
 
