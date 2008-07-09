@@ -20,6 +20,9 @@ etcpath    = "/etc/httpd/conf.d"
 self_etcpath    = "/etc/funcweb"
 #the init path for starting and stoping the server !
 initpath = "/etc/init.d"
+#the log path
+logpath = "/var/log/funcweb"
+rotpath = "/etc/logrotate.d"
 
 #the setup part
 setup(
@@ -88,6 +91,8 @@ setup(
     data_files = [
             (etcpath,['etc/funcweb.conf']),
             (self_etcpath,['etc/prod.cfg']),
-            (initpath,['init-scripts/funcwebd'])
+            (initpath,['init-scripts/funcwebd']),
+            (logpath,[]),
+            (rotpath,['etc/funcweb_rotate'])
             ],
     )
