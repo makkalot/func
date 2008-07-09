@@ -4,7 +4,7 @@
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
 
 %define version 0.1
-Summary: Web GUI for FUNC API
+Summary: Web application for Func API
 Name: funcweb
 Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
@@ -38,7 +38,7 @@ BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
 %description
 
-FuncWeb is the Web GUI management tool for commandline based tool func.
+Web interface for managing systems controlled by Func
 
 %prep
 %setup -q
