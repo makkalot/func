@@ -59,5 +59,5 @@ def start():
     try:
         turbogears.start_server(Root())
     except Exception,e:
-        print "Debug information from cherrypy server ..."
-        sys.exit(1)    
+        print "Debug information from cherrypy server ...: ",e
+        #sys.exit(1)    
