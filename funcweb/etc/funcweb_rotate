@@ -1,0 +1,12 @@
+/var/log/funcweb/server.log {
+   missingok
+   notifempty
+   rotate 4
+   weekly
+   postrotate
+      if [ -f /var/lock/subsys/funcwebd ]; then
+         /etc/init.d/funcwebd condrestart
+      fi
+   endscript
+}
+
