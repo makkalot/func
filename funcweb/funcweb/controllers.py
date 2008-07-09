@@ -26,8 +26,7 @@ def validate_decorator_updater(validator_value=None):
     global global_form
     return global_form
 
-class Root(controllers.RootController):
-    
+class Funcweb(object):
     #preventing the everytime polling and getting
     #func = Overlord("name") thing
     func_cache={          
@@ -210,9 +209,11 @@ class Root(controllers.RootController):
                    "this resource.")
         else:
             msg=_("Please log in.")
-            forward_url= request.headers.get("Referer", "/")
+            print "I use that thing here"
+            forward_url= request.headers.get("Referer", ".")
 
         response.status=403
+
         return dict(message=msg, previous_url=previous_url, logging_in=True,
                     original_parameters=request.params,
                     forward_url=forward_url)
@@ -314,3 +315,14 @@ class Root(controllers.RootController):
         """
         identity.current.logout()
         raise redirect("/")
+
+
+
+class Root(controllers.RootController):
+    
+    @expose()
+    def index(self):
+        raise redirect("/funcweb")
+    
+    index = index # start with our minion view, for now
+    funcweb = Funcweb()
