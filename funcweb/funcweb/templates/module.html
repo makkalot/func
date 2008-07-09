@@ -7,7 +7,7 @@
     <ul py:for="minion, methods in modules.items()">
       <h2>${module}</h2>
       <li py:for="method in methods">
-      <a href="#" onclick="myj('#col2').hide();myj('#col5').hide().show('slow');myj('#col4').hide().load('/method_display/${minion}/${module}/${method}').show('slow')">${method}</a>
+      <a href="#" onclick="myj('#col2').hide();myj('#col5').hide().show('slow');myj('#col4').hide().load('/funcweb/method_display/${minion}/${module}/${method}').show('slow')">${method}</a>
       </li>
     </ul>
   </div>

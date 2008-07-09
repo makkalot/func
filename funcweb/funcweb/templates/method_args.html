@@ -9,7 +9,7 @@
         ${ET(minion_form.display(displays_on='genshi'))}
     </div>
     <div py:if="not minion_form" id="men">
-        <a href="#" onclick="myj('#results').hide().load('/execute_link/${minion}/${module}/${method}/').show('slow');">Run Method</a>
+        <a href="#" onclick="myj('#results').hide().load('/funcweb/execute_link/${minion}/${module}/${method}/').show('slow');">Run Method</a>
         <div class="results" id="results" />
     </div>
 </body>
