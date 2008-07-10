@@ -37,7 +37,7 @@ from func.CommonErrors import *
 
 DEFAULT_PORT = 51234
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
-DEFAULT_MAPLOC = "/var/lib/func/inventory/map"
+DEFAULT_MAPLOC = "/var/lib/func/map"
 DELEGATION_METH = "delegation.run"
 
 # ===================================
@@ -277,10 +277,7 @@ class Overlord(object):
         
         resulthash = {}
         
-        #First we run everything that can be run directly beneath this overlord
-        resulthash.update(self.run_direct(module,method,args,nforks))
-        
-        #Next we get all call paths for minions not directly beneath this overlord
+        #First we get all call paths for minions not directly beneath this overlord
         dele_paths = dtools.get_paths_for_glob(self.server_spec, self.minionmap)
         non_single_paths = [path for path in dele_paths if len(path) > 1]
         
@@ -290,6 +287,11 @@ class Overlord(object):
                                               args,
                                               nforks,
                                               call_path=path))
+        
+        #Next, we run everything that can be run directly beneath this overlord
+        #Why do we do this after delegation calls?  Imagine what happens when
+        #reboot is called...
+        resulthash.update(self.run_direct(module,method,args,nforks))
         
         return resulthash
         

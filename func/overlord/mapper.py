@@ -21,7 +21,7 @@ import sys
 import yaml
 import func.overlord.client as func_client
 
-DEFAULT_TREE = "/var/lib/func/inventory/map"
+DEFAULT_TREE = "/var/lib/func/map"
 
 class MapperTool(object):
 
@@ -36,10 +36,6 @@ class MapperTool(object):
                      dest="append",
                      action="store_true",
                      help="append new map to current map")
-        p.add_option("-r", "--rebuild",
-                     dest="rebuild",
-                     action="store_true",
-                     help="rebuild map from scratch")
         p.add_option("-o", "--onlyalive",
                      dest="only_alive",
                      action="store_true",
