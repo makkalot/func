@@ -15,11 +15,13 @@ Source0: %{name}-%{version}.tar.gz
 
 #packages that are required
 Requires: python >= 2.3
-#Requires: func >= 0.20
+Requires: func >= 0.20
 Requires: certmaster >= 0.1
 Requires: mod_ssl >= 2.0
 Requires: httpd >= 2.0
 Requires: TurboGears >= 1.0.4.2
+Requires: pam
+Requires: pam-devel
 
 #the build requires
 BuildRequires: python-devel
