@@ -21,7 +21,6 @@ Requires: mod_ssl >= 2.0
 Requires: httpd >= 2.0
 Requires: TurboGears >= 1.0.4.2
 Requires: pam
-Requires: pam-devel
 
 #the build requires
 BuildRequires: python-devel
@@ -57,10 +56,8 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
-%if 0%{?fedora} >= 8
 %dir %{python_sitelib}/funcweb*egg-info
 %{python_sitelib}/funcweb*egg-info/*
-%endif
 
 #creating the directory structure
 %dir %{python_sitelib}/funcweb/
