@@ -1,0 +1,9 @@
+<plugin name='func' version='1.0'>
+  <author>Marco Mornati</author>
+  <authorEmail>mmornati@byte-code.com</authorEmail>
+  <title>Plugin to make your application ables to call Func (https://fedorahosted.org/func)</title>
+  <documentation>http://grails.org/FuncGrailsPlugin+Plugin</documentation>
+  <resources>
+    <resource>Func</resource>
+  </resources>
+</plugin>
