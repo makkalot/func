@@ -98,6 +98,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir /var/log/funcweb
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/funcweb.conf
 %config(noreplace) %{_sysconfdir}/%{name}/prod.cfg
+%config(noreplace) %{_sysconfdir}/pam.d/funcweb
 %config(noreplace) /etc/logrotate.d/funcweb_rotate
 
 #adding the server startup shutdown thing 

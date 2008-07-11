@@ -82,7 +82,7 @@ PAM_AUTHENTICATE = LIBPAM.pam_authenticate
 PAM_AUTHENTICATE.restype = c_int
 PAM_AUTHENTICATE.argtypes = [PamHandle, c_int]
 
-def authenticate(username, password, service='login'):
+def authenticate(username, password, service='funcweb'):
     """Returns True if the given username and password authenticate for the
     given service.  Returns False otherwise
 
