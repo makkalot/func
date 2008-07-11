@@ -1,3 +1,26 @@
+function addDomAjaxREsult(){
+    
+    //just creates the sturctore that is in result.html
+    if (getElement('resultbox')==null){
+    var result_header = DIV({'align':'center','class':'graytexts'});
+    result_header.innerHTML = "Result";
+    var minions = DIV({'class':'minions','id':'minions'},result_header);
+    var results = DIV({'class':'resultbox','id':'resultbox'});
+    var main = DIV(
+            {'class':'resultbigbox','id':'resultbigbox'},
+            minions,
+            results
+            );
+
+    //adding those to main part ..
+    var result_container=getElement("resultcontent");
+    appendChildNodes(result_container,main);
+    }
+    else
+        getElement('resultbox').innerHTML = "";
+}
+
+
 function remoteFormRequest(form, target, options) {
 	var query = Array();
     var contents = formContents(form);
