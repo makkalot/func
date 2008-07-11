@@ -1,5 +1,6 @@
 """
 Test module for rendering funcweb
+(We can remove this module once other modules are instrumented)
 """
 
 import func_module

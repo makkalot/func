@@ -15,7 +15,7 @@
 
 # our modules
 import func_module
-from func import certmaster as certmaster
+import certmaster.certmaster as certmaster
 
 # =================================
 

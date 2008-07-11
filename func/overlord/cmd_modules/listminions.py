@@ -17,6 +17,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import optparse
 import os
 
+from func.overlord import client
 from func.overlord import base_command
 
 class ListMinions(base_command.BaseCommand):
@@ -36,15 +37,10 @@ class ListMinions(base_command.BaseCommand):
     def do(self, args):
 
         self.server_spec = self.parentCommand.server_spec
-        self.getOverlord()
 
-        results = self.overlord_obj.test.add(1,2)
-        servers = results.keys()
+        minion_set = client.Minions(self.server_spec, port=self.port)
+        servers = minion_set.get_all_hosts()
         servers.sort()
-
-        # print servers
         for server in servers:
-            # just cause I hate regex'es -akl
-            # host = server.split(':')[-2]
-            # host = host.split('/')[-1]
             print server
+
