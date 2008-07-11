@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="master.html"/>
+  <head/>
+  <body>
+       
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="minioncontent">
+            <div class="minionsbigbox" id="minionsbigbox">
+                <div class="minions" id="minions">
+                    <div align="center" class="graytexts">Minions</div>
+                </div>
+        
+                <div id="minionstexts" py:for="minion in minions">
+                    <a onclick="myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide().load('/funcweb/minion/${minion}').show('slow');" href="#modulescontent" class="minionstextblue">${minion}</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="emptyimagebox" id="emptyimagebox"></div> 
+        <div class="minioncontent" id="modulescontent"></div>
+        <a name="modulescontent"/>
+
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="methotdscontent"></div>
+        <a name="methotdscontent"/>
+  
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="widgetcontent"></div>
+        <a name="widgetcontent"/>
+        
+        <div class="emptyimagebox" id="emptyimagebox"></div> 
+        <div class="minioncontent" id="resultcontent"></div>
+        <a name="resultcontent"/>
+  
+</body>
+</html>
