@@ -18,7 +18,7 @@
 
 import optparse
 import sys
-import yaml
+import func.yaml as yaml
 import func.overlord.client as func_client
 
 DEFAULT_TREE = "/var/lib/func/map"
@@ -65,8 +65,8 @@ class MapperTool(object):
         
         if self.options.append:
             try:
-                oldmap = file(DEFAULT_TREE, 'r')
-                old_hash = yaml.load(oldmap)
+                oldmap = file(DEFAULT_TREE, 'r').read()
+                old_hash = yaml.load(oldmap).next()
                 oldmap.close()
             except e:
                 print "ERROR: old map could not be read, append failed"
@@ -88,4 +88,6 @@ class MapperTool(object):
             print "- writing to %s" % DEFAULT_TREE
         
         mapfile = file(DEFAULT_TREE, 'w')
-        yaml.dump(minion_hash,mapfile)
+        data = yaml.dump(minion_hash)
+        mapfile.write(data)
+         

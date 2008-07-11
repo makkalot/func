@@ -16,7 +16,7 @@
 import sys
 import glob
 import os
-import yaml
+import func.yaml as yaml
 
 from certmaster.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
@@ -66,24 +66,6 @@ class CommandAutomagic(object):
         module = self.base[0]
         method = ".".join(self.base[1:])
         return self.clientref.run(module,method,args,nforks=self.nforks)
-
-
-#def get_groups():    
-#    group_class = groups.Groups()
-#    return group_class.get_groups()
-
-
-#def get_hosts_by_groupgoo(groups, groupgoo):
-#    group_gloobs = groupgoo.split(':')
-#    hosts = []
-#    for group_gloob in group_gloobs:
-#        if not group_gloob[0] == "@":
-#            continue
-#        if groups.has_key(group_gloob[1:]):
-#            hosts = hosts + groups[group_gloob[1:]]
-#        else:            
-#            print "group %s not defined" % group_gloob
-#    return hosts
 
 # ===================================
 # this is a module level def so we can use it and isServer() from
@@ -193,8 +175,8 @@ class Overlord(object):
         
         if self.delegate:
             try:
-                mapstream = file(self.mapfile, 'r')
-                self.minionmap = yaml.load(mapstream)
+                mapstream = file(self.mapfile, 'r').read()
+                self.minionmap = yaml.load(mapstream).next()
             except e:
                 sys.stderr.write("mapfile load failed, switching delegation off")
                 self.delegate = False
@@ -396,7 +378,6 @@ class Overlord(object):
 #            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
             expanded_minions = Minions(spec, port=self.port, noglobs=True, verbose=self.verbose)
             minions = expanded_minions.get_urls()[0]
-#            print minions
             results = process_server(0, 0, minions)
         
         if use_delegate:
@@ -437,6 +418,4 @@ class Overlord(object):
 class Client(Overlord):
     def __init__(self, *args, **kwargs):
         Overlord.__init__(self, *args, **kwargs)
-        # we can remove this if folks want -akl 
-        print "Client() class is deprecated, please use the Overlord() class."
-        
+        # provided for backward compatibility only 

@@ -146,7 +146,6 @@ class Call(base_command.BaseCommand):
         
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
-        print self.overlord_obj
 
         if not self.options.jobstatus:
             results = self.overlord_obj.run(self.module, self.method, self.method_args)
@@ -177,9 +176,6 @@ class Call(base_command.BaseCommand):
                     else:
                         sys.stderr.write("Async error")
                         return 0
-
-        # TO DO: add multiplexer support
-        # probably as a higher level module.
 
         # dump the return code stuff atm till we figure out the right place for it
         foo =  self.format_return(results)
