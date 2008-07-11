@@ -40,7 +40,7 @@ class Funcweb(object):
             }
     #will be reused for widget validation
 
-    @expose(template="funcweb.templates.minions")
+    @expose(template="funcweb.templates.index")
     @identity.require(identity.not_anonymous())
     def minions(self, glob='*'):
         """ Return a list of our minions that match a given glob """
@@ -57,7 +57,7 @@ class Funcweb(object):
 
     index = minions # start with our minion view, for now
 
-    @expose(template="funcweb.templates.minion")
+    @expose(template="funcweb.templates.modules")
     @identity.require(identity.not_anonymous())
     def minion(self, name="*", module=None, method=None):
         """ Display module or method details for a specific minion.
@@ -127,12 +127,12 @@ class Funcweb(object):
                     self.func_cache['methods'] = modules
                 #display em
                 return dict(modules=modules, module=module,
-                            tg_template="funcweb.templates.module")
+                            tg_template="funcweb.templates.methods")
             else:
                 return "Wrong place :)"
 
 
-    @expose(template="funcweb.templates.method_args")
+    @expose(template="funcweb.templates.widgets")
     @identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
         """
@@ -284,7 +284,7 @@ class Funcweb(object):
         else:
             return "Missing arguments sorry can not proceess the form"
     
-    @expose(template="funcweb.templates.method_args")
+    @expose(template="funcweb.templates.result")
     @identity.require(identity.not_anonymous())
     def execute_link(self,minion=None,module=None,method=None):
         """
@@ -304,9 +304,7 @@ class Funcweb(object):
             self.func_cache['methods']=None
 
         result = getattr(getattr(fc,module),method)()
-        return str(result)
-
-
+        return dict(result=str(result))
 
     @expose()
     def logout(self):
