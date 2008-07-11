@@ -260,8 +260,8 @@ class RemoteFormAutomation(CoreWD):
                 fields = generated_fields,
                 validator = validator_schema,
                 name = "minion_form",
-                update = "col5",
-                before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
+                update = "resultbox",
+                before='myj(\'#resultcontent\').hide().show(\'slow\');addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
         )
 
