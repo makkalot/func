@@ -12,6 +12,7 @@ Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 License: GPLv2+
 Group: Applications/System
 Source0: %{name}-%{version}.tar.gz 
+Source1: %{name}.te
 
 #packages that are required
 Requires: python >= 2.3
@@ -34,6 +35,12 @@ BuildRequires: python-setuptools-devel
 BuildRequires: python-setuptools
 %endif
 %endif
+# SELinux module
+%if 0%{?fedora} == 5
+BuildRequires: checkpolicy, selinux-policy >= 2.2.40, m4
+%else
+BuildRequires: checkpolicy, selinux-policy-devel
+%endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
@@ -41,8 +48,21 @@ Url: https://hosted.fedoraproject.org/projects/func/
 
 Web interface for managing systems controlled by Func
 
+%package    selinux
+Summary:    SELinux support for FuncWeb
+Group:      System Environment/Daemons
+Requires:   %{name} = %{version}
+Requires(post): policycoreutils, initscripts, %{name}
+Requires(preun): policycoreutils, initscripts, %{name}
+Requires(postun): policycoreutils
+
+%description selinux
+This package adds SELinux policy for FuncWeb
+
 %prep
 %setup -q
+mkdir -p selinux
+cp -p %{SOURCE1} selinux/
 
 %build
 %{__python} setup.py build
@@ -50,6 +70,11 @@ Web interface for managing systems controlled by Func
 %install
 test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install --prefix=/usr --root=$RPM_BUILD_ROOT
+
+#SELinux part
+cd selinux/
+make -f %{_datadir}/selinux/devel/Makefile
+install -p -m 644 -D %{name}.pp $RPM_BUILD_ROOT%{_datadir}/selinux/packages/%{name}/%{name}.pp
 
 %clean
 rm -fr $RPM_BUILD_ROOT
@@ -103,6 +128,10 @@ rm -fr $RPM_BUILD_ROOT
 /usr/bin/funcwebd
 %doc README
 
+%files selinux
+%defattr(-, root, root, -)
+%{_datadir}/selinux/packages/%{name}/%{name}.pp
+
 %post
 # for suse 
 if [ -x /usr/lib/lsb/install_initd ]; then
@@ -120,6 +149,24 @@ else
    done
 fi
 
+%post selinux
+if [ "$1" -le "1" ]; then # Fist install
+    semodule -i %{_datadir}/selinux/packages/%{name}/%{name}.pp 2>/dev/null || :
+    semanage port -a -t funcweb_port_t -p tcp 51236 2>/dev/null || :
+fi
+
+%preun selinux
+if [ "$1" -lt "1" ]; then # Final removal
+    semanage port -d -t funcweb_port_t -p tcp 51236 2>/dev/null || :
+    semodule -r funcweb 2>/dev/null || :
+fi
+
+%postun selinux
+if [ "$1" -ge "1" ]; then # Upgrade
+    # Replaces the module if it is already loaded
+    semodule -i %{_datadir}/selinux/packages/%{name}/%{name}.pp 2>/dev/null || :
+fi
+
 #before uninstall the things 
 %preun
 if [ "$1" = 0 ] ; then
@@ -135,6 +182,9 @@ fi
 
 
 %changelog
+* Fri Jul 11 2008 Krzysztof A. Adamski <krzysztofa@gmail.com> - 0.1
+- SELinux policy added
+
 * Sat Jul 05 2008 Denis Kurov <makkalot@gmail.com> - 0.1
 - The first RPM for funcweb with new dynamic widget stuff
 
