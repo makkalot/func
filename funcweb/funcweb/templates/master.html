@@ -13,10 +13,6 @@
     <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
     <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ajax.js')}" />
 
-    <link href="${tg.url('/funcweb/static/images/favicon.ico')}"
-      type="image/vnd.microsoft.icon" rel="shortcut icon" /> 
-    <link href="${tg.url('/funcweb/static/images/favicon.ico')}"
-      type="image/x-icon" rel="shortcut icon"/> 
 
     <style type="text/css" media="screen">
       @import url("/funcweb/static/css/style.css");
@@ -33,37 +29,31 @@
   </head>
   <body py:match="body" py:attrs="select('@*')">
     <div py:for="js in tg_js_bodytop" py:replace="ET(js.display())" />
-    <div class="wrapper">
-      <div class="head">
-        <h1><a href="http://fedorahosted.org/func">Func</a></h1>
-        <div class="mainsearch">
-          <form action="${tg.url('/search')}" method="get">
-            <input type="text" name="search" />
-          </form> 
+    
+    <div class="header" id="header"></div>
+    <div class="underheader" id="underheader"></div>
+    
+    <div class="container" id="container">
+        
+        <div class="minionglob" id="minionglob">
+            <form id="form1" name="form1" method="post" action="">
+                <div class="graytexts2" id="minionglobtext">
+                    <div align="center">Minion Glob</div>
+                </div>
+                <input name="Submit" type="submit" class="minionbutton" id="button" value="Submit" border="0" alt=""  />
+                <input name="textfield" type="text" class="minionbox" id="textfield" />
+            </form>
         </div>
-      </div>
-      <div class="content">
-        <!--
-        <div py:if="tg.config('identity.on',False) and not 'logging_in' in locals()" id="pageLogin" class="usernav">
-          <span py:if="tg.identity.anonymous">
-            You are not logged in yet <a class="loginButton" href="${tg.url('/login/')}">login</a>
-          </span>
-          <span py:if="not tg.identity.anonymous">
-            <a href="${tg.url('/users/info/')}">profile</a> |
-            <a class="loginButton" href="${tg.url('/logout/')}">logout</a>
-          </span>
-        </div>
-        -->
         <div py:replace="select('*|text()')" />
-      </div>
+ 
+
+        <div class="footercontent" id="footercontent">
+            <div class="footer" id="footer"></div>
+        </div>
+    
     </div>
-    <div id="bottom">
-      <div id="footer">
-        <img src="${tg.url('/funcweb/static/images/under_the_hood_blue.png')}"/>
-        <center>
-          Powered by <a href="http://fedorahosted.org/func">func</a>.
-        </center>
-      </div>
-    </div>
+
+
+
   </body>
 </html>
