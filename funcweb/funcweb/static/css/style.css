@@ -1,346 +1,362 @@
-*
-{
-  margin: 0;
-  padding: 0;
+@charset "utf-8";
+
+
+#header {
+background-image:url(../images/header.jpg);
+background-repeat:no-repeat;
+height:89px;
+width: 900px;
+margin-left:auto;
+margin-right:auto;
+margin-top: 0px;
+display: block;
+overflow: hidden;
+padding-top: 0px;
 }
 
-html, body
-{
-  height: 100%;
+#underheader {
+background-image:url(../images/line.png);
+background-repeat:repeat-x;
+height:17px;
+width:100%;
+}
+#container {
+width: 900px;
+margin-left:auto;
+margin-right:auto;
 }
 
-body
-{
-  color: #666666;
-  font-size: 80%;
-  background: #FFFFFF url(http://fedoraproject.org/static/images/border-left.png) 0 0 repeat-y;
+#minionglob {
+width:260px;
+float:right;
+height:50px;
+padding: 5px;
+font-size:18px;
+font-weight:bold;
+color: #666666;
+margin-right:2.2em;
+margin-left:2em;
+margin-top:5px;
+margin-bottom:5px;
 }
 
-a img
-{
-  border: none;
+.minionbox {
+background-color:#f2f5f6;
+border: 2px solid #dddddd;
+width:160px;
+height:20px;
+}
+#container {
+width:100%;
+margin-left:auto;
+margin-right:auto;
+}
+#minionsbigbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#minions {
+background-color:#f1f5f6;
+height:20px;
+width:120px;
+margin-left:auto;
+margin-right:auto;
+padding:10px;
+border: 2px solid #dddddd;
 }
 
-.wrapper
-{
-  margin-left: 18px;
-  font: normal 2.3ex/1.5 sans-serif;
-  min-height: 100%;
-  background: #FFFFFF url(http://fedoraproject.org/static/images/border-right.png) 100% 0 repeat-y;
-  padding-right: 18px;
-  overflow: auto;
+.graytexts {
+font-family: Arial, Helvetica, sans-serif;
+font-size:16px;
+font-weight:bold;
+color: #666666;
 }
 
-.head
-{
-  border-top: 10px solid #337ACC;
-  padding: 1ex 2ex 17px;
-  background: #FFFFFF url(http://fedoraproject.org/static/images/line.png) 0 100% repeat-x;
+.graytexts2 {
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+font-weight:bold;
+color: #666666;
 }
 
-.head h1 a
-{
-  display: block;
-  text-indent: -9999px;
-  /*background: url(http://fedoraproject.org/static/images/fedora-logo.png) 20px 50% no-repeat;*/
-  height: 73px;
-  width: 138px;
-  overflow: hidden;
+#minionstexts {
+float:left;
+margin-left: 4em;
+height:20px;
+max-width: 280px;
+margin-top: 2em;
 }
 
-#sidebar
-{
-  float: left;
-  width: 230px;
-  margin: 2ex 0;
-  background: #FFFFFF;
-  padding-bottom: 100px;
+.minionstextblue {
+font-family: Arial, Helvetica, sans-serif;
+font-size:18px;
+color: #5499d4;
+text-decoration:none;
+}
+.minionstextblue:link {
+font-family: Arial, Helvetica, sans-serif;
+font-size:18px;
+color: #5499d4;
+text-decoration:none;
+}
+.minionstextblue:hover {
+font-family: Arial, Helvetica, sans-serif;
+font-size:18px;
+color: #5499d4;
+text-decoration:underline;
+}
+#methodsbigbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
 }
 
-#banner img
-{
-  display: block;
-  width: 200px;
-  margin: 0 3ex;
+#modulesbigbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
 }
 
-#get
-{
-  text-align: center;
-  margin: 1ex 0.5ex;
-  font-weight: bold;
+#methodstextbox {
+float:left;
+margin-left: 4em;
+height:20px;
+max-width: 200px;
+margin-top: 2em;
 }
 
-#get ul
-{
-  font-weight: normal;
-  list-style: none;
-  display: inline;
-  font-size: 1.7ex;
+#modulestexts {
+float:left;
+margin-left: 4em;
+height:20px;
+max-width: 200px;
+margin-top: 2em;
+}
+#widgetbgbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#widgettext {
+float:left;
+margin-left: 4em;
+height:20px;
+max-width: 200px;
+margin-top: 2em;
+}
+#resultbigbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#resultbox {
+background-color:#f1f5f6;
+overflow: auto;
+height: 300px;
+width: 900px;
+margin-left: auto;
+margin-right: auto;
+margin-top: 2em;
+margin-bottom: 2px;
+padding:4px;
+border: 2px solid #dddddd;
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+color: #666666;
+text-decoration:none;
+min-height: 250px;
 }
 
-#get li
-{
-  display: inline;
-  border-left: 1px solid #CCCCCC;
-  margin-left: -1px;
-  padding: 0 1ex;
+#inwidgetbox {
+background-color:#f1f5f6;
+max-height: 250px;
+width: 900px;
+margin-left: auto;
+margin-right: auto;
+margin-top: 2em;
+margin-bottom: 2px;
+padding:4px;
+border: 2px solid #dddddd;
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+color: #666666;
+text-decoration:none;
+}
+.minionbutton {
+height:25px;
+width:80px;;
+background-image: url(../images/button.jpg);
+border: 0px;
+padding-bottom:5px;
+}
+.minionbutton:link {
+height:25px;
+width:80px;;
+background-image: url(../images/button.jpg);
+border: 0px;
+}
+.minionbutton:hover {
+height:25px;
+width:80px;;
+background-image: url(../images/button_over.jpg);
+border: 0px;
+}
+#errorbox {
+margin:5px;
+width:850px;
+max-height:200px;
+margin-left:auto;
+margin-right:auto;
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+color: #990000;
+font-weight:bold;
+text-decoration:none;
+}
+#widgetresult {
+margin:5px;
+width:850px;
+max-height:250px;
+margin-left:auto;
+margin-right:auto;
+}
+#minionglobtext {
+height:20px;
+width:90px;
+margin-left:8em;
+}
+#loadingimage {
+background-image:url(../images/LoadingGIF_2.gif);
+background-repeat:no-repeat;
+height: 50px;
+width: 50px;
+float:left;
+margin:2px;
+margin-top:1em;
+}
+.minioncontent {
+width:100%;
+max-height:800px;
+margin-left:10px;
+margin-right:10px;
+float:left;
+margin-top: 1em;
+margin-bottom: 2px;
+padding:5px;
+}
+#emptyimagebox {
+margin-left:2.5em;
+min-height:20px;
+width:60px;
+float:left;
+padding:1px;
+}
+#footer {
+background-image: url(../images/footer.jpg);
+background-repeat:no-repeat;
+height:50px;
+margin-left:auto;
+margin-right:auto;
+margin-top: 0px;
+width:900px;
+}
+#footercontent {
+width: 100%;
+float:left;
 }
 
-#get li.first
-{
-  border-left: none;
+#widgetdescrition {
+margin:5px;
+width:850px;
+max-height:250px;
+margin-left:auto;
+margin-right:auto;
+font-family: Arial, Helvetica, sans-serif;
+font-size:16px;
+font-weight:bold;
+color: #666666;
+
+}
+#emptydiv {
+float:right;
+height:20px;
+margin-top:5px;
+margin-bottom:5px;
+margin:5px;
+width:900px;
+max-height:100px;
+margin-left:auto;
+margin-right:1em;
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+color: #990000;
+font-weight:bold;
+text-decoration:none;
+border: 1px dashed #dddddd;
+padding:5px;
+}
+#emptybigdiv {
+float:right;
+max-height:150px;
+width:930px;
+margin-left:auto;
+margin-right:8em;
+
 }
 
-#get a
-{
-  color: #00356B;
+a{
+font-family: Arial, Helvetica, sans-serif;
+font-size:16px;
+color: #5499d4;
+text-decoration:none;
+
 }
 
-#nav
-{
-  margin: 0 1.5ex;
-  padding: 0 1.5ex;
-}
-
-#nav h2
-{
-  border-bottom: 1px dotted #AAAAAA;
-  color: #444444;
-  font-size: 1.725ex;
-  margin: 2ex 0 1ex;
-  text-transform: uppercase;
-  font-weight: normal;
-}
-
-#nav ul
-{
-  list-style: url(http://fedoraproject.org/static/images/arrow.png);
-  margin-left: 15px;
-}
-
-#nav li
-{
-  margin: 0.25ex 1ex;
-  color: #777777;
-  font-size: 1.4ex;
-}
-
-#nav a
-{
-  font-weight: bold;
-  margin-right: 0.75ex;
-  color: #729FCF;
-  font-size: 2.4ex;
-  display: block;
-}
-
-.home #nav-home a, .get #nav-get a, .join #nav-join a
-{
-  color: #777777;
-  text-decoration: none;
-}
-
-.content
-{
-  margin-left: 0px;
-  margin-right: 10px;
-  color: #666666;
-  background: #FFFFFF;
-  display: inline-block;
-}
-
-/* Blame IE6 and the guillotine bug for this one */
-.content { display: block; }
-
-.content h2
-{
-  font-size: 3.25ex;
-}
-
-.content h2 div {
-  font-size: 1ex;
-  font-weight: normal;
-}
-
-.content h3
-{
-  color: #337acc;
-  margin: 1.5ex 0 0.5ex;
-  font-size: 2.5ex;
-}
-
-.content table
+table
 {
   border-collapse: collapse;
 }
 
-.content table th
+table th
 {
   background: #DDDDDD;
 }
 
-.content table th, .content table td
+table th,table td
 {
   border: 1px solid #000000;
   padding: 0.6ex;
 }
 
-.content p
+p
 {
   margin: 1ex 5ex 1ex 0;
-}
-
-.content ul
-{
-  list-style: square;
-  margin: 0 3ex 2ex;
-}
-
-.content img
-{
-  margin: 2ex 0;
-}
-
-.content a
-{
-  color: #337ACC;
-}
-
-.download
-{
-  list-style-image: url(http://fedoraproject.org/static/images/arrow.png);
-  list-style-position: outside;
-  margin: 1.6ex 3ex;
-}
-
-.download li
-{
-  color: #777777;
-  font-size: 1.8ex;
-  background: #EFEFEF;
-  padding: 1ex;
-  border-bottom: 1px dotted #AAAAAA;
-}
-
-.download a
-{
-  font-weight: bold;
-}
-
-.roles
-{
-  margin: 0!important;
-  list-style: none!important;
-  background: red;
-  display: inline;
-}
-
-.roles li
-{
-  float: left;
-  margin-bottom: 0.5ex;
-}
-
-.roles a
-{
-  line-height: 1;
-  width: 130px;
-  height: 150px;
-  text-align: center;
-  display: block;
-  text-decoration: none;
-}
-
-.roles a:hover
-{
-  background-color: #EFEFEF;
-}
-
-.roles img
-{
-}
-
-#footer
-{
-  position: relative;
-  font: normal 1.5ex/1.5 sans-serif;
-  text-align: center;
-  background: #FFFFFF url(http://fedoraproject.org/static/images/line-bottom.png) 0 0 repeat-x;
-  margin: -90px 0 0;
-  border-bottom: 10px solid #337ACC;
-  height: 80px;
-  color: #AAAAAA;
-}
-
-#bottom
-{
-  margin-left: 18px;
-  padding-right: 18px;
-}
-
-#footer ul
-{
-  list-style: none;
-}
-
-#footer li
-{
-  display: inline;
-  border-left: 1px solid #AAAAAA;
-  padding: 0 0.75ex;
-  margin-left: -1px;
-}
-
-#footer li.first
-{
-  border-left: none;
-}
-
-#footer a
-{
-  color: #223344;
-}
-
-#footer a:hover
-{
-  color: #112233;
-}
-
-#footer p
-{
-  margin: 0 1.5ex;
-}
-
-#footer .copy
-{
-  padding-top: 3ex;
-}
-
-#footer .disclaimer
-{
-}
-
-#screenshot-banner a {
-  font-size: 1.6ex;
-  text-align: left;
-}
-
-#screenshot-banner ul
-{
-  list-style: none;
-}
-
-#screenshot-banner li
-{
-  display: inline;
-  margin-right: 2ex;
-}
-
-#screenshot-banner img
-{
-  vertical-align: bottom;
-  border: 0;
 }
 
 input, textarea, select
@@ -351,371 +367,4 @@ input, textarea, select
 input, textarea, option
 {
   padding: 2px 5px 2px 5px;
-}
-
-#content #sponsors
-{
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  overflow: auto;
-}
-
-#content #sponsors li
-{
-  text-align: center;
-  float: left;
-  width: 150px;
-  margin: 0 1ex;
-}
-
-#content #sponsors li img
-{
-  display: block;
-}
-
-#content ul.downloadbox
-{
-  overflow: hidden;
-  list-style: none;
-  margin: 0 2ex;
-  padding: 6ex 2ex 4ex 180px;
-  border-radius: 1.5ex;
-  -webkit-border-radius: 1.5ex;
-  -moz-border-radius: 1.5ex;
-  background: #C0DBDD 30px 50% no-repeat;
-  font-size: 1.7ex;
-  display: inline-block;
-}
-
-#content ul.installdvd { background-image: url(http://fedoraproject.org/static/images/installdvd.png); }
-#content ul.gnomelive { background-image: url(http://fedoraproject.org/static/images/gnomelive.png); }
-#content ul.kdelive { background-image: url(http://fedoraproject.org/static/images/kdelive.png); }
-
-.downloadbox li
-{
-  width: 32ex;
-  float: left;
-  padding: 0 0 2ex;
-}
-
-.downloadbox li li
-{
-  width: auto;
-  float: none;
-  padding: 0;
-}
-
-
-#content pre.command
-{
-  font-size: 2.25ex;
-  border: solid #DDDDDD;
-  border-width: 1px 1px 1px 5px;
-  background: #F2F5F6;
-  padding: 0.5ex 2ex;
-}
-
-
-#content p.note
-{
-  padding: 1ex 2ex;
-  font-size: 1.75ex;
-  border: 1px solid #DDDDDD;
-  background: #F2F5F6;
-}
-
-#content ul#resources
-{
-  list-style: none;
-}
-
-#content ul#resources a
-{
-  padding-left: 20px;
-  background: url(http://fedoraproject.org/static/images/arrow.png) 0 50% no-repeat;
-}
-
-#content ul#resources li
-{
-  padding-left: 70px;
-  margin-bottom: 3.5ex;
-}
-
-ul#resources li.resource-docs
-{
-  background: url(http://fedoraproject.org/static/images/icon-docs.png) 0 50% no-repeat;
-}
-
-ul#resources li.resource-communicate
-{
-  background: url(http://fedoraproject.org/static/images/icon-communicate.png) 0 50% no-repeat;
-}
-
-ul#resources li.resource-download
-{
-  background: url(http://fedoraproject.org/static/images/icon-download.png) 0 50% no-repeat;
-}
-
-
-#tabfloat {
-  right:25px;
-  position:absolute;
-  top:77px;
-  width:100%;
-  z-index:2;
-}
-
-ul#primary-links {
-  list-style-type:none;
-  margin:0px;
-  padding:0px 0px 0px 255px;
-}
-
-ul#primary-links li {
-  background:transparent url(http://fedoraproject.org/static/images/header-tab1.png) no-repeat scroll 0%;
-  float:right;
-  list-style-type:none;
-  margin:0px 0px;
-  padding:0px;
-}
-
-ul#primary-links li a {
-  background:transparent url(http://fedoraproject.org/static/images/header-tab2.png) no-repeat scroll 100% 0px;
-  color: #666666;
-  display:block;
-  font-weight:bold;
-  font-size:larger;
-  height:33px;
-  list-style-type:none;
-  margin:0px;
-  padding:4px 20px 0px;
-  text-decoration:none;
-  white-space:nowrap;
-}
-
-ul#primary-links li:hover {
-background-image:url(/static/images/header-tab1.png);
-background-position:0% -24px;
-}
-ul#primary-links li:hover a {
-background-image:url(/static/images/header-tab2.png);
-background-position:100% -24px;
-}
-
-/*********** My Fedora Widget stuff *************/
-
-.col {
-  margin: 10px
-  padding: 0 0 2ex;
-}
-
-.downloadbox li li
-{
-  width: auto;
-  float: none;
-  padding: 0;
-}
-
-
-.content pre.command
-{
-  font-size: 2.25ex;
-  border: solid #DDDDDD;
-  border-width: 1px 1px 1px 5px;
-  background: #F2F5F6;
-  padding: 0.5ex 2ex;
-}
-
-#results
-{
-  border: 1px solid #DDDDDD;
-  background: #F2F5F6;
-  font-size: 1.50ex;
-  width: 450px;
-  height: 400px;
-  overflow: auto;
-  display: none;
-}
-
-.content p.note
-{
-  padding: 1ex 2ex;
-  font-size: 1.75ex;
-  border: 1px solid #DDDDDD;
-  background: #F2F5F6;
-}
-
-.content ul#resources
-{
-  list-style: none;
-}
-
-.content ul#resources a
-{
-  padding-left: 20px;
-  background: url(http://fedoraproject.org/static/images/arrow.png) 0 50% no-repeat;
-}
-
-.content ul#resources li
-{
-  padding-left: 70px;
-  margin-bottom: 3.5ex;
-}
-
-ul#resources li.resource-docs
-{
-  background: url(http://fedoraproject.org/static/images/icon-docs.png) 0 50% no-repeat;
-}
-
-ul#resources li.resource-communicate
-{
-  background: url(http://fedoraproject.org/static/images/icon-communicate.png) 0 50% no-repeat;
-}
-
-ul#resources li.resource-download
-{
-  background: url(http://fedoraproject.org/static/images/icon-download.png) 0 50% no-repeat;
-}
-
-
-#tabfloat {
-  right:25px;
-  position:absolute;
-  top:77px;
-  width:100%;
-  z-index:2;
-}
-
-ul#primary-links {
-  list-style-type:none;
-  margin:0px;
-  padding:0px 0px 0px 255px;
-}
-
-ul#primary-links li {
-  background:transparent url(/static/images/header-tab1.png) no-repeat scroll 0%;
-  float:right;
-  list-style-type:none;
-  margin:0px 0px;
-  padding:0px;
-}
-
-ul#primary-links li a {
-  background:transparent url(/static/images/header-tab2.png) no-repeat scroll 100% 0px;
-  color: #666666;
-  display:block;
-  font-weight:bold;
-  font-size:larger;
-  height:33px;
-  list-style-type:none;
-  margin:0px;
-  padding:4px 20px 0px;
-  text-decoration:none;
-  white-space:nowrap;
-}
-
-ul#primary-links li:hover {
-background-image:url(/static/images/header-tab1.png);
-background-position:0% -24px;
-}
-ul#primary-links li:hover a {
-background-image:url(/static/images/header-tab2.png);
-background-position:100% -24px;
-}
-
-.mainsearch 
-  {
-  top: 18px;
-  right: 28px;
-  z-index:2;
-  width: 300;
-  z-index:2;
-  position:absolute;
-}
-
-/*********** My Fedora Widget stuff *************/
-
-.col-group {
-  overflow: hidden;
-}
-
-.col {
-  float: left;
-  margin: 30px;
-  padding: 0 0 2ex; 
-  padding-bottom: 32767px;
-  margin-bottom: -32767px;  
-  /*display: table-column; */
-}
-
-.col ul {
-  font-weight: normal;
-  list-style: none;
-  font-size: 1.7ex;
-}
-
-.widget-list {
-  list-style: none;
-}
-
-#col1 {
-  width: 150px;
-  height: 100%;
-}
-
-#col2 {
-  width: 150px;
-}
-
-#col3 {
-  width: 150px;
-}
-
-#col4 {
-  width: 200px;
-  
-}
-
-#col5 {
-  width: 200px;
-  margin-left: 500px;
-}
-.widget-list {
-  /*display: table-cell;*/
-}
-
-#col1 .widget {
-  border-width: 1px 1px 1px 1px;
-  border-spacing: 2px;
-  border-style: outset outset outset outset;
-  border-color: gray gray gray gray;
-  border-collapse: separate;
-  background-color: white;
-}
-
-#col3 .widget {
-  border-width: 1px 1px 1px 1px;
-  border-spacing: 2px;
-  border-style: outset outset outset outset;
-  border-color: gray gray gray gray;
-  border-collapse: separate;
-  background-color: white;
-}
-
-
-
-.widget h2 {
-  border-width: 1px 1px 1px 1px;
-  font-weight: bold;
-  text-align: center; 
-}
-
-#col2 .widget h2 {
-  text-align: left;
-}
-
-.usernav {
-  margin-bottom: 10px;
-  text-align: right;
 }
