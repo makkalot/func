@@ -16,6 +16,8 @@ import command
 import client
 
 DEFAULT_PORT = 51234
+DEFAULT_MAPLOC = "/var/lib/func/map"
+
 class BaseCommand(command.Command):
     """ wrapper class for commands with some convience functions, namely
     getOverlord() for getting a overlord client api handle"""
@@ -25,6 +27,8 @@ class BaseCommand(command.Command):
     port=DEFAULT_PORT
     async=False
     forks=1
+    delegate=False
+    mapfile=DEFAULT_MAPLOC
     def getOverlord(self):
         self.overlord_obj = client.Overlord(self.server_spec,
                                             port=self.port,
@@ -32,4 +36,6 @@ class BaseCommand(command.Command):
                                             verbose=self.verbose,
                                             config=self.config,
                                             async=self.async,
-                                            nforks=self.forks)
+                                            nforks=self.forks,
+                                            delegate=self.delegate,
+                                            mapfile=self.mapfile)

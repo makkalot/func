@@ -13,6 +13,7 @@ License: GPLv2+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
+Requires: pyYaml
 Requires: certmaster >= 0.1
 BuildRequires: python-devel
 %if %is_suse
@@ -55,6 +56,7 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func-inventory
 %{_bindir}/func-create-module
 %{_bindir}/func-transmit
+%{_bindir}/func-build-map
 #%{_bindir}/update-func
 /etc/init.d/funcd
 %dir %{_sysconfdir}/%{name}
@@ -128,6 +130,9 @@ fi
 
 
 %changelog
+* Fri Jul 11 2008 Michael DeHaan <mdehaan@redhat.com> - 0.23-1
+- (for ssalevan) adding in mapping/delegation tools
+
 * Mon Jul 07 2008 Michael DeHaan <mdehaan@redhat.com> - 0.22-1
 - packaged func-transmit script
 
@@ -140,6 +145,7 @@ fi
 * Fri Jun 28 2008 Adrian Likins <alikins@redhat.com> - 0.18-2
 - fix fedora bug #441283 - typo in postinstall scriptlet
   (the init.d symlinks for runlevels 1 and 6 were created wrong)
+
 
 * Mon Mar 03 2008 Adrian Likins <alikins@redhat.com> - 0.18-1
 - split off certmaster

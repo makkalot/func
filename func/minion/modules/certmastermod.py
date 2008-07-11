@@ -15,7 +15,7 @@
 
 # our modules
 import func_module
-import certmaster.certmaster as certmaster
+from certmaster import certmaster as certmaster
 
 # =================================
 
@@ -32,6 +32,14 @@ class CertMasterModule(func_module.FuncModule):
         list_of_hosts = self.__listify(list_of_hosts)
         cm = certmaster.CertMaster()
         return cm.get_csrs_waiting()
+        
+    def get_signed_certs(self, list_of_hosts):
+        """
+        Returns a list of all signed certs on this minion
+        """
+        list_of_hosts = self.__listify(list_of_hosts)
+        cm = certmaster.CertMaster()
+        return cm.get_signed_certs()
 
     def sign_hosts(self, list_of_hosts):
         """

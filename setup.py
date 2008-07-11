@@ -34,8 +34,8 @@ if __name__ == "__main__":
                      "scripts/func-inventory",
                      "scripts/func-create-module",
 		     "scripts/func-transmit"
+		     "scripts/func-build-map"
                 ],
-		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME
                 },
 		packages = ["%s" % NAME,
