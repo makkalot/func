@@ -36,13 +36,17 @@
     <div class="container" id="container">
         
         <div class="minionglob" id="minionglob">
-            <form id="form1" name="form1" method="post" action="">
+            <form id="form1" name="form1" method="post" action="/funcweb/minions">
                 <div class="graytexts2" id="minionglobtext">
                     <div align="center">Minion Glob</div>
                 </div>
-                <input name="Submit" type="submit" class="minionbutton" id="button" value="Submit" border="0" alt=""  />
-                <input name="textfield" type="text" class="minionbox" id="textfield" />
+                <input name="submit" type="submit" class="minionbutton" id="button" value="submit" border="0"/>
+                <input name="glob" type="text" class="minionbox" id="textfield" />
             </form>
+        </div>
+                    
+        <div class="globalerrorbig" id="globalerrorbig">
+              <div class="globalerror" id="globalerror" py:if="value_of('tg_flash', None)" py:content="tg_flash"></div>
         </div>
         <div py:replace="select('*|text()')" />
  
