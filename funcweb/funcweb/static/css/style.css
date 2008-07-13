@@ -63,12 +63,28 @@ margin-right:30px;
 }
 #minions {
 background-color:#f1f5f6;
+max-height: 20px;
+min-width: 120px;
+margin-left: auto;
+margin-right: auto;
+margin-top: 2em;
+margin-bottom: 2px;
+padding:4px;
+border: 2px solid #dddddd;
+font-family: Arial, Helvetica, sans-serif;
+font-size:14px;
+color: #666666;
+text-decoration:none;
+}
+
+.minions {
+background-color:#f1f5f6;
 height:20px;
-width:120px;
-margin-left:auto;
-margin-right:auto;
+min-width:200px;
 padding:10px;
 border: 2px solid #dddddd;
+margin-left:auto;
+margin-right:auto;
 }
 
 .graytexts {
@@ -297,13 +313,8 @@ width:850px;
 max-height:250px;
 margin-left:auto;
 margin-right:auto;
-font-family: Arial, Helvetica, sans-serif;
-font-size:16px;
-font-weight:bold;
-color: #666666;
-
 }
-#emptydiv {
+#globalerror {
 float:right;
 height:20px;
 margin-top:5px;
@@ -319,15 +330,45 @@ color: #990000;
 font-weight:bold;
 text-decoration:none;
 border: 1px dashed #dddddd;
-padding:5px;
+padding:1px;
 }
-#emptybigdiv {
+#globalerrorbig {
 float:right;
 max-height:150px;
 width:930px;
 margin-left:auto;
 margin-right:8em;
 
+}
+
+#runmethodbutton{
+height:50px;
+width:300px;
+float:left;
+margin-left:4em;
+}
+
+#runmethoddiv{
+height:55px;
+width:320px;
+float:left;
+margin-left:3em;
+}
+
+
+.runmethoddiv {
+height:25px;
+width:113px;;
+background-image: url(../images/button2.jpg);
+background-repeat:no-repeat;
+border: 0px;
+}
+.runmethoddiv:hover{
+height:25px;
+width:113px;;
+background-image: url(../images/button2_hover.jpg);
+background-repeat:no-repeat;
+border: 0px;
 }
 
 a{
