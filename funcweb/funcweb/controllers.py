@@ -42,7 +42,7 @@ class Funcweb(object):
 
     @expose(template="funcweb.templates.index")
     @identity.require(identity.not_anonymous())
-    def minions(self, glob='*'):
+    def minions(self, glob='*',submit='submit'):
         """ Return a list of our minions that match a given glob """
         #make the cache thing
         if self.func_cache['glob'] == glob:
