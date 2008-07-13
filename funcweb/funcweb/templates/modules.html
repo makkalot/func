@@ -5,12 +5,10 @@
 <body>
     <div class="modulesbigbox" id="modulesbigbox">
         <span py:for="minion, modules in modules.items()">
-        <div class="minions" id="minions">
             <div align="center" class="graytexts">${minion}</div>
-        </div>
     
         <div class="modulestexts" id="modulestexts" py:for="module in modules">
-            <a href="#methotdscontent" class="minionstextblue" onclick="myj('#methotdscontent').hide().load('/funcweb/minion/${minion}/${module}').show('slow')">${module}</a>
+            <a href="#methotdscontent" class="minionstextblue" onclick="myj('#widgetcontent').hide();myj('#resultcontent').hide();myj('#methotdscontent').hide().load('/funcweb/minion/${minion}/${module}').show('slow')">${module}</a>
         </div>
         </span>
     </div>
