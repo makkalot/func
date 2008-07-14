@@ -92,6 +92,7 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/funcweb/static/css/*.css
 %{python_sitelib}/funcweb/static/css/Makefile
 %{python_sitelib}/funcweb/static/images/*.png
+%{python_sitelib}/funcweb/static/images/*.jpg
 %{python_sitelib}/funcweb/static/images/*.ico
 %{python_sitelib}/funcweb/static/images/*.gif
 %{python_sitelib}/funcweb/static/images/Makefile
