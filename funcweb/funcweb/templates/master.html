@@ -36,7 +36,8 @@
     <div class="container" id="container">
         
         <div class="minionglob" id="minionglob">
-            <form id="form1" name="form1" method="post" action="/funcweb/minions">
+            <form action="/funcweb/minions" method="post" onsubmit="return !remoteFormRequest(this, 'minioncontent', {&quot;loading&quot;: null, &quot;confirm&quot;: null, &quot;after&quot;: null, &quot;on_complete&quot;: null, &quot;loaded&quot;: null, &quot;on_failure&quot;: null, &quot;on_success&quot;: null, &quot;before&quot;:&quot;myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();&quot;});" class="tableform" name="minion_form">
+
                 <div class="graytexts2" id="minionglobtext">
                     <div align="center">Minion Glob</div>
                 </div>
