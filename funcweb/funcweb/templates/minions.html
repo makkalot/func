@@ -1,0 +1,16 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+    <head/>
+    <body>
+        <div class="minionsbigbox" id="minionsbigbox" py:if="minions">
+            <div align="center" class="graytexts">Methods</div> 
+            <div id="minionstexts" py:for="minion in minions">
+                <a onclick="myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide().load('/funcweb/minion/${minion}').show('slow');" href="#modulescontent" class="minionstextblue">${minion}</a>
+            </div>
+            </div>
+            <div class="errorbox" id="errorbox" py:if="not minions">There is no minion to display with that glob, try something different</div>
+ 
+  </body>
+  </html>
