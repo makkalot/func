@@ -12,7 +12,7 @@ Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 License: GPLv2+
 Group: Applications/System
 Source0: %{name}-%{version}.tar.gz 
-Source1: %{name}.te
+Source2: %{name}.te
 
 #packages that are required
 Requires: python >= 2.3
@@ -62,7 +62,7 @@ This package adds SELinux policy for FuncWeb
 %prep
 %setup -q
 mkdir -p selinux
-cp -p %{SOURCE1} selinux/
+cp -p %{SOURCE2} selinux/
 
 %build
 %{__python} setup.py build
