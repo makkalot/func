@@ -40,11 +40,12 @@ class Funcweb(object):
             }
     #will be reused for widget validation
 
-    @expose(template="funcweb.templates.index")
+    @expose(allow_json=True)
     @identity.require(identity.not_anonymous())
-    def minions(self, glob='*',submit='submit'):
+    def minions(self, glob='*',submit=None):
         """ Return a list of our minions that match a given glob """
         #make the cache thing
+
         if self.func_cache['glob'] == glob:
             minions = self.func_cache['minions']
         else:
@@ -52,8 +53,12 @@ class Funcweb(object):
             minions=Minions(glob).get_all_hosts()
             self.func_cache['glob']=glob
             self.func_cache['minions']=minions
+        
+        if not submit:
+            return dict(minions=minions,tg_template="funcweb.templates.index")
+        else:
+            return dict(minions=minions,tg_template="funcweb.templates.minions")
 
-        return dict(minions=minions)
 
     index = minions # start with our minion view, for now
 
