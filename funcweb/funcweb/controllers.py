@@ -283,6 +283,13 @@ class Funcweb(object):
                 cmd_args[index_of_arg]=kw[arg]
            
             #now execute the stuff
+            #at the final execute it as a multiple if the glob suits for that
+            #if not (actually there shouldnt be an option like that but who knows :))
+            #it will run as a normal single command to clicked minion
+            if self.func_cache['glob']:
+                fc = None
+                fc = Overlord(self.func_cache['glob'])
+            
             result = getattr(getattr(fc,module),method)(*cmd_args)
             return str(result)
 
@@ -297,16 +304,19 @@ class Funcweb(object):
         arguments so they provide only some information,executed
         by pressing only the link !
         """
-        if self.func_cache['minion_name'] == minion:
-            fc = self.func_cache['fc_object']
+        if self.func_cache['glob']:
+            fc = Overlord(self.func_cache['glob'])
         else:
-            fc = Overlord(minion)
-            self.func_cache['fc_object']=fc
-            self.func_cache['minion_name']=minion
-            #reset the children :)
-            self.func_cache['module_name']=module
-            self.func_cache['modules']=None
-            self.func_cache['methods']=None
+            if self.func_cache['minion_name'] == minion:
+                fc = self.func_cache['fc_object']
+            else:
+                fc = Overlord(minion)
+                self.func_cache['fc_object']=fc
+                self.func_cache['minion_name']=minion
+                #reset the children :)
+                self.func_cache['module_name']=module
+                self.func_cache['modules']=None
+                self.func_cache['methods']=None
 
         result = getattr(getattr(fc,module),method)()
         return dict(result=str(result))
