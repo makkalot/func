@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+##
+## Copyright 2008, Various
+## Adrian Likins <alikins@redhat.com>
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+
 import os
 import socket
 import unittest
@@ -120,6 +128,15 @@ class TestTest(BaseTest):
 
     def test_echo_float(self):
         self._echo_test(123.456)
+
+    def test_echo_big_float(self):
+        self._echo_test(123121232.23)
+
+    def test_echo_bigger_float(self):
+        self._echo_test(234234234234234234234.234234234234234)
+
+    def test_echo_little_float(self):
+        self._echo_test(0.000000000000000000000000000000037)
 
     def test_echo_binary(self):
         blob = "348dshke354ts0d9urgk"
