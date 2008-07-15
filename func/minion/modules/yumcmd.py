@@ -24,14 +24,17 @@ class Yum(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Package updates through yum."
 
-    def update(self):
+    def update(self, pkg=None):
         # XXX support updating specific rpms
         ayum = yum.YumBase()
         ayum.doGenericSetup()
         ayum.doRepoSetup()
         try:
             ayum.doLock()
-            ayum.update()
+            if pkg != None:
+                ayum.update(name=pkg)
+            else:
+                ayum.update()
             ayum.buildTransaction()
             ayum.processTransaction(
                     callback=DummyCallback())
