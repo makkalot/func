@@ -11,6 +11,7 @@
 import func_module
 import func.overlord.client as fc
 from func import utils
+from func.overlord import delegation_tools as dtools
 
 class DelegationModule(func_module.FuncModule):
     
@@ -18,18 +19,28 @@ class DelegationModule(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Minion-side module to support delegation on sub-Overlords."
     
-    def run(self,module,method,args,delegation_path):
+    def run(self,module,method,args,delegation_list):
         """
         Delegates commands down the path of delegation
         supplied as an argument
         """
+        result_dict = {}
         
-        next_hop = delegation_path[0]
-        overlord = fc.Overlord(next_hop)
-        if len(delegation_path) == 1: #minion exists under this overlord
+        #separate list passed to us into minions we can call directly and 
+        #further delegation paths
+        (single_paths, grouped_paths) = dtools.group_paths(delegation_list)
+        
+        #run delegated calls
+        for group in grouped_paths.keys():
+            overlord = fc.Overlord(group)
+            path_list = grouped_paths[group]
+            delegation_results = overlord.delegation.run(module,method,args,path_list)
+            result_dict.update(delegation_results[group]) #strip away nesting hash
+        
+        #run direct calls
+        for minion in single_paths:
+            overlord = fc.Overlord(minion)
             overlord_module = getattr(overlord,module)
-            return getattr(overlord_module,method)(*args[:])
+            result_dict.update(getattr(overlord_module,method)(*args[:]))
         
-        stripped_list = delegation_path[1:len(delegation_path)]
-        delegation_results = overlord.delegation.run(module,method,args,stripped_list)
-        return delegation_results[next_hop] #strip away nested hash data from results
+        return result_dict 

@@ -259,17 +259,24 @@ class Overlord(object):
             return self.run_direct(module, method, args, nforks)
         
         resulthash = {}
+        grouped_paths = []
         
         #First we get all call paths for minions not directly beneath this overlord
         dele_paths = dtools.get_paths_for_glob(self.server_spec, self.minionmap)
-        non_single_paths = [path for path in dele_paths if len(path) > 1]
         
-        for path in non_single_paths:
+        #Then we group them together in a dictionary by a common next hop
+        (single_paths,grouped_paths) = dtools.group_paths(dele_paths)
+        #print "single:%s" % single_paths
+        #print "grouped:%s" % grouped_paths
+        
+        for group in grouped_paths.keys():
+            #print "mygroup:%s" % group
             resulthash.update(self.run_direct(module,
                                               method,
                                               args,
                                               nforks,
-                                              call_path=path))
+                                              call_path=grouped_paths[group],
+                                              suboverlord=group))
         
         #Next, we run everything that can be run directly beneath this overlord
         #Why do we do this after delegation calls?  Imagine what happens when
@@ -333,6 +340,7 @@ class Overlord(object):
 
                 if self.interactive:
                     print retval
+                    
             except Exception, e:
                 (t, v, tb) = sys.exc_info()
                 retval = utils.nice_exception(t,v,tb)
@@ -349,10 +357,10 @@ class Overlord(object):
                 return (server_name, retval)
         
         if kwargs.has_key('call_path'): #we're delegating if this key exists
-            spec = kwargs['call_path'][0] #the sub-overlord directly beneath this one
+            delegation_path = kwargs['call_path']
+            spec = kwargs['suboverlord'] #the sub-overlord directly beneath this one
             minionobj = Minions(spec, port=self.port, verbose=self.verbose)
             use_delegate = True #signal to process_server to call delegate method
-            delegation_path = kwargs['call_path'][1:len(kwargs['call_path'])]
             minionurls = minionobj.get_urls() #the single-item url list to make async
                                               #tools such as jobthing/forkbomb happy
         else: #we're directly calling minions, so treat everything normally
