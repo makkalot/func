@@ -30,8 +30,10 @@ method: run
 parameters: "/bin/echo Hello World"
 """
 
+import string
 import sys
 import distutils.sysconfig
+import optparse
 
 import func.yaml as yaml # FIXME: need to subpackage this as part of Func
 import func.overlord.func_command as func_command
@@ -44,12 +46,25 @@ params = yaml.load(input).next()
 
 # scan arguments
 
+def is_a_list(item):
+    if type(item) in [type([]), type(())]:
+        return True
+    return False
+
+# slightly odd, but we expect clients to be a string we parse
+# out later (glob and group expansion, etc). So if it is a list,
+# flatten it into a string. 
 clients    = params.get('clients', "*")
+if is_a_list(clients):
+    clients  = string.join(clients,';')
+
+
 method     = params.get('method','unknown')
 
 if method == "list_minions":
-    server_spec = "*"
-    minion_set = fc.Minions(server_spec)
+    # clients will default to * if not specified, and specifing is a good
+    # way to see who is in what group, etc, so pass it though
+    minion_set = fc.Minions(clients)
     servers = minion_set.get_all_hosts()
     servers.sort()
     results = servers
@@ -68,7 +83,7 @@ else:
     method_handle = getattr(module_handle, method)
     if parameters is not None:
         # listify if we get something thats not a list
-        if type(parameters) not in [type([]), type(())]:
+        if not is_a_list(parameters):
             parameters = [parameters]
         results = method_handle(*parameters)
     else:

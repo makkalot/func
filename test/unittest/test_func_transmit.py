@@ -69,7 +69,57 @@ class TestListMinion(BaseTest):
         out = self.call({'clients': '*',
                           'method': 'list_minions'})
 
-        print out
+    def test_list_minions_no_match(self):
+        out = self.call({'clients': 'somerandom-name-that-shouldnt-be-a_real_host_name',
+                         'method': 'list_minions'})
+        assert out == []
+
+    def test_list_minions_group_name(self):
+        out = self.call({'clients': '@test',
+                         'method': 'list_minions'})
+
+    def test_list_minions_no_clients(self):
+        out = self.call({'method': 'list_minions'})
+
+
+
+class TestClientGlob(BaseTest):
+
+    def _test_add(self, client):
+        result = self.call({'clients': client,
+                            'method': 'add',
+                            'module': 'test',
+                            'parameters': [1,2]})
+        self.assert_on_fault(result)
+        return result
+    
+    def test_single_client(self):
+        result = self._test_add(self.th)
+
+    def test_glob_client(self):
+        result = self._test_add("*")
+
+    def test_glob_list(self):
+        result = self._test_add([self.th, self.th])
+
+    def test_glob_string_list(self):
+        result = self._test_add("%s;*" % self.th)
+
+    # note, needs a /etc/func/group setup with the proper groups defined
+    # need to figure out a good way to test this... -akl
+    def test_group(self):
+        result = self._test_add("@test")
+
+    def test_group_and_glob(self):
+        result = self._test_add("@test;*")
+
+    def test_list_of_groups(self):
+        result = self._test_add(["@test", "@test2"])
+
+    def test_string_list_of_groups(self):
+        result = self._test_add("@test;@test2")
+
+        
 
 
 class TestTest(BaseTest):
