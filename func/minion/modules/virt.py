@@ -197,10 +197,13 @@ class Virt(func_module.FuncModule):
 		"/etc/xen/auto"
 	    ]
         else:
-       	    autostart_args = [
-		"/usr/bin/virsh",
-		"autostart",
-		vm
+            # We aren't using virsh autostart because we want
+            # the command to work even when the VM isn't running
+	    autostart_args = [
+		"/bin/ln",
+		"-s",
+		"/etc/libvirt/qemu/%s.xml" % vm,
+		"/etc/libvirt/qemu/autostart/%s.xml" % vm
 	    ]
 
         return sub_process.call(autostart_args,shell=False,close_fds=True)
