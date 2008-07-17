@@ -122,6 +122,9 @@ class FuncLibvirtConnection(object):
     def nodeinfo(self):
         return self.conn.getInfo()
 
+    def get_type(self):
+        return self.conn.getType()
+
 
 class Virt(func_module.FuncModule):
 
@@ -183,6 +186,24 @@ class Virt(func_module.FuncModule):
             except:
                 pass
         return results
+
+    def autostart(self, vm):
+	self.conn = self.__get_conn()
+	if self.conn.get_type() == "Xen":
+	    autostart_args = [
+		"/bin/ln",
+		"-s",
+		"/etc/xen/%s" % vm,
+		"/etc/xen/auto"
+	    ]
+        else:
+       	    autostart_args = [
+		"/usr/bin/virsh",
+		"autostart",
+		vm
+	    ]
+
+        return sub_process.call(autostart_args,shell=False,close_fds=True)
 
     def freemem(self):
         self.conn = self.__get_conn()
