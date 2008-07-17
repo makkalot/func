@@ -216,8 +216,8 @@ def job_status(jobid, client_class=None):
             else:
                 (minion_interim_rc, minion_interim_result) = minion_result
 
-            if minion_interim_rc not in [ JOB_ID_RUNNING ]:
-                if minion_interim_rc in [ JOB_ID_LOST_IN_SPACE ]:
+            if minion_interim_rc != JOB_ID_RUNNING :
+                if minion_interim_rc == JOB_ID_LOST_IN_SPACE:
                     partial_results[host] = [ utils.REMOTE_ERROR, "lost job" ]
                 else:
                     partial_results[host] = minion_interim_result
@@ -225,8 +225,11 @@ def job_status(jobid, client_class=None):
                 some_missing = True
 
         if some_missing:
+            __update_status(jobid, JOB_ID_PARTIAL, partial_results)
             return (JOB_ID_PARTIAL, partial_results)
+
         else:
+            __update_status(jobid,JOB_ID_FINISHED, partial_results)
             return (JOB_ID_FINISHED, partial_results)
 
     else:
