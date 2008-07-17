@@ -187,6 +187,9 @@ class Virt(func_module.FuncModule):
                 pass
         return results
 
+    def virttype(self):
+	return self.__get_conn().get_type()
+
     def autostart(self, vm):
 	self.conn = self.__get_conn()
 	if self.conn.get_type() == "Xen":
