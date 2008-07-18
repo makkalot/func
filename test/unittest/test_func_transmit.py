@@ -11,47 +11,80 @@
 
 import os
 import socket
-import unittest
 import subprocess
+import time
+import unittest
+
+import simplejson
 
 import func.utils
 from func import yaml
-import StringIO
-import cStringIO
+from func import jobthing
 
 
 
 def structToYaml(data):
     # takes a data structure, serializes it to
-    # yaml, them makes a cStringIO out of it to
-    # feed to func-trasmit on stdin
-
+    # yaml
     buf = yaml.dump(data)
     return buf
 
-class BaseTest:
+
+def structToJSON(data):
+    #Take data structure for the test
+    #and serializes it using json
+    
+    serialized = simplejson.dumps(input)
+    return serialized
+
+
+class BaseTest(object):
     # assume we are talking to localhost
     # th = socket.gethostname()
     th = socket.getfqdn()
     nforks=1
     async=False
+    ft_cmd = "func-transmit"
 
     # just so we can change it easy later
-    def __serialize(self, data):
-        buf = yaml.dump(data)
-        return buf
+    def _serialize(self, data):
+        raise NotImplementedError
 
-    def __deserialize(self, buf):
-        data = yaml.load(buf).next()
-        return data
+    def _deserialize(self, buf):
+        raise NotImplementedError
 
-    def call(self, data):
-        f = self.__serialize(data)
-        p = subprocess.Popen("func-transmit", shell=True,
+
+    def _call_async(self, data):
+        data['async'] = True
+        data['nforks'] = 4
+
+        job_id = self._call(data)
+
+        no_answer = True
+        while (no_answer):
+            out = self._call({'clients': '*',
+                             'method':'job_status',
+                             'parameters': job_id})
+            if out[0] == jobthing.JOB_ID_FINISHED:
+                no_answer = False
+            else:
+                time.sleep(.25)
+
+        result = out[1]
+        return result
+
+    def _call(self, data):
+        f = self._serialize(data)
+        p = subprocess.Popen(self.ft_cmd,  shell=True,
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output = p.communicate(input=f)
 
-        return self.__deserialize(output[0])
+        return self._deserialize(output[0])
+
+    def call(self, data):
+        if self.async:
+            return self._call_async(data)
+        return self._call(data)
         
     def __init__(self):
         pass
@@ -63,16 +96,38 @@ class BaseTest:
 #        assert type(result[self.th]) != xmlrpclib.Fault
 
 
-class TestListMinion(BaseTest):
+class YamlBaseTest(BaseTest):
+    # i'd add the "yaml" attr here for nosetest to find, but it doesnt
+    # seem to find it unless the class is a test class directly
+    ft_cmd = "func-transmit --yaml"
+    def _serialize(self, data):
+        buf = yaml.dump(data)
+        return buf
+
+    def _deserialize(self, buf):
+        data = yaml.load(buf).next()
+        return data
+
+class JSONBaseTest(BaseTest):
+    ft_cmd = "func-transmit --json"
+    def _serialize(self, data):
+        buf = simplejson.dumps(data)
+        return buf
+
+    def _deserialize(self, buf):
+        data = simplejson.loads(buf)
+        return data
+
+class ListMinion(object):
     
     def test_list_minions(self):
         out = self.call({'clients': '*',
                           'method': 'list_minions'})
-
+        
     def test_list_minions_no_match(self):
         out = self.call({'clients': 'somerandom-name-that-shouldnt-be-a_real_host_name',
                          'method': 'list_minions'})
-        assert out == []
+        assert out['list_minions'] == []
 
     def test_list_minions_group_name(self):
         out = self.call({'clients': '@test',
@@ -80,11 +135,39 @@ class TestListMinion(BaseTest):
 
     def test_list_minions_no_clients(self):
         out = self.call({'method': 'list_minions'})
+                        
+              
+class ListMinionAsync(ListMinion):
+    async = True
+
+class TestListMinionYaml(YamlBaseTest, ListMinion):
+    yaml = True
+    def __init__(self):
+        super(TestListMinionYaml, self).__init__()
+
+class TestListMinionJSON(JSONBaseTest, ListMinion):
+    json = True
+    def __init__(self):
+        super(TestListMinionJSON, self).__init__()
+
+# list_minions is a convience call for func_transmit, and doesn't
+# really make any sense to call async
+
+#class TestListMinionYamlAsync(YamlBaseTest, ListMinionAsync):
+#    yaml = True
+#    async = True
+#    def __init__(self):
+#        super(TestListMinionYamlAsync, self).__init__()
+
+#class TestListMinionJSONAsync(JSONBaseTest, ListMinionAsync):
+#    json = True
+#    async = True
+#    def __init__(self):
+#        super(TestListMinionJSONAsync, self).__init__()
 
 
-
-class TestClientGlob(BaseTest):
-
+    
+class ClientGlob(object):
     def _test_add(self, client):
         result = self.call({'clients': client,
                             'method': 'add',
@@ -110,19 +193,51 @@ class TestClientGlob(BaseTest):
     def test_group(self):
         result = self._test_add("@test")
 
-    def test_group_and_glob(self):
-        result = self._test_add("@test;*")
+#    def test_group_and_glob(self):
+#        result = self._test_add("@test;*")
 
-    def test_list_of_groups(self):
-        result = self._test_add(["@test", "@test2"])
+#    def test_list_of_groups(self):
+#        result = self._test_add(["@test", "@test2"])
 
-    def test_string_list_of_groups(self):
-        result = self._test_add("@test;@test2")
-
-        
+#    def test_string_list_of_groups(self):
+#        result = self._test_add("@test;@test2")
 
 
-class TestTest(BaseTest):
+# run all the same tests, but run then 
+class ClientGlobAsync(ClientGlob):
+    async = True
+
+class TestClientGlobYaml(YamlBaseTest, ClientGlob):
+    yaml = True
+    def __init__(self):
+        super(TestClientGlobYaml, self).__init__()
+
+class TestClientGlobJSON(JSONBaseTest, ClientGlob):
+    json = True
+    def __init__(self):
+        super(TestClientGlobJSON, self).__init__()
+
+class TestClientGlobYamlAsync(YamlBaseTest, ClientGlobAsync):
+    yaml = True
+    async = True
+    def __init__(self):
+        super(TestClientGlobYamlAsync, self).__init__()
+
+class TestClientGlobJSONAsync(JSONBaseTest, ClientGlobAsync):
+    json = True
+    async = True
+    def __init__(self):
+        super(TestClientGlobJSONAsync, self).__init__()
+
+
+
+
+# why the weird T_est name? because nosetests doesn't seem to reliably
+# respect the __test__ attribute, and these modules aren't meant to be
+# invoked as test classes themselves, only as bases for other tests
+class T_estTest(object):
+    __test__ = False
+    
     def _echo_test(self, data):
         result = self.call({'clients':'*',
                              'method': 'echo',
@@ -153,6 +268,8 @@ class TestTest(BaseTest):
     def test_echo_float(self):
         self._echo_test(1.0)
 
+
+    # NOTE/FIXME: the big float tests fail for yaml and json 
     def test_echo_big_float(self):
         self._echo_test(123121232.23)
 
@@ -162,12 +279,36 @@ class TestTest(BaseTest):
     def test_echo_little_float(self):
         self._echo_test(0.0000000000000000000000000000000000037)
 
-        
+    # Note/FIXME: these test currently fail for YAML
     def test_echo_boolean_true(self):
         self._echo_test(True)
 
     def test_echo_boolean_false(self):
         self._echo_test(False)
 
-        
-        
+
+class T_estTestAsync(T_estTest):
+    __test__ = False
+    async = True
+
+class TestTestYaml(YamlBaseTest, T_estTest):
+    yaml = True
+    def __init__(self):
+        super(YamlBaseTest, self).__init__()
+
+class TestTestJSON(JSONBaseTest, T_estTest):
+    json = True
+    def __init__(self):
+        super(JSONBaseTest,self).__init__()
+
+class TestTestAsyncJSON(JSONBaseTest, T_estTestAsync):
+    json = True
+    async = True
+    def __init__(self):
+        super(JSONBaseTest,self).__init__()
+                               
+class TestTestAsyncYaml(YamlBaseTest, T_estTestAsync):
+    yaml = True
+    async = True
+    def __init__(self):
+        super(YamlBaseTest,self).__init__()
