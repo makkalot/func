@@ -10,6 +10,7 @@
 ## Copyright 2008, Various
 ## Marco Mornati <mmornati@byte-code.com>
 ## Michael DeHaan <mdehaan@redhat.com>
+## Adrian Likins <alikins@redhat.com>
 ##
 ## This software may be freely redistributed under the terms of the GNU
 ## general public license.
@@ -20,7 +21,7 @@
 ##
 
 
-## Example input file format:
+## Example yaml input file format:
 """
 clients: "*"
 aysnc: False
@@ -30,105 +31,111 @@ method: run
 parameters: "/bin/echo Hello World"
 """
 
+
 import exceptions
 import string
 import sys
 import distutils.sysconfig
 import optparse
 
-import func.yaml as yaml # FIXME: need to subpackage this as part of Func
-import func.overlord.func_command as func_command
-import func.overlord.client as fc
-
-from optparse import OptionParser
 import simplejson
 
-
-# load input parameters
-parser = OptionParser()
-parser.add_option("-j","--json",help="Json Parser",action="store_true",dest="json",default=False)
-parser.add_option("-y","--yaml",help="Yaml Parser",action="store_true",dest="yaml",default=False)
-
-(language,args)=parser.parse_args()
-
-# Setting default language if no one is selected by user
-if (language.json==False and language.yaml==False):
-    language.json = True
-
-
-# load input from stdin
-input = sys.stdin.read()
-
-if (language.yaml):
-    params = yaml.load(input).next()
-elif (language.json):
-    params = simplejson.loads(input)
-
+import func.overlord.func_command as func_command
+import func.overlord.client as fc
+import func.yaml as yaml
 
 
 class NoAsyncForListMinionException(exceptions.Exception):
-    def __init__(self, msg):
-        self.msg = msg
-# scan arguments
+        def __init__(self, msg):
+            self.msg = msg
+    # scan arguments
 
 def is_a_list(item):
     if type(item) in [type([]), type(())]:
         return True
     return False
 
-# slightly odd, but we expect clients to be a string we parse
-# out later (glob and group expansion, etc). So if it is a list,
-# flatten it into a string. 
-clients    = params.get('clients', "*")
-if is_a_list(clients):
-    clients  = string.join(clients,';')
-
-method     = params.get('method','unknown')
-async      = params.get('async', False)
-
-if method == "list_minions":
-    # clients will default to * if not specified, and specifing is a good
-    # way to see who is in what group, etc, so pass it though
-
-    if async == True:
-        raise NoAsyncForListMinionException("list_minions method can not be run in async")
-    minion_set = fc.Minions(clients)
-    servers = minion_set.get_all_hosts()
-    results = servers
+def main(argv):
+# load input parameters
+    parser = optparse.OptionParser()
+    parser.add_option("-j","--json",
+                      help="Json Parser",
+                      action="store_true",
+                      dest="json",
+                      default=False)
+    parser.add_option("-y","--yaml",
+                      help="Yaml Parser",
+                      action="store_true",
+                      dest="yaml",
+                      default=False)
     
-else:
-    # scan more arguments
-    nforks     = params.get('nforks', 1)
-    module     = params.get('module', None)
-    parameters = params.get('parameters', None)
+    (options,args) = parser.parse_args()
 
-    # make the call
-    client = fc.Overlord(clients, async=async, nforks=nforks)
-    if module is None:
-        method_handle = getattr(client, method)
-    else:
-        module_handle = getattr(client, module)
-        method_handle = getattr(module_handle, method)
+    # load input from stdin
+    input = sys.stdin.read()
+
+    # Setting default language if no one is selected by user
+    if (options.json==False and options.yaml==False):
+        options.json = True
+
+    if (options.yaml):
+        params = yaml.load(input).next()
+    elif (options.json):
+        params = simplejson.loads(input)
+
+    # slightly odd, but we expect clients to be a string we parse
+    # out later (glob and group expansion, etc). So if it is a list,
+    # flatten it into a string. 
+    clients    = params.get('clients', "*")
+    if is_a_list(clients):
+        clients  = string.join(clients,';')
+
+    method     = params.get('method','unknown')
+    async      = params.get('async', False)
+
+    if method == "list_minions":
+        # clients will default to * if not specified, and specifing is a good
+        # way to see who is in what group, etc, so pass it though
+
+        if async == True:
+            raise NoAsyncForListMinionException("list_minions method can not be run in async")
         
-    if parameters is not None:
-        # listify if we get something thats not a list
-        if not is_a_list(parameters):
-            parameters = [parameters]
-        results = method_handle(*parameters)
+        minion_set = fc.Minions(clients)
+        servers = minion_set.get_all_hosts()
+        results = servers
+
     else:
-        results = method_handle()
+        # scan more arguments
+        nforks     = params.get('nforks', 1)
+        module     = params.get('module', None)
+        parameters = params.get('parameters', None)
 
-# convert to selected language (default is YAML)
-if (language.json):
-    output = simplejson.dumps(results)
-elif (language.yaml):
-    output = yaml.dump(results)
+        # make the call
+        client = fc.Overlord(clients, async=async, nforks=nforks)
+        if module is None:
+            method_handle = getattr(client, method)
+        else:
+            module_handle = getattr(client, module)
+            method_handle = getattr(module_handle, method)
+
+        if parameters is not None:
+            # listify if we get something thats not a list
+            if not is_a_list(parameters):
+                parameters = [parameters]
+            results = method_handle(*parameters)
+        else:
+            results = method_handle()
+
+    # convert to selected language (default is JSON)
+    if (options.json):
+        output = simplejson.dumps(results)
+    elif (options.yaml):
+        output = yaml.dump(results)
+
+    # write to stdout
+    print output
 
 
-# write to stdout
-print output
 
-
-
-#if __name__ == "__main__":
-#    main(sys.argv)
+if __name__ == "__main__":
+    main(sys.argv)
