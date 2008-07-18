@@ -30,6 +30,7 @@ method: run
 parameters: "/bin/echo Hello World"
 """
 
+import exceptions
 import string
 import sys
 import distutils.sysconfig
@@ -39,11 +40,35 @@ import func.yaml as yaml # FIXME: need to subpackage this as part of Func
 import func.overlord.func_command as func_command
 import func.overlord.client as fc
 
+from optparse import OptionParser
+import simplejson
+
+
+# load input parameters
+parser = OptionParser()
+parser.add_option("-j","--json",help="Json Parser",action="store_true",dest="json",default=False)
+parser.add_option("-y","--yaml",help="Yaml Parser",action="store_true",dest="yaml",default=False)
+
+(language,args)=parser.parse_args()
+
+# Setting default language if no one is selected by user
+if (language.json==False and language.yaml==False):
+    language.json = True
+
+
 # load input from stdin
 input = sys.stdin.read()
-params = yaml.load(input).next()
+
+if (language.yaml):
+    params = yaml.load(input).next()
+elif (language.json):
+    params = simplejson.loads(input)
 
 
+
+class NoAsyncForListMinionException(exceptions.Exception):
+    def __init__(self, msg):
+        self.msg = msg
 # scan arguments
 
 def is_a_list(item):
@@ -58,29 +83,34 @@ clients    = params.get('clients', "*")
 if is_a_list(clients):
     clients  = string.join(clients,';')
 
-
 method     = params.get('method','unknown')
+async      = params.get('async', False)
 
 if method == "list_minions":
     # clients will default to * if not specified, and specifing is a good
     # way to see who is in what group, etc, so pass it though
+
+    if async == True:
+        raise NoAsyncForListMinionException("list_minions method can not be run in async")
     minion_set = fc.Minions(clients)
     servers = minion_set.get_all_hosts()
-    servers.sort()
-    results = servers
- 
+    # for marco ;-> -akl
+    results =  {'list_minions': servers}
+    
 else:
     # scan more arguments
-    async      = params.get('async', False)
     nforks     = params.get('nforks', 1)
-    module     = params.get('module','unknown')
+    module     = params.get('module', None)
     parameters = params.get('parameters', None)
-
 
     # make the call
     client = fc.Overlord(clients, async=async, nforks=nforks)
-    module_handle = getattr(client, module)
-    method_handle = getattr(module_handle, method)
+    if module is None:
+        method_handle = getattr(client, method)
+    else:
+        module_handle = getattr(client, module)
+        method_handle = getattr(module_handle, method)
+        
     if parameters is not None:
         # listify if we get something thats not a list
         if not is_a_list(parameters):
@@ -89,13 +119,17 @@ else:
     else:
         results = method_handle()
 
-# convert to YAML
-output = yaml.dump(results)
+# convert to selected language (default is YAML)
+if (language.json):
+    output = simplejson.dumps(results)
+elif (language.yaml):
+    output = yaml.dump(results)
+
 
 # write to stdout
 print output
 
 
 
-
-
+#if __name__ == "__main__":
+#    main(sys.argv)
