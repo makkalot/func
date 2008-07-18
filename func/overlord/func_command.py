@@ -30,7 +30,7 @@ from func.overlord import client
 class FuncCommandLine(command.Command):
 
     name = "func"
-    usage = "func is the command line interface for controlling func minions"
+    usage = "func [--options] \"hostname glob\" module method [arg1] [arg2] ... "
 
     subCommandClasses = [
         call.Call, show.Show, copyfile.CopyFile, 

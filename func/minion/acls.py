@@ -65,7 +65,7 @@ class Acls(object):
                     self.acls[host] = []
                 self.acls[host].extend(methods)
 
-        self.logger.debug("acls", self.acls)
+        self.logger.debug("acls %s" % self.acls)
 
         return self.acls
 

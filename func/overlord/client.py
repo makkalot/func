@@ -16,6 +16,7 @@
 import sys
 import glob
 import os
+import func.yaml as yaml
 
 from certmaster.commonconfig import CMConfig
 from func.config import read_config, CONFIG_FILE
@@ -24,6 +25,7 @@ import sslclient
 
 import command
 import groups
+import delegation_tools as dtools
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
 import func.utils as utils
@@ -35,6 +37,8 @@ from func.CommonErrors import *
 
 DEFAULT_PORT = 51234
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
+DEFAULT_MAPLOC = "/var/lib/func/map"
+DELEGATION_METH = "delegation.run"
 
 # ===================================
 
@@ -63,24 +67,6 @@ class CommandAutomagic(object):
         method = ".".join(self.base[1:])
         return self.clientref.run(module,method,args,nforks=self.nforks)
 
-
-#def get_groups():    
-#    group_class = groups.Groups()
-#    return group_class.get_groups()
-
-
-#def get_hosts_by_groupgoo(groups, groupgoo):
-#    group_gloobs = groupgoo.split(':')
-#    hosts = []
-#    for group_gloob in group_gloobs:
-#        if not group_gloob[0] == "@":
-#            continue
-#        if groups.has_key(group_gloob[1:]):
-#            hosts = hosts + groups[group_gloob[1:]]
-#        else:            
-#            print "group %s not defined" % group_gloob
-#    return hosts
-
 # ===================================
 # this is a module level def so we can use it and isServer() from
 # other modules with a Overlord class
@@ -88,13 +74,16 @@ class CommandAutomagic(object):
 class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
-                 just_fqdns=False, groups_file=None):
+                 just_fqdns=False, groups_file=None,
+                 delegate=False, minionmap={}):
 
         self.spec = spec
         self.port = port
         self.noglobs = noglobs
         self.verbose = verbose
         self.just_fqdns = just_fqdns
+        self.delegate = delegate
+        self.minionmap = minionmap
 
         self.config = read_config(CONFIG_FILE, CMConfig)
         self.group_class = groups.Groups(filename=groups_file)
@@ -111,11 +100,11 @@ class Minions(object):
         seperate_gloobs = self.spec.split(";")
         seperate_gloobs = seperate_gloobs + self.new_hosts
         for each_gloob in seperate_gloobs:
-            actual_gloob = "%s/%s.cert" % (self.config.certroot, each_gloob)
+            actual_gloob = "%s/%s.%s" % (self.config.certroot, each_gloob, self.config.cert_extension)
             certs = glob.glob(actual_gloob)
             for cert in certs:
                 self.all_certs.append(cert)
-                host = cert.replace(self.config.certroot,"")[1:-5]
+                host = cert.replace(self.config.certroot,"")[1:-(len(self.config.cert_extension) + 1)]
                 self.all_hosts.append(host)
         return self.all_hosts
 
@@ -153,12 +142,11 @@ def is_minion(minion_string):
     return minions.is_minion()
 
 
-
-
 class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
-        verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True):
+        verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
+        delegate=False, mapfile=DEFAULT_MAPLOC):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -179,9 +167,19 @@ class Overlord(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async       = async
+        self.delegate    = delegate
+        self.mapfile     = mapfile
         
         self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
         self.minions = self.minions_class.get_urls()
+        
+        if self.delegate:
+            try:
+                mapstream = file(self.mapfile, 'r').read()
+                self.minionmap = yaml.load(mapstream).next()
+            except e:
+                sys.stderr.write("mapfile load failed, switching delegation off")
+                self.delegate = False
     
         if init_ssl:
             self.setup_ssl()
@@ -214,7 +212,8 @@ class Overlord(object):
             self.key = fd_key
             self.cert = fd_crt
         else:
-            raise Func_Client_Exception, 'Cannot read ssl credentials: ssl, cert, ca'
+            raise Func_Client_Exception, 'Cannot read ssl credentials: ssl, cert, ca. '+\
+                  'Ensure you have permission to read files in /etc/pki/certmaster/ directory.'
             
 
         
@@ -245,7 +244,51 @@ class Overlord(object):
 
     # -----------------------------------------------
 
+    def open_job_ids(self):
+        """
+        That method can be used by other apps that uses func API
+        to get current ids with their short results in the database
+        """
+        return jobthing.get_open_ids()
+
     def run(self, module, method, args, nforks=1):
+        """
+        Invoke a remote method on one or more servers.
+        Run returns a hash, the keys are server names, the values are the
+        returns.
+
+        The returns may include exception objects.
+        If Overlord() was constructed with noglobs=True, the return is instead
+        just a single value, not a hash.
+        """
+        
+        if not self.delegate: #delegation is turned off, so run normally
+            return self.run_direct(module, method, args, nforks)
+        
+        resulthash = {}
+        
+        #First we get all call paths for minions not directly beneath this overlord
+        dele_paths = dtools.get_paths_for_glob(self.server_spec, self.minionmap)
+        non_single_paths = [path for path in dele_paths if len(path) > 1]
+        
+        for path in non_single_paths:
+            resulthash.update(self.run_direct(module,
+                                              method,
+                                              args,
+                                              nforks,
+                                              call_path=path))
+        
+        #Next, we run everything that can be run directly beneath this overlord
+        #Why do we do this after delegation calls?  Imagine what happens when
+        #reboot is called...
+        resulthash.update(self.run_direct(module,method,args,nforks))
+        
+        return resulthash
+        
+        
+    # -----------------------------------------------
+
+    def run_direct(self, module, method, args, nforks=1, *extraargs, **kwargs):
         """
         Invoke a remote method on one or more servers.
         Run returns a hash, the keys are server names, the values are the
@@ -257,7 +300,11 @@ class Overlord(object):
         """
 
         results = {}
-
+        spec = ''
+        minionurls = []
+        use_delegate = False
+        delegation_path = []
+        
         def process_server(bucketnumber, buckets, server):
             
             conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
@@ -274,7 +321,10 @@ class Overlord(object):
                 # thats some pretty code right there aint it? -akl
                 # we can't call "call" on s, since thats a rpc, so
                 # we call gettatr around it.
-                meth = "%s.%s" % (module, method)
+                if use_delegate:
+                    meth = DELEGATION_METH #call delegation module
+                else:
+                    meth = "%s.%s" % (module, method)
 
                 # async calling signature has an "imaginary" prefix
                 # so async.abc.def does abc.def as a background task.
@@ -283,7 +333,10 @@ class Overlord(object):
                     meth = "async.%s" % meth
 
                 # this is the point at which we make the remote call.
-                retval = getattr(conn, meth)(*args[:])
+                if use_delegate:
+                    retval = getattr(conn, meth)(module, method, args, delegation_path)
+                else:
+                    retval = getattr(conn, meth)(*args[:])
 
                 if self.interactive:
                     print retval
@@ -301,29 +354,46 @@ class Overlord(object):
                 right = server.rfind(":")
                 server_name = server[left:right]
                 return (server_name, retval)
-
+        
+        if kwargs.has_key('call_path'): #we're delegating if this key exists
+            spec = kwargs['call_path'][0] #the sub-overlord directly beneath this one
+            minionobj = Minions(spec, port=self.port, verbose=self.verbose)
+            use_delegate = True #signal to process_server to call delegate method
+            delegation_path = kwargs['call_path'][1:len(kwargs['call_path'])]
+            minionurls = minionobj.get_urls() #the single-item url list to make async
+                                              #tools such as jobthing/forkbomb happy
+        else: #we're directly calling minions, so treat everything normally
+            spec = self.server_spec
+            minionurls = self.minions
+            #print "Minion_url is :",minionurls
+            #print "Process server is :",process_server
+        
         if not self.noglobs:
             if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
                 if not self.async:
-                    results = forkbomb.batch_run(self.minions, process_server, nforks)
+                   
+                    results = forkbomb.batch_run(minionurls, process_server, nforks)
                 else:
-                    results = jobthing.batch_run(self.minions, process_server, nforks)
+                    minion_info =dict(spec=spec,module=module,method=method)
+                    results = jobthing.batch_run(minionurls, process_server,nforks,**minion_info)
             else:
                 # no need to go through the fork code, we can do this directly
                 results = {}
-                for x in self.minions:
+                for x in minionurls:
                     (nkey,nvalue) = process_server(0, 0, x)
                     results[nkey] = nvalue    
         else:
             # globbing is not being used, but still need to make sure
             # URI is well formed.
 #            expanded = expand_servers(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)[0]
-            expanded_minions = Minions(self.server_spec, port=self.port, noglobs=True, verbose=self.verbose)
+            expanded_minions = Minions(spec, port=self.port, noglobs=True, verbose=self.verbose)
             minions = expanded_minions.get_urls()[0]
-            print minions
             results = process_server(0, 0, minions)
-
+        
+        if use_delegate:
+            return results[spec]
+        
         return results
 
    # -----------------------------------------------
@@ -359,6 +429,4 @@ class Overlord(object):
 class Client(Overlord):
     def __init__(self, *args, **kwargs):
         Overlord.__init__(self, *args, **kwargs)
-        # we can remove this if folks want -akl 
-        print "Client() class is deprecated, please use the Overlord() class."
-        
+        # provided for backward compatibility only 

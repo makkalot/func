@@ -25,6 +25,8 @@ class Service(func_module.FuncModule):
     description = "Allows for service control via func."
 
     def __command(self, service_name, command):
+	
+	service_name = service_name.strip() # remove useless spaces
 
         filename = os.path.join("/etc/rc.d/init.d/",service_name)
         if os.path.exists(filename):

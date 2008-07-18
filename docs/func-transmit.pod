@@ -1,0 +1,39 @@
+=head1 NAME
+
+Func-transmit -- cross-language func adapter
+
+=head1 SYNOPSIS
+
+func-transmit < yaml_in > yaml_out
+
+=head1 DESCRIPTION
+
+Func includes a powerful Python API for addressing the overlord via software.  When writing an app in a language other than Python, func-transmit can be used
+to operate the overlord and recieve structured results from it.
+
+This tool, func-transmit, is intended to be called using pipes, sending formatted data into stdin and recieving return codes via stdout.  It also can be invoked using the shell.
+
+=head1 FORMATS AND USAGE
+
+The input and output format is YAML 1.0.
+
+The data formats used by Func transmit are described in more detail (with
+examples) at https://fedorahosted.org/func/wiki/FuncTransmit
+
+=head1 EXIT_STATUS
+
+Generally func-transmit should always return 0 if loading is successful.  Return data is then expressed in the output stream, to be interpreted by a YAML module at the other end of the pipe.  Non-zero return codes indicate more serious setup problems.
+
+Func-transmit will exit after every command issued to the overlord, it does not await further input on the pipes.
+
+=head1 ADDITONAL RESOURCES
+
+See https://hosted.fedoraproject.org/projects/func/ for more information.
+
+See also the manpages for "func-inventory", "funcd", "certmaster", and "certmaster-ca".
+
+=head1 AUTHOR
+
+Various. See https://hosted.fedoraproject.org/projects/func
+
+

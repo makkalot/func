@@ -1,0 +1,81 @@
+#!/usr/bin/python
+
+##
+## func yaml wrapper tool.
+## allows usage of func over stdin/stdin using yaml as a marshalling format
+## for access to the Overlord() API from non-Python code.
+## this should typically be accessed via a pipe, though also works as
+##     func-transmit < yamlfile
+##
+## Copyright 2008, Various
+## Marco Mornati <mmornati@byte-code.com>
+## Michael DeHaan <mdehaan@redhat.com>
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##
+
+
+## Example input file format:
+"""
+clients: "*"
+aysnc: False
+nforks: 1
+module: command
+method: run
+parameters: "/bin/echo Hello World"
+"""
+
+import sys
+import distutils.sysconfig
+
+import func.yaml as yaml # FIXME: need to subpackage this as part of Func
+import func.overlord.func_command as func_command
+import func.overlord.client as fc
+
+# load input from stdin
+input = sys.stdin.read()
+params = yaml.load(input).next()
+
+# scan arguments
+
+clients    = params.get('clients', "*")
+method     = params.get('method','unknown')
+
+if method == "list_minions":
+    server_spec = "*"
+    minion_set = fc.Minions(server_spec)
+    servers = minion_set.get_all_hosts()
+    servers.sort()
+    results = servers
+ 
+else:
+    # scan more arguments
+    async      = params.get('async', False)
+    nforks     = params.get('nforks', 1)
+    module     = params.get('module','unknown')
+    parameters = params.get('parameters', None)
+
+    # make the call
+    client = fc.Overlord(clients, async=async, nforks=nforks)
+    module_handle = getattr(client, module)
+    method_handle = getattr(module_handle, method)
+    if parameters is not None:
+        results = method_handle(parameters)
+    else:
+        results = method_handle()
+
+# convert to YAML
+output = yaml.dump(results)
+
+# write to stdout
+print output
+
+
+
+
+

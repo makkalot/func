@@ -1,0 +1,11 @@
+#!/usr/bin/python
+
+import sys
+import distutils.sysconfig
+import func.overlord.find_resources as find_resources
+
+find_res = find_resources.FindResources()
+avail_host = find_res.run(sys.argv)
+
+if avail_host:
+    print "%s" % avail_host[0]

@@ -1,7 +1,22 @@
 #!/usr/bin/python
 
+##
+## Copyright 2007-2008, Red Hat Inc
+## Michael DeHaan <mdehaan@redhat.com>
+## Adrian Likins <alikins@redhat.com>
+## Seth Vidal <skvidal@redhat.com>
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
 import sys
 import distutils.sysconfig
+from func.CommonErrors import Func_Client_Exception
 
 # sys.path.append("%s/func" % distutils.sysconfig.get_python_lib())
 
@@ -9,6 +24,10 @@ import func.overlord.func_command as func_command
 
 myname, argv = sys.argv[0], sys.argv[1:]
 cli = func_command.FuncCommandLine()
-cli.parse(argv)
+try:
+    cli.parse(argv)
+except Func_Client_Exception, e:
+    print "ERROR:", e
+    sys.exit(1)
 
 

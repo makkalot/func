@@ -1,0 +1,6 @@
+clients: "*"
+aysnc: False
+nforks: 1
+module: system
+method: list_modules
+parameters: ~

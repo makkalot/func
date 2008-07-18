@@ -26,6 +26,7 @@ from func.overlord import client
 class CopyFile(base_command.BaseCommand):
     name = "copyfile"
     usage = "copy a file to a client"
+    summary = "copy a file to a minion"
 
 
     def addOptions(self):
@@ -42,6 +43,10 @@ class CopyFile(base_command.BaseCommand):
         self.verbose = self.options.verbose
 
     def do(self, args):
+        if not args:
+            self.outputUsage()
+            return
+        
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
         

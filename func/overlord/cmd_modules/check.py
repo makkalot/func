@@ -28,6 +28,7 @@ from certmaster.commonconfig import MinionConfig
 class CheckAction(base_command.BaseCommand):
     name = "check"
     usage = "check func for possible setup problems"
+    summary = usage
 
     def addOptions(self):
         self.parser.add_option("-c", "--certmaster", action="store_true", help="check the certmaster configuration on this box")

@@ -26,6 +26,7 @@ from func.overlord import client
 class Ping(base_command.BaseCommand):
     name = "ping"
     usage = "see what func minions are up/accessible"
+    summary = usage
 
     def addOptions(self):
         """
@@ -59,7 +60,6 @@ class Ping(base_command.BaseCommand):
                                            noglobs=True)
 
             results = overlord_obj.run("test", "ping", [])
-	    print "results", results, type(results)
             if results == 1:
                 print "[ ok ... ] %s" % server
             else:

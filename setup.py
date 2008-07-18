@@ -33,9 +33,9 @@ if __name__ == "__main__":
 		     "scripts/func", 
                      "scripts/func-inventory",
                      "scripts/func-create-module",
-		     # "scripts/update-func",
+		     "scripts/func-transmit",
+		     "scripts/func-build-map"
                 ],
-		# package_data = { '' : ['*.*'] },
                 package_dir = {"%s" % NAME: "%s" % NAME
                 },
 		packages = ["%s" % NAME,
@@ -44,6 +44,7 @@ if __name__ == "__main__":
 			    "%s/overlord/cmd_modules" % NAME,
                             "%s/overlord/modules" % NAME,
                             "%s/minion/modules" % NAME,
+                            "%s/yaml" % NAME,
                             # FIXME if there's a clean/easy way to recursively
                             # find modules then by all means do it, for now
                             # this will work.
@@ -53,9 +54,11 @@ if __name__ == "__main__":
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (etcpath,  ["etc/minion.conf"]),
+                              (etcpath,  ["etc/async_methods.conf"]),
                               (manpath,  ["docs/func.1.gz"]),
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
+                              (manpath,  ["docs/func-transmit.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
 			      (etcmodpath,  []),

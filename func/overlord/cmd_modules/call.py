@@ -16,15 +16,25 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import optparse
 import pprint
 import xmlrpclib
+import time
+import sys
 
 from func.overlord import client
 from func.overlord import base_command
+from func.config import read_config, BaseConfig, ListOption
+
+import func.jobthing as jobthing
 
 DEFAULT_FORKS = 1
+config_file = '/etc/func/async_methods.conf'
+
+class CallConfig(BaseConfig):
+    force_async = ListOption('')
 
 class Call(base_command.BaseCommand):
     name = "call"
     usage = "call module method name arg1 arg2..."
+    summary = "allows a specific module and method to be called"
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
                                action="store_true")
@@ -43,6 +53,21 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-f", "--forks", dest="forks",
                                help="how many parallel processes?  (default 1)",
                                default=DEFAULT_FORKS)
+        self.parser.add_option("-a", "--async", dest="async",
+                               help="Use async calls?  (default 0)",
+                               action="store_true")
+        self.parser.add_option("-n", "--nopoll", dest="nopoll",
+                               help="Don't wait for async results",
+                               action="store_true")
+        self.parser.add_option("", "--sort", dest="sort",
+                               help="In async mode, wait for all results and print them sorted.",
+                               action="store_true")
+        self.parser.add_option("-s", "--jobstatus", dest="jobstatus",
+                               help="Do not run any job, just check for status.",
+                               action="store_true")
+        self.parser.add_option('-d', '--delegate', dest="delegate",
+                               help="use delegation to make function call",
+                               action="store_true")
 
     def handleOptions(self, options):
         self.options = options
@@ -89,6 +114,11 @@ class Call(base_command.BaseCommand):
 
         # I kind of feel like we shouldn't be parsing args here, but I'm
         # not sure what the write place is -al;
+
+        if not args:
+            self.outputUsage()
+            return
+        
         self.module           = args[0]
         if len(args) > 1:
             self.method       = args[1]
@@ -105,21 +135,62 @@ class Call(base_command.BaseCommand):
         # or some sort of shared datastruct?
         #        self.getOverlord()
 
+        call_config = read_config(config_file, CallConfig)
+        if self.method and (self.module+"."+self.method in call_config.force_async):
+            self.options.async=True
 
         self.interactive = False
+        self.async = self.options.async
+        self.forks = self.options.forks
+        self.delegate = self.options.delegate
         
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
-        
 
-        results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        if not self.options.jobstatus:
+            results = self.overlord_obj.run(self.module, self.method, self.method_args)
+        else:
+            (return_code, async_results) = self.overlord_obj.job_status(self.module)
+            res = self.format_return((return_code, async_results))
+            print res
+            return async_results
 
-        # TO DO: add multiplexer support
-        # probably as a higher level module.
+        if self.options.async:
+            partial = {}
+            if self.options.nopoll:
+                print "JOB_ID:", pprint.pformat(results)
+                return results
+            else:
+                async_done = False
+                while not async_done:
+                    (return_code, async_results) = self.overlord_obj.job_status(results)
+                    if return_code == jobthing.JOB_ID_RUNNING:
+                        time.sleep(0.1)
+                    elif return_code == jobthing.JOB_ID_FINISHED:
+                        async_done = True
+                        partial = self.print_partial_results(partial, async_results, self.options.sort)
+                        return partial
+                    elif return_code == jobthing.JOB_ID_PARTIAL:
+                        if not self.options.sort:
+                            partial = self.print_partial_results(partial, async_results)
+                    else:
+                        sys.stderr.write("Async error")
+                        return 0
 
         # dump the return code stuff atm till we figure out the right place for it
         foo =  self.format_return(results)
         print foo
 
         # nothing really makes use of this atm -akl
-        return foo
+        return results
+
+    def print_partial_results(self, old, new, sort=0):
+        diff = dict([(k, v) for k, v in new.iteritems() if k not in old])
+        if len(diff) > 0:
+            iter=diff.iteritems()
+            if sort:
+                iter=sorted(iter)
+            for res in iter:
+                print self.format_return(res)
+            return new
+        return old

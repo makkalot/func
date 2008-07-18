@@ -18,17 +18,19 @@ import os
 import random # for testing only
 import time   # for testing only
 import shelve
-import bsddb
+import dbm
 import sys
 import fcntl
 import forkbomb
 import utils
+import pprint
+from func.CommonErrors import *
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
 JOB_ID_LOST_IN_SPACE = 2
-JOB_ID_ASYNC_PARTIAL = 3
-JOB_ID_ASYNC_FINISHED = 4
+JOB_ID_PARTIAL = 3
+JOB_ID_REMOTE_ERROR = 4
 
 # how long to retain old job records in the job id database
 RETAIN_INTERVAL = 60 * 60    
@@ -55,22 +57,46 @@ def __purge_old_jobs(storage):
     nowtime = time.time()
     for x in storage.keys():
         # minion jobs have "-minion" in the job id so disambiguation so we need to remove that
-        jobkey = x.replace("-","").replace("minion","")
+        jobkey = x.strip().split('-')[3]
         create_time = float(jobkey)
         if nowtime - create_time > RETAIN_INTERVAL:
             del storage[x]
 
-def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purge=False):
+def get_open_ids():
+    return __access_status(write=False,get_all=True)
+
+def __get_open_ids(storage):
+    """
+    That method is needes from other language/API/UI/GUI parts that uses 
+    func's async methods to know the status of the results.
+    """
+    result_hash_pack = {}
+    #print storage
+    for job_id,result in storage.iteritems():
+        result_hash_pack[job_id]=result[0]
+
+    return result_hash_pack
+
+        
+
+def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purge=False,get_all=False):
 
     dir = os.path.expanduser(CACHE_DIR)
     if not os.path.exists(dir):
-        os.makedirs(dir)
+        try:
+            os.makedirs(dir)
+        except IOError:
+            raise Func_Client_Exception, 'Cannot create directory for status files. '+\
+                  'Ensure you have permission to create %s directory' % dir
     filename = os.path.join(dir,"status-%s" % os.getuid()) 
 
-    internal_db = bsddb.btopen(filename, 'c', 0644 )
-    handle = open(filename,"r")
+    try:
+        handle = open(filename,"w")
+    except IOError, e:
+        raise Func_Client_Exception, 'Cannot create status file. Ensure you have permission to write in %s directory' % dir
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-    storage = shelve.BsdDbShelf(internal_db)
+    internal_db = dbm.open(filename, 'c', 0644 )
+    storage = shelve.Shelf(internal_db)
 
 
     if clear:
@@ -85,6 +111,8 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
     if write:
         storage[str(jobid)] = (status, results)
         rc = jobid
+    elif get_all:
+        rc=__get_open_ids(storage)
     elif not purge:
         if storage.has_key(str(jobid)):
             # tuple of (status, results)
@@ -100,7 +128,7 @@ def __access_status(jobid=0, status=0, results=0, clear=False, write=False, purg
 
     return rc
 
-def batch_run(server, process_server, nforks):
+def batch_run(pool, callback, nforks,**extra_args):
     """
     This is the method used by the overlord side usage of jobthing.
     Minion side usage will use minion_async_run instead.
@@ -110,18 +138,17 @@ def batch_run(server, process_server, nforks):
     operation will be created in cachedir and subsequently deleted.    
     """
    
-    job_id = time.time()
+    job_id = "".join([extra_args['spec'],"-",extra_args['module'],"-",extra_args['method'],"-",pprint.pformat(time.time())])
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
         return job_id
     else:
         # kick off the job
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
-        results = forkbomb.batch_run(server, process_server, nforks)
+        results = forkbomb.batch_run(pool, callback, nforks)
         
         # we now have a list of job id's for each minion, kill the task
-        __update_status(job_id, JOB_ID_ASYNC_PARTIAL, results)
+        __update_status(job_id, JOB_ID_PARTIAL, results)
         sys.exit(0)
 
 def minion_async_run(retriever, method, args):
@@ -132,13 +159,20 @@ def minion_async_run(retriever, method, args):
     # minion jobs contain the string "minion".  
 
 
-    job_id = "%s-minion" % time.time()
+    job_id = "%s-minion" % pprint.pformat(time.time())
+    __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
     if pid != 0:
-        __update_status(job_id, JOB_ID_RUNNING, -1)
+        os.waitpid(pid, 0)
         return job_id
     else:
-        __update_status(job_id, JOB_ID_RUNNING,  -1)
+        # daemonize!
+        os.umask(077)
+        os.chdir('/')
+        os.setsid()
+        if os.fork():
+            os._exit(0)
+
         try:
             function_ref = retriever(method)
             rc = function_ref(*args)
@@ -147,7 +181,7 @@ def minion_async_run(retriever, method, args):
             rc = utils.nice_exception(t,v,tb)
 
         __update_status(job_id, JOB_ID_FINISHED, rc)
-        sys.exit(0)
+        os._exit(0)
 
 def job_status(jobid, client_class=None):
  
@@ -158,13 +192,13 @@ def job_status(jobid, client_class=None):
    
     got_status = __get_status(jobid)
 
-    # if the status comes back as JOB_ID_ASYNC_PARTIAL what we have is actually a hash
+    # if the status comes back as JOB_ID_PARTIAL what we have is actually a hash
     # of hostname/minion-jobid pairs.  Instantiate a client handle for each and poll them
     # for their actual status, filling in only the ones that are actually done.
 
     (interim_rc, interim_results) = got_status
 
-    if interim_rc == JOB_ID_ASYNC_PARTIAL:
+    if interim_rc == JOB_ID_PARTIAL:
 
         partial_results = {}
 
@@ -176,10 +210,14 @@ def job_status(jobid, client_class=None):
             client = client_class(host, noglobs=True, async=False)
             minion_result = client.jobs.job_status(minion_job)
 
-            (minion_interim_rc, minion_interim_result) = minion_result
+            if type(minion_result) != list or len(minion_result)!=2:
+                minion_interim_rc = JOB_ID_REMOTE_ERROR
+                minion_interim_result = minion_result[:3]
+            else:
+                (minion_interim_rc, minion_interim_result) = minion_result
 
-            if minion_interim_rc not in [ JOB_ID_RUNNING ]:
-                if minion_interim_rc in [ JOB_ID_LOST_IN_SPACE ]:
+            if minion_interim_rc != JOB_ID_RUNNING :
+                if minion_interim_rc == JOB_ID_LOST_IN_SPACE:
                     partial_results[host] = [ utils.REMOTE_ERROR, "lost job" ]
                 else:
                     partial_results[host] = minion_interim_result
@@ -187,9 +225,12 @@ def job_status(jobid, client_class=None):
                 some_missing = True
 
         if some_missing:
-            return (JOB_ID_ASYNC_PARTIAL, partial_results)
+            __update_status(jobid, JOB_ID_PARTIAL, partial_results)
+            return (JOB_ID_PARTIAL, partial_results)
+
         else:
-            return (JOB_ID_ASYNC_FINISHED, partial_results)
+            __update_status(jobid,JOB_ID_FINISHED, partial_results)
+            return (JOB_ID_FINISHED, partial_results)
 
     else:
         return got_status

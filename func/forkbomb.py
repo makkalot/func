@@ -16,7 +16,7 @@ import os
 import random # for testing only
 import time   # for testing only
 import shelve
-import bsddb
+import dbm
 import sys
 import tempfile
 import fcntl
@@ -39,10 +39,10 @@ def __access_buckets(filename,clear,new_key=None,new_value=None):
     modifying it as required.
     """
 
-    internal_db = bsddb.btopen(filename, 'c', 0644 )
-    handle = open(filename,"r")
+    handle = open(filename,"w")
     fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
-    storage = shelve.BsdDbShelf(internal_db)
+    internal_db = dbm.open(filename, 'c', 0644 )
+    storage = shelve.Shelf(internal_db)
 
     if clear:
         storage.clear()
@@ -75,8 +75,8 @@ def __bucketize(pool, slots):
     buckets = {}
     count = 0
     for key in pool:
-        count = count + 1
         slot = count % slots
+        count = count + 1
         if not buckets.has_key(slot):
             buckets[slot] = [] 
         buckets[slot].append(key)
@@ -130,15 +130,22 @@ def batch_run(pool,callback,nforks=DEFAULT_FORKS,cachedir=DEFAULT_CACHE_DIR):
     the workload over nfork forks.  Temporary files used during the
     operation will be created in cachedir and subsequently deleted.    
     """
-    if nforks <= 1:
+    if nforks < 1:
        # modulus voodoo gets crazy otherwise and bad things happen
-       nforks = 2
+       nforks = 1
     shelf_file = __get_storage(cachedir)
     __access_buckets(shelf_file,True,None)
     buckets = __bucketize(pool, nforks)
-    __forkbomb(1,buckets,callback,shelf_file)
+    __forkbomb(0,buckets,callback,shelf_file)
     rc = __access_buckets(shelf_file,False,None)
-    os.remove(shelf_file)
+
+    try: #it's only cleanup so don't care if the files disapeared
+        os.remove(shelf_file)
+        os.remove(shelf_file+".pag")
+        os.remove(shelf_file+".dir")
+    except OSError:
+        pass
+
     return rc
 
 def __test(nforks=4,sample_size=20):

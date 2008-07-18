@@ -184,7 +184,25 @@ class Virt(func_module.FuncModule):
                 pass
         return results
 
-    def install(self, server_name, target_name, system=False):
+    def freemem(self):
+        self.conn = self.__get_conn()
+        # Start with the physical memory and subtract
+        memory = self.conn.nodeinfo()[1]
+
+        # Take 256M off which is reserved for Domain-0
+        memory = memory - 256
+
+        vms = self.conn.find_vm(-1)
+        for vm in vms:
+            # Exclude stopped vms and Domain-0 by using
+            # ids greater than 0
+            if vm.ID() > 0:
+                # This node is active - remove its memory (in bytes)
+                memory = memory - int(vm.info()[2])/1024
+
+        return memory
+
+    def install(self, server_name, target_name, system=False, virt_name=None, virt_path=None, graphics=False):
 
         """
         Install a new virt system by way of a named cobbler profile.
@@ -192,6 +210,7 @@ class Virt(func_module.FuncModule):
 
         # Example:
         # install("bootserver.example.org", "fc7webserver", True)
+        # install("bootserver.example.org", "client.example.org", True, "client-disk0", "HostVolGroup00")
 
         conn = self.__get_conn()
 
@@ -204,16 +223,23 @@ class Virt(func_module.FuncModule):
         if system:
             target = "system"
 
-        # TODO: FUTURE: set --virt-path in cobbler or here
         koan_args = [
             "/usr/bin/koan",
             "--virt",
-            "--virt-graphics",  # enable VNC
             "--%s=%s" % (target, target_name),
             "--server=%s" % server_name
         ]
 
-        rc = sub_process.call(koan_args,shell=False)
+        if virt_name:
+            koan_args.append("--virt-name=%s" % virt_name)
+
+        if virt_path:
+            koan_args.append("--virt-path=%s" % virt_path)
+
+        if not graphics:
+            koan_args.append("--nogfx")
+
+        rc = sub_process.call(koan_args,shell=False,close_fds=True)
         if rc == 0:
             return 0
         else:

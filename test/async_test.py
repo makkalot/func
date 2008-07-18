@@ -44,12 +44,12 @@ def __tester(async,test):
                return
            if code == jobthing.JOB_ID_RUNNING:  
                print "task is still running, %s elapsed ..." % delta
-           elif code == jobthing.JOB_ID_ASYNC_PARTIAL:
+           elif code == jobthing.JOB_ID_PARTIAL:
                print "task reports partial status, %s elapsed, results = %s" % (delta, results)
            elif code == jobthing.JOB_ID_FINISHED:
                print "(non-async) task complete, %s elapsed, results = %s" % (delta, results)
                return
-           elif code == jobthing.JOB_ID_ASYNC_FINISHED:
+           elif code == jobthing.JOB_ID_FINISHED:
                print "(async) task complete, %s elapsed, results = %s" % (delta, results)
                return
            else:

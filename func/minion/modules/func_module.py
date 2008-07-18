@@ -13,7 +13,7 @@
 import inspect
 
 from func import logger
-from func.config import read_config
+from func.config import read_config, BaseConfig
 from func.commonconfig import FuncdConfig
 from func.minion.func_arg import * #the arg getter stuff
 
@@ -23,6 +23,9 @@ class FuncModule(object):
     version = "0.0.0"
     api_version = "0.0.0"
     description = "No Description provided"
+
+    class Config(BaseConfig):
+        pass
 
     def __init__(self):
 
@@ -37,10 +40,16 @@ class FuncModule(object):
             "list_methods"       : self.__list_methods,
             "get_method_args"    : self.__get_method_args,
         }
+        self.__init_options()
 
     def __init_log(self):
         log = logger.Logger()
         self.logger = log.logger
+
+    def __init_options(self):
+        options_file = '/etc/func/modules/'+self.__class__.__name__+'.conf'
+        self.options = read_config(options_file, self.Config)
+        return
 
     def register_rpc(self, handlers, module_name):
         # add the internal methods, note that this means they
