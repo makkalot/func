@@ -200,6 +200,15 @@ class Virt(func_module.FuncModule):
 		"/etc/xen/auto"
 	    ]
         else:
+            # When using KVM, we need to make sure the autostart
+            # directory exists
+	    mkdir_args = [
+		"/bin/mkdir",
+		"-p",
+		"/etc/libvirt/qemu/autostart"
+	    ]
+            sub_process.call(mkdir_args,shell=False,close_fds=True)
+
             # We aren't using virsh autostart because we want
             # the command to work even when the VM isn't running
 	    autostart_args = [
