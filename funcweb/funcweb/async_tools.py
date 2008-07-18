@@ -38,15 +38,20 @@ class AsyncResultManager(object):
             if self.__current_list.has_key(job_id):
                 #the code is same no change occured
                 if self.__current_list[job_id][0] == code:
+                    #print "I have that code %s no change will be reported"%job_id
                     self.__current_list[job_id][1] = self.JOB_CODE_SAME
                 else:
                     #we have change i db 
-                    self.__current_list[job_id][0]=code
-                    self.__current_list[job_id][1]=self.JOB_CODE_CHANGED
-                    changed.append(job_id)
+                    #print "That is a change from %d to %d for %s"%(self.__current_list[job_id][0],code,job_id)
+                    self.__current_list[job_id]=[code,self.JOB_CODE_CHANGED]
+                    if check_for_change:
+                        changed.append(job_id)
             else:
                 # a new code was added
-                self.__current_list[job_id] = [code,self.JOB_CODE_NEW] 
+                #print "A new code was added %s"%job_id
+                self.__current_list[job_id] = [code,self.JOB_CODE_NEW]
+                if check_for_change:
+                    changed.append(job_id)
 
         #if true the db was updated and ours is outofdate
         if len(self.__current_list.keys()) != len(tmp_ids.keys()):
@@ -82,17 +87,19 @@ class AsyncResultManager(object):
             if code == JOB_ID_RUNNING or code == JOB_ID_PARTIAL:
                 #that operation updates the db at the same time
                 try :
-                    self.fc.job_status(job_id)
-                    should_check_change = True
+                    #print "The status from %s is %s in check_for_changes"%(job_id,self.fc.job_status(job_id)[0])
+                    tmp_code = self.fc.job_status(job_id)[0]
+                    #should_check_change = True
                 except Exception,e:
                     print "Some exception in pulling the job_id_status",e
                     continue
+            #else:
+            #    print "The job_id is not checked remotely :%s in check_for_changes and the code is %s"%(job_id,code)
 
         #if you thing there is sth to check interesting send it
-        if should_check_change:
-            return self.__get_current_list(check_for_change=True)
+        #if should_check_change:
+        return self.__get_current_list(check_for_change=True)
 
-        return None
             
     
     def select_from(self,pull_property):
@@ -155,6 +162,10 @@ class AsyncResultManager(object):
         if not self.__current_list:
             self.__get_current_list()
         return self.__current_list
+
+    def reset_current_list(self):
+        "Reset the list may need it sometimes :)"
+        self.__current_list = {}
 
   
 if __name__ == "__main__":
