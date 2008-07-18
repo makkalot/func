@@ -127,7 +127,7 @@ class ListMinion(object):
     def test_list_minions_no_match(self):
         out = self.call({'clients': 'somerandom-name-that-shouldnt-be-a_real_host_name',
                          'method': 'list_minions'})
-        assert out['list_minions'] == []
+        assert out == []
 
     def test_list_minions_group_name(self):
         out = self.call({'clients': '@test',
