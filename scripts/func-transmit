@@ -94,8 +94,7 @@ if method == "list_minions":
         raise NoAsyncForListMinionException("list_minions method can not be run in async")
     minion_set = fc.Minions(clients)
     servers = minion_set.get_all_hosts()
-    # for marco ;-> -akl
-    results =  {'list_minions': servers}
+    results = servers
     
 else:
     # scan more arguments
