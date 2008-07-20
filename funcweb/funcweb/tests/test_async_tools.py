@@ -18,11 +18,8 @@ class AsyncResultManagerTest(object):
         
 
     def check_for_changes_test(self):
-        
-        #first reset the database to see what is there
-        self.remove_db()
-        #all of them are new now
-        self.async_manager.reset_current_list()
+        print "***** Testing check_for_changes *****" 
+        self.reset_stuff()
         #now make a new entry into database to have a only one 
         #new entry in the db ...
         #running a new command which is a short one
@@ -72,9 +69,71 @@ class AsyncResultManagerTest(object):
         
         
     def select_from_test(self):
-        pass
+        print "****Testing select_from**** "
+        #these tests are a little bit tricky so may not have 
+        #the exact results all depends on remote machines :)
+        self.reset_stuff()
+        new_fc = Overlord("*",async=True)
+        #new_job_id=new_fc.test.add(1,2)
+        new_job_id = new_fc.test.sleep(6)
+        
         #insert one running
+        #now we have one entry into async_manager 
+        result_ids = new_fc.open_job_ids()
+        self.async_manager.refresh_list() 
+        if result_ids.has_key(new_job_id) and result_ids[new_job_id] == JOB_ID_RUNNING:
+            print "Testing for SELECT RUNNING ..."
+            select_list = self.async_manager.select_from('RUNNING')
+            #print "Result form selct RUNNING :",select_list
+            assert len(select_list) == 1
+            assert select_list[0].has_key(new_job_id)
+            assert select_list[0][new_job_id][0] == JOB_ID_RUNNING
+        
+        #pull_property_options = ('FINISHED','ERROR','NEW','CHANGED','RUNNING','PARTIAL')
         #insert one that finishes
+        #get one NEW
+        print "Testing for SELECT NEW ..."
+        select_list = self.async_manager.select_from('NEW')
+        #print "The select list is :",select_list
+        assert len(select_list) == 1
+        assert select_list[0].has_key(new_job_id)
+        assert select_list[0][new_job_id][1] == self.async_manager.JOB_CODE_NEW
+        
+        #test the ones that are changed :)
+        another_test = False
+        current_job_status = new_fc.job_status(new_job_id)[0] 
+        while current_job_status != JOB_ID_FINISHED:
+            print "Waiting for sleep command to finish "
+            time.sleep(1)
+            another_test = True
+            
+            #test also for partial resultst status
+            if current_job_status == JOB_ID_PARTIAL:
+                #populate the list
+                print "Testing for SELECT PARTIAL ..."
+                self.async_manager.refresh_list()
+                select_list = self.async_manager.select_from('PARTIAL')
+                assert select_list[0].has_key(new_job_id)
+                assert select_list[0][new_job_id][0] == JOB_ID_PARTIAL
+                
+            current_job_status = new_fc.job_status(new_job_id)[0] 
+                
+        
+        if another_test:
+        
+            print "Testing for SELECT CHANGED ..."
+            self.async_manager.refresh_list()
+            select_list = self.async_manager.select_from('CHANGED')
+            #print "current Select list is :",select_list
+            assert len(select_list) == 1
+            assert select_list[0].has_key(new_job_id)
+            assert select_list[0][new_job_id][1] == self.async_manager.JOB_CODE_CHANGED
+       
+            print "Testing for SELECT FINISHED ..."
+            assert select_list[0][new_job_id][0] == JOB_ID_FINISHED
+
+        #didnt test for ERROR and others they are not present in overlord :)
+
         #insert one raises error
         #insert one another
 
@@ -92,6 +151,13 @@ class AsyncResultManagerTest(object):
         real_result =self.async_manager.current_db()
         #print real_result
         assert manual_list ==real_result 
+    
+    def reset_stuff(self):
+        #first reset the database to see what is there
+        self.remove_db()
+        #all of them are new now
+        self.async_manager.reset_current_list()
+       
 
     def remove_db(self):
         import os
@@ -107,4 +173,4 @@ tester = AsyncResultManagerTest()
 tester.setUp()
 #tester.current_db_test()
 tester.check_for_changes_test()
-
+tester.select_from_test()
