@@ -43,7 +43,7 @@ class CopyFile(base_command.BaseCommand):
         self.verbose = self.options.verbose
 
     def do(self, args):
-        if not args:
+        if not self.options.filename or not self.options.remotepath:
             self.outputUsage()
             return
         
