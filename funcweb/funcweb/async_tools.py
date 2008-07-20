@@ -111,10 +111,10 @@ class AsyncResultManager(object):
         status = None
         #get the list of the finished jobs
         if pull_property == self.pull_property_options[0]:
-            code = (JOB_ID_FINISHED,)
+            code = JOB_ID_FINISHED
         #get the jobs that caused error
         elif pull_property == self.pull_property_options[1]:
-            code = (JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR)
+            code = JOB_ID_REMOTE_ERROR
         #get the jobs which are new
         elif pull_property == self.pull_property_options[2]:
             status = self.JOB_CODE_NEW
@@ -132,12 +132,18 @@ class AsyncResultManager(object):
             return None
         #now pull the list and return it back 
         final_list = []
-
+        #print "The current list in the selct is :",self.__current_list
         for job_id,code_status_pack in self.__current_list.iteritems():
-            if code and code == code_status_pack[0]:
-                final_list.append(dict(job_id=code_status_pack))
-            elif status and code_status_pack[1] == status:
-                final_list.append(dict(job_id=code_status_pack))
+            if code != None and code == code_status_pack[0]:
+                tmp_hash = {}
+                tmp_hash[job_id]=code_status_pack
+            
+                #print "To select %s with code %s"%(job_id,code)
+                final_list.append(tmp_hash)
+            elif status != None  and code_status_pack[1] == status:
+                tmp_hash = {}
+                tmp_hash[job_id]=code_status_pack
+                final_list.append(tmp_hash)
         
         #get the final list here
         return final_list
@@ -166,6 +172,13 @@ class AsyncResultManager(object):
     def reset_current_list(self):
         "Reset the list may need it sometimes :)"
         self.__current_list = {}
+
+
+    def refresh_list(self):
+        """
+        Simple one to checkout to prepopulate the current memory list
+        """
+        self.__get_current_list()
 
   
 if __name__ == "__main__":
