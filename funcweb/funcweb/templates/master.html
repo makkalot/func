@@ -20,7 +20,8 @@
   
   <link media="screen" href="/funcweb/static/css/expanding_form.css" type="text/css" rel="stylesheet"/>
   <script src="${tg.url('/funcweb/static/javascript/expanding_form.js')}" type="text/javascript"/>
-  
+  <script src="${tg.url('/funcweb/static/javascript/async_tools.js')}" type="text/javascript"/>
+      
   <script type="text/javascript">
     jQuery._$ = MochiKit.DOM.getElement;
     var myj = jQuery.noConflict();
@@ -47,7 +48,7 @@
         </div>
                     
         <div class="globalerrorbig" id="globalerrorbig">
-              <div class="globalerror" id="globalerror" py:if="value_of('tg_flash', None)" py:content="tg_flash"></div>
+              <div class="globalerror" id="globalerror"></div>
         </div>
         <div py:replace="select('*|text()')" />
  
