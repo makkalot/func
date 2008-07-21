@@ -5,6 +5,7 @@ from turbogears import controllers, expose, flash, identity, redirect, error_han
 from func.overlord.client import Overlord, Minions
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
 from funcweb.widget_validation import WidgetSchemaFactory
+from funcweb.async_tools import AsyncResultManager
 
 # it is assigned into method_display on every request 
 global_form = None 
@@ -31,6 +32,7 @@ class Funcweb(object):
     #func = Overlord("name") thing
     func_cache={          
                 'fc_object':None,#the fc = Overlord() thing,
+                'fc_async_obj':None,
                 'glob':None,
                 'minion_name':None,
                 'module_name':None,
@@ -38,6 +40,7 @@ class Funcweb(object):
                 'minions':None,
                 'methods':None
             }
+    async_manager = None
     #will be reused for widget validation
 
     @expose(allow_json=True)
@@ -287,10 +290,10 @@ class Funcweb(object):
             #if not (actually there shouldnt be an option like that but who knows :))
             #it will run as a normal single command to clicked minion
             if self.func_cache['glob']:
-                fc = None
-                fc = Overlord(self.func_cache['glob'])
+                fc_async = Overlord(self.func_cache['glob'],async=True)
             
-            result = getattr(getattr(fc,module),method)(*cmd_args)
+            result_id = getattr(getattr(fc_async,module),method)(*cmd_args)
+            result = "".join(["The id for current job is :",str(result_id)," You will be notified when there is some change about that command !"])
             return str(result)
 
         else:
@@ -305,21 +308,44 @@ class Funcweb(object):
         by pressing only the link !
         """
         if self.func_cache['glob']:
-            fc = Overlord(self.func_cache['glob'])
+            fc = Overlord(self.func_cache['glob'],async = True)
         else:
             if self.func_cache['minion_name'] == minion:
-                fc = self.func_cache['fc_object']
+                fc = self.func_cache['fc_async_obj']
             else:
-                fc = Overlord(minion)
-                self.func_cache['fc_object']=fc
+                fc = Overlord(minion,async = True)
+                self.func_cache['fc_async_obj']=fc
                 self.func_cache['minion_name']=minion
                 #reset the children :)
                 self.func_cache['module_name']=module
                 self.func_cache['modules']=None
                 self.func_cache['methods']=None
 
-        result = getattr(getattr(fc,module),method)()
+        result_id = getattr(getattr(fc,module),method)()
+        result = "".join(["The id for current id is :",str(result_id)," You will be notified when there is some change about that command !"])
         return dict(result=str(result))
+
+    @expose(format = "json")
+    def check_async(self,check_change = False):
+        """
+        That method is polled by js code to see if there is some
+        interesting change in current db
+        """
+        changed = False
+
+        if not check_change :
+            msg = "Method invoked with False parameter which makes it useless"
+            return dict(changed = False,changes = [],remote_error=msg)
+        
+        if not self.async_manager:
+            self.async_manager = AsyncResultManager()
+        changes = self.async_manager.check_for_changes()
+        if changes:
+            changed = True
+        
+        
+        return dict(changed = changed,changes = changes)
+
 
     @expose()
     def logout(self):
