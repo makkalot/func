@@ -6,6 +6,18 @@
   <head/>
   <body onLoad = "window.setTimeout('check_async_change()',10000);">
        
+     <div class="minionglob" id="minionglob">
+            <form action="/funcweb/minions" method="post" onsubmit="return !remoteFormRequest(this, 'minioncontent', {&quot;loading&quot;: null, &quot;confirm&quot;: null, &quot;after&quot;: null, &quot;on_complete&quot;: null, &quot;loaded&quot;: null, &quot;on_failure&quot;: null, &quot;on_success&quot;: null, &quot;before&quot;:&quot;myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();&quot;});" class="tableform" name="minion_form">
+
+                <div class="graytexts2" id="minionglobtext">
+                    <div align="center">Minion Glob</div>
+                </div>
+                <input name="submit" type="submit" class="minionbutton" id="button" value="submit" border="0"/>
+                <input name="glob" type="text" class="minionbox" id="textfield" />
+            </form>
+        </div>
+    
+
         <div class="emptyimagebox" id="emptyimagebox"></div>
         <div class="minioncontent" id="minioncontent">
             <div class="minionsbigbox" id="minionsbigbox" py:if="minions">

@@ -33,20 +33,16 @@
     
     <div class="header" id="header"></div>
     <div class="underheader" id="underheader"></div>
-    
+    <div id="menudiv">
+        <div class="navgation" id="navigaton">
+            <span class="lines">|</span><a href="#" class="navlinks">Home</a><span class="lines">|</span><a href="#" class="navlinks">Tabble Results</a><span class="lines">|</span>
+        </div>
+    </div>
+
+
     <div class="container" id="container">
         
-        <div class="minionglob" id="minionglob">
-            <form action="/funcweb/minions" method="post" onsubmit="return !remoteFormRequest(this, 'minioncontent', {&quot;loading&quot;: null, &quot;confirm&quot;: null, &quot;after&quot;: null, &quot;on_complete&quot;: null, &quot;loaded&quot;: null, &quot;on_failure&quot;: null, &quot;on_success&quot;: null, &quot;before&quot;:&quot;myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();&quot;});" class="tableform" name="minion_form">
-
-                <div class="graytexts2" id="minionglobtext">
-                    <div align="center">Minion Glob</div>
-                </div>
-                <input name="submit" type="submit" class="minionbutton" id="button" value="submit" border="0"/>
-                <input name="glob" type="text" class="minionbox" id="textfield" />
-            </form>
-        </div>
-                    
+                   
         <div class="globalerrorbig" id="globalerrorbig">
               <div class="globalerror" id="globalerror"></div>
         </div>
