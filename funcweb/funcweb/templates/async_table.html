@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="master.html"/>
+  <head/>
+  <body onLoad = "window.setTimeout('check_async_change()',10000);">
+
+    <div class="minioncontent" id="tablecontent"> 
+        <div id="tablebigbox">
+        <div class="graytexts" id="tablename">
+            <div align="center">Async Call Result Table</div>
+        </div>
+        <div class="tablebox" id="tablebox">
+            <table width="900"  align="center" cellpadding="1" cellspacing="3" bordercolor="#DDDDDD" bgcolor="#F1F5F6">
+            <tr>
+                <td width="180" class="tableboxes"><div align="center" class="graytexts">Glob</div></td>
+                <td width="180" class="tableboxes"><div align="center" class="graytexts">Module</div></td>
+                <td width="180" class="tableboxes"><div align="center" class="graytexts">Method</div></td>
+                <td width="180" class="tableboxes"><div align="center" class="graytexts">Job id</div></td>
+                <td width="180" class="tableboxes"><div align="center" class="graytexts">Job status</div></td>
+            </tr>
+            <tr py:for="job_id,job_pack in func_db.iteritems()">
+                <td class="tableboxes"><p class="intabletext">${job_pack[2]}</p></td>
+                <td class="tableboxes"><p class="intabletext">${job_pack[3]}</p></td>
+                <td class="tableboxes"><p class="intabletext">${job_pack[4]}</p></td>
+                <td class="tableboxes"><p class="intabletext">${job_id}</p></td>
+                <td class="tableboxes"><div class="newico" id="newico"></div>${job_pack[0]}</td>
+            </tr>
+            </table>
+        </div>
+        </div>
+    </div>
+        
+        
+    <div class="minioncontent" id="resultcontent"></div>
+    <a name="resultcontent"/>
+  
+</body>
+</html>
