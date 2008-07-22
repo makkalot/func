@@ -6,6 +6,7 @@ from func.overlord.client import Overlord, Minions
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
 from funcweb.widget_validation import WidgetSchemaFactory
 from funcweb.async_tools import AsyncResultManager
+from func.jobthing import purge_old_jobs,JOB_ID_RUNNING,JOB_ID_FINISHED,JOB_ID_PARTIAL
 
 # it is assigned into method_display on every request 
 global_form = None 
@@ -326,6 +327,7 @@ class Funcweb(object):
         return dict(result=str(result))
 
     @expose(format = "json")
+    @identity.require(identity.not_anonymous())
     def check_async(self,check_change = False):
         """
         That method is polled by js code to see if there is some
@@ -338,6 +340,8 @@ class Funcweb(object):
             return dict(changed = False,changes = [],remote_error=msg)
         
         if not self.async_manager:
+            #cleanup tha database firstly 
+            purge_old_jobs()
             self.async_manager = AsyncResultManager()
         changes = self.async_manager.check_for_changes()
         if changes:
@@ -346,6 +350,67 @@ class Funcweb(object):
         
         return dict(changed = changed,changes = changes)
 
+    
+    @expose(template="funcweb.templates.result")
+    @identity.require(identity.not_anonymous())
+    def check_job_status(self,job_id):
+        """
+        Checking the job status for specific job_id
+        that method will be useful to see the results from
+        async_results table ...
+        """
+        if not job_id:
+            return dict(result = "job id shouldn be empty!")
+
+        if not self.func_cache['fc_async_obj']:
+            if self.func_cache['glob']:
+                fc_async = Overlord(self.func_cache['glob'],async=True)
+                #store also into the cache
+            else:
+                fc_async = Overlord("*",async=True)
+            
+            self.func_cache['fc_async_obj'] = fc_async
+
+        else:
+            fc_async = self.func_cache['fc_async_obj']
+
+        id_result = fc_async.job_status(job_id)
+
+        #the final id_result
+        return dict(result=id_result)
+
+    @expose(template="funcweb.templates.async_table")
+    @identity.require(identity.not_anonymous())
+    def display_async_results(self):
+        """
+        Displaying the current db results that are in the memory
+        """
+        if not self.async_manager:
+            #here should run the clean_old ids
+            print "I dont have another copy ?"
+            purge_old_jobs()
+            self.async_manager = AsyncResultManager()
+        else:
+            #make a refresh of the memory copy
+            self.async_manager.refresh_list()
+        #get the actual db    
+        func_db = self.async_manager.current_db()
+        
+        for job_id,code_status_pack in func_db.iteritems():
+            parsed_job_id = job_id.split("-")
+            if func_db[job_id][0] == JOB_ID_RUNNING:
+                func_db[job_id][0] = "RUNNING"
+            elif func_db[job_id][0] == JOB_ID_FINISHED:
+                func_db[job_id][0] = "FINISHED"
+            elif func_db[job_id][0] == JOB_ID_PARTIAL:
+                func_db[job_id][0] = "PARTIAL"
+            else:
+                func_db[job_id][0] = "ERROR"
+
+            func_db[job_id].extend(parsed_job_id)
+
+        #print func_db
+        return dict(func_db = func_db)
 
     @expose()
     def logout(self):
