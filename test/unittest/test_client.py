@@ -383,6 +383,24 @@ class TestYum(BaseTest):
         result = self.overlord.yumcmd.check_update()
         self.assert_on_fault(result)
 
+    def test_check_update_empty_filter(self):
+        results = self.overlord.yumcmd.check_update([])
+        self.assert_on_fault(results)
+        results_no_filter = self.overlord.yumcmd.check_update()
+        assert results == results_no_filter
+
+    def test_check_update_splat_filter(self):
+        results = self.overlord.yumcmd.check_update(['*'])
+        self.assert_on_fault(results)
+        results_no_filter = self.overlord.yumcmd.check_update()
+        assert results == results_no_filter
+
+# this fails on fc6, need to test on newer yum to see whats up
+#    def test_update_non_existent_package(self):
+#        result = self.overlord.yumcmd.update("thisisapackage-_-that_should==never+exist234234234")
+#        self.assert_on_fault(result)
+#        # hmm, that method always returns True... not much to test there... -akl
+
 class TestIptables(BaseTest):
     module = "iptables"
 
