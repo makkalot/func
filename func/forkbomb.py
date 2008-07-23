@@ -111,7 +111,7 @@ def __forkbomb(mybucket,buckets,what_to_do,filename):
                 raise ose
     else:
         __with_my_bucket(mybucket,buckets,what_to_do,filename)    
-        sys.exit(0)
+        os._exit(0)
 
 def __demo(bucket_number, buckets, my_item):
     """ 

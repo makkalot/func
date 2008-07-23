@@ -16,6 +16,7 @@
 import sys
 import glob
 import os
+import time
 import func.yaml as yaml
 
 from certmaster.commonconfig import CMConfig
@@ -244,6 +245,21 @@ class Overlord(object):
 
     # -----------------------------------------------
 
+    def list_minions(self, format='list'):
+        """
+        Returns a flat list containing the minions this Overlord object currently
+        controls
+        """
+        if self.delegate:
+            return dtools.match_glob_in_tree(self.server_spec, self.minionmap)
+        minionlist = [] #nasty ugly hack to remove duplicate minions from list
+        for minion in self.minions_class.get_all_hosts():
+            if minion not in minionlist: #ugh, brute force :(
+                minionlist.append(minion)
+        return minionlist
+        
+    # -----------------------------------------------
+
     def run(self, module, method, args, nforks=1):
         """
         Invoke a remote method on one or more servers.
@@ -258,20 +274,18 @@ class Overlord(object):
         if not self.delegate: #delegation is turned off, so run normally
             return self.run_direct(module, method, args, nforks)
         
-        resulthash = {}
-        grouped_paths = []
+        delegatedhash = {}
+        directhash = {}
+        completedhash = {}
         
         #First we get all call paths for minions not directly beneath this overlord
         dele_paths = dtools.get_paths_for_glob(self.server_spec, self.minionmap)
         
         #Then we group them together in a dictionary by a common next hop
         (single_paths,grouped_paths) = dtools.group_paths(dele_paths)
-        #print "single:%s" % single_paths
-        #print "grouped:%s" % grouped_paths
         
         for group in grouped_paths.keys():
-            #print "mygroup:%s" % group
-            resulthash.update(self.run_direct(module,
+            delegatedhash.update(self.run_direct(module,
                                               method,
                                               args,
                                               nforks,
@@ -281,9 +295,40 @@ class Overlord(object):
         #Next, we run everything that can be run directly beneath this overlord
         #Why do we do this after delegation calls?  Imagine what happens when
         #reboot is called...
-        resulthash.update(self.run_direct(module,method,args,nforks))
+        directhash.update(self.run_direct(module,method,args,nforks))
         
-        return resulthash
+        #poll async results if we've async turned on
+        if self.async:
+            while (len(delegatedhash) + len(directhash)) > 0:
+                for minion in delegatedhash.keys():
+                    results = delegatedhash[minion]
+                    (return_code, async_results) = self.job_status(results)
+                    if return_code == jobthing.JOB_ID_RUNNING:
+                        pass
+                    elif return_code == jobthing.JOB_ID_PARTIAL:
+                        pass
+                    else:
+                        completedhash.update(async_results[minion])
+                        del delegatedhash[minion]
+                
+                for minion in directhash.keys():
+                    results = directhash[minion]
+                    (return_code, async_results) = self.job_status(results)
+                    if return_code == jobthing.JOB_ID_RUNNING:
+                        pass
+                    elif return_code == jobthing.JOB_ID_PARTIAL:
+                        pass
+                    else:
+                        completedhash.update(async_results)
+                        del directhash[minion]
+                time.sleep(0.1) #pause a bit so we don't flood our minions
+            return completedhash
+        
+        #we didn't instantiate this Overlord in async mode, so we just return the
+        #result hash
+        completedhash.update(delegatedhash)
+        completedhash.update(directhash)
+        return completedhash
         
         
     # -----------------------------------------------
@@ -334,7 +379,12 @@ class Overlord(object):
 
                 # this is the point at which we make the remote call.
                 if use_delegate:
-                    retval = getattr(conn, meth)(module, method, args, delegation_path)
+                    retval = getattr(conn, meth)(module,
+                                                 method, 
+                                                 args,
+                                                 delegation_path,
+                                                 self.async,
+                                                 self.nforks)
                 else:
                     retval = getattr(conn, meth)(*args[:])
 
@@ -388,7 +438,13 @@ class Overlord(object):
             minions = expanded_minions.get_urls()[0]
             results = process_server(0, 0, minions)
         
+        if self.delegate and self.async:
+            return {spec:results}
+        
         if use_delegate:
+            if utils.is_error(results[spec]):
+                print results
+                return results
             return results[spec]
         
         return results

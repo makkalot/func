@@ -73,6 +73,20 @@ def get_paths_for_glob(glob, minionmap):
             pathlist.append(result)
     return pathlist
 
+def list_all_minions(minionmap):
+    """
+    Given a minion map, returns a flat list of all minions
+    contained within it
+    """
+    minionlist = []
+    for minion in minionmap.keys():
+        if minion not in minionlist:
+            minionlist.append(minion)
+        for minion in list_all_minions(minionmap[minion]):
+            if minion not in minionlist:
+                minionlist.append(minion)
+    return minionlist
+
 def flatten_list(bumpy_list):
     """
     Flattens gnarly nested lists into much

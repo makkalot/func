@@ -40,7 +40,7 @@ class OverlordModule(func_module.FuncModule):
             else:
                 next_hop = fc.Overlord(current_minion)
                 mapresults = next_hop.overlord.map_minions()[current_minion]
-                if not utils.is_error(mapresults[current_minion]):
+                if not utils.is_error(mapresults):
                     maphash[current_minion] = mapresults
                 else:
                     maphash[current_minion] = {}
