@@ -57,7 +57,12 @@ def __purge_old_jobs(storage):
     nowtime = time.time()
     for x in storage.keys():
         # minion jobs have "-minion" in the job id so disambiguation so we need to remove that
-        jobkey = x.strip().split('-')[3]
+        jobkey = x.strip().split('-')
+        if len(jobkey) == 4:
+            jobkey = jobkey[3]
+        else:
+            jobkey = jobkey[0]
+
         create_time = float(jobkey)
         if nowtime - create_time > RETAIN_INTERVAL:
             del storage[x]
