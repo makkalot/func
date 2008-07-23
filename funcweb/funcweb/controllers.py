@@ -295,6 +295,12 @@ class Funcweb(object):
             
             result_id = getattr(getattr(fc_async,module),method)(*cmd_args)
             result = "".join(["The id for current job is :",str(result_id)," You will be notified when there is some change about that command !"])
+            import time 
+            time.sleep(4)
+            tmp_as_res = fc_async.job_status(result_id)
+            if tmp_as_res[0] == JOB_ID_FINISHED:
+                result = tmp_as_res[1]
+                
             return str(result)
 
         else:
@@ -309,6 +315,7 @@ class Funcweb(object):
         by pressing only the link !
         """
         if self.func_cache['glob']:
+            print "Yeni overlord ile execution yapiyoz ya"
             fc = Overlord(self.func_cache['glob'],async = True)
         else:
             if self.func_cache['minion_name'] == minion:
@@ -392,21 +399,13 @@ class Funcweb(object):
             self.async_manager = AsyncResultManager()
         else:
             #make a refresh of the memory copy
+            print "I refreshed the list"
             self.async_manager.refresh_list()
         #get the actual db    
         func_db = self.async_manager.current_db()
         
         for job_id,code_status_pack in func_db.iteritems():
             parsed_job_id = job_id.split("-")
-            if func_db[job_id][0] == JOB_ID_RUNNING:
-                func_db[job_id][0] = "RUNNING"
-            elif func_db[job_id][0] == JOB_ID_FINISHED:
-                func_db[job_id][0] = "FINISHED"
-            elif func_db[job_id][0] == JOB_ID_PARTIAL:
-                func_db[job_id][0] = "PARTIAL"
-            else:
-                func_db[job_id][0] = "ERROR"
-
             func_db[job_id].extend(parsed_job_id)
 
         #print func_db
