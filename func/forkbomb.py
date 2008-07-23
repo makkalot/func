@@ -97,6 +97,7 @@ def __forkbomb(mybucket,buckets,what_to_do,filename):
     """
     Recursive function to spawn of a lot of worker forks.
     """
+
     nbuckets = len(buckets)
     pid = os.fork()
     if pid != 0:
@@ -111,7 +112,7 @@ def __forkbomb(mybucket,buckets,what_to_do,filename):
                 raise ose
     else:
         __with_my_bucket(mybucket,buckets,what_to_do,filename)    
-        sys.exit(0)
+        os._exit(0)
 
 def __demo(bucket_number, buckets, my_item):
     """ 
