@@ -13,7 +13,7 @@ License: GPLv2+
 Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
-Requires: pyYaml
+Requires: python-simplejson
 Requires: certmaster >= 0.1
 BuildRequires: python-devel
 %if %is_suse

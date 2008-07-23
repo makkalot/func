@@ -1,5 +1,13 @@
 #!/usr/bin/python
 
+##
+## Copyright 2008, Various
+## Adrian Likins <alikins@redhat.com>
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+
 import os
 import socket
 import unittest
@@ -120,6 +128,15 @@ class TestTest(BaseTest):
 
     def test_echo_float(self):
         self._echo_test(123.456)
+
+    def test_echo_big_float(self):
+        self._echo_test(123121232.23)
+
+    def test_echo_bigger_float(self):
+        self._echo_test(234234234234234234234.234234234234234)
+
+    def test_echo_little_float(self):
+        self._echo_test(0.000000000000000000000000000000037)
 
     def test_echo_binary(self):
         blob = "348dshke354ts0d9urgk"
@@ -365,6 +382,24 @@ class TestYum(BaseTest):
     def test_check_update(self):
         result = self.overlord.yumcmd.check_update()
         self.assert_on_fault(result)
+
+    def test_check_update_empty_filter(self):
+        results = self.overlord.yumcmd.check_update([])
+        self.assert_on_fault(results)
+        results_no_filter = self.overlord.yumcmd.check_update()
+        assert results == results_no_filter
+
+    def test_check_update_splat_filter(self):
+        results = self.overlord.yumcmd.check_update(['*'])
+        self.assert_on_fault(results)
+        results_no_filter = self.overlord.yumcmd.check_update()
+        assert results == results_no_filter
+
+# this fails on fc6, need to test on newer yum to see whats up
+#    def test_update_non_existent_package(self):
+#        result = self.overlord.yumcmd.update("thisisapackage-_-that_should==never+exist234234234")
+#        self.assert_on_fault(result)
+#        # hmm, that method always returns True... not much to test there... -akl
 
 class TestIptables(BaseTest):
     module = "iptables"
