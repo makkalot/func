@@ -42,6 +42,7 @@ class Funcweb(object):
                 'methods':None
             }
     async_manager = None
+    first_run = True
     #will be reused for widget validation
 
     @expose(allow_json=True)
@@ -218,7 +219,6 @@ class Funcweb(object):
                    "this resource.")
         else:
             msg=_("Please log in.")
-            print "I use that thing here"
             forward_url= request.headers.get("Referer", ".")
 
         response.status=403
@@ -315,7 +315,6 @@ class Funcweb(object):
         by pressing only the link !
         """
         if self.func_cache['glob']:
-            print "Yeni overlord ile execution yapiyoz ya"
             fc = Overlord(self.func_cache['glob'],async = True)
         else:
             if self.func_cache['minion_name'] == minion:
@@ -352,8 +351,10 @@ class Funcweb(object):
             self.async_manager = AsyncResultManager()
         changes = self.async_manager.check_for_changes()
         if changes:
-            changed = True
-        
+            if not self.first_run:
+                changed = True
+            else:
+                self.first_run = False
         
         return dict(changed = changed,changes = changes)
 
@@ -394,12 +395,10 @@ class Funcweb(object):
         """
         if not self.async_manager:
             #here should run the clean_old ids
-            print "I dont have another copy ?"
             purge_old_jobs()
             self.async_manager = AsyncResultManager()
         else:
             #make a refresh of the memory copy
-            print "I refreshed the list"
             self.async_manager.refresh_list()
         #get the actual db    
         func_db = self.async_manager.current_db()
