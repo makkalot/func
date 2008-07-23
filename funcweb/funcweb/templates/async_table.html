@@ -25,7 +25,13 @@
                 <td class="tableboxes"><p class="intabletext">${job_pack[3]}</p></td>
                 <td class="tableboxes"><p class="intabletext">${job_pack[4]}</p></td>
                 <td class="tableboxes"><p class="intabletext">${job_id}</p></td>
-                <td class="tableboxes"><div class="newico" id="newico"></div>${job_pack[0]}</td>
+                <td class="tableboxes"><div class="newico" id="newico"></div>
+                    <span py:if="job_pack[0] == 0"><a href="#resultcontent" onclick="myj('#resultcontent').hide().load('/funcweb/check_job_status/${job_id}').show('slow');">RUNNING</a></span>
+                    <span py:if="job_pack[0] == 1"><a href="#resultcontent" onclick="myj('#resultcontent').hide().load('/funcweb/check_job_status/${job_id}').show('slow');">FINISHED</a></span>
+                    <span py:if="job_pack[0] == 3"><a href="#resultcontent" onclick="myj('#resultcontent').hide().load('/funcweb/check_job_status/${job_id}').show('slow');">PARTIAL</a></span>
+                    <span py:if="job_pack[0] == 4"><a href="#resultcontent" onclick="myj('#resultcontent').hide().load('/funcweb/check_job_status/${job_id}').show('slow');">ERROR</a></span>
+                
+                </td>
             </tr>
             </table>
         </div>
