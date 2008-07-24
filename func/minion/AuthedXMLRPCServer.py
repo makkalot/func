@@ -18,7 +18,7 @@
 import sys
 import socket
 import SimpleXMLRPCServer
-from func import SSLCommon
+from certmaster import SSLCommon
 import OpenSSL
 import SocketServer
 

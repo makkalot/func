@@ -19,6 +19,7 @@ import os
 import func.yaml as yaml
 
 from certmaster.commonconfig import CMConfig
+from certmaster import utils
 from func.config import read_config, CONFIG_FILE
 
 import sslclient
@@ -28,7 +29,6 @@ import groups
 import delegation_tools as dtools
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
-import func.utils as utils
 from func.CommonErrors import *
 
 # ===================================
