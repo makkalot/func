@@ -14,7 +14,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 
-from config import BaseConfig, BoolOption, Option
+from certmaster.config import BaseConfig, BoolOption, Option
 
 
 class FuncdConfig(BaseConfig):
