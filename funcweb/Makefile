@@ -26,6 +26,7 @@ clean:
 	-rm -rf dist/
 	-rm -rf *~
 	-rm -rf rpm-build/
+	-rm -rf funcweb.egg-info/
 	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
 
 clean_hard:
