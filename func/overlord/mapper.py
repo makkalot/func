@@ -21,6 +21,8 @@ import sys
 import func.yaml as yaml
 import func.overlord.client as func_client
 
+from func import utils
+
 DEFAULT_TREE = "/var/lib/func/map"
 
 class MapperTool(object):
@@ -59,6 +61,10 @@ class MapperTool(object):
         
         minion_hash = func_client.Overlord("*").overlord.map_minions(self.options.only_alive==True)
         
+        for minion in minion_hash.keys(): #clean hash of any top-level errors
+            if utils.is_error(minion_hash[minion]):
+                minion_hash[minion] = {}        
+
         if self.options.verbose:
             print "- built the following map:"
             print minion_hash

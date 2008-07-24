@@ -17,6 +17,49 @@
 
 import fnmatch
 
+class groupby(object):
+    """
+    Borrowing the groupby iterator class directly 
+    from the Python API as it does not exist in Pythons < 2.4
+    """
+    
+    def __init__(self, iterable, key=None):
+        if key is None:
+            key = lambda x: x
+        self.keyfunc = key
+        self.it = iter(iterable)
+        self.tgtkey = self.currkey = self.currvalue = xrange(0)
+    def __iter__(self):
+        return self
+    def next(self): 
+        while self.currkey == self.tgtkey:
+            self.currvalue = self.it.next() # Exit on StopIteration
+            self.currkey = self.keyfunc(self.currvalue)
+        self.tgtkey = self.currkey
+        return (self.currkey, self._grouper(self.tgtkey))
+    def _grouper(self, tgtkey):
+        while self.currkey == tgtkey:
+            yield self.currvalue
+            self.currvalue = self.it.next() # Exit on StopIteration
+            self.currkey = self.keyfunc(self.currvalue)
+
+def group_paths(ungrouped_list):
+    """
+    Given a list of multi-element path lists, 
+    groups them together into a list of single-element paths (which
+    exist directly under the current overlord) and a dictionary of paths
+    to send to next hops in the delegation chain, containing a list of lists
+    keyed by their common next hop.
+    """
+    
+    single_paths = [path[0] for path in ungrouped_list if len(path) == 1]
+    non_single_paths = [path for path in ungrouped_list if len(path) > 1]
+    path_group = dict([(key,[path[1:len(path)] for path in list(gen)]) 
+                       for key, gen in groupby(non_single_paths,
+                                               key=lambda x:x[0])])
+    
+    return (single_paths,path_group)
+                                          
 def get_paths_for_glob(glob, minionmap):
     """
     Given a glob, returns shortest path to all minions
@@ -29,6 +72,20 @@ def get_paths_for_glob(glob, minionmap):
         if result not in pathlist: #prevents duplicates
             pathlist.append(result)
     return pathlist
+
+def list_all_minions(minionmap):
+    """
+    Given a minion map, returns a flat list of all minions
+    contained within it
+    """
+    minionlist = []
+    for minion in minionmap.keys():
+        if minion not in minionlist:
+            minionlist.append(minion)
+        for minion in list_all_minions(minionmap[minion]):
+            if minion not in minionlist:
+                minionlist.append(minion)
+    return minionlist
 
 def flatten_list(bumpy_list):
     """
@@ -151,5 +208,8 @@ if __name__ == "__main__":
         print "Element: %s, best path: %s" % (elem, get_shortest_path(elem,mymap))
         
     print "- And finally, with all duplicates removed:"
-    for elem in get_paths_for_glob('*path*',mymap):
+    for elem in get_paths_for_glob('*',mymap):
         print "Valid Path: %s" % elem
+        
+    print "- And grouped together:"
+    print group_paths(get_paths_for_glob('*',mymap))
