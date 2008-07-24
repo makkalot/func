@@ -130,7 +130,7 @@ def batch_run(pool, callback, nforks):
         
         # we now have a list of job id's for each minion, kill the task
         __update_status(job_id, JOB_ID_PARTIAL, results)
-        sys.exit(0)
+        os._exit(0)
 
 def minion_async_run(retriever, method, args):
     """
