@@ -21,7 +21,7 @@ import urllib2
 from func.overlord import base_command
 from func import utils
 from func.minion import sub_process
-from func.config import read_config
+from certmaster.config import read_config
 from certmaster.commonconfig import MinionConfig
 
 

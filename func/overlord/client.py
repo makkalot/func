@@ -20,7 +20,7 @@ import func.yaml as yaml
 
 from certmaster.commonconfig import CMConfig
 from certmaster import utils
-from func.config import read_config, CONFIG_FILE
+from certmaster.config import read_config, CONFIG_FILE
 
 import sslclient
 
