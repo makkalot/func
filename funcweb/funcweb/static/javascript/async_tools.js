@@ -9,7 +9,7 @@ function poll_async_changes(result){
     if (result['changed']==true){
         //alert('Check it ');
         var the_change_msg = "We have some async changes : ";
-        the_change_msg = the_change_msg + repr(result['changes'])+" check the RESULTS page!";
+        the_change_msg = the_change_msg + repr(result['changes'])+" check the <a href='/funcweb/display_async_results'>RESULTS</a> page!";
         getElement('globalerror').innerHTML = the_change_msg;
         window.setTimeout('check_async_change()',50000);
      }
