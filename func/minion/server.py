@@ -27,15 +27,13 @@ from func.config import read_config
 from func.commonconfig import FuncdConfig
 from certmaster.commonconfig import CMConfig
 from func import logger
-from func import certs
+from certmaster import certs
 import func.jobthing as jobthing
 
 # our modules
 import AuthedXMLRPCServer
 import codes
 import module_loader
-import func.utils as futils
-import func.minion.utils as fmutils
 import func.minion.acls as acls_mod
 
 from certmaster import utils
@@ -139,11 +137,11 @@ class FuncApiMethod:
         except codes.FuncException, e:
             self.__log_exc()
             (t, v, tb) = sys.exc_info()
-            rc = futils.nice_exception(t,v,tb)
+            rc = utils.nice_exception(t,v,tb)
         except:
             self.__log_exc()
             (t, v, tb) = sys.exc_info()
-            rc = futils.nice_exception(t,v,tb)
+            rc = utils.nice_exception(t,v,tb)
         self.logger.debug("Return code for %s: %s" % (self.__name, rc))
 
         return rc
@@ -235,7 +233,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
                 return jobthing.minion_async_run(self.get_dispatch_method, method, params)
         except:
             (t, v, tb) = sys.exc_info()
-            rc = futils.nice_exception(t, v, tb)
+            rc = utils.nice_exception(t, v, tb)
             return rc
 
     def auth_cb(self, request, client_address):
@@ -250,7 +248,7 @@ def main(argv):
     """
 
     if "daemon" in sys.argv or "--daemon" in sys.argv:
-        futils.daemonize("/var/run/funcd.pid")
+        utils.daemonize("/var/run/funcd.pid")
     else:
         print "serving...\n"
 
