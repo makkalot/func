@@ -69,9 +69,7 @@ class Groups(object):
     def add_hosts_to_group(self, group, hoststring):
         hosts = self.__parse_hoststrings(hoststring)
         for host in hosts:
-            self.add_host_to_group(group, host)
-
-        
+            self.add_host_to_group(group, host)        
 
     def add_host_to_group(self, group, host):
         if not self.groups.has_key(group):
@@ -82,7 +80,7 @@ class Groups(object):
         return self.groups
 
     def get_hosts_by_groupgoo(self, groupgoo):
-        group_gloobs = groupgoo.split(':')
+        group_gloobs = groupgoo.split(';')
         hosts = []
         for group_gloob in group_gloobs:
             if not group_gloob[0] == "@":
@@ -90,7 +88,7 @@ class Groups(object):
             if self.groups.has_key(group_gloob[1:]):
                 hosts = hosts + self.groups[group_gloob[1:]]
             else:            
-                print "group %s not defined" % group_gloob
+                sys.stderr.write("group %s not defined\n" % group_gloob)
         return hosts
 
 
