@@ -173,6 +173,8 @@ class Overlord(object):
         
         self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
         self.minions = self.minions_class.get_urls()
+        if len(self.minions) == 0:
+            raise Func_Client_Exception, 'Can\'t find any minions matching \"%s\". ' % self.server_spec
         
         if self.delegate:
             try:
