@@ -2,7 +2,7 @@ import sys
 import xmlrpclib
 import urllib
 
-from func import SSLCommon
+from certmaster import SSLCommon
 
 
 class SSL_Transport(xmlrpclib.Transport):

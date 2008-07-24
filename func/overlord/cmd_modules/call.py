@@ -21,7 +21,7 @@ import sys
 
 from func.overlord import client
 from func.overlord import base_command
-from func.config import read_config, BaseConfig, ListOption
+from certmaster.config import read_config, BaseConfig, ListOption
 
 import func.jobthing as jobthing
 

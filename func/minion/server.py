@@ -23,7 +23,7 @@ from gettext import textdomain
 I18N_DOMAIN = "func"
 
 
-from func.config import read_config
+from certmaster.config import read_config
 from func.commonconfig import FuncdConfig
 from certmaster.commonconfig import CMConfig
 from func import logger

@@ -13,7 +13,7 @@
 import inspect
 
 from func import logger
-from func.config import read_config, BaseConfig
+from certmaster.config import read_config, BaseConfig
 from func.commonconfig import FuncdConfig
 from func.minion.func_arg import * #the arg getter stuff
 
