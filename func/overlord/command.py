@@ -14,7 +14,7 @@ Command class.
 import optparse
 import sys
 
-from func.config import read_config, CONFIG_FILE
+from certmaster.config import read_config, CONFIG_FILE
 
 from certmaster.commonconfig import CMConfig
 

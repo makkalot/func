@@ -14,7 +14,7 @@
 
 
 import logging
-from func.config import read_config
+from certmaster.config import read_config
 from func.commonconfig import FuncdConfig
 
 
