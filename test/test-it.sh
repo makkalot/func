@@ -173,6 +173,8 @@ install_the_func()
 {
     msg "Installing func directly from $1 $BUILD_PATH"
     pushd $1/func
+    # remove any remnants of func already installed
+    make clean clean_hard clean_harder
     make install 
 
     pushd $1/certmaster
