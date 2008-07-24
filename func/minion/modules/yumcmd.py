@@ -26,23 +26,22 @@ class Yum(func_module.FuncModule):
     description = "Package updates through yum."
 
     def update(self, pkg=None):
-        # XXX support updating specific rpms
         ayum = yum.YumBase()
         ayum.doGenericSetup()
         ayum.doRepoSetup()
         try:
             ayum.doLock()
             if pkg != None:
-                ayum.update(name=pkg)
+                tx_result = ayum.update(name=pkg)
             else:
-                ayum.update()
+                tx_result = ayum.update()
             ayum.buildTransaction()
             ayum.processTransaction(
                     callback=DummyCallback())
         finally:
             ayum.closeRpmDB()
             ayum.doUnlock()
-        return True
+        return map(str, tx_result)
 
     def check_update(self, filter=[], repo=None):
         """Returns a list of packages due to be updated
