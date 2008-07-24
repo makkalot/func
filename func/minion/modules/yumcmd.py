@@ -22,7 +22,7 @@ class DummyCallback(object):
 class Yum(func_module.FuncModule):
 
     version = "0.0.1"
-    api_version = "0.0.1"
+    api_version = "0.1.0"
     description = "Package updates through yum."
 
     def update(self, pkg=None):
