@@ -191,7 +191,7 @@ class Overlord(object):
           # raise FuncClientError
         ol_key = '%s/certmaster.key' % self.config.cadir
         ol_crt = '%s/certmaster.crt' % self.config.cadir
-        myname = utils.get_hostname()
+        myname = utils.get_hostname(talk_to_certmaster=False)
 
         # FIXME: should be config -akl?
         # maybe /etc/pki/func is a variable somewhere?
