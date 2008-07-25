@@ -75,7 +75,7 @@ class MapperTool(object):
                 old_hash = yaml.load(oldmap).next()
                 oldmap.close()
             except e:
-                print "ERROR: old map could not be read, append failed"
+                sys.stderr.write("ERROR: old map could not be read, append failed\n")
                 sys.exit(-1)
                 
             merged_map = {}

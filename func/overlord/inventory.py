@@ -86,7 +86,7 @@ class FuncInventory(object):
         for (host, methods) in host_methods.iteritems():
 
             if utils.is_error(methods):
-                print "-- connection refused: %s" % host 
+                sys.stderr.write("-- connection refused: %s\n" % host) 
                 break 
 
             for each_method in methods:
@@ -131,7 +131,7 @@ class FuncInventory(object):
                 import simplejson
                 return simplejson.dumps(data)
             except ImportError:
-                print "ERROR: json support not found, install python-simplejson"
+                sys.stderr.write("ERROR: json support not found, install python-simplejson\n")
                 sys.exit(1)
 
         return pprint.pformat(data)
@@ -152,8 +152,8 @@ class FuncInventory(object):
         if options.nogit:
             return  
         if not os.path.exists("/usr/bin/git"):
-            print "git-core is not installed, so no change tracking is available."
-            print "use --no-git or, better, just install it."
+            sys.stderr.write("git-core is not installed, so no change tracking is available.\n")
+            sys.stderr.write("use --no-git or, better, just install it.\n")
             sys.exit(411) 
             
         if not os.path.exists(options.tree):

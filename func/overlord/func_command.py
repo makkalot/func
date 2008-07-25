@@ -57,7 +57,7 @@ class FuncCommandLine(command.Command):
         
     def handleArguments(self, args):
         if len(args) < 2:
-            print "see the func manpage for usage"
+            sys.stderr.write("see the func manpage for usage\n")
             sys.exit(411)
         minion_string = args[0]
         # try to be clever about this for now
@@ -72,4 +72,4 @@ class FuncCommandLine(command.Command):
     def handleOptions(self, options):
         if options.version:
             #FIXME
-            print "version is NOT IMPLEMENTED YET"
+            sys.stderr.write("version is NOT IMPLEMENTED YET\n")

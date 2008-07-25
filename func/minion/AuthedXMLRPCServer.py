@@ -47,7 +47,7 @@ class AuthedSimpleXMLRPCRequestHandler(SimpleXMLRPCServer.SimpleXMLRPCRequestHan
         except socket.timeout:
             pass
         except (socket.error, OpenSSL.SSL.SysCallError), e:
-            print "Error (%s): socket error - '%s'" % (self.client_address, e)
+            sys.stderr.write("Error (%s): socket error - '%s'\n" % (self.client_address, e))
 
 
 class BaseAuthedXMLRPCServer(SocketServer.ForkingMixIn):

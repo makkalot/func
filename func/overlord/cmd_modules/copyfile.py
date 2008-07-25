@@ -53,7 +53,7 @@ class CopyFile(base_command.BaseCommand):
         try:
             fb = open(self.options.filename, "r").read()
         except IOError, e:
-            print "Unable to open file: %s: %s" % (self.options.filename, e)
+            sys.stderr.write("Unable to open file: %s: %s\n" % (self.options.filename, e))
             return
 
         st = os.stat(self.options.filename)

@@ -13,6 +13,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import fnmatch
 import glob
 import os
+import sys
 
 from func import logger
 
@@ -37,7 +38,7 @@ class Acls(object):
         """
     
         if not os.path.exists(self.acldir):
-            print 'acl dir does not exist: %s' % self.acldir
+            sys.stderr.write('acl dir does not exist: %s\n' % self.acldir)
             return self.acls
     
         # get the set of files
@@ -49,7 +50,7 @@ class Acls(object):
             try:
                 fo = open(acl_file, 'r')
             except (IOError, OSError), e:
-                print 'cannot open acl config file: %s - %s' % (acl_file, e)
+                sys.stderr.write('cannot open acl config file: %s - %s\n' % (acl_file, e))
                 continue
     
             for line in fo.readlines():

@@ -95,7 +95,7 @@ class Call(base_command.BaseCommand):
                 import simplejson
                 return simplejson.dumps(data)
             except ImportError:
-                print "WARNING: json support not found, install python-simplejson"
+                sys.stderr.write("WARNING: json support not found, install python-simplejson\n")
                 return data
 
         if self.options.rawprint:
