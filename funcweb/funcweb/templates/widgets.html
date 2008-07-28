@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+
+<body>
+    <div class="widgetbgbox" id="widgetbgbox">
+        <div align="center" class="graytexts">${method}</div>
+        <div class="inwidgetbox" id="inwidgetbox">
+            <div class="widgetdescrition" id="widgetdescrition" py:if="description" align="center">Description :${description}</div>
+            <div class="widgetresult" id="widgetresult" align="center">
+                <span py:if="minion_form">
+                    ${ET(minion_form.display(displays_on='genshi'))}
+                </span>          
+                <span py:if="not minion_form">
+                    <a href="#resultcontent" onclick="myj('#resultcontent').hide().load('/funcweb/execute_link/${minion}/${module}/${method}/').show('slow');">Run Method</a>
+                </span>          
+            </div>
+            <div class="errorbox" id="errorbox">
+            </div>
+        </div>
+    </div>
+ 
+</body>
+</html>
+
+ 
+  

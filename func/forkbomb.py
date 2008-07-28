@@ -97,6 +97,7 @@ def __forkbomb(mybucket,buckets,what_to_do,filename):
     """
     Recursive function to spawn of a lot of worker forks.
     """
+
     nbuckets = len(buckets)
     pid = os.fork()
     if pid != 0:

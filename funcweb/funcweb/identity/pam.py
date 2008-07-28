@@ -15,7 +15,7 @@ from ctypes import CDLL, POINTER, Structure, CFUNCTYPE, cast, pointer, sizeof
 from ctypes import c_void_p, c_uint, c_char_p, c_char, c_int
 
 
-LIBPAM = CDLL("libpam.so")
+LIBPAM = CDLL("libpam.so.0")
 LIBC = CDLL("libc.so.6")
 
 CALLOC = LIBC.calloc

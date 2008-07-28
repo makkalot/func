@@ -240,7 +240,7 @@ class RemoteFormAutomation(CoreWD):
 
     template = """ 
     <div>
-       ${for_widget.display(action='post_form')}
+       ${for_widget.display(action='/funcweb/post_form')}
         <div id="loading"></div>
         <div id="post_data"></div>
     </div>
@@ -260,9 +260,10 @@ class RemoteFormAutomation(CoreWD):
                 fields = generated_fields,
                 validator = validator_schema,
                 name = "minion_form",
-                update = "col5",
-                before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'100\',height:\'100\'}));',
+                update = "resultbox",
+                before='myj(\'#resultcontent\').hide().show(\'slow\');addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
+                submit_text = "Send Command to Glob"
         )
 
 ####################################################################################################
@@ -275,10 +276,10 @@ class RemoteFormFactory(object):
     #some values that may want to change later 
     name = "minion_form",
     update = "col5",
-    before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../static/images/loading.gif\',width:\'100\',height:\'100\'}));',
+    before='getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
     on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
     submit_text = "Send Minion Form"
-    action = "/post_form"
+    action = "/funcweb/post_form"
 
     def __init__(self,wlist_object,validator_schema):
         self.wlist_object = wlist_object
@@ -297,30 +298,6 @@ class RemoteFormFactory(object):
                 submit_text = self.submit_text,
                 action = self.action,
                 validator = self.validator_schema
-                )
-
-class RemoteLinkFactory(CoreWD):
-    """
-    A rpc executer for the methods without arguments
-    """
-
-    name = "Minion Remote Link Executer"
-
-    template =""" 
-    <div>
-        ${for_widget.display()}
-        <div id="items">Minion Result</div>
-    </div>
-    """
-
-    def __init__(self,*args,**kwargs):
-        """The init part here"""
-        super(SomeRemoteLink,self).__init__(*args,**kwargs)
-        self.for_widget = LinkRemoteFunction(
-                name = "catexecuter",
-                action = "/catlister",
-                data = dict(give_all="all"),
-                update = "items"
                 )
 
 

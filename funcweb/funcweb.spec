@@ -4,7 +4,7 @@
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
 
 %define version 0.1
-Summary: Web GUI for FUNC API
+Summary: Web application for Func API
 Name: funcweb
 Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
@@ -20,6 +20,7 @@ Requires: certmaster >= 0.1
 Requires: mod_ssl >= 2.0
 Requires: httpd >= 2.0
 Requires: TurboGears >= 1.0.4.2
+Requires: pam
 
 #the build requires
 BuildRequires: python-devel
@@ -38,7 +39,7 @@ BuildArch: noarch
 Url: https://hosted.fedoraproject.org/projects/func/
 %description
 
-FuncWeb is the Web GUI management tool for commandline based tool func.
+Web interface for managing systems controlled by Func
 
 %prep
 %setup -q
@@ -55,10 +56,8 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
-%if 0%{?fedora} >= 8
 %dir %{python_sitelib}/funcweb*egg-info
 %{python_sitelib}/funcweb*egg-info/*
-%endif
 
 #creating the directory structure
 %dir %{python_sitelib}/funcweb/
@@ -71,8 +70,10 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/funcweb/static/javascript
 %dir %{python_sitelib}/funcweb/identity
 %dir %{_sysconfdir}/%{name}
+%dir /var/log/funcweb
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/funcweb.conf
 %config(noreplace) %{_sysconfdir}/%{name}/prod.cfg
+%config(noreplace) /etc/logrotate.d/funcweb_rotate
 
 #adding the server startup shutdown thing 
 /etc/init.d/funcwebd
@@ -91,6 +92,7 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/funcweb/static/css/*.css
 %{python_sitelib}/funcweb/static/css/Makefile
 %{python_sitelib}/funcweb/static/images/*.png
+%{python_sitelib}/funcweb/static/images/*.jpg
 %{python_sitelib}/funcweb/static/images/*.ico
 %{python_sitelib}/funcweb/static/images/*.gif
 %{python_sitelib}/funcweb/static/images/Makefile

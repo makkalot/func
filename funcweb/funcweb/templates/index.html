@@ -1,0 +1,49 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="master.html"/>
+  <head/>
+  <body onLoad = "window.setTimeout('check_async_change()',10000);">
+       
+     <div class="minionglob" id="minionglob">
+            <form action="/funcweb/minions" method="post" onsubmit="return !remoteFormRequest(this, 'minioncontent', {&quot;loading&quot;: null, &quot;confirm&quot;: null, &quot;after&quot;: null, &quot;on_complete&quot;: null, &quot;loaded&quot;: null, &quot;on_failure&quot;: null, &quot;on_success&quot;: null, &quot;before&quot;:&quot;myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();&quot;});" class="tableform" name="minion_form">
+
+                <div class="graytexts2" id="minionglobtext">
+                    <div align="center">Minion Glob</div>
+                </div>
+                <input name="submit" type="submit" class="minionbutton" id="button" value="submit" border="0"/>
+                <input name="glob" type="text" class="minionbox" id="textfield" />
+            </form>
+        </div>
+    
+
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="minioncontent">
+            <div class="minionsbigbox" id="minionsbigbox" py:if="minions">
+                <div align="center" class="graytexts">Mininons</div> 
+                <div id="minionstexts" py:for="minion in minions">
+                    <a onclick="myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide().load('/funcweb/minion/${minion}').show('slow');" href="#modulescontent" class="minionstextblue">${minion}</a>
+                </div>
+            </div>
+            <div class="errorbox" id="errorbox" py:if="not minions">There is no minion to display with that glob, try something different</div>
+        </div>
+
+        <div class="emptyimagebox" id="emptyimagebox"></div> 
+        <div class="minioncontent" id="modulescontent"></div>
+        <a name="modulescontent"/>
+
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="methotdscontent"></div>
+        <a name="methotdscontent"/>
+  
+        <div class="emptyimagebox" id="emptyimagebox"></div>
+        <div class="minioncontent" id="widgetcontent"></div>
+        <a name="widgetcontent"/>
+        
+        <div class="emptyimagebox" id="emptyimagebox"></div> 
+        <div class="minioncontent" id="resultcontent"></div>
+        <a name="resultcontent"/>
+  
+</body>
+</html>

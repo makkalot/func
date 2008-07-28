@@ -5,6 +5,8 @@ from turbogears import controllers, expose, flash, identity, redirect, error_han
 from func.overlord.client import Overlord, Minions
 from funcweb.widget_automation import WidgetListFactory,RemoteFormAutomation,RemoteFormFactory
 from funcweb.widget_validation import WidgetSchemaFactory
+from funcweb.async_tools import AsyncResultManager
+from func.jobthing import purge_old_jobs,JOB_ID_RUNNING,JOB_ID_FINISHED,JOB_ID_PARTIAL
 
 # it is assigned into method_display on every request 
 global_form = None 
@@ -26,12 +28,12 @@ def validate_decorator_updater(validator_value=None):
     global global_form
     return global_form
 
-class Root(controllers.RootController):
-    
+class Funcweb(object):
     #preventing the everytime polling and getting
     #func = Overlord("name") thing
     func_cache={          
                 'fc_object':None,#the fc = Overlord() thing,
+                'fc_async_obj':None,
                 'glob':None,
                 'minion_name':None,
                 'module_name':None,
@@ -39,13 +41,16 @@ class Root(controllers.RootController):
                 'minions':None,
                 'methods':None
             }
+    async_manager = None
+    first_run = True
     #will be reused for widget validation
 
-    @expose(template="funcweb.templates.minions")
+    @expose(allow_json=True)
     @identity.require(identity.not_anonymous())
-    def minions(self, glob='*'):
+    def minions(self, glob='*',submit=None):
         """ Return a list of our minions that match a given glob """
         #make the cache thing
+
         if self.func_cache['glob'] == glob:
             minions = self.func_cache['minions']
         else:
@@ -53,12 +58,16 @@ class Root(controllers.RootController):
             minions=Minions(glob).get_all_hosts()
             self.func_cache['glob']=glob
             self.func_cache['minions']=minions
+        
+        if not submit:
+            return dict(minions=minions,tg_template="funcweb.templates.index")
+        else:
+            return dict(minions=minions,tg_template="funcweb.templates.minions")
 
-        return dict(minions=minions)
 
     index = minions # start with our minion view, for now
 
-    @expose(template="funcweb.templates.minion")
+    @expose(template="funcweb.templates.modules")
     @identity.require(identity.not_anonymous())
     def minion(self, name="*", module=None, method=None):
         """ Display module or method details for a specific minion.
@@ -128,12 +137,12 @@ class Root(controllers.RootController):
                     self.func_cache['methods'] = modules
                 #display em
                 return dict(modules=modules, module=module,
-                            tg_template="funcweb.templates.module")
+                            tg_template="funcweb.templates.methods")
             else:
                 return "Wrong place :)"
 
 
-    @expose(template="funcweb.templates.method_args")
+    @expose(template="funcweb.templates.widgets")
     @identity.require(identity.not_anonymous())
     def method_display(self,minion=None,module=None,method=None):
         """
@@ -210,9 +219,10 @@ class Root(controllers.RootController):
                    "this resource.")
         else:
             msg=_("Please log in.")
-            forward_url= request.headers.get("Referer", "/")
+            forward_url= request.headers.get("Referer", ".")
 
         response.status=403
+
         return dict(message=msg, previous_url=previous_url, logging_in=True,
                     original_parameters=request.params,
                     forward_url=forward_url)
@@ -277,13 +287,36 @@ class Root(controllers.RootController):
                 cmd_args[index_of_arg]=kw[arg]
            
             #now execute the stuff
-            result = getattr(getattr(fc,module),method)(*cmd_args)
+            #at the final execute it as a multiple if the glob suits for that
+            #if not (actually there shouldnt be an option like that but who knows :))
+            #it will run as a normal single command to clicked minion
+            if self.func_cache['glob']:
+                fc_async = Overlord(self.func_cache['glob'],async=True)
+            
+            result_id = getattr(getattr(fc_async,module),method)(*cmd_args)
+            result = "".join(["The id for current job is :",str(result_id)," You will be notified when there is some change about that command !"])
+            
+            #that part gives a chance for short methods to finish their jobs and display them 
+            #immediately so user will not wait for new notifications for that short thing
+            import time 
+            time.sleep(4)
+            tmp_as_res = fc_async.job_status(result_id)
+            if tmp_as_res[0] == JOB_ID_FINISHED:
+                result = tmp_as_res[1]
+                
+                if not self.async_manager:
+                    #cleanup tha database firstly 
+                    purge_old_jobs()
+                    self.async_manager = AsyncResultManager()
+                self.async_manager.refresh_list()
+            
+            #TODO reformat that returning string to be more elegant to display :)
             return str(result)
 
         else:
             return "Missing arguments sorry can not proceess the form"
     
-    @expose(template="funcweb.templates.method_args")
+    @expose(template="funcweb.templates.result")
     @identity.require(identity.not_anonymous())
     def execute_link(self,minion=None,module=None,method=None):
         """
@@ -291,21 +324,102 @@ class Root(controllers.RootController):
         arguments so they provide only some information,executed
         by pressing only the link !
         """
-        if self.func_cache['minion_name'] == minion:
-            fc = self.func_cache['fc_object']
+        if self.func_cache['glob']:
+            fc = Overlord(self.func_cache['glob'],async = True)
         else:
-            fc = Overlord(minion)
-            self.func_cache['fc_object']=fc
-            self.func_cache['minion_name']=minion
-            #reset the children :)
-            self.func_cache['module_name']=module
-            self.func_cache['modules']=None
-            self.func_cache['methods']=None
+            if self.func_cache['minion_name'] == minion:
+                fc = self.func_cache['fc_async_obj']
+            else:
+                fc = Overlord(minion,async = True)
+                self.func_cache['fc_async_obj']=fc
+                self.func_cache['minion_name']=minion
+                #reset the children :)
+                self.func_cache['module_name']=module
+                self.func_cache['modules']=None
+                self.func_cache['methods']=None
 
-        result = getattr(getattr(fc,module),method)()
-        return str(result)
+        #i assume that they are long enough so dont poll here
+        result_id = getattr(getattr(fc,module),method)()
+        result = "".join(["The id for current id is :",str(result_id)," You will be notified when there is some change about that command !"])
+        return dict(result=str(result))
 
+    @expose(format = "json")
+    @identity.require(identity.not_anonymous())
+    def check_async(self,check_change = False):
+        """
+        That method is polled by js code to see if there is some
+        interesting change in current db
+        """
+        changed = False
 
+        if not check_change :
+            msg = "Method invoked with False parameter which makes it useless"
+            return dict(changed = False,changes = [],remote_error=msg)
+        
+        if not self.async_manager:
+            #cleanup tha database firstly 
+            purge_old_jobs()
+            self.async_manager = AsyncResultManager()
+        changes = self.async_manager.check_for_changes()
+        if changes:
+            if not self.first_run:
+                changed = True
+            else:
+                self.first_run = False
+        
+        return dict(changed = changed,changes = changes)
+
+    
+    @expose(template="funcweb.templates.result")
+    @identity.require(identity.not_anonymous())
+    def check_job_status(self,job_id):
+        """
+        Checking the job status for specific job_id
+        that method will be useful to see the results from
+        async_results table ...
+        """
+        if not job_id:
+            return dict(result = "job id shouldn be empty!")
+
+        if not self.func_cache['fc_async_obj']:
+            if self.func_cache['glob']:
+                fc_async = Overlord(self.func_cache['glob'],async=True)
+                #store also into the cache
+            else:
+                fc_async = Overlord("*",async=True)
+            
+            self.func_cache['fc_async_obj'] = fc_async
+
+        else:
+            fc_async = self.func_cache['fc_async_obj']
+
+        id_result = fc_async.job_status(job_id)
+
+        #the final id_result
+        return dict(result=id_result)
+
+    @expose(template="funcweb.templates.async_table")
+    @identity.require(identity.not_anonymous())
+    def display_async_results(self):
+        """
+        Displaying the current db results that are in the memory
+        """
+        if not self.async_manager:
+            #here should run the clean_old ids
+            purge_old_jobs()
+            self.async_manager = AsyncResultManager()
+        else:
+            #make a refresh of the memory copy
+            self.async_manager.refresh_list()
+        #get the actual db    
+        func_db = self.async_manager.current_db()
+        
+        for job_id,code_status_pack in func_db.iteritems():
+            parsed_job_id = job_id.split("-")
+            func_db[job_id].extend(parsed_job_id)
+
+        #print func_db
+        return dict(func_db = func_db)
 
     @expose()
     def logout(self):
@@ -314,3 +428,14 @@ class Root(controllers.RootController):
         """
         identity.current.logout()
         raise redirect("/")
+
+
+
+class Root(controllers.RootController):
+    
+    @expose()
+    def index(self):
+        raise redirect("/funcweb")
+    
+    index = index # start with our minion view, for now
+    funcweb = Funcweb()

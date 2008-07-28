@@ -247,6 +247,13 @@ class Overlord(object):
 
     # -----------------------------------------------
 
+    def open_job_ids(self):
+        """
+        That method can be used by other apps that uses func API
+        to get current ids with their short results in the database
+        """
+        return jobthing.get_open_ids()
+    
     def list_minions(self, format='list'):
         """
         Returns a flat list containing the minions this Overlord object currently
@@ -418,14 +425,18 @@ class Overlord(object):
         else: #we're directly calling minions, so treat everything normally
             spec = self.server_spec
             minionurls = self.minions
+            #print "Minion_url is :",minionurls
+            #print "Process server is :",process_server
         
         if not self.noglobs:
             if self.nforks > 1 or self.async:
                 # using forkbomb module to distribute job over multiple threads
                 if not self.async:
+                   
                     results = forkbomb.batch_run(minionurls, process_server, nforks)
                 else:
-                    results = jobthing.batch_run(minionurls, process_server, nforks)
+                    minion_info =dict(spec=spec,module=module,method=method)
+                    results = jobthing.batch_run(minionurls, process_server,nforks,**minion_info)
             else:
                 # no need to go through the fork code, we can do this directly
                 results = {}
