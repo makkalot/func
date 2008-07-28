@@ -58,9 +58,9 @@ def __purge_old_jobs(storage):
     for x in storage.keys():
         # minion jobs have "-minion" in the job id so disambiguation so we need to remove that
         jobkey = x.strip().split('-')
-        if len(jobkey) == 4:
+        if len(jobkey) == 4: #the overrlord part for new format job_ids
             jobkey = jobkey[3]
-        else:
+        else: #the minion part job_ids
             jobkey = jobkey[0]
 
         create_time = float(jobkey)
@@ -78,7 +78,11 @@ def __get_open_ids(storage):
     result_hash_pack = {}
     #print storage
     for job_id,result in storage.iteritems():
-        result_hash_pack[job_id]=result[0]
+        #TOBE REMOVED that control is for old job_ids 
+        #some users who will upgrade to new version will have errors
+        #if we dont have that control here :)
+        if len(job_id.split("-"))==4: #ignore the old job_ids
+            result_hash_pack[job_id]=result[0]
 
     return result_hash_pack
 
