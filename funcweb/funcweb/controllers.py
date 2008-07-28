@@ -308,7 +308,7 @@ class Funcweb(object):
                     #cleanup tha database firstly 
                     purge_old_jobs()
                     self.async_manager = AsyncResultManager()
-                    self.async_manager.refresh_list()
+                self.async_manager.refresh_list()
             
             #TODO reformat that returning string to be more elegant to display :)
             return str(result)
