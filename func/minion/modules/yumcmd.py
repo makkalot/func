@@ -32,7 +32,7 @@ class Yum(func_module.FuncModule):
         try:
             ayum.doLock()
             if pkg != None:
-                tx_result = ayum.update(name=pkg)
+                tx_result = ayum.update(pattern=pkg)
             else:
                 tx_result = ayum.update()
             ayum.buildTransaction()
