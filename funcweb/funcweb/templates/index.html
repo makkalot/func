@@ -21,7 +21,7 @@
         <div class="emptyimagebox" id="emptyimagebox"></div>
         <div class="minioncontent" id="minioncontent">
             <div class="minionsbigbox" id="minionsbigbox" py:if="minions">
-                <div align="center" class="graytexts">Methods</div> 
+                <div align="center" class="graytexts">Mininons</div> 
                 <div id="minionstexts" py:for="minion in minions">
                     <a onclick="myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide().load('/funcweb/minion/${minion}').show('slow');" href="#modulescontent" class="minionstextblue">${minion}</a>
                 </div>
