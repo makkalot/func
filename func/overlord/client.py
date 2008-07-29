@@ -94,20 +94,26 @@ class Minions(object):
         self.all_urls = []
 
     def _get_new_hosts(self):
-        self.new_hosts = self.group_class.get_hosts_by_groupgoo(self.spec)
+        self.new_hosts = self.group_class.get_hosts_by_group_glob(self.spec)
         return self.new_hosts
 
     def _get_all_hosts(self):
         seperate_gloobs = self.spec.split(";")
         seperate_gloobs = seperate_gloobs + self.new_hosts
         for each_gloob in seperate_gloobs:
+            #if there is some string from group glob just skip it
+            if each_gloob.startswith('@'):
+                continue
             actual_gloob = "%s/%s.%s" % (self.config.certroot, each_gloob, self.config.cert_extension)
             certs = glob.glob(actual_gloob)
             for cert in certs:
-                self.all_certs.append(cert)
-                host = cert.replace(self.config.certroot,"")[1:-(len(self.config.cert_extension) + 1)]
-                self.all_hosts.append(host)
-        return self.all_hosts
+                #if the spec includes some groups and also it includes some *
+                #may cause some duplicates so should check that
+                #For example spec = "@home_group;*" will give lots of duplicates as a result
+                if not cert in self.all_certs:
+                    self.all_certs.append(cert)
+                    host = cert.replace(self.config.certroot,"")[1:-(len(self.config.cert_extension) + 1)]
+                    self.all_hosts.append(host)
 
     def get_all_hosts(self):
         self._get_new_hosts()
