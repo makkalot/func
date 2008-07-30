@@ -1,0 +1,168 @@
+#!/usr/bin/python
+
+
+import optparse
+import os
+import subprocess
+import sys
+
+# wrapper script to make it a little easier to track git repo's of func
+# 
+## Copyright 2008, Adrian Likins <alikins@redhat.com>
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+
+
+#REPOS=$(git-config --file gum.config --get-regexp "remote\..*\.url" | cut -f2 -d' ')
+#echo $REPOS
+
+def get_remotes():
+    pass
+
+
+def find_new_branches(remote):
+    pass
+
+def find_all_new_branches(remotes):
+    pass
+
+
+# ugh, what is it with me and software that involces "repos"? -akl
+class Repos(object):
+    remotes = {}
+    def __init__(self):
+        self.remotes = {}
+        self.parse_config()
+        
+        
+
+    def parse_config(self, filename="gum.config"):
+        cmd = "git-config --file %s --get-regexp 'remote\..*\.url'" % filename
+        p = subprocess.Popen(cmd,  shell=True,
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = p.communicate()
+        lines = output[0].splitlines()
+
+        for line in lines:
+            (name_blurb, url) = line.split()
+            # uh yeah, this should be a regex of something. 
+            name = name_blurb.split('.')[1]
+            self.remotes[name] = url
+
+    def find_remote_branches(self, names):
+        for name in names:
+            branches_cmd = "git-ls-remote -h %s" % name
+            p = subprocess.Popen(branches_cmd,  shell=True,
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            output = p.communicate()[0]
+ #           print output
+            branch_names = output.splitlines()
+            for branch_name_bits in branch_names:
+#                print branch_name
+                bits = branch_name_bits.split()
+#                print bits
+                # it's not really a path, but it looks enough like it
+                branch_name = os.path.basename(bits[1])
+                print "name: %s branch_name %s" % (name, branch_name)
+#                print branch_name
+            
+           # print branch_name
+
+
+    def add_remote(self, names):
+        for name in names:
+            add_cmd = "echo git remote add %s %s" % (name, self.remotes[name])
+            p = subprocess.Popen(add_cmd,  shell=True,
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            output = p.communicate()
+            
+            fetch_cmd = "echo git fetch %s" % name
+            p = subprocess.Popen(fetch_cmd,  shell=True,
+                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+            output = p.communicate()
+            
+            branches = self.find_remote_branches(name)
+
+
+
+    def list_remotes(self):
+        for name in self.remotes.keys():
+            print name, self.remotes[name]
+
+
+    def names(self):
+        return self.remotes.keys()
+
+# parse args
+# "parse" gum.conf
+#
+
+#options
+#   list-remotes
+#   list-branches
+#   add [remote]
+#       (adds branches automatically)
+#       --all
+#       (adds all remotes we know about, and all branches)
+#
+#   update remote
+#       (adds any new branches)
+#
+#   orphans [remote]
+#       (shows any branches that are local that no longer exist remotely)
+#
+
+
+
+def main(args):
+    parser = optparse.OptionParser()
+    parser.add_option("-a","--add",
+                      help="add a remote repo",
+                      action="store_true",
+                      dest="add",
+                      default=False)
+    parser.add_option("-A","--add-all",
+                      help="add a remote repo",
+                      action="store_true",
+                      dest="add_all",
+                      default=False)
+    parser.add_option("-l","--list",
+                      help="list remote repos",
+                      action="store_true",
+                      dest="list_remote",
+                      default=False)
+    parser.add_option("-L","--list-branches",
+                      help="list remote repos and branches",
+                      action="store_true",
+                      dest="list_remote_branches",
+                      default=False)
+    
+    parser.add_option("-u","--update",
+                      help="update remote repos",
+                      action="store_true",
+                      dest="update_remote",
+                      default=False)
+
+    
+    (options,args) = parser.parse_args()
+
+
+    repos = Repos()
+
+    if options.add:
+        repos.add_remote(args)
+        
+
+    if options.add_all:
+        repos.add_remote(repos.names())
+
+    if options.list_remote:
+        repos.list_remotes()
+
+    if options.list_remote_branches:
+        repos.find_remote_branches(repos.names())
+
+if __name__ == "__main__":
+    main(sys.argv)
