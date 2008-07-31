@@ -104,3 +104,57 @@ function makePOSTRequest(source, url, target, parameters, options) {
     http_request.setRequestHeader("Connection", "close");
     http_request.send(parameters);
 }
+
+function glob_submit(form_element,target_dom){
+    /*
+     * Because it is a common function we have to move it here for better results
+     * form_element is what we submit and the target_dom is the place that will be replaced
+     */
+
+    //sometimes we are not sure which dom to get so is that situation
+    if(compare(target_dom,'not_sure')==0)
+        target_dom = which_dom();
+
+    //if we are in the index page should to that 
+    if (compare(target_dom,'minioncontent')==0){
+        before_action = "myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();";
+    }
+    else if(compare(target_dom,'groupscontent')==0){
+        before_action = "myj('#miniongroupcontents').hide();";
+    }
+    
+    form_result = remoteFormRequest(form_element,target_dom, {
+            'loading': null,
+            'confirm': null, 
+            'after':null,
+            'on_complete':null, 
+            'loaded':null, 
+            'on_failure':null, 
+            'on_success':null, 
+            'before':before_action 
+            }
+            );
+    return form_result;
+}
+
+function which_dom(){
+    /*
+     * We use the glob submit in lots of places so we should
+     * know where we are actually so that method will handle that
+     */
+
+    dom_result = getElement('minioncontent');
+    if (dom_result != null){
+        //alert("Im giving back the minioncontent");
+        return 'minioncontent';
+
+    }
+    
+    dom_result = getElement('another');
+    //will change it later
+     if (dom_result != null){
+        return 'another';
+    }
+
+    return dom_result;
+}
