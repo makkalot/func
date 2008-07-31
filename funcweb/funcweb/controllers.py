@@ -428,9 +428,62 @@ class Funcweb(object):
         """
         identity.current.logout()
         raise redirect("/")
+ 
+################################ Groups API methods here #############################    
+    @expose(template="funcweb.templates.groups_main")
+    @identity.require(identity.not_anonymous())
+    def groups_main(self):
+        """
+        The main page of the groups
+        """
+        #a dummy object to let us to get the groups api
+        #we dont supply a new group file it will handle the default
+        minion_api = Minions("*")
+        groups = minion_api.group_class.get_group_names()
+        del minion_api
+        #result to the template please :)
+        return dict(groups = groups)
 
+    @expose(template="funcweb.templates.list_group")
+    @identity.require(identity.not_anonymous())
+    def add_new_group(self,group_name,submit):
+        """
+        Adding a new group
+        """
+        minion_api = Minions("*")
+        minion_api.group_class.add_group(group_name,save=True)
+        groups = minion_api.group_class.get_group_names()
+        del minion_api
+        return dict(groups = groups)
 
+    @expose(template="funcweb.templates.list_group")
+    @identity.require(identity.not_anonymous())
+    def remove_group(self,**kw):
+        """
+        Adding a new group
+        """
+        minion_api = Minions("*")
+        minion_api.group_class.remove_group(kw['group_name'],save=True)
+        groups = minion_api.group_class.get_group_names()
+        del minion_api
+        return dict(groups = groups)
 
+    @expose(template="funcweb.templates.list_group")
+    @identity.require(identity.not_anonymous())
+    def list_host_by_group(self,group_name):
+        """
+        Get the hosts for the specified group_name
+        """
+        if not group_name.startswith('@'):
+            group_name = "".join(["@",group_name.strip()])
+        
+        minion_api = Minions("*")
+        hosts = minion_api.group_class.get_hosts_by_group_glob(kw['group_name'])
+        all_minions = minion_api.get_all_hosts()
+        del minion_api
+        return dict(hosts = hosts,all_minions = all_minions)
+
+############################# END of GROUPS API METHODS ############################
 class Root(controllers.RootController):
     
     @expose()
