@@ -57,12 +57,18 @@ class TestGroupsBase(object):
     #def test_expand_servers(self):
     #    result = self.minions.get_urls()
     #    print result
+        assert result == self.util_save_change()
 
     def test_get_groups(self):
         #will reset on every test
         self.setUp()
         result = self.minions.group_class.get_groups()
         assert self.test_dict == result
+
+    def test_get_group_names(self):
+        self.setUp()
+        result = self.minions.group_class.get_group_names()
+        assert self.test_dict.keys() == result
 
 
     def test_add_hosts_to_group(self):
@@ -90,6 +96,19 @@ class TestGroupsBase(object):
         self.test_dict["home_group"].append("bloop")
         assert self.test_dict == result
         
+    def test_add_host_list(self):
+        
+        self.setUp()
+        self.minions.group_class.add_host_list("home_group",["bloop","woop","zoo"])
+        self.test_dict["home_group"].extend(["bloop","woop","zoo"])
+        result = self.minions.group_class.get_groups()
+        assert self.test_dict == result
+
+        #add one for save 
+        self.minions.group_class.add_host_list("home_group",["hey.com"],save = True)
+        result = self.minions.group_class.get_groups()
+        assert result == self.util_save_change()
+
 
     def test_save_changes(self):
         self.setUp()
@@ -138,7 +157,22 @@ class TestGroupsBase(object):
         #print "The result we got is : ",result
         #print "The data from file is :i ",self.util_save_change()
         assert result == self.util_save_change()
+
+    def test_remove_host_list(self):
+        self.setUp()
+        self.minions.group_class.remove_host_list("home_group",["first","second"])
+        self.test_dict["home_group"].remove("first")
+        self.test_dict["home_group"].remove("second")
+        result = self.minions.group_class.get_groups()
+        assert self.test_dict == result
         
+        #also check the save situation
+        self.minions.group_class.add_host_to_group("home_group","bloop")
+        self.minions.group_class.remove_host_list("home_group",["bloop"],save = True)
+        result = self.minions.group_class.get_groups()
+        assert result == self.util_save_change()
+
+
     def test_add_group(self):
         self.setUp()
         self.minions.group_class.add_group("lab_group")

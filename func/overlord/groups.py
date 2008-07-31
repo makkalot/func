@@ -77,8 +77,6 @@ class Groups(object):
             #a control for it will be missed otherwise :)
             if len(hoststring)!=0:
                 hosts.append(hoststring)
-            else:
-                sys.stderr.write("\nYou can only separate the host by , and ;\n")
             return hosts
 
         #now append the god ones
@@ -90,7 +88,7 @@ class Groups(object):
 
         return hosts
 
-    def add_hosts_to_group(self, group, hoststring):
+    def add_hosts_to_group(self, group, hoststring,save = False):
         """
         Here you can add more than one hosts to a given group
         """
@@ -104,7 +102,7 @@ class Groups(object):
         for host in hosts:
             self.add_host_to_group(group, host)        
 
-    def add_host_to_group(self, group, host):
+    def add_host_to_group(self, group, host,save = False):
         """
         Add a single host to group
         """
@@ -115,11 +113,33 @@ class Groups(object):
         if not host in self.__groups[group]:
             self.__groups[group].append(host) 
 
+    def add_host_list(self,group,host_list,save = False):
+        """
+        Similar as other add methods but accepts a list of hosts
+        instead of some strings
+        """
+        if type(host_list) != list:
+            sys.stderr.write("We accept only lists for for add_host_list method")
+            return
+
+        for host in host_list:
+            self.add_host_to_group(group,host)
+
+        if save:
+            self.save_changes()
+
+
     def get_groups(self):
         """
         Simple getter
         """
         return self.__groups
+
+    def get_group_names(self):
+        """
+        Getting the groups names
+        """
+        return self.__groups.keys()
 
     def get_hosts_by_group_glob(self, group_glob_str):
         """
@@ -176,7 +196,9 @@ class Groups(object):
         return True
 
     def remove_host(self,group_name,host,save=False):
-        
+        """
+        Removes a proper host from the conf file
+        """
         if not self.__groups.has_key(group_name) or not host in self.__groups[group_name]:
             return False
         
@@ -187,6 +209,24 @@ class Groups(object):
             self.save_changes()
 
         return True
+
+    def remove_host_list(self,group,host_list,save = False):
+        """
+        Remove a whole list from the conf file of hosts
+        """
+
+        if type(host_list) != list:
+            sys.stderr.write("We accept only lists for for add_host_list method")
+            return False
+
+        for host in host_list:
+            self.remove_host(group,host,save = False)
+            
+        if save:
+            self.save_changes()
+
+
+
 
     def add_group(self,group_name,save=False):
         """
