@@ -24,8 +24,18 @@ function addDomAjaxREsult(){
 function remoteFormRequest(form, target, options) {
 	var query = Array();
     var contents = formContents(form);
-    for (var j=0; j<contents[0].length; j++)
-        query[contents[0][j]] = contents[1][j];
+    for (var j=0; j<contents[0].length; j++){
+        if(compare(target,'group_small')==0){
+            if(!query[contents[0][j]]){
+                query[contents[0][j]] = [];
+            }
+            //add that here
+            query[contents[0][j]].push(contents[1][j]);
+
+        }
+        else
+            query[contents[0][j]] = contents[1][j];
+    }
 	query["tg_random"] = new Date().getTime();
 	//makePOSTRequest(form.action, target, queryString(query));
 	remoteRequest(form, form.action, target, query, options);
@@ -110,7 +120,8 @@ function glob_submit(form_element,target_dom){
      * Because it is a common function we have to move it here for better results
      * form_element is what we submit and the target_dom is the place that will be replaced
      */
-
+    
+    before_action = null;
     //sometimes we are not sure which dom to get so is that situation
     if(compare(target_dom,'not_sure')==0)
         target_dom = which_dom();
@@ -134,6 +145,7 @@ function glob_submit(form_element,target_dom){
             'before':before_action 
             }
             );
+    
     return form_result;
 }
 
