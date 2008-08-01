@@ -468,20 +468,66 @@ class Funcweb(object):
         del minion_api
         return dict(groups = groups)
 
-    @expose(template="funcweb.templates.list_group")
+    @expose(template="funcweb.templates.group_minion")
     @identity.require(identity.not_anonymous())
     def list_host_by_group(self,group_name):
         """
         Get the hosts for the specified group_name
         """
+        from copy import copy
+        copy_group_name = copy(group_name)
         if not group_name.startswith('@'):
             group_name = "".join(["@",group_name.strip()])
         
         minion_api = Minions("*")
-        hosts = minion_api.group_class.get_hosts_by_group_glob(kw['group_name'])
+        hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
         all_minions = minion_api.get_all_hosts()
         del minion_api
-        return dict(hosts = hosts,all_minions = all_minions)
+        return dict(hosts = hosts,all_minions = all_minions,group_name = copy_group_name)
+
+    @expose(template="funcweb.templates.group_small")
+    @identity.require(identity.not_anonymous())
+    def add_minions_togroup(self,**kw):
+        """
+        Add or remove multiple minions to given group
+        """
+        #print "The dict value is : ",kw
+        minion_api = Minions("*")
+        hosts = []
+        if not kw.has_key('group_name') or not kw.has_key('action_name'):
+            return dict(hosts =hosts,group_name = None)
+        
+        current_host_list = None
+
+        #if we are adding some hosts 
+        if kw['action_name'] == "add":
+            if not kw.has_key('checkminion'):
+                return dict(hosts =hosts,group_name = kw['group_name'])
+            current_host_list = kw['checkminion']
+        else:#it is a remove action
+            if not kw.has_key('rmgroup'):
+                return dict(hosts =hosts,group_name = kw['group_name'])
+            current_host_list = kw['rmgroup']
+        #sanity checks
+        if type(current_host_list)!=list:
+            hosts.extend(current_host_list.split(","))
+        else:
+            hosts.extend(current_host_list)
+        
+        if kw['action_name'] == "add":
+            minion_api.group_class.add_host_list(kw['group_name'],hosts,save = True)
+        else:#remove them
+            minion_api.group_class.remove_host_list(kw['group_name'],hosts,save = True)
+
+        from copy import copy
+        #we need that check because @ is a sign for group search
+        group_name = copy(kw['group_name'])
+        if not group_name.startswith('@'):
+            group_name = "".join(["@",group_name.strip()])
+        
+        hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
+        return dict(hosts =hosts,group_name = kw['group_name'])
+    
 
 ############################# END of GROUPS API METHODS ############################
 class Root(controllers.RootController):
