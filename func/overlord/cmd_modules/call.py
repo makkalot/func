@@ -163,6 +163,7 @@ class Call(base_command.BaseCommand):
             else:
                 async_done = False
                 while not async_done:
+                    time.sleep(3)
                     (return_code, async_results) = self.overlord_obj.job_status(results)
                     if return_code == jobthing.JOB_ID_RUNNING:
                         time.sleep(0.1)
