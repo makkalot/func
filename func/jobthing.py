@@ -200,7 +200,6 @@ def job_status(jobid, client_class=None):
     # users should not be calling jobthing.py methods directly.
    
     got_status = __get_status(jobid)
-
     # if the status comes back as JOB_ID_PARTIAL what we have is actually a hash
     # of hostname/minion-jobid pairs.  Instantiate a client handle for each and poll them
     # for their actual status, filling in only the ones that are actually done.
@@ -234,11 +233,13 @@ def job_status(jobid, client_class=None):
                 some_missing = True
 
         if some_missing:
-            __update_status(jobid, JOB_ID_PARTIAL, partial_results)
+            if partial_results:
+                __update_status(jobid, JOB_ID_PARTIAL, partial_results)
             return (JOB_ID_PARTIAL, partial_results)
-
+        
         else:
-            __update_status(jobid,JOB_ID_FINISHED, partial_results)
+            if partial_results:
+                __update_status(jobid,JOB_ID_FINISHED, partial_results)
             return (JOB_ID_FINISHED, partial_results)
 
     else:
