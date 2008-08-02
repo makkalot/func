@@ -39,10 +39,12 @@ def module_walker(topdir):
 
     return module_files
 
-def load_modules(blacklist=None):
+def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None):
 
-    module_file_path="%s/func/minion/modules/" % distutils.sysconfig.get_python_lib()
-    mod_path="%s/func/minion/"  % distutils.sysconfig.get_python_lib()
+    python_path = distutils.sysconfig.get_python_lib()
+    module_file_path = "%s/%s" % (python_path, path)
+    (mod_path, mod_dir) = os.path.split(os.path.normpath(module_file_path))
+    mod_dir = "func."+module_file_path[len(python_path+'/func/'):].replace("/",".")
 
     sys.path.insert(0, mod_path)
     mods = {}
@@ -80,10 +82,10 @@ def load_modules(blacklist=None):
 
         try:
             # Auto-detect and load all FuncModules
-            blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
+            blip =  __import__("%s%s" % ( mod_dir,mod_imp_name), globals(), locals(), [mod_imp_name])
             for obj in dir(blip):
                 attr = getattr(blip, obj)
-                if isclass(attr) and issubclass(attr, func_module.FuncModule):
+                if isclass(attr) and issubclass(attr, main_class):
                     logger.debug("Loading %s module" % attr)
                     mods[mod_imp_name] = attr()
 
