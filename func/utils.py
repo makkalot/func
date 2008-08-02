@@ -29,4 +29,26 @@ def is_error(result):
     return False
 
 
-              
+def remove_weird_chars(dirty_word):
+    """
+    That method will be used to clean some
+    glob adress expressions because async stuff
+    depends on that part
+    
+    @param dirty_word : word to be cleaned
+    """
+    from copy import copy
+    copy_word = copy(dirty_word)
+    copy_word = copy_word.replace("-","_")
+    return copy_word
+
+def get_formated_jobid(**id_pack):
+    import time
+    import pprint
+
+    glob = remove_weird_chars(id_pack['spec'])
+    module = remove_weird_chars(id_pack['module'])
+    method = remove_weird_chars(id_pack['method'])
+    job_id = "".join([glob,"-",module,"-",method,"-",pprint.pformat(time.time())])
+    return job_id
+
