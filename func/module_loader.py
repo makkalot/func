@@ -16,6 +16,7 @@
 import distutils.sysconfig
 import os
 import sys
+import inspect
 from gettext import gettext
 _ = gettext
 
@@ -36,8 +37,16 @@ def module_walker(topdir):
                 # in the module name, and foo..bar doesnt work -akl
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
-
     return module_files
+
+def load_methods(path, main_class):
+    methods = {}
+    modules = load_modules(path, main_class)
+    for x in modules.keys():
+        for method in dir(modules[x]):
+            if is_public_valid_method(modules[x], method):
+                methods["%s.%s" % (x,method)]=getattr(modules[x], method)
+    return methods
 
 def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None):
 
@@ -102,6 +111,14 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
             continue
 
     return mods
+
+def is_public_valid_method(obj, attr, blacklist=[]):
+    if inspect.ismethod(getattr(obj, attr)) and attr[0] != '_':
+        for b in blacklist:
+            if attr==b:
+                return False
+        return True
+    return False
 
 
 if __name__ == "__main__":

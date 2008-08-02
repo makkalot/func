@@ -15,6 +15,7 @@ import inspect
 from func import logger
 from certmaster.config import read_config, BaseConfig
 from func.commonconfig import FuncdConfig
+import func.module_loader
 from func.minion.func_arg import * #the arg getter stuff
 
 class FuncModule(object):
@@ -85,10 +86,7 @@ class FuncModule(object):
         return self.description
 
     def __is_public_valid_method(self,attr):
-        if inspect.ismethod(getattr(self, attr)) and attr[0] != '_' and\
-                attr != 'register_rpc' and attr!='register_method_args':
-                    return True
-        return False
+        return func.module_loader.is_public_valid_method(self, attr, blacklist=['register_rpc', 'register_method_args'])
 
     def __get_method_args(self):
         """
