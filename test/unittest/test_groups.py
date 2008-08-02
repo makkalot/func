@@ -54,11 +54,6 @@ class TestGroupsBase(object):
         self.gfb.create(self.the_groups_dict)
    
 
-    #def test_expand_servers(self):
-    #    result = self.minions.get_urls()
-    #    print result
-        assert result == self.util_save_change()
-
     def test_get_groups(self):
         #will reset on every test
         self.setUp()
@@ -103,8 +98,7 @@ class TestGroupsBase(object):
         self.test_dict["home_group"].extend(["bloop","woop","zoo"])
         result = self.minions.group_class.get_groups()
         assert self.test_dict == result
-
-        #add one for save 
+       #add one for save 
         self.minions.group_class.add_host_list("home_group",["hey.com"],save = True)
         result = self.minions.group_class.get_groups()
         assert result == self.util_save_change()
