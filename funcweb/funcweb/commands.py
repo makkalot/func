@@ -18,6 +18,9 @@ cherrypy.lowercase_api = True
 class ConfigurationError(Exception):
     pass
 
+#that variable will help us to see when we are in PRODUCTION 
+PRODUCTION_ENV = False
+
 def start():
     """Start the CherryPy application server."""
 
@@ -54,6 +57,8 @@ def start():
     from funcweb.controllers import Root
     
     if exists("/etc/funcweb/prod.cfg"):
+        #we work with production settings now !
+        PRODUCTION_ENV = True
         utils.daemonize("/var/run/funcwebd.pid")
     #then start the server
     try:
