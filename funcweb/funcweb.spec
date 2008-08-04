@@ -22,6 +22,9 @@ Requires: mod_ssl >= 2.0
 Requires: httpd >= 2.0
 Requires: TurboGears >= 1.0.4.2
 Requires: pam
+#a bug in Turbogears package that causes some problems if 
+#bigger version than that one is installed on the system !
+Requires: python-cherrypy < 3.0
 
 #the build requires
 BuildRequires: python-devel
