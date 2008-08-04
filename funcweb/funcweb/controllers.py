@@ -497,7 +497,7 @@ class Funcweb(object):
         del minion_api
 
         #store the current group_name in cache variable 
-        self.group_name = group_name
+        self.group_name = copy_group_name
         return dict(hosts = hosts,all_minions = all_minions,group_name = copy_group_name,submit_adress="/funcweb/filter_group_minions")
 
     @expose(template="funcweb.templates.group_small")
