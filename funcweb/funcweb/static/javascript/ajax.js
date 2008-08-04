@@ -155,6 +155,7 @@ function which_dom(){
      * know where we are actually so that method will handle that
      */
 
+    //that is for index.html
     dom_result = getElement('minioncontent');
     if (dom_result != null){
         //alert("Im giving back the minioncontent");
@@ -162,10 +163,11 @@ function which_dom(){
 
     }
     
-    dom_result = getElement('another');
+    //it is for groups_main.html
+    dom_result = getElement('minion_small');
     //will change it later
      if (dom_result != null){
-        return 'another';
+        return 'minion_small';
     }
 
     return dom_result;
