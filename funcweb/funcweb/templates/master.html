@@ -6,12 +6,13 @@
   <head py:match="head" py:attrs="select('@*')">
     <meta content="text/html; charset=UTF-8" http-equiv="content-type"
       py:replace="''" />
-    <title py:content="'Your Title Goes Here'"></title>
+    <title py:content="'Funcweb'"></title>
 
     <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/jquery.js')}" />
     <link py:for="js in tg_js_head" py:strip="">${ET(js.display())}</link>
     <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
     <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ajax.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/utils.js')}" />
 
 
     <style type="text/css" media="screen">
