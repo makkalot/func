@@ -43,14 +43,17 @@ class Funcweb(object):
             }
     async_manager = None
     first_run = True
+    group_name = None # a cache variable for current group_name
     #will be reused for widget validation
 
-    @expose(allow_json=True)
-    @identity.require(identity.not_anonymous())
-    def minions(self, glob='*',submit=None):
-        """ Return a list of our minions that match a given glob """
-        #make the cache thing
-
+    def get_current_minion_list(self,glob):
+        """
+        That method will not be reachable from web interface it just 
+        a util method that gives back the current minion list back, 
+        we use that minion glob form in lots of places so it is a hack
+        to avoid writing stupid code again and again :)
+        """
+        
         if self.func_cache['glob'] == glob:
             minions = self.func_cache['minions']
         else:
@@ -59,10 +62,19 @@ class Funcweb(object):
             self.func_cache['glob']=glob
             self.func_cache['minions']=minions
         
+        return minions
+
+    @expose(allow_json=True)
+    @identity.require(identity.not_anonymous())
+    def minions(self, glob='*',submit=None):
+        """ Return a list of our minions that match a given glob """
+        #make the cache thing
+
+        minions = self.get_current_minion_list(glob) 
         if not submit:
-            return dict(minions=minions,tg_template="funcweb.templates.index")
+            return dict(minions=minions,submit_adress="/funcweb/minions",tg_template="funcweb.templates.index")
         else:
-            return dict(minions=minions,tg_template="funcweb.templates.minions")
+            return dict(minions=minions,submit_adress="/funcweb/minions",tg_template="funcweb.templates.minions")
 
 
     index = minions # start with our minion view, for now
@@ -483,7 +495,10 @@ class Funcweb(object):
         hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
         all_minions = minion_api.get_all_hosts()
         del minion_api
-        return dict(hosts = hosts,all_minions = all_minions,group_name = copy_group_name)
+
+        #store the current group_name in cache variable 
+        self.group_name = group_name
+        return dict(hosts = hosts,all_minions = all_minions,group_name = copy_group_name,submit_adress="/funcweb/filter_group_minions")
 
     @expose(template="funcweb.templates.group_small")
     @identity.require(identity.not_anonymous())
@@ -528,6 +543,21 @@ class Funcweb(object):
         hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
         return dict(hosts =hosts,group_name = kw['group_name'])
     
+    @expose(allow_json=True)
+    @identity.require(identity.not_anonymous())
+    def filter_group_minions(self,glob='*',submit=None):
+        """ Return a list of our minions that match a given glob """
+        #make the cache thing
+        print "The glob we got is :",glob
+        print "The glob we got is :",submit
+
+        minions = self.get_current_minion_list(glob) 
+        if submit:
+            return dict(all_minions=minions,submit_adress="/funcweb/filter_group_minions",tg_template="funcweb.templates.minion_small",group_name= self.group_name)
+        else:
+            return str("Wrong way :)")
+
+
 
 ############################# END of GROUPS API METHODS ############################
 class Root(controllers.RootController):
