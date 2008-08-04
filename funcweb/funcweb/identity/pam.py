@@ -14,6 +14,8 @@ __all__ = ['authenticate']
 from ctypes import CDLL, POINTER, Structure, CFUNCTYPE, cast, pointer, sizeof
 from ctypes import c_void_p, c_uint, c_char_p, c_char, c_int
 
+#funcweb specific part 
+from funcweb.commands import PRODUCTION_ENV
 
 LIBPAM = CDLL("libpam.so.0")
 LIBC = CDLL("libc.so.6")
@@ -82,7 +84,7 @@ PAM_AUTHENTICATE = LIBPAM.pam_authenticate
 PAM_AUTHENTICATE.restype = c_int
 PAM_AUTHENTICATE.argtypes = [PamHandle, c_int]
 
-def authenticate(username, password, service='funcweb'):
+def authenticate(username, password, service=None):
     """Returns True if the given username and password authenticate for the
     given service.  Returns False otherwise
 
@@ -92,6 +94,13 @@ def authenticate(username, password, service='funcweb'):
 
     ``service``: the PAM service to authenticate against.
                  Defaults to 'login'"""
+    #we make that control because we dont want to install ti everytime on system
+    #while working on funcweb ...
+    if PRODUCTION_ENV:
+        service = "funcweb"
+    else:
+        service = "login"
+
     @CONV_FUNC
     def my_conv(n_messages, messages, p_response, app_data):
         """Simple conversation function that responds to any
