@@ -125,8 +125,8 @@ max-height: 400px;
 width: 40%;
 padding:10px;
 float:left;
-margin-left:30px;
-margin-right:30px;
+margin-left:35px;
+margin-right:35px;
 }
 #groupbox {
 background-color:#F1F5F6;
@@ -175,4 +175,11 @@ font-family: Arial, Helvetica, sans-serif;
 font-size:18px;
 color: #5499d4;
 text-decoration:none;
+}
+
+#minion_glob_box {
+padding-right:175px;
+width: 80%;
+height: 50px;
+float:right;
 }
