@@ -548,8 +548,6 @@ class Funcweb(object):
     def filter_group_minions(self,glob='*',submit=None):
         """ Return a list of our minions that match a given glob """
         #make the cache thing
-        print "The glob we got is :",glob
-        print "The glob we got is :",submit
 
         minions = self.get_current_minion_list(glob) 
         if submit:
