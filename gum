@@ -34,12 +34,17 @@ class Repos(object):
     remotes = {}
     def __init__(self):
         self.remotes = {}
-        self.parse_config()
-        
-        
+        self.local_config = {}
+        self.parse_config(filename="gum.config",
+                          config=self.remotes)
+        self.parse_config(filename=".git/config",
+                          config=self.local_config)
 
-    def parse_config(self, filename="gum.config"):
-        cmd = "git-config --file %s --get-regexp 'remote\..*\.url'" % filename
+    def parse_config(self, filename=None, config={}):
+        file_arg = ""
+        if filename:
+            file_arg = "--file %s" % filename
+        cmd = "git-config %s --get-regexp 'remote\..*\.url'" % file_arg
         p = subprocess.Popen(cmd,  shell=True,
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output = p.communicate()
@@ -49,48 +54,91 @@ class Repos(object):
             (name_blurb, url) = line.split()
             # uh yeah, this should be a regex of something. 
             name = name_blurb.split('.')[1]
-            self.remotes[name] = url
+            config[name] = url
 
-    def find_remote_branches(self, names):
+    def find_remote_branches(self, name):
+        remote_branches = []
+        branches_cmd = "git-ls-remote -h %s" % self.remotes[name]
+        p = subprocess.Popen(branches_cmd,  shell=True,
+                             stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = p.communicate()[0]
+ #           print "output", output
+        branch_names = output.splitlines()
+        for branch_name_bits in branch_names:
+            #                print branch_name
+            bits = branch_name_bits.split()
+            #                print bits
+            # it's not really a path, but it looks enough like it
+            branch_name = os.path.basename(bits[1])
+            #               print "name: %s branch_name %s" % (name, branch_name)
+            #                print branch_name
+            remote_branches.append(branch_name)
+
+        return remote_branches
+
+    def find_remotes_branches(self, names):
+        remote_branches = {}
         for name in names:
-            branches_cmd = "git-ls-remote -h %s" % name
-            p = subprocess.Popen(branches_cmd,  shell=True,
-                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            output = p.communicate()[0]
-            print "output", output
-            branch_names = output.splitlines()
-            for branch_name_bits in branch_names:
-#                print branch_name
-                bits = branch_name_bits.split()
-#                print bits
-                # it's not really a path, but it looks enough like it
-                branch_name = os.path.basename(bits[1])
-                print "name: %s branch_name %s" % (name, branch_name)
-#                print branch_name
-            
-           # print branch_name
+            branches = self.find_remote_branches(name)
+            for branch in branches:
+                if not remote_branches.has_key(name):
+                    remote_branches[name] = []
+                remote_branches[name].append(branch)
 
+        return remote_branches
+
+
+    def show_remote_branches(self):
+        branches = self.find_remotes_branches(self.names())
+
+        for repo in branches.keys():
+            for branch in branches[repo]:
+                print "%s/%s" % (repo, branch)
+
+    # see if we are already cofigured for a remote
+    def remote_exists(self, name):
+        if self.local_config.has_key(name):
+            print "remote exists", name
+            return True
+        return False
+
+    # see if we are already configure for a branch
+    def branch_exists(self, name):
+        pass
 
     def add_remote(self, names):
+        print "add_remote", names
         for name in names:
-            add_cmd = "git remote add %s %s" % (name, self.remotes[name])
-            p = subprocess.Popen(add_cmd,  shell=True,
-                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            output = p.communicate()
+            if not self.remote_exists(name):
+                print "name", name, "self.remotes[name]", self.remotes[name]
+                add_cmd = "git remote add %s %s" % (name, self.remotes[name])
+                p = subprocess.Popen(add_cmd,  shell=True,
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                output = p.communicate()
             
-            fetch_cmd = "git fetch %s" % name
-            p = subprocess.Popen(fetch_cmd,  shell=True,
-                                 stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-            output = p.communicate()
+                fetch_cmd = "git fetch %s" % name
+                p = subprocess.Popen(fetch_cmd,  shell=True,
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                output = p.communicate()
+            else:
+                print "%s is already added to the local git config" % name
             
-#            branches = self.find_remote_branches(name)
+            branches = self.find_remote_branches(name)
+            print "add_remote branches", branches
+
+            for branch in branches:
+                add_branch_cmd = "echo git checkout -b  %s-%s %s/%s " % (name, branch, name, branch) 
+                p = subprocess.Popen(add_branch_cmd,  shell=True,
+                                     stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                output = p.communicate()
+                print add_branch_cmd, output
+
 
 
 
     def list_remotes(self):
         for name in self.remotes.keys():
             print name, self.remotes[name]
-
 
     def names(self):
         return self.remotes.keys()
@@ -154,7 +202,6 @@ def main(args):
     if options.add:
         repos.add_remote(args)
         
-
     if options.add_all:
         repos.add_remote(repos.names())
 
@@ -162,7 +209,8 @@ def main(args):
         repos.list_remotes()
 
     if options.list_remote_branches:
-        repos.find_remote_branches(repos.names())
+        repos.show_remote_branches()
+#        repos.find_remote_branches(repos.names())
 
 if __name__ == "__main__":
     main(sys.argv)
