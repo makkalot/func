@@ -86,7 +86,24 @@ function makePOSTRequest(source, url, target, parameters, options) {
             }
             if (http_request.status == 200) {
                 if(target) {
-                    target.innerHTML = http_request.responseText;
+                    var is_error = true;
+                    //some hacky olution to catch the python errors
+                    try{
+                        var check_error = evalJSON(http_request.responseText);
+                                    }
+                        catch(e){
+                            //There is no error in request
+                            is_error = false;
+                        }
+                        if (is_error == true){
+                            if (compare(check_error['fg_flash'],null)!=0)
+                                connection_error(check_error['tg_flash']);
+                            else
+                                is_error = false;
+                        }
+                        
+                        if (is_error == false)
+                            target.innerHTML = http_request.responseText;
                 }
                 //success
                 if (options['on_success']) {
@@ -96,9 +113,15 @@ function makePOSTRequest(source, url, target, parameters, options) {
                 //failure
                 if (options['on_failure']) {
                     eval(options['on_failure']);
-                } else {
+                //it seems to be an expiration ...
+                } else if(http_request.status == 403){
+                    alert('It seems that current session expired you should log in !');
+                    window.location = window.location.href;
+                }
+                else {
                     alert('There was a problem with the request. Status('+http_request.status+')');
                 }
+
             }
             //complete
             if (options['on_complete']) {
