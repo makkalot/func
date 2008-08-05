@@ -7,7 +7,7 @@
         <div class="minionsbigbox" id="minionsbigbox" py:if="minions">
             <div align="center" class="graytexts">Minions</div> 
             <div id="minionstexts" py:for="minion in minions">
-                <a onclick="myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide().load('/funcweb/minion/${minion}').show('slow');" href="#modulescontent" class="minionstextblue">${minion}</a>
+                <a onclick="list_minion_modules('${minion}');" href="#modulescontent" class="minionstextblue">${minion}</a>
             </div>
             </div>
             <div class="errorbox" id="errorbox" py:if="not minions">There is no minion to display with that glob, try something different</div>

@@ -8,7 +8,7 @@
             <div align="center" class="graytexts">${minion}</div>
     
         <div class="modulestexts" id="modulestexts" py:for="module in modules">
-            <a href="#methotdscontent" class="minionstextblue" onclick="myj('#widgetcontent').hide();myj('#resultcontent').hide();myj('#methotdscontent').hide().load('/funcweb/minion/${minion}/${module}').show('slow')">${module}</a>
+            <a href="#methotdscontent" class="minionstextblue" onclick="list_module_methods('${minion}','${module}');">${module}</a>
         </div>
         </span>
     </div>
