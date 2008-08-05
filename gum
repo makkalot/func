@@ -57,7 +57,7 @@ class Repos(object):
             p = subprocess.Popen(branches_cmd,  shell=True,
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             output = p.communicate()[0]
- #           print output
+            print "output", output
             branch_names = output.splitlines()
             for branch_name_bits in branch_names:
 #                print branch_name
@@ -73,17 +73,17 @@ class Repos(object):
 
     def add_remote(self, names):
         for name in names:
-            add_cmd = "echo git remote add %s %s" % (name, self.remotes[name])
+            add_cmd = "git remote add %s %s" % (name, self.remotes[name])
             p = subprocess.Popen(add_cmd,  shell=True,
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             output = p.communicate()
             
-            fetch_cmd = "echo git fetch %s" % name
+            fetch_cmd = "git fetch %s" % name
             p = subprocess.Popen(fetch_cmd,  shell=True,
                                  stdin=subprocess.PIPE, stdout=subprocess.PIPE)
             output = p.communicate()
             
-            branches = self.find_remote_branches(name)
+#            branches = self.find_remote_branches(name)
 
 
 
