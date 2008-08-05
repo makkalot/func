@@ -5,7 +5,8 @@ function poll_async_changes(result){
      */
 
     //runs on the index page and polls the server side if there is new
-    //change in the async db 
+    //change in the async db
+    //alert(repr(result));
     if (result['changed']==true){
         //alert('Check it ');
         var the_change_msg = "We have some async changes : ";
@@ -27,9 +28,14 @@ function check_async_change(){
                 }
                 ));
     d.addCallback(poll_async_changes);
+    d.addErrback(poll_error);
 
 }
 
 function poll_error(error){
-    alert("Some error in xmlHttpRequest check your connection : ");
+    var error_msg = "Async Error : probably you have shut down your server or your session has expired try to REFRESH and check your connection !";
+    var error_div = getElement("globalerror");
+    if (error_div != null){
+        error_div.innerHTML = error_msg;
+    }
 }
