@@ -460,8 +460,12 @@ class Funcweb(object):
 
         else:
             fc_async = self.func_cache['fc_async_obj']
-
-        id_result = fc_async.job_status(job_id)
+        
+        try:
+            id_result = fc_async.job_status(job_id)
+        except Exception,e:
+            flash("We encountered some error while getting the status for %s job id"%(job_id))
+            return dict()
 
         #the final id_result
         return dict(result=id_result)
@@ -546,11 +550,15 @@ class Funcweb(object):
         copy_group_name = copy(group_name)
         if not group_name.startswith('@'):
             group_name = "".join(["@",group_name.strip()])
-        
-        minion_api = Minions("*")
-        hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
-        all_minions = minion_api.get_all_hosts()
-        del minion_api
+       
+        try:
+            minion_api = Minions("*")
+            hosts = minion_api.group_class.get_hosts_by_group_glob(group_name)
+            all_minions = minion_api.get_all_hosts()
+            del minion_api
+        except Exception,e:
+            flash("We encountered some error while getting host list for %s "%(copy_group_name))
+            return dict()
 
         #store the current group_name in cache variable 
         self.group_name = copy_group_name
