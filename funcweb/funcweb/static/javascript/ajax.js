@@ -151,10 +151,10 @@ function glob_submit(form_element,target_dom){
 
     //if we are in the index page should to that 
     if (compare(target_dom,'minioncontent')==0){
-        before_action = "myj('#resultcontent').hide();myj('#widgetcontent').hide();myj('#methotdscontent').hide();myj('#modulescontent').hide();";
+        before_action = "hideElement(getElement('resultcontent'));hideElement(getElement('widgetcontent'));hideElement(getElement('methotdscontent'));hideElement(getElement('modulescontent'));";
     }
     else if(compare(target_dom,'groupscontent')==0){
-        before_action = "myj('#miniongroupcontents').hide();";
+        before_action = "hideElement(getElement('miniongroupcontents'));";
     }
     
     form_result = remoteFormRequest(form_element,target_dom, {

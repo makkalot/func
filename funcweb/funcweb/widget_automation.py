@@ -261,7 +261,7 @@ class RemoteFormAutomation(CoreWD):
                 validator = validator_schema,
                 name = "minion_form",
                 update = "resultbox",
-                before='myj(\'#resultcontent\').hide().show(\'slow\');addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
+                before='hideElement(getElement(\'resultcontent\'));showElement(getElement(\'resultcontent\'));addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
                 submit_text = "Send Command to Glob"
         )
