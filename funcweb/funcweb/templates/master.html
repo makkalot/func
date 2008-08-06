@@ -8,7 +8,6 @@
       py:replace="''" />
     <title py:content="'Funcweb'"></title>
 
-    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/jquery.js')}" />
     <link py:for="js in tg_js_head" py:strip="">${ET(js.display())}</link>
     <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
     <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ajax.js')}" />
@@ -26,10 +25,6 @@
   <script src="${tg.url('/funcweb/static/javascript/expanding_form.js')}" type="text/javascript"/>
   <script src="${tg.url('/funcweb/static/javascript/async_tools.js')}" type="text/javascript"/>
       
-  <script type="text/javascript">
-    jQuery._$ = MochiKit.DOM.getElement;
-    var myj = jQuery.noConflict();
-  </script> 
   
   </head>
   <body py:match="body" py:attrs="select('@*')">

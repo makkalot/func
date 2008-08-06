@@ -4,7 +4,7 @@
     
     <div align="center" class="graytexts">Groups</div>
     <span py:for="group_name in groups">
-        <div class="minionstextblue" id="groupstexts"><a href="#miniongroupcontents" onclick="myj('#miniongroupcontents').hide().load('/funcweb/list_host_by_group/${group_name}').show('slow');" >${group_name}</a></div>
+        <div class="minionstextblue" id="groupstexts"><a href="#miniongroupcontents" onclick="get_hosts_by_group('${group_name}');">${group_name}</a></div>
         <form action="/funcweb/remove_group" method="post" onsubmit="return !glob_submit(this,'groupscontent');" name="remove_form">
  
             <input type="hidden" name="group_name" value="${group_name}"/>
