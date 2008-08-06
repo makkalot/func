@@ -82,6 +82,45 @@ function get_method_widget(minion_name,module_name,method_name){
     send_some_JSON(base_url,data_pack,div_to_replace);
 }
 
+function check_async_result(job_id){
+    //sends some request to get the current job ids status :)
+    hideElement(getElement('resultcontent'));
+    var base_url = '/funcweb/check_job_status';
+    var data_pack = {
+        'job_id':job_id
+    };
+    var div_to_replace = 'resultcontent';
+    send_some_JSON(base_url,data_pack,div_to_replace);
+
+}
+
+function execute_link_method(minion,module,method){
+
+    //execution part for methods that accept no arguments
+    hideElement(getElement('resultcontent'));
+    var base_url = '/funcweb/execute_link';
+    var data_pack = {
+        'minion':minion,
+        'module':module,
+        'method':method
+    };
+    var div_to_replace = 'resultcontent';
+    send_some_JSON(base_url,data_pack,div_to_replace);
+}
+
+function get_hosts_by_group(group_name){
+    
+    //it is a part from group management api
+    //gets the hosts for specified group_name
+    hideElement(getElement('resultcontent'));
+    var base_url = '/funcweb/list_host_by_group';
+    var data_pack = {
+        'group_name':group_name
+    };
+    var div_to_replace = 'miniongroupcontents';
+    send_some_JSON(base_url,data_pack,div_to_replace);
+}
+
 function send_some_JSON(base_url,data_pack,div_to_replace){
     /*
      * A common method that will responsible for sending 
@@ -117,11 +156,12 @@ function replace_div_success(div_to_replace,result){
     }
 
     if (is_error == true){
-        if (compare(check_error['fg_flash'],null)!=0)
+        //js is so stupid damn :|
+        if (compare(check_error['fg_flash'],'null')!=0)
             connection_error(check_error['tg_flash']);
         else{
+            alert("It was marked as non error");
             is_error = false;
-            alert("I marked it as non error");
         }
     }
 
