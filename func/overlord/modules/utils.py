@@ -35,3 +35,6 @@ class utils(overlord_module.BaseModule):
                 return 0
 
             time.sleep(interval)
+
+    def list_minions(self):
+       return self.parent.minions
