@@ -195,7 +195,7 @@ class Overlord(object):
         if init_ssl:
             self.setup_ssl()
 
-        self.methods = module_loader.load_methods('func/overlord/modules/', overlord_module.BaseModule)
+        self.methods = module_loader.load_methods('func/overlord/modules/', overlord_module.BaseModule, self)
             
     def setup_ssl(self, client_key=None, client_cert=None, ca=None):
         # defaults go:
@@ -292,7 +292,7 @@ class Overlord(object):
 
         if module == "local":
             if method in self.methods.keys():
-                return self.methods[method]()
+                return self.methods[method](*args)
             else:
                 raise AttributeError("no such method")
 

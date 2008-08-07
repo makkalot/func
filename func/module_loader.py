@@ -39,17 +39,16 @@ def module_walker(topdir):
 
     return module_files
 
-def load_methods(path, main_class):
+def load_methods(path, main_class, parent_class=None):
     methods = {}
-    modules = load_modules(path, main_class)
+    modules = load_modules(path, main_class, parent_class=parent_class)
     for x in modules.keys():
         for method in dir(modules[x]):
             if is_public_valid_method(modules[x], method):
                 methods["%s.%s" % (x,method)]=getattr(modules[x], method)
     return methods
 
-def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None):
-
+def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None, parent_class=None):
     python_path = distutils.sysconfig.get_python_lib()
     module_file_path = "%s/%s" % (python_path, path)
     (mod_path, mod_dir) = os.path.split(os.path.normpath(module_file_path))
@@ -96,7 +95,7 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
                 attr = getattr(blip, obj)
                 if isclass(attr) and issubclass(attr, main_class):
                     logger.debug("Loading %s module" % attr)
-                    mods[mod_imp_name] = attr()
+                    mods[mod_imp_name] = attr(parent_class)
 
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
