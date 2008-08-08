@@ -25,6 +25,7 @@ logger = logger.Logger().logger
 
 from inspect import isclass
 from func.minion.modules import func_module
+from func.utils import is_public_valid_method
 
 def module_walker(topdir):
     module_files = []
@@ -110,15 +111,6 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
             continue
 
     return mods
-
-def is_public_valid_method(obj, attr, blacklist=[]):
-    if inspect.ismethod(getattr(obj, attr)) and attr[0] != '_':
-        for b in blacklist:
-            if attr==b:
-                return False
-        return True
-    return False
-
 
 if __name__ == "__main__":
 
