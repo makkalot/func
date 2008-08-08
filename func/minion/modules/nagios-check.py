@@ -32,3 +32,21 @@ class Nagios(func_module.FuncModule):
         cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
+
+    def register_method_args(self):
+        """
+        Implementing argument getter part
+        """
+
+        return{
+                'run':{
+                    'args':{
+                        'check_command':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The command to be checked"
+                            }
+                        },
+                    'description':"Runs a nagios check returning the return code"
+                    }
+                }
