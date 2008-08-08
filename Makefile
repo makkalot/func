@@ -4,6 +4,10 @@ NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 
 MESSAGESPOT=po/messages.pot
 
+# file to get translation strings from, little ugly, but it works
+POTFILES = func/*.py func/overlord/*.py func/minion/*.py func/minion/modules/*.py \
+	func/overlord/cmd_modules/*.py func/overlord/modules/*.py
+
 TOPDIR = $(shell pwd)
 DIRS	= func docs examples scripts test test/unittest funcweb
 PYDIRS	= func scripts examples funcweb
@@ -19,8 +23,8 @@ manpage:
 	pod2man --center="func-inventory" --release="" ./docs/func-inventory.pod | gzip -c > ./docs/func-inventory.1.gz
 	pod2man --center="func-transmit" --release="" ./docs/func-transmit.pod | gzip -c > ./docs/func-transmit.1.gz
 
-messages: func/minion/*.py
-	xgettext -k_ -kN_ -o $(MESSAGESPOT) func/minion/*.py
+messages:
+	xgettext -k_ -kN_ -o $(MESSAGESPOT) $(POTFILES)
 	sed -i'~' -e 's/SOME DESCRIPTIVE TITLE/func/g' -e 's/YEAR THE PACKAGE'"'"'S COPYRIGHT HOLDER/2007 Red Hat, inc. /g' -e 's/FIRST AUTHOR <EMAIL@ADDRESS>, YEAR/Adrian Likins <alikins@redhat.com>, 2007/g' -e 's/PACKAGE VERSION/func $(VERSION)-$(RELEASE)/g' -e 's/PACKAGE/func/g' $(MESSAGESPOT)
 
 
