@@ -96,7 +96,10 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
                 attr = getattr(blip, obj)
                 if isclass(attr) and issubclass(attr, main_class):
                     logger.debug("Loading %s module" % attr)
-                    mods[mod_imp_name] = attr(parent_class)
+                    if parent_class:
+                        mods[mod_imp_name] = attr(parent_class)
+                    else:
+                        mods[mod_imp_name] = attr()
 
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
