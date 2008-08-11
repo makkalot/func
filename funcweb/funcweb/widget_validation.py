@@ -23,11 +23,16 @@ class WidgetSchemaFactory(object):
         and according to their types it sends the process to more specialized
         validator adders 
         """
-        
+        # a mirror var to show that these are same things 
+        mirror_case = {'list*':'list'}
         for argument_name,argument_values in self.method_argument_dict.iteritems():
             #some lazy stuff :)
             #for ex : _add_int_validator(some_arg)
-            getattr(self,"_add_%s_validator"%(argument_values['type']))(argument_name)
+            current_type = argument_values['type']
+            if current_type == "list*":
+                getattr(self,"_add_%s_validator"%(mirror_case[current_type]))(argument_name)
+            else:
+                getattr(self,"_add_%s_validator"%(current_type))(argument_name)
 
     def _add_boolean_validator(self,argument_name):
         bool_data_set = {}
