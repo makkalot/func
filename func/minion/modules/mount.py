@@ -90,7 +90,7 @@ class MountModule(func_module.FuncModule):
         """
 
         return{
-                'list':{'args':{}
+                'list':{'args':{},
                     'description':"Listing the mounting points"
                     },
                 'mount':{
