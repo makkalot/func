@@ -57,13 +57,6 @@ class EchoTest(func_module.FuncModule):
         return command
     
     
-    def run_hash_star(self,**command):
-        """
-        Run hash
-        """
-
-        return command
-
   
     def run_boolean(self,command):
         """
