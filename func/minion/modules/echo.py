@@ -140,16 +140,7 @@ class EchoTest(func_module.FuncModule):
                         },
                     'description':'Returns back a hash'
                     },
-                'run_hash_star':{
-                    'args':
-                    {
-                        'command':{
-                            'type':'hash**',
-                            'optional':False
-                            }
-                        },
-                    'description':'Prototype for **kwargs '
-                    },
+   
 
                 'run_boolean':{
                     'args':
