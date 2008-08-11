@@ -224,7 +224,7 @@ class FileTracker(func_module.FuncModule):
                         'full_scan':{
                             'type':'int',
                             'optional':True,
-                            'default':0
+                            'default':0,
                             'description':"The 0 is for off and 1 is for on"
                             }
                         },
