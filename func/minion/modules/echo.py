@@ -40,14 +40,31 @@ class EchoTest(func_module.FuncModule):
         Run a list
         """
         return command
+    
+    
+    def run_list_star(self,*command):
+        """
+        Run a star list :)
+        """
+        return command
 
+    
     def run_hash(self,command):
         """
         Run hash
         """
 
         return command
+    
+    
+    def run_hash_star(self,**command):
+        """
+        Run hash
+        """
 
+        return command
+
+  
     def run_boolean(self,command):
         """
         Run boolean
@@ -109,6 +126,17 @@ class EchoTest(func_module.FuncModule):
                         },
                     'description':'Returns back a list'
                     },
+                'run_list_star':{
+                    'args':
+                    {
+                        'command':{
+                            'type':'list*',
+                            'optional':False
+                            }
+                        },
+                    'description':'Prototype for *args'
+                    },
+
                 'run_hash':{
                     'args':
                     {
@@ -119,6 +147,17 @@ class EchoTest(func_module.FuncModule):
                         },
                     'description':'Returns back a hash'
                     },
+                'run_hash_star':{
+                    'args':
+                    {
+                        'command':{
+                            'type':'hash**',
+                            'optional':False
+                            }
+                        },
+                    'description':'Prototype for **kwargs '
+                    },
+
                 'run_boolean':{
                     'args':
                     {
