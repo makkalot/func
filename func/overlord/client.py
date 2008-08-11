@@ -31,6 +31,8 @@ import delegation_tools as dtools
 import func.forkbomb as forkbomb
 import func.jobthing as jobthing
 from func.CommonErrors import *
+import func.module_loader as module_loader
+from func.overlord import overlord_module
 
 # ===================================
 # defaults
@@ -192,6 +194,8 @@ class Overlord(object):
     
         if init_ssl:
             self.setup_ssl()
+
+        self.methods = module_loader.load_methods('func/overlord/modules/', overlord_module.BaseModule, self)
             
     def setup_ssl(self, client_key=None, client_cert=None, ca=None):
         # defaults go:
@@ -285,7 +289,13 @@ class Overlord(object):
         If Overlord() was constructed with noglobs=True, the return is instead
         just a single value, not a hash.
         """
-        
+
+        if module == "local":
+            if method in self.methods.keys():
+                return self.methods[method](*args)
+            else:
+                raise AttributeError("no such method")
+
         if not self.delegate: #delegation is turned off, so run normally
             return self.run_direct(module, method, args, nforks)
         

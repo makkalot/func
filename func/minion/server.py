@@ -33,7 +33,7 @@ import func.jobthing as jobthing
 # our modules
 import AuthedXMLRPCServer
 import codes
-import module_loader
+import func.module_loader as module_loader
 import func.minion.acls as acls_mod
 
 from certmaster import utils
