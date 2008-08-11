@@ -10,9 +10,8 @@
 
 
 import func_module
-from codes import FuncException
-
-import sub_process
+from func.minion.codes import FuncException
+from func.minion import sub_process
 
 class NetworkTest(func_module.FuncModule):
 
@@ -120,7 +119,7 @@ class NetworkTest(func_module.FuncModule):
                             'optional':False,
                             'min':0,
                             'max':65535,
-                            'description':The port to be checked on specified host
+                            'description':'The port to be checked on specified host'
                             }
                         },
                     'description':"Checks if port is open for specified host"
