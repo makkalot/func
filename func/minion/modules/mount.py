@@ -12,8 +12,9 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-import sub_process, os
+import os
 import func_module
+from func.minion import sub_process
 
 
 class MountModule(func_module.FuncModule):
@@ -135,7 +136,7 @@ class MountModule(func_module.FuncModule):
                         'optional':True,
                         'description':'The killal option'
                         },
-                    'force'{
+                    'force':{
                         'type':'boolean',
                         'optional':True,
                         'description':'To force operation check it'
