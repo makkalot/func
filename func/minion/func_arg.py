@@ -50,7 +50,9 @@ class ArgCompatibility(object):
                 'boolean':(),
                 'float':('range','min','max'),
                 'hash':('validator',),
+                'hash**':('validator',),
                 'list':('validator',),
+                'list*':('validator',),
             }
 
 
