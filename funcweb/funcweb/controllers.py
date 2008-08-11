@@ -337,13 +337,33 @@ class Funcweb(object):
                 flash("Encountered some error when trying to get method arguments for %s.%s.%s"%(minion,module,method))
                 return dict()
             #so we know the order just allocate and put them there 
-            cmd_args=['']*(len(kw.keys()))
-            
+            cmd_args=[]
+           
+            #firstly create a better dict to lookup
+            sorted_args = {}
             for arg in kw.keys():
                 #wow what a lookup :)
-                index_of_arg = arguments[minion][method]['args'][arg]['order']
-                cmd_args[index_of_arg]=kw[arg]
-           
+                tmp_arg_num  = arguments[minion][method]['args'][arg]['order']
+                sorted_args[tmp_arg_num] = []
+                sorted_args[tmp_arg_num].append(arg)
+                sorted_args[tmp_arg_num].append(kw[arg])
+
+            #now append them to main cmd args
+            #not a very efficient algorithm i know i know :|
+            ordered_keys = sorted_args.keys()
+            ordered_keys.sort()
+            for order_key in ordered_keys:
+                current_argument_name = sorted_args[order_key][0]
+                current_argument = sorted_args[order_key][1]
+                current_type = arguments[minion][method]['args'][current_argument_name]['type']
+                #for *args types
+                if current_type == "list*":
+                    for list_arg in current_argument:
+                        cmd_args.append(list_arg)
+                else:
+                    cmd_args.append(current_argument)
+          
+            #print "The list to be send is : ",cmd_args
             #now execute the stuff
             #at the final execute it as a multiple if the glob suits for that
             #if not (actually there shouldnt be an option like that but who knows :))
