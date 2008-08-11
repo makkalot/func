@@ -126,3 +126,82 @@ class Vol(func_module.FuncModule):
         TODO: Document me ...
         """
         pass
+
+    def register_method_args(self):
+        """
+        Implementing the method argument getter
+        """
+        vol = {
+                'type':'string',
+                'optional':False,
+                'description':"The name of the volume"
+                }
+        
+        filer = {
+                'type':'string',
+                'optional':False,
+                'description':"Resolvable name of the target filer"
+                }
+
+        return {
+                
+                'create':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        'aggr':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'Aggregate in which to create the new volume (e.g. aggr0)'
+                            },
+                        'size':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'Size of the new volume (e.g. 500g)'
+                            }
+                        },
+                    'description':"Returns True if volume is created successfully"
+
+                    },
+                'destroy':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol
+                        },
+                    'description':"Returns True if volume is successfully destroyed"
+
+                    },
+                'offline':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol
+                        },
+                    'description':"Returns True if volume is successfully offlined"
+                    },
+                'online':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol
+                        },
+                    'description':"Returns True if volume is successfully onlined"
+                        },
+                'status':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol
+                        },
+                    'description':"If vol is not given, returns a list of dictionaries containing the status information of each volume in the system If vol is given, return just the dictionary for the given volume "
+                        },
+                'size':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        'delta':{
+                            'type':'string',
+                            'optional':True,
+                            'description':'Optional change in size (e.g. +200g or -50g)'
+                            }
+                        },
+                    'description':"If delta is not given, return the size of the given volume (e.g. '500g') If delta is given, return True if volume is successfully resized "
+                    }
+                }
