@@ -14,7 +14,7 @@ Abitrary command execution module for func.
 """
 
 import func_module
-import sub_process
+from func.minion import sub_process
 
 class Command(func_module.FuncModule):
 

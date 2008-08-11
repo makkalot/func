@@ -14,8 +14,8 @@
 ##
 
 # other modules
-import sub_process
-import codes
+from func.minion import sub_process
+from func.minion import codes
 
 # our modules
 import func_module
