@@ -25,19 +25,17 @@ class CertMasterModule(func_module.FuncModule):
     api_version = "0.0.1"
     description = "Administers certs on an overlord."
 
-    def get_hosts_to_sign(self, list_of_hosts):
+    def get_hosts_to_sign(self):
         """
         ...
         """
-        list_of_hosts = self.__listify(list_of_hosts)
         cm = certmaster.CertMaster()
         return cm.get_csrs_waiting()
         
-    def get_signed_certs(self, list_of_hosts):
+    def get_signed_certs(self):
         """
         Returns a list of all signed certs on this minion
         """
-        list_of_hosts = self.__listify(list_of_hosts)
         cm = certmaster.CertMaster()
         return cm.get_signed_certs()
 
@@ -65,5 +63,38 @@ class CertMasterModule(func_module.FuncModule):
         if type(list_of_hosts) is type([]):
             return list_of_hosts
         else:
-            return [ list_of_hosts ]    
+            return [ list_of_hosts ]
 
+    def register_method_args(self):
+        """
+        Export certmaster module 
+        """
+
+        list_of_hosts = {
+                'type':'list',
+                'optional':False,
+                'description':'A list of hosts to apply the operation'
+                }
+
+        return {
+                'get_hosts_to_sign':{
+                    'args':{},
+                    'description':"Returns a list of hosts to sign"
+                    },
+                'get_signed_certs':{
+                    'args':{},
+                    'description':"Get the certs you signed"
+                    },
+                'sign_hosts':{
+                    'args':{
+                        'list_of_hosts':list_of_hosts
+                        },
+                    'description':"Sign a list of hosts"
+                    },
+                'cleanup_hosts':{
+                    'args':{
+                        'list_of_hosts':list_of_hosts
+                        },
+                    'description':"Clean the certs for specified hosts"
+                    }
+                }
