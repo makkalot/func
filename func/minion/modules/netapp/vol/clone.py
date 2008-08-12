@@ -42,5 +42,48 @@ class Clone(func_module.FuncModule):
         output = ssh(filer, cmd_opts)
         return check_output(regex, output)
 
+    
+    def register_method_args(self):
+        """
+        Implementing netapp.clone export
+        """
+        vol = {
+                'type':'string',
+                'optional':False,
+                'description':"The name of the volume"
+                }
+        
+        filer = {
+                'type':'string',
+                'optional':False,
+                'description':"Resolvable name of the target filer"
+                }
+        
+        snap = {
+                'type':'string',
+                'optional':False,
+                'description':"The name of the snapshot"
+                }
 
-
+        return {
+                'create':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        'snap':snap,
+                        'parent':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The parent to clone"
+                            }
+                        },
+                    'description':"Create a clone"
+                    },
+                'split':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol
+                        },
+                    'description':"Split the vol"
+                    }   
+                }
