@@ -71,7 +71,7 @@ class NetworkTest(func_module.FuncModule):
                 'ping':{
                     'args':{
                         'args':{
-                            'type':'list',
+                            'type':'list*',
                             'optional':False,
                             'description':"Options for ping command"
                             }
@@ -81,7 +81,7 @@ class NetworkTest(func_module.FuncModule):
                 'netstat':{
                     'args':{
                     'args':{
-                        'type':'list',
+                        'type':'list*',
                         'optional':False,
                         'description':"Options for netstat command"
                             }},
@@ -90,7 +90,7 @@ class NetworkTest(func_module.FuncModule):
                 'traceroute':{
                     'args':{
                     'args':{
-                        'type':'list',
+                        'type':'list*',
                         'optional':False,
                         'description':"Options for traceroute command"
 
@@ -100,7 +100,7 @@ class NetworkTest(func_module.FuncModule):
                 'dig':{
                     'args':{
                     'args':{
-                        'type':'list',
+                        'type':'list*',
                         'optional':False,
                         'description':"Options for dig command"
 
