@@ -93,38 +93,26 @@ def main(argv):
     method     = params.get('method','unknown')
     async      = params.get('async', False)
 
-    if method == "list_minions":
-        # clients will default to * if not specified, and specifing is a good
-        # way to see who is in what group, etc, so pass it though
+    # scan more arguments
+    nforks     = params.get('nforks', 1)
+    module     = params.get('module', None)
+    parameters = params.get('parameters', None)
 
-        if async == True:
-            raise NoAsyncForListMinionException("list_minions method can not be run in async")
-        
-        minion_set = fc.Minions(clients)
-        servers = minion_set.get_all_hosts()
-        results = servers
-
+    # make the call
+    client = fc.Overlord(clients, async=async, nforks=nforks)
+    if module is None:
+        method_handle = getattr(client, method)
     else:
-        # scan more arguments
-        nforks     = params.get('nforks', 1)
-        module     = params.get('module', None)
-        parameters = params.get('parameters', None)
+        module_handle = getattr(client, module)
+        method_handle = getattr(module_handle, method)
 
-        # make the call
-        client = fc.Overlord(clients, async=async, nforks=nforks)
-        if module is None:
-            method_handle = getattr(client, method)
-        else:
-            module_handle = getattr(client, module)
-            method_handle = getattr(module_handle, method)
-
-        if parameters is not None:
-            # listify if we get something thats not a list
-            if not is_a_list(parameters):
-                parameters = [parameters]
-            results = method_handle(*parameters)
-        else:
-            results = method_handle()
+    if parameters is not None:
+        # listify if we get something thats not a list
+        if not is_a_list(parameters):
+            parameters = [parameters]
+        results = method_handle(*parameters)
+    else:
+        results = method_handle()
 
     # convert to selected language (default is JSON)
     if (options.json):

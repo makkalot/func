@@ -16,7 +16,6 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 import optparse
 import pprint
 import xmlrpclib
-import time
 import sys
 
 from func.overlord import client
@@ -156,27 +155,13 @@ class Call(base_command.BaseCommand):
             return async_results
 
         if self.options.async:
-            partial = {}
+            self.partial = {}
             if self.options.nopoll:
                 print "JOB_ID:", pprint.pformat(results)
                 return results
             else:
-                async_done = False
-                while not async_done:
-                    time.sleep(3)
-                    (return_code, async_results) = self.overlord_obj.job_status(results)
-                    if return_code == jobthing.JOB_ID_RUNNING:
-                        time.sleep(0.1)
-                    elif return_code == jobthing.JOB_ID_FINISHED:
-                        async_done = True
-                        partial = self.print_partial_results(partial, async_results, self.options.sort)
-                        return partial
-                    elif return_code == jobthing.JOB_ID_PARTIAL:
-                        if not self.options.sort:
-                            partial = self.print_partial_results(partial, async_results)
-                    else:
-                        sys.stderr.write("Async error")
-                        return 0
+                
+                return self.overlord_obj.local.utils.async_poll(results, self.print_results)
 
         # dump the return code stuff atm till we figure out the right place for it
         foo =  self.format_return(results)
@@ -185,13 +170,6 @@ class Call(base_command.BaseCommand):
         # nothing really makes use of this atm -akl
         return results
 
-    def print_partial_results(self, old, new, sort=0):
-        diff = dict([(k, v) for k, v in new.iteritems() if k not in old])
-        if len(diff) > 0:
-            iter=diff.iteritems()
-            if sort:
-                iter=sorted(iter)
-            for res in iter:
-                print self.format_return(res)
-            return new
-        return old
+    def print_results(self, res):
+        for i in res.iteritems():
+            print self.format_return(i)

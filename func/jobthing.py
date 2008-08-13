@@ -170,8 +170,9 @@ def batch_run(pool, callback, nforks,**extra_args):
         # kick off the job
         results = forkbomb.batch_run(pool, callback, nforks)
         
-        # we now have a list of job id's for each minion, kill the task
+        # write job IDs to the state file on overlord 
         __update_status(job_id, JOB_ID_PARTIAL, results)
+        # we now have a list of job id's for each minion, kill the task
         os._exit(0)
 
 def minion_async_run(retriever, method, args):
@@ -247,11 +248,11 @@ def job_status(jobid, client_class=None):
                 some_missing = True
 
         if some_missing or not interim_results:
-            if partial_results:
-                __update_status(jobid, JOB_ID_PARTIAL, partial_results)
             return (JOB_ID_PARTIAL, partial_results)
         
         else:
+            # Save partial results in state file so next time we don't
+            # call minions to get status.
             if partial_results:
                 __update_status(jobid,JOB_ID_FINISHED, partial_results)
             return (JOB_ID_FINISHED, partial_results)

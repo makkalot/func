@@ -4,7 +4,7 @@ Func-transmit -- cross-language func adapter
 
 =head1 SYNOPSIS
 
-func-transmit < yaml_in > yaml_out
+func-transmit [-h|--help] [-j|--json] [-y|--yaml] < data_in > data_out
 
 =head1 DESCRIPTION
 
@@ -15,14 +15,14 @@ This tool, func-transmit, is intended to be called using pipes, sending formatte
 
 =head1 FORMATS AND USAGE
 
-The input and output format is YAML 1.0.
+The input and output format is either JSON or YAML 1.0. The default is JSON. The [--yaml] option enables YAML support.
 
 The data formats used by Func transmit are described in more detail (with
 examples) at https://fedorahosted.org/func/wiki/FuncTransmit
 
 =head1 EXIT_STATUS
 
-Generally func-transmit should always return 0 if loading is successful.  Return data is then expressed in the output stream, to be interpreted by a YAML module at the other end of the pipe.  Non-zero return codes indicate more serious setup problems.
+Generally func-transmit should always return 0 if loading is successful.  Return data is then expressed in the output stream, to be interpreted by a JSON or YAML  module at the other end of the pipe.  Non-zero return codes indicate more serious setup problems.
 
 Func-transmit will exit after every command issued to the overlord, it does not await further input on the pipes.
 
