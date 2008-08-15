@@ -1,34 +1,40 @@
-def produce_res_rec(counter,result_pack,send_list = None):
+global_max = 0
+def produce_res_rec(result_pack):
     """
     A beautiful recursive tree like hash producer
     """
-    global_result = {}
-    global_result ['id'] = counter
-
-
+    send_list = []
+    global global_max
     #print "The pack is counter:",counter
     #print "The pack is result_pack:",result_pack
     #print "The pack is global_result:",global_result
     #the final step of the execution
     if type(result_pack) != list and type(result_pack) != dict:
-        return {'id':counter,'text':str(result_pack)}
+        global_max = global_max + 1
+        return {'id':global_max,'text':str(result_pack)}
     
     elif type(result_pack) == list :
         for result_list in result_pack:
-            counter = 2*counter
+            #counter = 2*counter
             if type(result_list) == list:
-                tmp_list_result = produce_res_rec(counter,result_list,[])
-                global_result['text'] = 'res%s%s'%(counter,counter)
-                if not global_result.has_key('item'):
-                      global_result['item'] = []
+                #if there is a new list then the new parent trick
+                global_max = global_max +1
+                tmp_parent = {}
+                tmp_parent['id'] = global_max
+                tmp_parent['text'] = 'leaf_result%s%s'%(global_max,global_max)
+                tmp_parent['item'] = []
+
+                tmp_list_result = produce_res_rec(result_list)
 
                 if type(tmp_list_result) == list:
-                    global_result['item'].extend(tmp_list_result)
+                    tmp_parent['item'].extend(tmp_list_result)
                 else:
-                    global_result['item'].append(tmp_list_result)
+                    tmp_parent['item'].append(tmp_list_result)
+                #appended to the parent
+                send_list.append(tmp_parent)
 
             else:
-                tmp_list_result = produce_res_rec(counter,result_list)
+                tmp_list_result = produce_res_rec(result_list)
                 if type(tmp_list_result) == list:
                     send_list.extend(tmp_list_result)
                 else:
@@ -37,60 +43,83 @@ def produce_res_rec(counter,result_pack,send_list = None):
     elif type(result_pack) == dict :
         for key_result,value_result in result_pack.iteritems():
             #a new key added
-            global_result['text'] = str(key_result)
-            if not global_result.has_key('item'):
-                global_result['item'] = []
+            global_max = global_max +1
+            tmp_parent = {}
+            #counter = 2*counter+1
+            tmp_parent ['id'] = global_max
+            tmp_parent ['text'] = str(key_result)
+            tmp_parent ['item'] = []
            
-            if type(value_result) == list:
-                tmp_dict_res = produce_res_rec((2*counter+1),value_result,[])
+            tmp_dict_res = produce_res_rec(value_result)
                 
-            else:
-                tmp_dict_res = produce_res_rec((2*counter+1),value_result)
             if type(tmp_dict_res) == list :
-                global_result['item'].extend(tmp_dict_res)
+                tmp_parent['item'].extend(tmp_dict_res)
             else:
-                global_result['item'].append(tmp_dict_res)
+                tmp_parent['item'].append(tmp_dict_res)
+
+            send_list.append(tmp_parent)
     
     else: #shouldnt come here !
         return {}
 
-    if not send_list:
-        return global_result
-    else:
-        return send_list
+    return send_list
 
 if __name__ == "__main__":
     """
       
-    main_pack = {
-            'minion':{'result':True}
-            }
-    
+      
     main_pack = {
             'minion':[["one","two"],["three","four"]]
             }
     
     
+    
+    
+       
+    
+    
     main_pack = {
-            'minion':{'result':True}
+            
+                'minion':{
+                    'result1':True,
+                    'result2':False
+                    },
+                'minion2':{
+                    'result3':True,
+                    'result4':False
+                    },
+                'minion3':{
+                    'result5':True,
+                    'result6':False
+                    }
+
+        
             }
-    
-    
     """
+    
     main_pack = {
-            'minion':[
+            'minion1':[
                 {
-                    'res1':'hey'
+                    'res1':[['hey','hhhey'],['mey','mmmey']]
                     },
                 {
-                    'res2':'wey'
+                    'res2':['wey','dey']
+                    }
+                ],
+            'minion2':[
+                {
+                    'res3':['nums','mums']
+                    },
+                {
+                    'res4':['wums','dums']
                     }
                 ]
+ 
             }
-    global_result = {'id':0,'item':[]}
-    final = produce_res_rec(1,main_pack)
+
+
+    final = produce_res_rec(main_pack)
     print "The final pack is like that : "
-    global_result['item'].append(final)
-    print global_result
+    print final
 
 
