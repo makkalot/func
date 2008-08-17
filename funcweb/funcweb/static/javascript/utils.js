@@ -30,6 +30,8 @@ function checkController(class_name,check_element){
  * do all the stuff here !
  */
 
+//------------------------------------------------------------------------------
+
 function list_minion_modules(minion_name){
     /*
      * Method that hanles all the stuff on index.html
@@ -82,16 +84,18 @@ function get_method_widget(minion_name,module_name,method_name){
     send_some_JSON(base_url,data_pack,div_to_replace);
 }
 
-function check_async_result(job_id){
-    //sends some request to get the current job ids status :)
-    hideElement(getElement('resultcontent'));
-    var base_url = '/funcweb/check_job_status';
-    var data_pack = {
-        'job_id':job_id
-    };
-    var div_to_replace = 'resultcontent';
-    send_some_JSON(base_url,data_pack,div_to_replace);
 
+function get_hosts_by_group(group_name){
+    
+    //it is a part from group management api
+    //gets the hosts for specified group_name
+    hideElement(getElement('resultcontent'));
+    var base_url = '/funcweb/list_host_by_group';
+    var data_pack = {
+        'group_name':group_name
+    };
+    var div_to_replace = 'miniongroupcontents';
+    send_some_JSON(base_url,data_pack,div_to_replace);
 }
 
 function execute_link_method(minion,module,method){
@@ -105,19 +109,6 @@ function execute_link_method(minion,module,method){
         'method':method
     };
     var div_to_replace = 'resultcontent';
-    send_some_JSON(base_url,data_pack,div_to_replace);
-}
-
-function get_hosts_by_group(group_name){
-    
-    //it is a part from group management api
-    //gets the hosts for specified group_name
-    hideElement(getElement('resultcontent'));
-    var base_url = '/funcweb/list_host_by_group';
-    var data_pack = {
-        'group_name':group_name
-    };
-    var div_to_replace = 'miniongroupcontents';
     send_some_JSON(base_url,data_pack,div_to_replace);
 }
 
@@ -185,3 +176,62 @@ function connection_error(error){
                 error_div.innerHTML = error_msg;
             }
 }
+
+//-------------------------------------------------------------------------------------------------------------
+function check_async_result(job_id){
+    //sends some request to get the current job ids status :)
+    hideElement(getElement('resultcontent'));
+    var base_url = '/funcweb/check_job_status';
+    var data_pack = {
+        'job_id':job_id
+    };
+    var div_to_replace = 'resultcontent';
+    send_JSON_DOC_info(base_url,data_pack,div_to_replace);
+
+}
+
+
+function send_JSON_DOC_info(base_url,data_pack,div_to_replace){
+    /*
+     * That method is for getting the result that comes
+     * from minion side parsed in JSON format
+     * maybe used for other things also ...
+     */
+
+    d=loadJSONDoc(base_url,data_pack);
+    d.addCallback(load_parsed_result_tree,div_to_replace);
+    d.addErrback(connection_error);
+    
+}
+
+function load_parsed_result_tree(div_to_replace,result){
+    /*
+     * The callback for showing the tree structure
+     */
+
+    //check for errors
+    if (compare(result['fg_flash'],null)!=0){
+        connection_error(result['tg_flash']);
+        return;
+    }
+    
+    //firstly load the div that will include the tree
+    var replace_div = getElement(div_to_replace);
+    if (replace_div != null){
+        //first make it to appear here
+        showElement(replace_div);
+
+        //place here the tree div that will show up the tree structure
+        replace_div.innerHTML = '<div id="treeboxbox_tree" style="width:200;height:200"></div>';
+        }
+
+    //now load the tree
+    tree=new dhtmlXTreeObject("treeboxbox_tree","100%","100%",0);
+    tree.setImagePath("/funcweb/static/images/imgs/");
+    tree.loadJSONObject(result['minion_result']);
+    alert("The tree should be loaded");
+
+
+}
+
+
