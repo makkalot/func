@@ -15,20 +15,20 @@ def produce_res_rec(result_pack):
     
     elif type(result_pack) == list :
         for result_list in result_pack:
-            #counter = 2*counter
             if type(result_list) == list:
                 #if there is a new list then the new parent trick
                 global_max = global_max +1
                 tmp_parent = {}
                 tmp_parent['id'] = global_max
-                tmp_parent['text'] = 'leaf_result%s%s'%(global_max,global_max)
-                tmp_parent['item'] = []
+                tmp_parent['text'] = 'leaf_result%s'%(global_max)
 
                 tmp_list_result = produce_res_rec(result_list)
 
-                if type(tmp_list_result) == list:
+                if tmp_list_result and type(tmp_list_result) == list:
+                    tmp_parent['item'] = []
                     tmp_parent['item'].extend(tmp_list_result)
-                else:
+                elif tmp_list_result:
+                    tmp_parent['item'] = []
                     tmp_parent['item'].append(tmp_list_result)
                 #appended to the parent
                 send_list.append(tmp_parent)
@@ -45,16 +45,16 @@ def produce_res_rec(result_pack):
             #a new key added
             global_max = global_max +1
             tmp_parent = {}
-            #counter = 2*counter+1
             tmp_parent ['id'] = global_max
             tmp_parent ['text'] = str(key_result)
-            tmp_parent ['item'] = []
            
             tmp_dict_res = produce_res_rec(value_result)
                 
-            if type(tmp_dict_res) == list :
+            if tmp_dict_res and type(tmp_dict_res) == list :
+                tmp_parent ['item'] = []
                 tmp_parent['item'].extend(tmp_dict_res)
-            else:
+            elif tmp_dict_res:
+                tmp_parent ['item'] = []
                 tmp_parent['item'].append(tmp_dict_res)
 
             send_list.append(tmp_parent)
