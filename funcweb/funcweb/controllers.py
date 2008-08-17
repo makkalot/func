@@ -458,7 +458,7 @@ class Funcweb(object):
         return dict(changed = changed,changes = changes)
 
     
-    @expose(template="funcweb.templates.result")
+    @expose(format = "json")
     @identity.require(identity.not_anonymous())
     def check_job_status(self,job_id):
         """
@@ -483,12 +483,19 @@ class Funcweb(object):
         
         try:
             id_result = fc_async.job_status(job_id)
+            #parse the comming data in a better looking way :)
+            from funcweb.result_handler import produce_res_rec
+            minion_result = produce_res_rec(id_result[1])
+            #print "The current minion_result is : ",minion_result
+            global_result = {'id':0,'item':[]}
+            global_result['item'].extend(minion_result)
+
         except Exception,e:
             flash("We encountered some error while getting the status for %s job id"%(job_id))
             return dict()
 
         #the final id_result
-        return dict(result=id_result)
+        return dict(minion_result = global_result)
 
     @expose(template="funcweb.templates.async_table")
     @identity.require(identity.not_anonymous())
