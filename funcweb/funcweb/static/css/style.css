@@ -195,7 +195,7 @@ margin-right:30px;
 background-color:#f1f5f6;
 overflow: auto;
 height: 300px;
-width: 900px;
+width: 85%;
 margin-left: auto;
 margin-right: auto;
 margin-top: 2em;
@@ -355,14 +355,14 @@ margin-left:3em;
 
 .runmethoddiv {
 height:25px;
-width:113px;;
+width:113px;
 background-image: url(../images/button2.jpg);
 background-repeat:no-repeat;
 border: 0px;
 }
-.runmethoddiv:hover{
+.runmethoddiv:hover {
 height:25px;
-width:113px;;
+width:113px;
 background-image: url(../images/button2_hover.jpg);
 background-repeat:no-repeat;
 border: 0px;
@@ -384,7 +384,7 @@ margin-right:30px;
 background-color:#f1f5f6;
 overflow: auto;
 min-height: 150px;
-width: 900px;
+width: 85%;
 margin-left: auto;
 margin-right: auto;
 margin-top: 2em;
@@ -500,33 +500,33 @@ text-decoration:none;
 
 }
 
-table
+#inwidgetbox table
 {
   border-collapse: collapse;
 }
 
-table th
+#inwidgetbox table th
 {
   background: #DDDDDD;
 }
 
-table th,table td
+#inwidgetbox table th,#inwidgetbox table td
 {
   border: 1px solid #000000;
   padding: 0.6ex;
 }
 
-p
+#inwidgetbox p
 {
   margin: 1ex 5ex 1ex 0;
 }
 
-input, textarea, select
+#inwidgetbox input, #inwidgetbox textarea, #inwidgetbox select
 {
   border: #AAA 1px solid;
 }
 
-input, textarea, option
+#inwidgetbox input, #inwidgetbox textarea, #inwidgetbox option
 {
   padding: 2px 5px 2px 5px;
 }

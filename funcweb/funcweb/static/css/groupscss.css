@@ -67,7 +67,7 @@ float:left;
 .removebtn {
 height:25px;
 width:25px;
-background-image:url(../images/removebtn.jpg);
+background-image: url(../images/removebtn.jpg);
 background-repeat:no-repeat;
 display:block;
 border: 0px;
@@ -182,4 +182,26 @@ padding-right:175px;
 width: 80%;
 height: 50px;
 float:right;
+}
+
+.addnewgroupbtn {
+height:25px;
+width:80px;;
+background-image: url(../images/buttonadd.jpg);
+border: 0px;
+padding-bottom:5px;
+}
+.addnewgroupbtn:link {
+height:25px;
+width:80px;;
+background-image: url(../images/buttonadd.jpg);
+border: 0px;
+padding-bottom:5px;
+}
+.addnewgroupbtn:hover {
+height:25px;
+width:80px;;
+background-image: url(../images/button_overadd.jpg);
+border: 0px;
+padding-bottom:5px;
 }
