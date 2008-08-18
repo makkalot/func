@@ -375,20 +375,6 @@ class Funcweb(object):
                 result_id = getattr(getattr(fc_async,module),method)(*cmd_args)
                 result = "".join(["The id for current job is :",str(result_id)," You will be notified when there is some change about that command !"])
             
-                #that part gives a chance for short methods to finish their jobs and display them 
-                #immediately so user will not wait for new notifications for that short thing
-                import time 
-                time.sleep(4)
-                tmp_as_res = fc_async.job_status(result_id)
-                if tmp_as_res[0] == JOB_ID_FINISHED:
-                    result = tmp_as_res[1]
-                
-                    if not self.async_manager:
-                        #cleanup tha database firstly 
-                        purge_old_jobs()
-                        self.async_manager = AsyncResultManager()
-                    self.async_manager.refresh_list()
-            
             except Exception,e:
                 flash("We got some error while trying to send command for %s.%s.%s"%(module,minion,method))
                 return dict()
