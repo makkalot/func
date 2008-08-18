@@ -95,7 +95,8 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/funcweb/static
 %dir %{python_sitelib}/funcweb/static/css
 %dir %{python_sitelib}/funcweb/static/images
-%dir %{python_sitelib}/funcweb/static/javascript
+%dir %{python_sitelib}/funcweb/static/images/imgs
+%dir %{python_sitelib}/funcweb/static/javascript/ext
 %dir %{python_sitelib}/funcweb/identity
 %dir %{_sysconfdir}/%{name}
 %dir /var/log/funcweb
@@ -124,8 +125,10 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/funcweb/static/images/*.jpg
 %{python_sitelib}/funcweb/static/images/*.ico
 %{python_sitelib}/funcweb/static/images/*.gif
+%{python_sitelib}/funcweb/static/images/imgs/*.gif
 %{python_sitelib}/funcweb/static/images/Makefile
 %{python_sitelib}/funcweb/static/javascript/*.js
+%{python_sitelib}/funcweb/static/javascript/ext/*.js
 %{python_sitelib}/funcweb/static/javascript/Makefile
 %{python_sitelib}/funcweb/identity/*.py*
 %{python_sitelib}/funcweb/identity/Makefile
