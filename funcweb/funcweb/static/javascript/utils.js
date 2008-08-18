@@ -222,7 +222,8 @@ function load_parsed_result_tree(div_to_replace,result){
         showElement(replace_div);
 
         //place here the tree div that will show up the tree structure
-        replace_div.innerHTML = '<div id="treeboxbox_tree" style="width:200;height:200"></div>';
+        var html_code = '<div class="resultbigbox" id="resultbigbox"><div align="center" class="graytexts">Result</div><div class="resultbox" id="resultbox"><div id="treeboxbox_tree" style="width:200;height:200;border:0"></div></div></div>'
+        replace_div.innerHTML = html_code;
         }
 
     //now load the tree
