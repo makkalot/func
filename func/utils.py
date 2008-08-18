@@ -15,6 +15,7 @@ import string
 import sys
 import traceback
 import socket
+import inspect
 
 REMOTE_ERROR = "REMOTE_ERROR"
 
@@ -52,3 +53,10 @@ def get_formated_jobid(**id_pack):
     job_id = "".join([glob,"-",module,"-",method,"-",pprint.pformat(time.time())])
     return job_id
 
+def is_public_valid_method(obj, attr, blacklist=[]):
+    if inspect.ismethod(getattr(obj, attr)) and attr[0] != '_':
+        for b in blacklist:
+            if attr==b:
+                return False
+        return True
+    return False

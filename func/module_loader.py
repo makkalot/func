@@ -16,6 +16,7 @@
 import distutils.sysconfig
 import os
 import sys
+import inspect
 from gettext import gettext
 _ = gettext
 
@@ -24,6 +25,7 @@ logger = logger.Logger().logger
 
 from inspect import isclass
 from func.minion.modules import func_module
+from func.utils import is_public_valid_method
 
 def module_walker(topdir):
     module_files = []
@@ -36,13 +38,22 @@ def module_walker(topdir):
                 # in the module name, and foo..bar doesnt work -akl
                 module_files.append(os.path.normpath("%s/%s" % (root, filename)))
 
-
     return module_files
 
-def load_modules(blacklist=None):
+def load_methods(path, main_class, parent_class=None):
+    methods = {}
+    modules = load_modules(path, main_class, parent_class=parent_class)
+    for x in modules.keys():
+        for method in dir(modules[x]):
+            if is_public_valid_method(modules[x], method):
+                methods["%s.%s" % (x,method)]=getattr(modules[x], method)
+    return methods
 
-    module_file_path="%s/func/minion/modules/" % distutils.sysconfig.get_python_lib()
-    mod_path="%s/func/minion/"  % distutils.sysconfig.get_python_lib()
+def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None, parent_class=None):
+    python_path = distutils.sysconfig.get_python_lib()
+    module_file_path = "%s/%s" % (python_path, path)
+    (mod_path, mod_dir) = os.path.split(os.path.normpath(module_file_path))
+    mod_dir = "func."+module_file_path[len(python_path+'/func/'):].replace("/",".")
 
     sys.path.insert(0, mod_path)
     mods = {}
@@ -80,12 +91,15 @@ def load_modules(blacklist=None):
 
         try:
             # Auto-detect and load all FuncModules
-            blip =  __import__("modules.%s" % ( mod_imp_name), globals(), locals(), [mod_imp_name])
+            blip =  __import__("%s%s" % ( mod_dir,mod_imp_name), globals(), locals(), [mod_imp_name])
             for obj in dir(blip):
                 attr = getattr(blip, obj)
-                if isclass(attr) and issubclass(attr, func_module.FuncModule):
+                if isclass(attr) and issubclass(attr, main_class):
                     logger.debug("Loading %s module" % attr)
-                    mods[mod_imp_name] = attr()
+                    if parent_class:
+                        mods[mod_imp_name] = attr(parent_class)
+                    else:
+                        mods[mod_imp_name] = attr()
 
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
@@ -100,7 +114,6 @@ def load_modules(blacklist=None):
             continue
 
     return mods
-
 
 if __name__ == "__main__":
 
