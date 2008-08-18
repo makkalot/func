@@ -92,6 +92,7 @@ class BaseTest(object):
 
    # we do this all over the place...
     def assert_on_fault(self, result):
+        print "\n\n", result, "\n\n\n"
         assert func.utils.is_error(result[self.th]) == False
 #        assert type(result[self.th]) != xmlrpclib.Fault
 
@@ -122,19 +123,23 @@ class ListMinion(object):
     
     def test_list_minions(self):
         out = self.call({'clients': '*',
-                          'method': 'list_minions'})
+                         'module':'local',
+                          'method': 'utils.list_minions'})
         
     def test_list_minions_no_match(self):
         out = self.call({'clients': 'somerandom-name-that-shouldnt-be-a_real_host_name',
-                         'method': 'list_minions'})
+                         'module':'local',
+                         'method':'utils.list_minions'})
         assert out == []
 
     def test_list_minions_group_name(self):
         out = self.call({'clients': '@test',
-                         'method': 'list_minions'})
+                         'module':'local',
+                         'method': 'local.utils.list_minions'})
 
     def test_list_minions_no_clients(self):
-        out = self.call({'method': 'list_minions'})
+        out = self.call({'module':'local',
+                         'method': 'utils.list_minions'})
                         
               
 class ListMinionAsync(ListMinion):
