@@ -45,3 +45,22 @@ class SmartModule(func_module.FuncModule):
             results.append(x)
 
         return (cmd.returncode, results)
+
+    def register_method_args(self):
+        """
+        Implementing method argument getter
+        """
+
+        return {
+                'info':{
+                    'args':{
+                        'flags':{
+                            'type':'string',
+                            'optional':True,
+                            'default':'-q onecheck',
+                            'description':"Flags for smart command"
+                            }
+                        },
+                    'description':"Grabs status from SMART to see if your hard drives are ok."
+                    }
+                }

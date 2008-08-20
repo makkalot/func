@@ -1,0 +1,27 @@
+<div class="group" id="group"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:py="http://genshi.edgewall.org/">
+    <div align="center">Group</div>
+     <form action="/funcweb/add_minions_togroup" method="post" onsubmit="return !glob_submit(this,'group_small');" name="group_remove">
+    <div class="groupbox" id="groupbox">
+        <span py:for="host in hosts">
+            <div class="minionstextbox" id="minionstextbox"><span class="minionsandgroupsbluetext">${host}</span>          
+            <label>
+                <input type="checkbox" class="rmgroup" name="rmgroup" id="groupcheckbox" value="${host}"/>
+            </label>
+        </div>
+        </span>
+    </div>  
+    <div class="selectallgroupboxes" id="selectallgroupboxes">
+        <input type="hidden" name="action_name" value="remove"/>
+        <input type="hidden" name="group_name" value="${group_name}"/>
+        <span class="graytexts2">Select all:</span> 
+        <label>
+            <input type="checkbox" name="check_all_group" id="check_all_group" onclick="checkController('rmgroup',this);"/>
+        </label>
+        <label>
+            <input name="removegroups" type="submit" class="addnewgroupbtn" id="removegroups" value="Remove" />
+        </label>
+    </div>
+    </form>
+</div>

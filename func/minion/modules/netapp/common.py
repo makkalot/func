@@ -13,7 +13,7 @@
 ##
 
 import re
-import sub_process 
+from func.minion import sub_process
 
 SSH = '/usr/bin/ssh'
 SSH_USER = 'root'

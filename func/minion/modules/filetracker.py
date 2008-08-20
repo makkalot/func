@@ -190,3 +190,54 @@ class FileTracker(func_module.FuncModule):
                 break
             m.update(d)
         return m.hexdigest()
+
+    def register_method_args(self):
+        """
+        Implementing the argument getter part
+        """
+
+        return {
+                'inventory':{
+                    'args':{
+                        'flatten':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Show info in clean diffs"
+                            },
+                        'checksum_enabled':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Enable the checksum"
+                            }
+                        },
+                    'description':"Returns information on all tracked files"
+                    },
+                'track':{
+                    'args':{
+                        'file_name':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The file name to track (full path)"
+                            },
+                        'full_scan':{
+                            'type':'int',
+                            'optional':True,
+                            'default':0,
+                            'description':"The 0 is for off and 1 is for on"
+                            }
+                        },
+                    'description':"Adds files to keep track of"
+                    },
+                'untrack':{
+                    'args':{
+                        'file_name':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The file name to untrack (full path)"
+                            }
+                        },
+                    'description':"Remove the track from specified file name"
+                    }
+                }

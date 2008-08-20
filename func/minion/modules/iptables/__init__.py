@@ -147,3 +147,124 @@ class Iptables(func_module.FuncModule):
         self.policy("INPUT", "DROP")
         self.policy("OUTPUT", "DROP")
         self.policy("FORWARD", "DROP")
+
+    def register_method_args(self):
+        """
+        Implmenting the export arguments
+        """
+        ip={
+                'type':'string',
+                'optional':False,
+                'default':'0.0.0.0'
+                }
+        chain={
+                'type':'string',
+                'optional':False,
+                'default':'INPUT',
+                'options':['INPUT','OUTPUT','FORWARD'],
+                'description':"The chain to apply policy"
+                }
+
+        return {
+                'run':{
+                    'args':{
+                        'args':{
+                            'type':'string',
+                            'optional':False,
+                            'default':"-L",
+                            'description':"The iptables command to send"
+                            }
+                        },
+                    'description':"Runs a iptables command"
+                    },
+                'policy':{
+                    'args':{
+                        'chain':chain,
+                        'policy':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The policy to apply (optional)"
+                            }
+
+                        },
+                    'description':"Change/set the policy of the given chain,if no policy is given it checks the chain status"
+                    },
+                'flush':{
+                    'args':{
+                        'chain':chain
+                        },
+                    'description':"Flush the given chain"
+                    },
+                'zero':{
+                    'args':{
+                        'chain':chain
+                        },
+                    'description':"Zero counters in selected chain (or INPUT if none given)"
+                    },
+                'drop_from':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Drop all incomming traffic from IP"
+                    },
+                'reject_from':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Reject all incoming traffic from IP"
+                    },
+                'accept_from':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Accept all incoming traffic from IP"
+                    },
+                'drop_to':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Drop all outgoing traffic to IP."
+                    },
+                'reject_to':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Reject all outgoing traffic to IP"
+                    },
+                'accept_to':{
+                    'args':{
+                        'ip':ip
+                        },
+                    'description':"Accept all outgoing traffic to IP."
+                    },
+                'inventory':{
+                    'args':{},
+                    'description':"The inventory part for that module"
+                    },
+                'dump':{
+                    'args':{
+                        'counters':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':False,
+                            'description':"Dump also the counters?"
+                            }
+                        },
+                    'description':"Dump iptables configuration in iptables-save format"
+                    },
+                'save':{
+                    'args':{
+                        'counters':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':False,
+                            'description':"Save also the counters?"
+                            }
+                        },
+                    'description':"Save iptables state using '/sbin/iptables-save'. If counters=True, save counters too."
+                        },
+                'panic':{
+                    'args':{},
+                    'description':"Drop all traffic (similar to 'service iptables panic')."
+                        }
+                }

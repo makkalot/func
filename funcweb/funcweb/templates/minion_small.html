@@ -1,0 +1,28 @@
+<div class="minions2" id="minions2"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:py="http://genshi.edgewall.org/">
+
+    <div align="center">Minions</div>
+    <form action="/funcweb/add_minions_togroup" method="post" onsubmit="return !glob_submit(this,'group_small');" name="minion_merge">
+    <div class="minions2box" id="minions2box">
+    <span py:for="minion in all_minions">
+        <div class="minionstextbox" id="minionstextbox"><span class="minionsandgroupsbluetext">${minion}</span>
+            <label>
+                <input type="checkbox" class = "checkminion" name="checkminion" id="checkminion" value="${minion}"/>
+            </label>
+        </div> 
+    </span>
+    </div>
+    <div class="graytexts2" id="selectallbox"> Select all:
+         <label>
+            <input type="checkbox" name="check_all_minion" id="check_all_minion" onclick="checkController('checkminion',this);"/>
+        </label>
+
+        <input type="hidden" name="group_name" value="${group_name}"/>
+        <input type="hidden" name="action_name" value="add"/>
+        <label>
+            <input name="addbtn" type="submit" class="addnewgroupbtn" id="addbtn" value="Add" />
+        </label>
+    </div>
+    </form>
+</div>

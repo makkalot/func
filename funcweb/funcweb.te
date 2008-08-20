@@ -1,0 +1,12 @@
+module funcweb 1.0.0;
+
+require {
+        type httpd_t;
+        type port_t;
+        attribute port_type;
+        class tcp_socket name_connect;
+}
+
+type funcweb_port_t, port_type;
+
+allow httpd_t funcweb_port_t:tcp_socket name_connect;

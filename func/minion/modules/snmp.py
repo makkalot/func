@@ -14,7 +14,7 @@ Abitrary command execution module for func.
 """
 
 import func_module
-import sub_process
+from func.minion import sub_process
 base_snmp_command = '/usr/bin/snmpget -v2c -Ov -OQ'
 
 class Snmp(func_module.FuncModule):
@@ -32,7 +32,35 @@ class Snmp(func_module.FuncModule):
         cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
+
+    def register_method_args(self):
+        """
+        Implementing the argument getter
+        """
         
+        return {
+                'get':{
+                    'args':{
+                        'oid':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'The oid'
+                            },
+                        'rocommunity':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The rocommunity"
+                            },
+                        'hostname':{
+                            'type':'string',
+                            'optional':True,
+                            'default':'localhost',
+                            'description':"The hostname tobe apllied on"
+                            }
+                        },
+                    'description':"Runs an snmpget on a specific oid returns the output of the call"
+                    }
+                }
     #def walk(self, oid, rocommunity):
 
     #def table(self, oid, rocommunity):

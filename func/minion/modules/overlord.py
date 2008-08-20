@@ -45,5 +45,23 @@ class OverlordModule(func_module.FuncModule):
                 else:
                     maphash[current_minion] = {}
         return maphash
+
+    def register_method_args(self):
+        """
+        Export overlord
+        """
+        return {
+                'map_minions':{
+                    'args':{
+                        'get_only_alive':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Get only online ones"
+                            }
+                        },
+                    'description':"Builds a recursive map of the minions currently assigned to this minion overlord"
+                    }
+                }
         
     

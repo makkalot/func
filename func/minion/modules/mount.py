@@ -12,8 +12,9 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
-import sub_process, os
+import os
 import func_module
+from func.minion import sub_process
 
 
 class MountModule(func_module.FuncModule):
@@ -82,3 +83,79 @@ class MountModule(func_module.FuncModule):
 
     def inventory(self, flatten=True):
         return self.list()
+
+
+    def register_method_args(self):
+        """
+        Implementing the method arg getter
+        """
+
+        return{
+                'list':{'args':{},
+                    'description':"Listing the mounting points"
+                    },
+                'mount':{
+                    'args':{
+                        'device':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'The device to be mounted',
+                            },
+                        'dir':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'The directory which will the device mounted under'
+                            },
+                        'type':{
+                            'type':'string',
+                            'optional':True,
+                            'default':'auto',
+                            'description':'The type of the mount'
+                            },
+                        'options':{
+                            'type':'list',
+                            'optional':True,
+                            'description':"Some extra options to be added to mount command"
+                            },
+                        'createdir':{
+                            'type':'boolean',
+                            'optional':True,
+                            'description':'Check if you want to create the dir place if not exist'
+                            }
+                        },
+                    'description':"Mount the specified device under some directory"
+                    },
+                'umount':{'args':{
+                    'dir':{
+                        'type':'string',
+                        'optional':False,
+                        'description':'The directory which will be unmounted'
+                         },
+                    'killall':{
+                        'type':'boolean',
+                        'optional':True,
+                        'description':'The killal option'
+                        },
+                    'force':{
+                        'type':'boolean',
+                        'optional':True,
+                        'description':'To force operation check it'
+                        },
+                    'lazy':{
+                        'type':'boolean',
+                        'optional':True,
+                        'description':'The lazy option'
+                        }
+                    },
+                    'description':"Unmounting the specified directory."
+                    },
+                'inventory':{'args':{
+                    'flatten':{
+                        'type':'boolean',
+                        'optional':True,
+                        'description':"To flatten check."
+                        }
+                    },
+                    'description':"Th einventory part of that module"
+                    }
+                }
