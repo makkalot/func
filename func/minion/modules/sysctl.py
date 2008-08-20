@@ -29,3 +29,41 @@ class SysctlModule(func_module.FuncModule):
 
     def set(self, name, value):
         return self.__run("/sbin/sysctl -w %s=%s" % (name, value))
+
+    def register_method_args(self):
+        """
+        Implementing the method argument getter
+        """
+
+        return {
+                'list':{
+                    'args':{},
+                    'description':"Display all values currently available."
+                    },
+                'get':{
+                    'args':{
+                        'name':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name of a key to read from.  An example is kernel.ostype"
+                            }
+                        },
+                    'description':"Use this option to disable printing of the key name when printing values"
+                    },
+                'set':{
+                    'args':{
+                        'name':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name of a key to read from.  An example is kernel.ostype"
+                            },
+                        'value':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name value to be set."
+                            }
+                    
+                        },
+                    'description':"Use this option when you want to change a sysctl setting"
+                    }
+                }

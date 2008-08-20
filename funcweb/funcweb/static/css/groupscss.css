@@ -1,0 +1,207 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+#addgroupbigbox {
+background-color:#f7f7f7;
+height: 100px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#addgroup {
+height:50px;
+width:400px;
+margin-left:auto;
+margin-right:auto;
+margin-top: 2em;
+}
+#groupnametext {
+height:40px;
+width:50px;
+float:left;
+margin-right:10px;
+padding-top:2px;
+margin-left:2.2em;
+}
+#groupsbigbox {
+background-color:#f7f7f7;
+overflow: auto;
+max-height: 250px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#groupstexts {
+float:left;
+margin-left: 4em;
+height:25px;
+max-width: 250px;
+margin-top: 2em;
+}
+
+#miniongroupsbigbox {
+background-color:#f7f7f7;
+min-height: 150px;
+width: 90%;
+padding:10px;
+border: 2px solid #dddddd;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+
+.addgroupbox {
+background-color: #FFFFFF;
+border: 2px solid #dddddd;
+width:200px;
+height:20px;
+float:left;
+}
+.removebtn {
+height:25px;
+width:25px;
+background-image: url(../images/removebtn.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+margin-top: 2.4em;
+float:left;
+}
+.removebtn:link {
+height:25px;
+width:25px;
+background-image:url(../images/removebtn.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+margin-top: 2.4em;
+float:left;
+}
+.removebtn:hover {
+height:25px;
+width:25px;
+background-image: url(../images/removebtnhover.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+margin-top: 2.4em;
+float:left;
+}
+
+.removegroupbtn {
+height:25px;
+width:25px;
+background-image:url(../images/groupremovebtn.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+}
+.removegroupbtn:link {
+height:25px;
+width:25px;
+background-image:url(../images/groupremovebtn.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+}
+.removegroupbtn:hover {
+height:25px;
+width:25px;
+background-image: url(../images/groupremovebtnhover.jpg);
+background-repeat:no-repeat;
+display:block;
+border: 0px;
+}
+
+#group {
+max-height: 400px;
+width: 40%;
+padding:10px;
+float:left;
+margin-left:35px;
+margin-right:35px;
+}
+#groupbox {
+background-color:#F1F5F6;
+border: 2px solid #dddddd;
+overflow: auto;
+max-height: 150px;
+margin-top: 2em;
+}
+#grouptextbox {
+max-width:100px;
+margin-bottom:15px;
+margin-top:10px;
+margin-left:190px;
+}
+#minions2 {
+max-height: 400px;
+width: 40%;
+padding:10px;
+float:left;
+margin-left:30px;
+margin-right:30px;
+}
+#minions2box {
+background-color:#F1F5F6;
+border: 2px solid #dddddd;
+overflow: auto;
+max-height: 150px;
+margin-top: 2em;
+}
+#minionstextbox {
+margin-left:190px;
+max-width:250px;
+margin-bottom:15px;
+margin-top:10px;
+}
+#selectallbox {
+float:right;
+margin-top:10px;
+}
+#selectallgroupboxes {
+float:left;
+margin-top:10px;
+}
+.minionsandgroupsbluetext {
+font-family: Arial, Helvetica, sans-serif;
+font-size:18px;
+color: #5499d4;
+text-decoration:none;
+}
+
+#minion_glob_box {
+padding-right:175px;
+width: 80%;
+height: 50px;
+float:right;
+}
+
+.addnewgroupbtn {
+height:25px;
+width:80px;;
+background-image: url(../images/buttonadd.jpg);
+border: 0px;
+padding-bottom:5px;
+}
+.addnewgroupbtn:link {
+height:25px;
+width:80px;;
+background-image: url(../images/buttonadd.jpg);
+border: 0px;
+padding-bottom:5px;
+}
+.addnewgroupbtn:hover {
+height:25px;
+width:80px;;
+background-image: url(../images/button_overadd.jpg);
+border: 0px;
+padding-bottom:5px;
+}

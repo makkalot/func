@@ -13,8 +13,8 @@
 
 
 import func_module
-import sub_process
-import codes 
+from func.minion import sub_process
+from func.minion import codes
 import process
 import networktest
 import command
@@ -173,6 +173,76 @@ class JBoss(func_module.FuncModule):
                 founded.append(item)
         
         return founded
+
+    def register_method_args(self):
+        """
+        Implementin the method argument getter part
+        """
+
+        return {
+                'status':{
+                    'args':{},
+                    'description':"Get jboss information"
+                    },
+                'check':{
+                    'args':{
+                        'status':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The status of instance to check (optional)"
+                            }
+                        },
+                    'description':"Check if jboss instances works"
+                    },
+                'search_by_port':{
+                    'args':{
+                        'port':{
+                            'type':'int',
+                            'optional':False,
+                            'min':0,
+                            'max':65535,
+                            'description':'The port to search for'
+                            },
+                        'status':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The status of instance to check (optional)"
+                            }
+                        },
+                    'description':"Search instance by listening port"
+                    },
+                'search_by_instance':{
+                    'args':{
+                        'instance':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name of the instance"
+                            },
+                        'status':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The status of the instance to search (optional)"
+                            }
+                        },
+                    'description':"Search instance by instance name"
+                    },
+                'search_by_address':{
+                    'args':{
+                        'address':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The bind adress to check"
+                            },
+                        'status':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The status of the instance to search (optional)"
+                            }
+                        },
+                    'description':"Search instance by bind address"
+
+                    }
+                }
 
 '''
     def start(self, address="127.0.0.1", instance="default"):

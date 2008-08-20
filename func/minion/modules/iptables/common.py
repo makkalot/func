@@ -10,7 +10,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # other modules
-import sub_process
+from func.minion import sub_process
 
 def run_iptables(args):
     cmd = sub_process.Popen(["/sbin/iptables"] + args.split(),

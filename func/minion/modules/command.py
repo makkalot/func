@@ -14,7 +14,7 @@ Abitrary command execution module for func.
 """
 
 import func_module
-import sub_process
+from func.minion import sub_process
 
 class Command(func_module.FuncModule):
 
@@ -42,3 +42,29 @@ class Command(func_module.FuncModule):
         if os.access(command, os.X_OK):
             return True
         return False
+
+    def register_method_args(self):
+        """
+        The argument export method
+        """
+        #common type in both descriptions
+        command = {
+                'type':'string',
+                'optional':False,
+                'description':'The command that is going to be used',
+                }
+
+        return {
+                'run':{
+                    'args':{
+                        'command':command
+                        },
+                    'description':'Run a specified command'
+                    },
+                'exists':{
+                    'args':{
+                        'command':command
+                        },
+                    'description':'Check if specific command exists'
+                    }
+                }

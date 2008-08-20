@@ -23,6 +23,8 @@ initpath = "/etc/init.d"
 #the log path
 logpath = "/var/log/funcweb"
 rotpath = "/etc/logrotate.d"
+#the pam path
+pampath = "/etc/pam.d/"
 
 #the setup part
 setup(
@@ -93,6 +95,7 @@ setup(
             (self_etcpath,['etc/prod.cfg']),
             (initpath,['init-scripts/funcwebd']),
             (logpath,[]),
-            (rotpath,['etc/funcweb_rotate'])
+            (rotpath,['etc/funcweb_rotate']),
+            (pampath,['etc/pam.d/funcweb'])
             ],
     )
