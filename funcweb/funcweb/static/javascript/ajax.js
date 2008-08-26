@@ -24,8 +24,18 @@ function addDomAjaxREsult(){
 function remoteFormRequest(form, target, options) {
 	var query = Array();
     var contents = formContents(form);
-    for (var j=0; j<contents[0].length; j++)
-        query[contents[0][j]] = contents[1][j];
+    for (var j=0; j<contents[0].length; j++){
+        if(compare(target,'group_small')==0){
+            if(!query[contents[0][j]]){
+                query[contents[0][j]] = [];
+            }
+            //add that here
+            query[contents[0][j]].push(contents[1][j]);
+
+        }
+        else
+            query[contents[0][j]] = contents[1][j];
+    }
 	query["tg_random"] = new Date().getTime();
 	//makePOSTRequest(form.action, target, queryString(query));
 	remoteRequest(form, form.action, target, query, options);
@@ -76,7 +86,24 @@ function makePOSTRequest(source, url, target, parameters, options) {
             }
             if (http_request.status == 200) {
                 if(target) {
-                    target.innerHTML = http_request.responseText;
+                    var is_error = true;
+                    //some hacky olution to catch the python errors
+                    try{
+                        var check_error = evalJSON(http_request.responseText);
+                                    }
+                        catch(e){
+                            //There is no error in request
+                            is_error = false;
+                        }
+                        if (is_error == true){
+                            if (compare(check_error['fg_flash'],null)!=0)
+                                connection_error(check_error['tg_flash']);
+                            else
+                                is_error = false;
+                        }
+                        
+                        if (is_error == false)
+                            target.innerHTML = http_request.responseText;
                 }
                 //success
                 if (options['on_success']) {
@@ -86,9 +113,15 @@ function makePOSTRequest(source, url, target, parameters, options) {
                 //failure
                 if (options['on_failure']) {
                     eval(options['on_failure']);
-                } else {
+                //it seems to be an expiration ...
+                } else if(http_request.status == 403){
+                    alert('It seems that current session expired you should log in !');
+                    window.location = window.location.href;
+                }
+                else {
                     alert('There was a problem with the request. Status('+http_request.status+')');
                 }
+
             }
             //complete
             if (options['on_complete']) {
@@ -103,4 +136,62 @@ function makePOSTRequest(source, url, target, parameters, options) {
     http_request.setRequestHeader("Content-length", parameters.length);
     http_request.setRequestHeader("Connection", "close");
     http_request.send(parameters);
+}
+
+function glob_submit(form_element,target_dom){
+    /*
+     * Because it is a common function we have to move it here for better results
+     * form_element is what we submit and the target_dom is the place that will be replaced
+     */
+    
+    before_action = null;
+    //sometimes we are not sure which dom to get so is that situation
+    if(compare(target_dom,'not_sure')==0)
+        target_dom = which_dom();
+
+    //if we are in the index page should to that 
+    if (compare(target_dom,'minioncontent')==0){
+        before_action = "hideElement(getElement('resultcontent'));hideElement(getElement('widgetcontent'));hideElement(getElement('methotdscontent'));hideElement(getElement('modulescontent'));";
+    }
+    else if(compare(target_dom,'groupscontent')==0){
+        before_action = "hideElement(getElement('miniongroupcontents'));";
+    }
+    
+    form_result = remoteFormRequest(form_element,target_dom, {
+            'loading': null,
+            'confirm': null, 
+            'after':null,
+            'on_complete':null, 
+            'loaded':null, 
+            'on_failure':null, 
+            'on_success':null, 
+            'before':before_action 
+            }
+            );
+    
+    return form_result;
+}
+
+function which_dom(){
+    /*
+     * We use the glob submit in lots of places so we should
+     * know where we are actually so that method will handle that
+     */
+
+    //that is for index.html
+    dom_result = getElement('minioncontent');
+    if (dom_result != null){
+        //alert("Im giving back the minioncontent");
+        return 'minioncontent';
+
+    }
+    
+    //it is for groups_main.html
+    dom_result = getElement('minion_small');
+    //will change it later
+     if (dom_result != null){
+        return 'minion_small';
+    }
+
+    return dom_result;
 }

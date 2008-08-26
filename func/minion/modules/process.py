@@ -14,8 +14,8 @@
 ##
 
 # other modules
-import sub_process
-import codes
+from func.minion import sub_process
+from func.minion import codes
 
 # our modules
 import func_module
@@ -218,3 +218,55 @@ class ProcessModule(func_module.FuncModule):
         rc = sub_process.call(["/usr/bin/pkill", name, level], 
                               executable="/usr/bin/pkill", shell=False)
         return rc
+
+    def register_method_args(self):
+        """
+        Implementing the argument getter
+        """
+        return{
+                'info':{
+                    'args':{
+                        'flags':{
+                            'type':'string',
+                            'default':'-auxh',
+                            'optional':True,
+                            'description':"Flags for ps command"
+                            }
+                        },
+                    'description':'Get the process info for system'
+                    },
+                'mem':{
+                    'args':{},
+                    'description':"Returns a list of per-program memory usage."
+                    },
+                'kill':{
+                    'args':{
+                        'pid':{
+                            'type':'int',
+                            'optional':False,
+                            'description':"The pid for process to be killed"
+                            },
+                        'signal':{
+                            'type':'string',
+                            'optional':True,
+                            'default':"TERM",
+                            'description':"Signal to send before killing"
+                            }
+                        },
+                    "description":"Kill a process with proper signal"
+                    },
+                'pkill':{
+                    'args':{
+                        'name':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name of the app but with full path info ."                  },
+                        'level':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"Level of killing"
+                            }
+                        },
+                    "description":"Kill an app with supplying a name and level"
+                    }
+                }

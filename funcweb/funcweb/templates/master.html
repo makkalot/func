@@ -6,26 +6,37 @@
   <head py:match="head" py:attrs="select('@*')">
     <meta content="text/html; charset=UTF-8" http-equiv="content-type"
       py:replace="''" />
-    <title py:content="'Your Title Goes Here'"></title>
+    <title py:content="'Funcweb'"></title>
 
-    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/jquery.js')}" />
     <link py:for="js in tg_js_head" py:strip="">${ET(js.display())}</link>
     <link py:for="css in tg_css" py:strip="">${ET(css.display())}</link>
     <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ajax.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/utils.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/dhtmlxcommon.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/dhtmlxtree.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ext/dhtmlxtree_dragin.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ext/dhtmlxtree_ed.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ext/dhtmlxtree_er.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ext/dhtmlxtree_json.js')}" />
+    <script type="text/javascript" src="${tg.url('/funcweb/static/javascript/ext/dhtmlxtree_start.js')}" />
 
 
-    <style type="text/css" media="screen">
+  <style type="text/css" media="screen">
       @import url("/funcweb/static/css/style.css");
   </style>
+  <style type="text/css" media="screen">
+      @import url("/funcweb/static/css/groupscss.css");
+  </style>
   
+  <style type="text/css" media="screen">
+      @import url("/funcweb/static/css/dhtmlxtree.css");
+  </style>
+
+
   <link media="screen" href="/funcweb/static/css/expanding_form.css" type="text/css" rel="stylesheet"/>
   <script src="${tg.url('/funcweb/static/javascript/expanding_form.js')}" type="text/javascript"/>
   <script src="${tg.url('/funcweb/static/javascript/async_tools.js')}" type="text/javascript"/>
       
-  <script type="text/javascript">
-    jQuery._$ = MochiKit.DOM.getElement;
-    var myj = jQuery.noConflict();
-  </script> 
   
   </head>
   <body py:match="body" py:attrs="select('@*')">
@@ -35,7 +46,14 @@
     <div class="underheader" id="underheader"></div>
     <div id="menudiv">
         <div class="navgation" id="navigaton">
-            <span class="lines">|</span><a href="/funcweb/" class="navlinks">Home</a><span class="lines">|</span><a href="/funcweb/display_async_results" class="navlinks">Async Results</a><span class="lines">|</span>
+            <span class="lines">|</span>
+                <a href="/funcweb/" class="navlinks">Home</a>
+            <span class="lines">|</span>
+                <a href="/funcweb/display_async_results" class="navlinks">Async Results</a>
+            <span class="lines">|</span>
+                <a href="/funcweb/groups_main" class="navlinks">Group Management</a>
+            <span class="lines">|</span>
+        
         </div>
     </div>
 

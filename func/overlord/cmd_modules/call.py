@@ -160,6 +160,7 @@ class Call(base_command.BaseCommand):
                 print "JOB_ID:", pprint.pformat(results)
                 return results
             else:
+                
                 return self.overlord_obj.local.utils.async_poll(results, self.print_results)
 
         # dump the return code stuff atm till we figure out the right place for it

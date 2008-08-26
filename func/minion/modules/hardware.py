@@ -72,6 +72,32 @@ class HardwareModule(func_module.FuncModule):
         """
         return hw_info(with_devices)
 
+    def register_method_args(self):
+        """
+        Implementing the argument getter
+        """
+
+        return{
+                'hal_info':{
+                    'args':{},
+                    'description':'Returns the output of lshal'},
+                'inventory':{
+                    'args':{},
+                    'description':"The inventory part"
+                    },
+                'info':{
+                    'args':{
+                        'with_devices':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':'All devices'
+                            }
+                        },
+                    'description':"A struct of hardware information"
+                    }
+                }
+
 # =================================
 
 def hw_info(with_devices=True):

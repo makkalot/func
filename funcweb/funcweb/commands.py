@@ -18,9 +18,12 @@ cherrypy.lowercase_api = True
 class ConfigurationError(Exception):
     pass
 
+#that variable will help us to see when we are in PRODUCTION 
+PRODUCTION_ENV = False
+
 def start():
     """Start the CherryPy application server."""
-
+    global PRODUCTION_ENV
     setupdir = dirname(dirname(__file__))
     curdir = os.getcwd()
 
@@ -32,6 +35,8 @@ def start():
     # 'prod.cfg' in the current directory and then for a default
     # config file called 'default.cfg' packaged in the egg.
     if exists("/etc/funcweb/prod.cfg"):
+        #we work with production settings now !
+        PRODUCTION_ENV = True
         configfile = "/etc/funcweb/prod.cfg"
     
     elif len(sys.argv) > 1:
@@ -53,7 +58,7 @@ def start():
 
     from funcweb.controllers import Root
     
-    if exists("/etc/funcweb/prod.cfg"):
+    if PRODUCTION_ENV:
         utils.daemonize("/var/run/funcwebd.pid")
     #then start the server
     try:

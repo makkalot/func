@@ -10,9 +10,8 @@
 
 
 import func_module
-from codes import FuncException
-
-import sub_process
+from func.minion.codes import FuncException
+from func.minion import sub_process
 
 class NetworkTest(func_module.FuncModule):
 
@@ -62,3 +61,67 @@ class NetworkTest(func_module.FuncModule):
         full_cmd = [command] + opts
         cmd = sub_process.Popen(full_cmd, stdout=sub_process.PIPE)
         return [line for line in cmd.communicate()[0].split('\n')]
+
+    def register_method_args(self):
+        """
+        Implementing method getter part
+        """
+
+        return{
+                'ping':{
+                    'args':{
+                        'args':{
+                            'type':'list*',
+                            'optional':False,
+                            'description':"Options for ping command"
+                            }
+                        },
+                    'description':"Ping command utility"
+                    },
+                'netstat':{
+                    'args':{
+                    'args':{
+                        'type':'list*',
+                        'optional':False,
+                        'description':"Options for netstat command"
+                            }},
+                    'description':"The unix netstat command utility"
+                    },
+                'traceroute':{
+                    'args':{
+                    'args':{
+                        'type':'list*',
+                        'optional':False,
+                        'description':"Options for traceroute command"
+
+                        }},
+                    'description':"Traceroute network utility"
+                    },
+                'dig':{
+                    'args':{
+                    'args':{
+                        'type':'list*',
+                        'optional':False,
+                        'description':"Options for dig command"
+
+                        }},
+                    'description':"Dig command utility"
+                    },
+                'isportopen':{
+                    'args':{
+                        'host':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The name of the host to be checked"
+                            },
+                        'port':{
+                            'type':'int',
+                            'optional':False,
+                            'min':0,
+                            'max':65535,
+                            'description':'The port to be checked on specified host'
+                            }
+                        },
+                    'description':"Checks if port is open for specified host"
+                    }
+                }

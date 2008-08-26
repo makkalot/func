@@ -33,3 +33,55 @@ class Test(func_module.FuncModule):
         Returns whatever was passed into it
         """
         return data
+
+    def register_method_args(self):
+        """
+        Implementing method argument getter
+        """
+
+        return {
+                'add':{
+                    'args':{
+                        'numb1':{
+                            'type':'int',
+                            'optional':False,
+                            'description':'An int'
+                            },
+                        'numb2':{
+                            'type':'int',
+                            'optional':False,
+                            'description':'An int'
+                                }
+
+                        },
+                    'description':'Gives back the sum of 2 integers'
+                    },
+                'ping':{
+                    'args':{},
+                    'description':"Ping the minion"
+                    },
+                'sleep':{
+                    'args':{
+                        't':{
+                            'type':'int',
+                            'optional':False,
+                            'description':'Num of sec'
+                            }
+                        },
+                    'description':"Sleep for a while"
+                    },
+                'explode':{
+                    'args':{},
+                    'description':"Raises an exception"
+                    },
+                'echo':{
+                    'args':{
+                        'data':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The message to send"
+                            }
+                        },
+                    'description':"Echoes back the sent data "
+                    }
+                }

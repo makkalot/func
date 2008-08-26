@@ -46,6 +46,47 @@ class CopyFile(func_module.FuncModule):
 
         return thissum.hexdigest()
 
+    def open(self, filepath, mode=None, uid=-1, gid=-1):
+        dirpath = os.path.dirname(filepath)
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
+
+        # Create empty file
+        try:
+            fo = open(filepath, 'w')
+            fo.close()
+            del fo
+        except (IOError, OSError), e:
+            # XXX logger output here
+            return -1
+
+        try:
+            # we could intify the mode here if it's a string
+            if mode:
+                os.chmod(filepath, mode)
+            if uid != -1 or gid != -1:
+                os.chown(filepath, uid, gid)
+        except (IOError, OSError), e:
+            return -1
+
+        return filepath
+
+    def append(self, filepath, filebuf):
+        if not os.path.exists(filepath):
+            # file disaperead
+            return -1
+
+        try:
+            fo = open(filepath, 'a')
+            fo.write(filebuf.data)
+            fo.close()
+            del fo
+        except (IOError, OSError), e:
+            # XXX logger output here
+            return -1
+
+        return 1
+
 
     def copyfile(self, filepath, filebuf, mode=0644, uid=0, gid=0, force=None):
         # -1 = problem file was not copied

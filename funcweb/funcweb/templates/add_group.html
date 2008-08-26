@@ -1,0 +1,20 @@
+<div class="minioncontent" id="addgroupcontent"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:py="http://genshi.edgewall.org/"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    >
+    <div class="addgroupbigbox" id="addgroupbigbox">
+        <div align="center" class="graytexts">Add Group</div>
+        <div class="graytexts" id="addgroup">
+            <div class="groupnametext" id="groupnametext">Name:</div>
+            <form id="form_addgroup" name="form_addgroup" method="post" onsubmit="return !glob_submit(this, 'groupscontent');" action="/funcweb/add_new_group">
+                <label>
+                    <input name="group_name" type="text" class="addgroupbox" id="addgroupfield"/>
+                </label>
+                <label>
+                    <input name="submit" type="submit" class="addnewgroupbtn" id="submit" value="ADD" />
+                </label>
+            </form>
+        </div>
+    </div>
+</div>

@@ -47,3 +47,50 @@ class Snap(func_module.FuncModule):
         """
         return True
 
+    def register_method_args(self):
+        """
+        Implementing the method argument getter part
+        """
+        vol = {
+                'type':'string',
+                'optional':False,
+                'description':"The name of the volume"
+                }
+        snap = {
+                'type':'string',
+                'optional':False,
+                'description':"The name of the snapshot"
+                }
+        
+        filer = {
+                'type':'string',
+                'optional':False,
+                'description':"Resolvable name of the target filer"
+                }
+
+        return {
+                'create':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        'snap':snap
+                        },
+                    'description':"Returns True if snapshot is created successfully"
+                    },
+                'delete':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        'snap':snap
+                        },
+                    'description':"Returns True if snapshot is delete successfully"
+                    },
+                'list':{
+                    'args':{
+                        'filer':filer,
+                        'vol':vol,
+                        },
+                    'description':""
+                    }
+                }
+

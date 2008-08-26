@@ -28,6 +28,8 @@ class WidgetListFactory(object):
             'hash':{
                 'type':"RepeatingFieldSet"},
             'list':{
+                'type':"RepeatingFieldSet"},
+            'list*':{
                 'type':"RepeatingFieldSet"} 
             }
     #will contain the input widget created in that class
@@ -50,7 +52,8 @@ class WidgetListFactory(object):
         self.method = method
     
     def __add_general_widget(self):
-
+        # a mirror var to show that these are same things 
+        mirror_case = {'list*':'list'}
         #key is the argument_name and the argument are options
         for key,argument in self.__argument_dict.iteritems():
             #get the type of the argument
@@ -69,7 +72,10 @@ class WidgetListFactory(object):
 
             if act_special:
                 #calling for example __add_specialized_string(..)
-                getattr(self,"_%s__add_specialized_%s"%(self.__class__.__name__,current_type))(argument,key)
+                if current_type == "list*":
+                    getattr(self,"_%s__add_specialized_%s"%(self.__class__.__name__,mirror_case[current_type]))(argument,key)
+                else:
+                    getattr(self,"_%s__add_specialized_%s"%(self.__class__.__name__,current_type))(argument,key)
             else:
                 temp_object = getattr(widgets,self.__convert_table[current_type]['default_value'])()
                 #add common options to it
@@ -261,7 +267,7 @@ class RemoteFormAutomation(CoreWD):
                 validator = validator_schema,
                 name = "minion_form",
                 update = "resultbox",
-                before='myj(\'#resultcontent\').hide().show(\'slow\');addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
+                before='hideElement(getElement(\'resultcontent\'));showElement(getElement(\'resultcontent\'));addDomAjaxREsult();getElement(\'loading\').innerHTML=toHTML(IMG({src:\'../funcweb/static/images/loading.gif\',width:\'100\',height:\'100\'}));',
                 on_complete='getElement(\'loading\'  ).innerHTML=\'Done!\';',
                 submit_text = "Send Command to Glob"
         )

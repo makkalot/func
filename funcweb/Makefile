@@ -77,6 +77,7 @@ unittest:
 rpms: build sdist
 	mkdir -p rpm-build
 	cp dist/*.gz rpm-build/
+	cp funcweb.te rpm-build/
 	cp version rpm-build/
 	rpmbuild --define "_topdir %(pwd)/rpm-build" \
 	--define "_builddir %{_topdir}" \

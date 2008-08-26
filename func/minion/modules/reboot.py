@@ -9,7 +9,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import func_module
-import sub_process
+from func.minion import sub_process
 
 class Reboot(func_module.FuncModule):
 
@@ -19,3 +19,28 @@ class Reboot(func_module.FuncModule):
 
     def reboot(self, when='now', message=''):
         return sub_process.call(["/sbin/shutdown", '-r', when, message])
+
+    def register_method_args(self):
+        """
+        Implementing method getter part
+        """
+
+        return {
+                'reboot':{
+                    'args':{
+                        'when':{
+                            'type':'string',
+                            'optional':True,
+                            'default':'now',
+                            'description':"When to reboot (optional)"
+                            },
+                        'message':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The shutdown message"
+                            }
+                        },
+                    'description':"Rebooting the minions"
+                    }
+                }
+

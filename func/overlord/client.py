@@ -294,7 +294,7 @@ class Overlord(object):
             if method in self.methods.keys():
                 return self.methods[method](*args)
             else:
-                raise AttributeError("no such method")
+                raise AttributeError("No such local method: %s" % method)
 
         if not self.delegate: #delegation is turned off, so run normally
             return self.run_direct(module, method, args, nforks)

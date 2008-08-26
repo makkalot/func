@@ -69,3 +69,36 @@ class Yum(func_module.FuncModule):
             pkg_list = exactmatch + matched
 
         return map(str, pkg_list)
+
+    def register_method_args(self):
+        """
+        Implementing the argument getter
+        """
+
+        return{
+                'update':{
+                    'args':{
+                        'pkg':{
+                            'type':'string',
+                            'optional':True,
+                            'description':"The yum pattern for updating package"
+                            }
+                        },
+                    'description':"Updating system according to a specified pattern"
+                    },
+                'check_update':{
+                    'args':{
+                        'filter':{
+                            'type':'list',
+                            'optional':True,
+                            'description':"A list of what you want to update"
+                            },
+                        'repo':{
+                            'type':'string',
+                            'optional':True,
+                            'description':'Repo name to use for that update'
+                            }
+                        },
+                    'description':"Cheking for updates with supplied filter patterns and repo"
+                    }
+                }

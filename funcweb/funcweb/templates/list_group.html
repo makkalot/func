@@ -1,0 +1,16 @@
+<div class="groupsbigbox" id="groupsbigbox" 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:py="http://genshi.edgewall.org/">
+    
+    <div align="center" class="graytexts">Groups</div>
+    <span py:for="group_name in groups">
+        <div class="minionstextblue" id="groupstexts"><a href="#miniongroupcontents" onclick="get_hosts_by_group('${group_name}');">${group_name}</a></div>
+        <form action="/funcweb/remove_group" method="post" onsubmit="return !glob_submit(this,'groupscontent');" name="remove_form">
+ 
+            <input type="hidden" name="group_name" value="${group_name}"/>
+        <span>
+            <input name="removebtn2" type="submit" class="removebtn" id="removebtn" value=""/>
+        </span>
+        </form>
+    </span>
+</div>

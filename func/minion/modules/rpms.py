@@ -67,3 +67,38 @@ class RpmModule(func_module.FuncModule):
             else:
                 results.append([name, epoch, version, release, arch])
         return results
+
+    def register_method_args(self):
+        """
+        Implementing the method argument getter
+        """
+
+        return {
+                'inventory':{
+                    'args':{
+                        'flatten':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Print clean in difss"
+                            }
+                        },
+                    'description':"Returns information on all installed packages"
+                    },
+                'glob':{
+                    'args':{
+                        'pattern':{
+                            'type':'string',
+                            'optional':False,
+                            'description':"The glob packet pattern"
+                            },
+                        'flatten':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Print clean in difss"
+                                }
+                        },
+                    'description':"Return a list of installed packages that match a pattern"
+                    }
+                }
