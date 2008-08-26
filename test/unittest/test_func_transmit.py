@@ -92,7 +92,6 @@ class BaseTest(object):
 
    # we do this all over the place...
     def assert_on_fault(self, result):
-        print "\n\n", result, "\n\n\n"
         assert func.utils.is_error(result[self.th]) == False
 #        assert type(result[self.th]) != xmlrpclib.Fault
 
