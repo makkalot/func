@@ -170,6 +170,11 @@ class TestCommand(BaseTest):
         assert result[self.th][1].split("-")[0] == "filesystem"
 
 
+    def test_env(self):
+	result = self.overlord.command.run("env",
+				           {'BLIPPYFOO':'awesome'})
+	self.assert_on_fault(result)
+	assert result[self.th][1].strip() == "BLIPPYFOO=awesome"
 
 class TestCopyfile(BaseTest):
     fn = "/tmp/func_test_file"

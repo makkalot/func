@@ -19,17 +19,22 @@ from func.minion import sub_process
 class Command(func_module.FuncModule):
 
     version = "0.0.1"
-    api_version = "0.0.1"
+    api_version = "0.0.2"
     description = "Works with shell commands."
 
-    def run(self, command):
+    def run(self, command, env=None):
         """
         Runs a command, returning the return code, stdout, and stderr as a tuple.
         NOT FOR USE WITH INTERACTIVE COMMANDS.
         """
 
-        cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
-                                   stderr=sub_process.PIPE, shell=False)
+        
+        if env:
+            cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
+                                       stderr=sub_process.PIPE, shell=False, env=env)
+        else:
+            cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
+                                       stderr=sub_process.PIPE, shell=False)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
 
