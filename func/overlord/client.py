@@ -117,7 +117,7 @@ class Minions(object):
 		    # use basename to trim off any excess /'s, fix
 		    # ticket #53 "Trailing slash in certmaster.conf confuses glob function
                     certname = os.path.basename(cert.replace(self.config.certroot, ""))
-                    host = certname[:(len(self.config.cert_extension) - 1)]
+                    host = certname[:-(len(self.config.cert_extension) + 1)]
                     self.all_hosts.append(host)
 
     def get_all_hosts(self):
