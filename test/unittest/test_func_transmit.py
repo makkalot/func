@@ -131,14 +131,14 @@ class ListMinion(object):
                          'method':'utils.list_minions'})
         assert out == []
 
-    def test_list_minions_group_name(self):
-        out = self.call({'clients': '@test',
-                         'module':'local',
-                         'method': 'local.utils.list_minions'})
+#    def test_list_minions_group_name(self):
+#        out = self.call({'clients': '@test',
+#                         'module':'local',
+#                         'method': 'local.utils.list_minions'})
 
-    def test_list_minions_no_clients(self):
-        out = self.call({'module':'local',
-                         'method': 'utils.list_minions'})
+#    def test_list_minions_no_clients(self):
+#        out = self.call({'module':'local',
+#                         'method': 'utils.list_minions'})
                         
               
 class ListMinionAsync(ListMinion):
@@ -194,17 +194,18 @@ class ClientGlob(object):
 
     # note, needs a /etc/func/group setup with the proper groups defined
     # need to figure out a good way to test this... -akl
-    def test_group(self):
-        result = self._test_add("@test")
+# FIXME: 
+#    def test_group(self):
+#        result = self._test_add("@test")
 
-    def test_group_and_glob(self):
-        result = self._test_add("@test;*")
+#    def test_group_and_glob(self):
+#        result = self._test_add("@test;*")
 
-    def test_list_of_groups(self):#
-        result = self._test_add(["@test", "@test2"])
+#    def test_list_of_groups(self):#
+#        result = self._test_add(["@test", "@test2"])
 
-    def test_string_list_of_groups(self):
-        result = self._test_add("@test;@test2")
+#    def test_string_list_of_groups(self):
+#        result = self._test_add("@test;@test2")
 
 
 # run all the same tests, but run then 
