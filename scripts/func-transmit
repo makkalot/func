@@ -43,17 +43,42 @@ import simplejson
 import func.overlord.func_command as func_command
 import func.overlord.client as fc
 import func.yaml as yaml
+import func.CommonErrors
 
 
 class NoAsyncForListMinionException(exceptions.Exception):
-        def __init__(self, msg):
-            self.msg = msg
+    def __init__(self, msg):
+        self.msg = msg
     # scan arguments
+
+class FuncTransmitError(object):
+    def __init__(self, name="", message="", info={}):
+        self.data = {'error':1,
+		     # not all of the marshall types support bools, so 1 will have to do 
+		      'name':name, 
+		     'message':message,
+		     'info':info}
+
 
 def is_a_list(item):
     if type(item) in [type([]), type(())]:
         return True
     return False
+
+def read_data(format, data):
+    if format == "yaml":
+        params = yaml.load(data).next()
+    elif format == "json":
+        params = simplejson.loads(data)
+    return params
+
+def write_data(format, data):
+    # convert to selected language (default is JSON)
+    if format == "json":
+        output = simplejson.dumps(data)
+    elif format == "yaml":
+        output = yaml.dump(data)
+    print output
 
 def main(argv):
 # load input parameters
@@ -78,10 +103,12 @@ def main(argv):
     if (options.json==False and options.yaml==False):
         options.json = True
 
+    format = "json"
     if (options.yaml):
-        params = yaml.load(input).next()
-    elif (options.json):
-        params = simplejson.loads(input)
+        format = "yaml"
+
+    params  = read_data(format, input)
+    
 
     # slightly odd, but we expect clients to be a string we parse
     # out later (glob and group expansion, etc). So if it is a list,
@@ -99,7 +126,13 @@ def main(argv):
     parameters = params.get('parameters', None)
 
     # make the call
-    client = fc.Overlord(clients, async=async, nforks=nforks)
+    try:
+	    client = fc.Overlord(clients, async=async, nforks=nforks)
+    except func.CommonErrors.Func_Client_Exception, e:
+	    error = FuncTransmitError("Func Client Exception", str(e))
+	    write_data(format, error.data)
+	    return 1
+
     if module is None:
         method_handle = getattr(client, method)
     else:
@@ -114,16 +147,12 @@ def main(argv):
     else:
         results = method_handle()
 
-    # convert to selected language (default is JSON)
-    if (options.json):
-        output = simplejson.dumps(results)
-    elif (options.yaml):
-        output = yaml.dump(results)
+    # convert to selected language (default is JSON) and output
+    write_data(format, results)
 
-    # write to stdout
-    print output
 
+    return 0
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    sys.exit(main(sys.argv))

@@ -123,13 +123,14 @@ class ListMinion(object):
     def test_list_minions(self):
         out = self.call({'clients': '*',
                          'module':'local',
-                          'method': 'utils.list_minions'})
+                         'method':'utils.list_minions'})
         
     def test_list_minions_no_match(self):
         out = self.call({'clients': 'somerandom-name-that-shouldnt-be-a_real_host_name',
                          'module':'local',
                          'method':'utils.list_minions'})
-        assert out == []
+        assert out['error'] == 1
+        assert out['name'] == "Func Client Exception"
 
 #    def test_list_minions_group_name(self):
 #        out = self.call({'clients': '@test',
