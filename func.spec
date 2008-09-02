@@ -130,6 +130,9 @@ fi
 
 
 %changelog
+* Fri Jul 18 2008 Adrian Likins <alikins@redhat.com> - 0.23-1
+- remove requirement for pyyaml, add python-simplejson
+
 * Fri Jul 11 2008 Michael DeHaan <mdehaan@redhat.com> - 0.23-1
 - (for ssalevan) adding in mapping/delegation tools
 
