@@ -31,10 +31,11 @@ class Command(func_module.FuncModule):
         
         if env:
             cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
-                                       stderr=sub_process.PIPE, shell=False, env=env)
+                                       stderr=sub_process.PIPE, shell=False, 
+                                       close_fds=True, env=env)
         else:
             cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
-                                       stderr=sub_process.PIPE, shell=False)
+                                       stderr=sub_process.PIPE, shell=False, close_fds=True)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
 
