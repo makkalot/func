@@ -247,6 +247,14 @@ def main(argv):
     Start things up.
     """
 
+    if len(sys.argv) > 1 and sys.argv[1] == "--list-modules":
+        module_names = module_loader.load_modules().keys()
+        module_names.sort()
+        print "loaded modules:"
+        for foo in module_names:
+            print "\t" + foo
+        sys.exit(0)
+
     if "daemon" in sys.argv or "--daemon" in sys.argv:
         utils.daemonize("/var/run/funcd.pid")
     else:
