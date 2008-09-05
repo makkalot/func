@@ -34,6 +34,12 @@ class Test(func_module.FuncModule):
         """
         return data
 
+    def bigint(self):
+        """
+        Returns an integer greater than 2^32-1
+        """
+        return 2**32
+
     def register_method_args(self):
         """
         Implementing method argument getter
@@ -83,5 +89,9 @@ class Test(func_module.FuncModule):
                             }
                         },
                     'description':"Echoes back the sent data "
+                    },
+                'bigint':{
+                    'args':{},
+                    'description':"Returns a number greater than 2^32-1"
                     }
                 }
