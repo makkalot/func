@@ -45,12 +45,12 @@ class JBoss(func_module.FuncModule):
                     if items.__contains__("-c"):
                         instance = items[items.index("-c")+1]
                     else:
-                        instance = None
+                        instance = ""
 
                     if items.__contains__("-b"):
                         address = items[items.index("-b")+1]
                     else:
-                        address = None
+                        address = ""
 
                     output.append((int(items[0]),instance,address,[]))
 
