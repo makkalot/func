@@ -151,6 +151,12 @@ class TestTest(BaseTest):
         data = xmlrpclib.DateTime(dt)
         self._echo_test(data)
 
+    def test_config(self):
+        result = self.overlord.test.configfoo()
+        self.assert_on_fault(result)
+
+        
+
 
 
 class TestCommand(BaseTest):

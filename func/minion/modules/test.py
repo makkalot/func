@@ -40,6 +40,15 @@ class Test(func_module.FuncModule):
         """
         return 2**32
 
+
+    def configfoo(self):
+        """
+        Returns the options config
+        """
+        return self.options
+
+
+
     def register_method_args(self):
         """
         Implementing method argument getter
