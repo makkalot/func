@@ -28,6 +28,9 @@ class Bridge(func_module.FuncModule):
 
     # A list of bridge names that should be ignored. You can use this if you
     # have bridges that should never be touched by func.
+    # This should go the the module-specific configuration file in the future.
+    # Will ignore virbr0 by default, as it's managed by libvirtd, it's probably
+    # a bad idea to touch it.
     ignorebridges = [ "virbr0" ]
     brctl = "/usr/sbin/brctl"
     ip = "/sbin/ip"
@@ -77,7 +80,7 @@ class Bridge(func_module.FuncModule):
     
         return retlist
     
-    def addbr(self, brname):
+    def add_bridge(self, brname):
         # Creates a bridge
         if brname not in self.ignorebridges:
             exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
@@ -86,7 +89,7 @@ class Bridge(func_module.FuncModule):
 
         return exitcode
 
-    def addif(self, brname, ifname):
+    def add_interface(self, brname, ifname):
         # Adds an interface to a bridge
         if brname not in self.ignorebridges:
             exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
@@ -95,7 +98,7 @@ class Bridge(func_module.FuncModule):
 
         return exitcode
 
-    def delbr(self, brname):
+    def delete_bridge(self, brname):
         # Deletes a bridge
         if brname not in self.ignorebridges:
             # This needs some more error checking. :)
@@ -105,7 +108,7 @@ class Bridge(func_module.FuncModule):
 
         return exitcode
     
-    def delif(self, brname, ifname):
+    def delete_interface(self, brname, ifname):
         # Deletes an interface from a bridge
         if brname not in self.ignorebridges:
             exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "delif", brname, ifname ] )
@@ -114,11 +117,13 @@ class Bridge(func_module.FuncModule):
 
         return exitcode
 
-    def addxenbr(self, brname, ifname):
-        # Does all the magic required to create a bridge for Xen to use for
-        # DomUs.
-        addbrret = self.addbr(brname)
-        addifret = self.addif(brname,ifname)
+    def add_promisc_bridge(self, brname, ifname):
+        # Creates a new bridge brname, attaches interface ifname to it and sets
+        # the MAC address of the connected interface to FE:FF:FF:FF:FF:FF so
+        # traffic can flow freely through the bridge. This is required for use
+        # with Xen.
+        addbrret = self.add_bridge(brname)
+        addifret = self.add_interface(brname,ifname)
         # Set the MAC address of the interface we're adding to the bridge to
         # FE:FF:FF:FF:FF:FF. This is consistent with the behaviour of the
         # Xen network-bridge script.
@@ -128,8 +133,9 @@ class Bridge(func_module.FuncModule):
         else:
             return 0
 
-    def updownbr(self, brname, up):
-        # Marks a bridge and all it's connected interfaces up.
+    def updown_bridge(self, brname, up):
+        # Marks a bridge and all it's connected interfaces up or down (used
+        # internally)
 
         if up:
             updown = "up"
@@ -154,9 +160,11 @@ class Bridge(func_module.FuncModule):
 
         return exitcode
 
-    def upbr(self, brname):
-        return self.updownbr(brname, 1)
+    def up_bridge(self, brname):
+        # Marks a bridge and all it's connected interfaces up
+        return self.updown_bridge(brname, 1)
 
-    def downbr(self, brname):
-        return self.updownbr(brname, 0)
+    def down_bridge(self, brname):
+        # Marks a bridge and all it's connected interfaces down
+        return self.updown_bridge(brname, 0)
 
