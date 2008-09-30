@@ -32,6 +32,8 @@ class Vlan(func_module.FuncModule):
     ignorevlans = [ ]
     vconfig = "/sbin/vconfig"
     ip = "/sbin/ip"
+    ifup = "/sbin/ifup"
+    ifdown = "/sbin/ifdown"
 
     def list(self):
         # Returns a dictionary, elements look like this:
@@ -70,6 +72,30 @@ class Vlan(func_module.FuncModule):
         
         return exitcode
 
+    def add_permanent(self, interface, vlanid, ipaddr=None, netmask=None, gateway=None):
+        # Permanently adds a VLAN by writing to an ifcfg-file
+        vlanid = int(vlanid)
+        device = "%s.%s" % (interface, vlanid)
+        if vlanid not in self.ignorevlans:
+            filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % device
+            fp = open(filename, "w")
+            filelines = [ "DEVICE=%s\n" % device, "VLAN=yes\n", "ONBOOT=yes\n" ]
+            if ipaddr != None:
+                filelines.append("BOOTPROTO=static\n")
+                filelines.append("IPADDR=%s\n" % ipaddr)
+            else:
+                filelines.append("BOOTPROTO=none\n")
+            if netmask != None:
+                filelines.append("NETMASK=%s\n" % netmask)
+            if gateway != None:
+                filelines.append("GATEWAY=%s\n" % gateway)
+            fp.writelines(filelines)
+            fp.close()
+            exitcode = os.spawnv(os.P_WAIT, self.ifup, [ self.ifup, device ])
+        else:
+            exitcode = -1
+        return exitcode
+
     def delete(self, interface, vlanid):
         # Deletes a vlan with vlanid from interface
         vintfname = interface + "." + str(vlanid)
@@ -78,6 +104,19 @@ class Vlan(func_module.FuncModule):
         else:
             exitcode = -1
 
+        return exitcode
+
+    def delete_permanent(self, interface, vlanid):
+        if vlanid not in self.ignorevlans:
+            device = "%s.%s" % (interface, vlanid)
+            filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % device
+            self.down(interface, vlanid)
+            self.delete(interface, vlanid)
+            if os.path.exists(filename):
+                os.remove(filename)
+            exitcode = 0
+        else:
+            exitcode = -1
         return exitcode
 
     def up(self, interface, vlanid):
