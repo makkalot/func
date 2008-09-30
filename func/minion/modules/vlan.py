@@ -19,11 +19,11 @@
 # 02110-1301  USA
 
 import func_module
-import os
+import os, re
 
 class Vlan(func_module.FuncModule):
-    version = "0.0.1"
-    api_version = "0.0.1"
+    version = "0.0.2"
+    api_version = "0.0.2"
     description = "Func module for VLAN management"
 
     # A list of VLAN IDs that should be ignored.
@@ -61,6 +61,27 @@ class Vlan(func_module.FuncModule):
                 retlist[interface].append(vlanid)
 
         return retlist
+
+    def list_permanent(self):
+        # Returns a dictionary of permanent VLANs, return format is the same as
+        # in the list() method.
+        retlist = {}
+        pattern = re.compile('ifcfg-([a-z0-9]+)\.([0-9]+)')
+
+        for item in os.listdir("/etc/sysconfig/network-scripts"):
+            match = pattern.match(item)
+            if match:
+                interface = match.group(1)
+                vlanid = match.group(2)
+
+                if interface not in retlist:
+                    retlist[interface] = [ vlanid ]
+                else:
+                    retlist[interface].append(vlanid)
+
+        return retlist
+
+
 
     def add(self, interface, vlanid):
         vlanid = int(vlanid)
@@ -175,4 +196,33 @@ class Vlan(func_module.FuncModule):
 
         # Todo: Compare the current configuration to the supplied configuration
         return self.list()
+    
+    def write(self):
+        # Permantly applies configuration obtained through the list() method to
+        # the system.
+        currentconfig = self.list_permanent()
+        newconfig = self.list()
 
+        # First, remove all VLANs present in current configuration, that are
+        # not present in new configuration.
+        for interface, vlans in currentconfig.iteritems():
+            if interface not in newconfig:
+                for vlan in vlans:
+                    self.delete_permanent(interface, vlan)
+
+            else:
+                for vlan in vlans:
+                    if vlan not in newconfig[interface]:
+                        self.delete_permanent(interface, vlan)
+
+        for interface, vlans in newconfig.iteritems():
+            if interface not in currentconfig:
+                for vlan in vlans:
+                    self.add_permanent(interface, vlan)
+            
+            else:
+                for vlan in vlans:
+                    if vlan not in currentconfig[interface]:
+                        self.add_permanent(interface, vlan)
+
+        return self.list_permanent()
