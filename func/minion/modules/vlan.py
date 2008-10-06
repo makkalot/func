@@ -160,7 +160,7 @@ class Vlan(func_module.FuncModule):
 
         return exitcode
 
-    def makeitso(self, configuration):
+    def make_it_so(self, configuration):
         # Applies the supplied configuration to the system.
         # Configuration is a dictionary, elements should look like this:
         # key: interface, value: [id1, id2, id3]
