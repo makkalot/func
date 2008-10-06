@@ -37,15 +37,19 @@ class Bridge(func_module.FuncModule):
     ifup = "/sbin/ifup"
     ifdown = "/sbin/ifdown"
 
-    def list(self):
+    def list(self, listvif=True):
         # Returns a dictionary. Elements look like this:
         # key: bridgename, value: [ interface1, interface2, ..., interfacen ]
+        # If listvif is provided as a parameter and set to false, the xen-style
+        # virtual interfaces (vifX.Y) will be omitted from the listing.
 
         retlist = {}
 
         command = self.brctl + " show"
 
         fp = os.popen(command)
+
+        vifpattern = re.compile('vif[0-9]+\.[0-9]+')
 
         # Read output, discard the first line (header):
         # Example output:
@@ -72,13 +76,18 @@ class Bridge(func_module.FuncModule):
                     elif len(elements) == 4:
                         # This is a bridge with one or more devices attached to
                         # it.
-                        retlist[elements[0]] = [ elements[3] ]
+                        if vifpattern.match(elements[3]) and listvif == False:
+                            # Omit this interface from the listing
+                            retlist[elements[0]] = [ ]
+                        else:
+                            retlist[elements[0]] = [ elements[3] ]
 
             elif len(elements) == 1:
                 # Dictionary key containing interface name should already
                 # exist, append the interface.
                 if not curbr in self.ignorebridges:
-                    retlist[curbr].append(elements[0])
+                    if not vifpattern.match(elements[0]) and listvif == True:
+                        retlist[curbr].append(elements[0])
     
         return retlist
 
@@ -141,7 +150,12 @@ class Bridge(func_module.FuncModule):
     def add_bridge(self, brname):
         # Creates a bridge
         if brname not in self.ignorebridges:
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+            brlist = self.list()
+            if brname not in brlist:
+                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+            else:
+                # Bridge already exists, return 0 anyway.
+                exitcode = 0
         else:
             exitcode = -1
 
@@ -171,7 +185,13 @@ class Bridge(func_module.FuncModule):
     def add_interface(self, brname, ifname):
         # Adds an interface to a bridge
         if brname not in self.ignorebridges:
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
+            brlist = self.list()
+            if ifname not in brlist[brname]:
+                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
+            else:
+                # Interface is already a member of this bridge, return 0
+                # anyway.
+                exitcode = 0
         else:
             exitcode = -1
 
@@ -286,8 +306,100 @@ class Bridge(func_module.FuncModule):
                     if exitcode == 0 and childexitcode != 0:
                         exitcode = childexitcode
             else:
-                exitcode = -1
+                exitcode = 1
+        else:
+            exitcode = -1
         return exitcode
+
+    def delete_all_interfaces_permanent(self, brname):
+        # Permanently deletes all interfaces from a bridge
+        if brname not in self.ignorebridges:
+            bridgelist = self.list_permanent()
+            if brname in bridgelist:
+                exitcode = 0
+                interfaces = bridgelist[brname]
+                for interface in interfaces:
+                    childexitcode = self.delete_interface_permanent(brname, interface)
+                    if exitcode == 0 and childexitcode != 0:
+                        exitcode = childexitcode
+                # Now that the startup-config is gone, remove all interfaces
+                # from this bridge in the running configuration
+                if exitcode == 0:
+                    exitcode = self.delete_all_interfaces(brname)
+            else:
+                exitcode = 1
+        else:
+            exitcode = -1
+        return exitcode
+
+    def make_it_so(self, newconfig):
+        # Applies supplied configuration to system
+
+        # The false argument is to make sure we don't get the VIFs in the
+        # listing.
+        currentconfig = self.list(False)
+
+        # First, delete all bridges / bridge interfaces not present in new
+        # configuration.
+        for bridge, interfaces in currentconfig.iteritems():
+            if bridge not in newconfig:
+                self.delete_all_interfaces(bridge)
+                self.delete_bridge(bridge)
+
+            else:
+                for interface in interfaces:
+                    if interface not in newconfig[bridge]:
+                        self.delete_interface(bridge, interface)
+
+        # Now, check for bridges / interfaces we need to add.
+        for bridge, interfaces in newconfig.iteritems():
+            if bridge not in currentconfig:
+                # Create this bridge
+                self.add_bridge(bridge)
+                for interface in interfaces:
+                    # Add all the interfaces to the bridge
+                    self.add_interface(bridge, interface)
+            else:
+                for interface in interfaces:
+                    if interface not in currentconfig[bridge]:
+                        self.add_interface(bridge, interface)
+
+        return self.list()
+
+    def write(self):
+        # Applies running configuration to startup configuration
+
+        # The false argument is to make sure we don't get the VIFs in the
+        # listing.
+        newconfig = self.list(False)
+        currentconfig = self.list_permanent()
+
+        # First, delete all bridges / bridge interfaces not present in new
+        # configuration.
+        for bridge, interfaces in currentconfig.iteritems():
+            if bridge not in newconfig:
+                self.delete_all_interfaces_permanent(bridge)
+                self.delete_bridge_permanent(bridge)
+
+            else:
+                for interface in interfaces:
+                    if interface not in newconfig[bridge]:
+                        self.delete_interface_permanent(bridge, interface)
+
+        # Now, check for bridges / interfaces we need to add.
+        for bridge, interfaces in newconfig.iteritems():
+            if bridge not in currentconfig:
+                # Create this bridge
+                self.add_bridge_permanent(bridge)
+                for interface in interfaces:
+                    # Add all the interfaces to the bridge
+                    self.add_interface_permanent(bridge, interface)
+            else:
+                for interface in interfaces:
+                    if interface not in currentconfig[bridge]:
+                        self.add_interface_permanent(bridge, interface)
+
+        return self.list_permanent()
 
     def add_promisc_bridge(self, brname, ifname):
         # Creates a new bridge brname, attaches interface ifname to it and sets
