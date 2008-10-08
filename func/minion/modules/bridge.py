@@ -19,11 +19,11 @@
 # 02110-1301  USA
 
 import func_module
-import os
+import os, re
 
 class Bridge(func_module.FuncModule):
-    version = "0.0.1"
-    api_version = "0.0.1"
+    version = "0.0.2"
+    api_version = "0.0.2"
     description = "Func module for Bridge management"
 
     # A list of bridge names that should be ignored. You can use this if you
@@ -34,16 +34,22 @@ class Bridge(func_module.FuncModule):
     ignorebridges = [ "virbr0" ]
     brctl = "/usr/sbin/brctl"
     ip = "/sbin/ip"
+    ifup = "/sbin/ifup"
+    ifdown = "/sbin/ifdown"
 
-    def list(self):
+    def list(self, listvif=True):
         # Returns a dictionary. Elements look like this:
         # key: bridgename, value: [ interface1, interface2, ..., interfacen ]
+        # If listvif is provided as a parameter and set to false, the xen-style
+        # virtual interfaces (vifX.Y) will be omitted from the listing.
 
         retlist = {}
 
         command = self.brctl + " show"
 
         fp = os.popen(command)
+
+        vifpattern = re.compile('vif[0-9]+\.[0-9]+')
 
         # Read output, discard the first line (header):
         # Example output:
@@ -70,29 +76,156 @@ class Bridge(func_module.FuncModule):
                     elif len(elements) == 4:
                         # This is a bridge with one or more devices attached to
                         # it.
-                        retlist[elements[0]] = [ elements[3] ]
+                        if vifpattern.match(elements[3]) and listvif == False:
+                            # Omit this interface from the listing
+                            retlist[elements[0]] = [ ]
+                        else:
+                            retlist[elements[0]] = [ elements[3] ]
 
             elif len(elements) == 1:
                 # Dictionary key containing interface name should already
                 # exist, append the interface.
                 if not curbr in self.ignorebridges:
-                    retlist[curbr].append(elements[0])
+                    if not vifpattern.match(elements[0]) and listvif == True:
+                        retlist[curbr].append(elements[0])
     
+        return retlist
+
+    def list_permanent(self):
+        # Returns a list of permanent bridges (bridges configured to be enabled
+        # at boot-time.
+        retlist = {}
+        ifpattern = re.compile('ifcfg-([a-z0-9]+)')
+        # RHEL treats this value as case-sensitive, so so will we.
+        brpattern = re.compile('TYPE=Bridge')
+        brifpattern = re.compile('BRIDGE=([a-zA-Z0-9]+)')
+        devpattern = re.compile('DEVICE=([a-zA-Z0-9\.]+)')
+        nwscriptdir = "/etc/sysconfig/network-scripts"
+
+        # Pass one: find bridges
+        for item in os.listdir(nwscriptdir):
+            match = ifpattern.match(item)
+            if match:
+                filename = "%s/%s" % (nwscriptdir, item)
+                fp = open(filename, "r")
+                lines = fp.readlines()
+                fp.close()
+                bridge = False
+                ifname = ""
+                for line in lines:
+                    if brpattern.match(line):
+                        bridge = True
+                    devmatch = devpattern.match(line)
+                    if devmatch:
+                        ifname = devmatch.group(1)
+                if bridge == True:
+                    # Create empty interface list for bridge
+                    retlist[ifname] = []
+
+        # Pass two: match interface to bridge
+        for item in os.listdir(nwscriptdir):
+            match = ifpattern.match(item)
+            if match:
+                filename = "%s/%s" % (nwscriptdir, item)
+                fp = open(filename, "r")
+                lines = fp.readlines()
+                fp.close()
+                ifname = ""
+                brname = ""
+                for line in lines:
+                    devmatch = devpattern.match(line)
+                    if devmatch:
+                        ifname = devmatch.group(1)
+                    brmatch = brifpattern.match(line)
+                    if brmatch:
+                        brname = brmatch.group(1)
+                if brname != "":
+                    # Interface belongs to bridge
+                    if brname in retlist:
+                        # Just to be sure... if it doesn't match this interface
+                        # is orphaned.
+                        retlist[brname].append(ifname)
         return retlist
     
     def add_bridge(self, brname):
         # Creates a bridge
         if brname not in self.ignorebridges:
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+            brlist = self.list()
+            if brname not in brlist:
+                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+            else:
+                # Bridge already exists, return 0 anyway.
+                exitcode = 0
         else:
             exitcode = -1
 
         return exitcode
 
+    def add_bridge_permanent(self, brname, ipaddr=None, netmask=None, gateway=None):
+        # Creates a permanent bridge (writes to
+        # /etc/sysconfig/network-scripts)
+        if brname not in self.ignorebridges:
+            filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
+            fp = open(filename, "w")
+            filelines = [ "DEVICE=%s\n" % brname, "TYPE=Bridge\n", "ONBOOT=yes\n" ]
+            if ipaddr != None:
+                filelines.append("IPADDR=%s\n" % ipaddr)
+            if netmask != None:
+                filelines.append("NETMASK=%s\n" % netmask)
+            if gateway != None:
+                filelines.append("GATEWAY=%s\n" % gateway)
+            fp.writelines(filelines)
+            fp.close()
+            exitcode = os.spawnv(os.P_WAIT, self.ifup, [ self.ifup, brname ] )
+        else:
+            exitcode = -1
+        return exitcode
+
+
     def add_interface(self, brname, ifname):
         # Adds an interface to a bridge
         if brname not in self.ignorebridges:
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
+            brlist = self.list()
+            if ifname not in brlist[brname]:
+                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
+            else:
+                # Interface is already a member of this bridge, return 0
+                # anyway.
+                exitcode = 0
+        else:
+            exitcode = -1
+
+        return exitcode
+
+    def add_interface_permanent(self, brname, ifname):
+        # Permanently adds an interface to a bridge.
+        # Both interface and bridge must have a ifcfg-file we can write to.
+        brfilename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
+        iffilename = "/etc/sysconfig/network-scripts/ifcfg-%s" % ifname
+        if os.path.exists(brfilename) and os.path.exists(iffilename):
+            # Read all lines first, then we append a BRIDGE= line.
+            fp = open(iffilename, "r")
+            lines = fp.readlines()
+            fp.close()
+            pattern = re.compile("BRIDGE=(.*)")
+            exitcode = 0
+            for line in lines:
+                if pattern.match(line) != None:
+                    # This interface is configured to bridge already, leave it
+                    # alone.
+                    exitcode = 1
+                    break
+            if exitcode == 0:
+                # Try change on live interface
+                if self.add_interface(brname, ifname) == 0:
+                    # Change succeeded, write to ifcfg-file
+                    # Reopen file for writing
+                    fp = open(iffilename, "w")
+                    lines.append("BRIDGE=%s\n" % brname)
+                    fp.writelines(lines)
+                    fp.close()
+                else:
+                    exitcode = 2
         else:
             exitcode = -1
 
@@ -102,11 +235,23 @@ class Bridge(func_module.FuncModule):
         # Deletes a bridge
         if brname not in self.ignorebridges:
             # This needs some more error checking. :)
+            self.down_bridge(brname)
             exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "delbr", brname ] )
         else:
             exitcode = -1
 
         return exitcode
+
+    def delete_bridge_permanent(self, brname):
+        # Deletes a bridge permanently
+        filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
+        if brname not in self.ignorebridges:
+            returncode = self.delete_bridge(brname)
+            if os.path.exists(filename):
+                os.remove(filename)
+        else:
+            returncode = -1
+        return returncode
     
     def delete_interface(self, brname, ifname):
         # Deletes an interface from a bridge
@@ -116,6 +261,145 @@ class Bridge(func_module.FuncModule):
             exitcode = -1
 
         return exitcode
+
+    def delete_interface_permanent(self, brname, ifname):
+        # Permanently deletes interface from bridge
+        iffilename = "/etc/sysconfig/network-scripts/ifcfg-%s" % ifname
+
+        if brname in self.ignorebridges:
+            exitcode = -1
+        elif os.path.exists(iffilename):
+            # This only works if the interface itself is permanent
+            fp = open(iffilename, "r")
+            lines = fp.readlines()
+            fp.close()
+            pattern = re.compile("BRIDGE=(.*)")
+            exitcode = 1
+            for line in lines:
+                if pattern.match(line):
+                    lines.remove(line)
+                    exitcode = 0
+            if exitcode == 0:
+                # Try change live
+                trychange = self.delete_interface(brname, ifname)
+                if trychange == 0:
+                    # Change succeeded, write new interface file.
+                    fp = open(iffilename, "w")
+                    fp.writelines(lines)
+                    fp.close()
+                else:
+                    exitcode = trychange
+        else:
+            exitcode = 2
+        return exitcode
+
+    def delete_all_interfaces(self, brname):
+        # Deletes all interfaces from a bridge
+        if brname not in self.ignorebridges:
+            bridgelist = self.list()
+            if brname in bridgelist:
+                # Does this bridge exist?
+                exitcode = 0
+                interfaces = bridgelist[brname]
+                for interface in interfaces:
+                    childexitcode = self.delete_interface(brname, interface)
+                    if exitcode == 0 and childexitcode != 0:
+                        exitcode = childexitcode
+            else:
+                exitcode = 1
+        else:
+            exitcode = -1
+        return exitcode
+
+    def delete_all_interfaces_permanent(self, brname):
+        # Permanently deletes all interfaces from a bridge
+        if brname not in self.ignorebridges:
+            bridgelist = self.list_permanent()
+            if brname in bridgelist:
+                exitcode = 0
+                interfaces = bridgelist[brname]
+                for interface in interfaces:
+                    childexitcode = self.delete_interface_permanent(brname, interface)
+                    if exitcode == 0 and childexitcode != 0:
+                        exitcode = childexitcode
+                # Now that the startup-config is gone, remove all interfaces
+                # from this bridge in the running configuration
+                if exitcode == 0:
+                    exitcode = self.delete_all_interfaces(brname)
+            else:
+                exitcode = 1
+        else:
+            exitcode = -1
+        return exitcode
+
+    def make_it_so(self, newconfig):
+        # Applies supplied configuration to system
+
+        # The false argument is to make sure we don't get the VIFs in the
+        # listing.
+        currentconfig = self.list(False)
+
+        # First, delete all bridges / bridge interfaces not present in new
+        # configuration.
+        for bridge, interfaces in currentconfig.iteritems():
+            if bridge not in newconfig:
+                self.delete_all_interfaces(bridge)
+                self.delete_bridge(bridge)
+
+            else:
+                for interface in interfaces:
+                    if interface not in newconfig[bridge]:
+                        self.delete_interface(bridge, interface)
+
+        # Now, check for bridges / interfaces we need to add.
+        for bridge, interfaces in newconfig.iteritems():
+            if bridge not in currentconfig:
+                # Create this bridge
+                self.add_bridge(bridge)
+                for interface in interfaces:
+                    # Add all the interfaces to the bridge
+                    self.add_interface(bridge, interface)
+            else:
+                for interface in interfaces:
+                    if interface not in currentconfig[bridge]:
+                        self.add_interface(bridge, interface)
+
+        return self.list()
+
+    def write(self):
+        # Applies running configuration to startup configuration
+
+        # The false argument is to make sure we don't get the VIFs in the
+        # listing.
+        newconfig = self.list(False)
+        currentconfig = self.list_permanent()
+
+        # First, delete all bridges / bridge interfaces not present in new
+        # configuration.
+        for bridge, interfaces in currentconfig.iteritems():
+            if bridge not in newconfig:
+                self.delete_all_interfaces_permanent(bridge)
+                self.delete_bridge_permanent(bridge)
+
+            else:
+                for interface in interfaces:
+                    if interface not in newconfig[bridge]:
+                        self.delete_interface_permanent(bridge, interface)
+
+        # Now, check for bridges / interfaces we need to add.
+        for bridge, interfaces in newconfig.iteritems():
+            if bridge not in currentconfig:
+                # Create this bridge
+                self.add_bridge_permanent(bridge)
+                for interface in interfaces:
+                    # Add all the interfaces to the bridge
+                    self.add_interface_permanent(bridge, interface)
+            else:
+                for interface in interfaces:
+                    if interface not in currentconfig[bridge]:
+                        self.add_interface_permanent(bridge, interface)
+
+        return self.list_permanent()
 
     def add_promisc_bridge(self, brname, ifname):
         # Creates a new bridge brname, attaches interface ifname to it and sets
