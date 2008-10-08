@@ -19,19 +19,22 @@
 # 02110-1301  USA
 
 import func_module
-import os
+import os, re
 
 class Vlan(func_module.FuncModule):
-    version = "0.0.1"
-    api_version = "0.0.1"
+    version = "0.0.2"
+    api_version = "0.0.2"
     description = "Func module for VLAN management"
 
     # A list of VLAN IDs that should be ignored.
     # You can use this if you have VLAN IDs which are reserved for internal
     # use, which should never be touched by func.
+    # Use strings here, not integers!
     ignorevlans = [ ]
     vconfig = "/sbin/vconfig"
     ip = "/sbin/ip"
+    ifup = "/sbin/ifup"
+    ifdown = "/sbin/ifdown"
 
     def list(self):
         # Returns a dictionary, elements look like this:
@@ -48,7 +51,7 @@ class Vlan(func_module.FuncModule):
 
         for line in lines:
             elements = line.split("|")
-            vlanid = int(elements[1].strip())
+            vlanid = elements[1].strip()
             interface = elements[2].strip()
 
             if interface not in retlist:
@@ -60,8 +63,28 @@ class Vlan(func_module.FuncModule):
 
         return retlist
 
+    def list_permanent(self):
+        # Returns a dictionary of permanent VLANs, return format is the same as
+        # in the list() method.
+        retlist = {}
+        pattern = re.compile('ifcfg-([a-z0-9]+)\.([0-9]+)')
+
+        for item in os.listdir("/etc/sysconfig/network-scripts"):
+            match = pattern.match(item)
+            if match:
+                interface = match.group(1)
+                vlanid = match.group(2)
+
+                if interface not in retlist:
+                    retlist[interface] = [ vlanid ]
+                else:
+                    retlist[interface].append(vlanid)
+
+        return retlist
+
+
+
     def add(self, interface, vlanid):
-        vlanid = int(vlanid)
         # Adds a vlan with vlanid on interface
         if vlanid not in self.ignorevlans:
             exitcode = os.spawnv(os.P_WAIT, self.vconfig, [ self.vconfig, "add", interface, str(vlanid)] )
@@ -70,20 +93,68 @@ class Vlan(func_module.FuncModule):
         
         return exitcode
 
+    def add_permanent(self, interface, vlanid, ipaddr=None, netmask=None, gateway=None):
+        # Permanently adds a VLAN by writing to an ifcfg-file
+        alreadyup = False
+        list = self.list()
+        if interface in list:
+            thisinterface = list[interface]
+            if vlanid in thisinterface:
+                alreadyup = True
+
+        device = "%s.%s" % (interface, vlanid)
+        if vlanid not in self.ignorevlans:
+            filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % device
+            fp = open(filename, "w")
+            filelines = [ "DEVICE=%s\n" % device, "VLAN=yes\n", "ONBOOT=yes\n" ]
+            if ipaddr != None:
+                filelines.append("BOOTPROTO=static\n")
+                filelines.append("IPADDR=%s\n" % ipaddr)
+            else:
+                filelines.append("BOOTPROTO=none\n")
+            if netmask != None:
+                filelines.append("NETMASK=%s\n" % netmask)
+            if gateway != None:
+                filelines.append("GATEWAY=%s\n" % gateway)
+            fp.writelines(filelines)
+            fp.close()
+
+            if alreadyup:
+                # Don't run ifup, this will confuse the OS
+                exitcode = self.up(interface, vlanid)
+            else:
+                exitcode = os.spawnv(os.P_WAIT, self.ifup, [ self.ifup, device ])
+        else:
+            exitcode = -1
+        return exitcode
+
     def delete(self, interface, vlanid):
         # Deletes a vlan with vlanid from interface
         vintfname = interface + "." + str(vlanid)
-        if int(vlanid) not in self.ignorevlans:
+        if vlanid not in self.ignorevlans:
             exitcode = os.spawnv(os.P_WAIT, self.vconfig, [ self.vconfig, "rem", vintfname] )
         else:
             exitcode = -1
 
         return exitcode
 
+    def delete_permanent(self, interface, vlanid):
+        if vlanid not in self.ignorevlans:
+            device = "%s.%s" % (interface, vlanid)
+            filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % device
+            self.down(interface, vlanid)
+            self.delete(interface, vlanid)
+            if os.path.exists(filename):
+                os.remove(filename)
+            exitcode = 0
+        else:
+            exitcode = -1
+        return exitcode
+
     def up(self, interface, vlanid):
         # Marks a vlan interface as up
         vintfname = interface + "." + str(vlanid)
-        if int(vlanid) not in self.ignorevlans:
+        if vlanid not in self.ignorevlans:
             exitcode = os.spawnv(os.P_WAIT, self.ip, [ self.ip, "link", "set", vintfname, "up" ])
         else:
             exitcode = -1
@@ -93,18 +164,27 @@ class Vlan(func_module.FuncModule):
     def down(self, interface, vlanid):
         # Marks a vlan interface as down
         vintfname = interface + "." + str(vlanid)
-        if int(vlanid) not in self.ignorevlans:
+        if vlanid not in self.ignorevlans:
             exitcode = os.spawnv(os.P_WAIT, self.ip, [ self.ip, "link", "set", vintfname, "down" ])
         else:
             exitcode = -1
 
         return exitcode
 
-    def makeitso(self, configuration):
+    def make_it_so(self, configuration):
         # Applies the supplied configuration to the system.
         # Configuration is a dictionary, elements should look like this:
         # key: interface, value: [id1, id2, id3]
         currentconfig = self.list()
+        newconfig = {}
+
+        # Convert the supplied configuration to strings.
+        for interface, vlans in configuration.iteritems():
+            newconfig[interface] = []
+            for vlan in vlans:
+                newconfig[interface].append(str(vlan))
+
+        configuration = newconfig
 
         # First, remove all VLANs present in current configuration, that are
         # not present in new configuration.
@@ -136,4 +216,33 @@ class Vlan(func_module.FuncModule):
 
         # Todo: Compare the current configuration to the supplied configuration
         return self.list()
+    
+    def write(self):
+        # Permantly applies configuration obtained through the list() method to
+        # the system.
+        currentconfig = self.list_permanent()
+        newconfig = self.list()
 
+        # First, remove all VLANs present in current configuration, that are
+        # not present in new configuration.
+        for interface, vlans in currentconfig.iteritems():
+            if interface not in newconfig:
+                for vlan in vlans:
+                    self.delete_permanent(interface, vlan)
+
+            else:
+                for vlan in vlans:
+                    if vlan not in newconfig[interface]:
+                        self.delete_permanent(interface, vlan)
+
+        for interface, vlans in newconfig.iteritems():
+            if interface not in currentconfig:
+                for vlan in vlans:
+                    self.add_permanent(interface, vlan)
+            
+            else:
+                for vlan in vlans:
+                    if vlan not in currentconfig[interface]:
+                        self.add_permanent(interface, vlan)
+
+        return self.list_permanent()
