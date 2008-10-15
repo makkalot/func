@@ -20,6 +20,7 @@ import func_module
 
 # other modules
 from stat import *
+import fnmatch
 import glob
 import os
 import md5
@@ -30,7 +31,7 @@ CONFIG_FILE='/etc/func/modules/filetracker.conf'
 class FileTracker(func_module.FuncModule):
 
     version = "0.0.1"
-    api_version = "0.0.1"
+    api_version = "0.0.2"
     description = "Maintains a manifest of files to keep track of."
 
     def __load(self):
@@ -70,28 +71,47 @@ class FileTracker(func_module.FuncModule):
 
     #==========================================================
                
-    def track(self, file_name, full_scan=0):
+    def track(self, file_name_globs, full_scan=0):
         """
         Adds files to keep track of.
+        file_names can be a single filename, a list of filenames, a filename glob
+           or a list of filename globs
         full_scan implies tracking the full contents of the file, defaults to off
         """
 
         filehash = self.__load()
-        filehash[file_name] = full_scan
+        filenameglobs = []
+
+        # accept a single string or list
+        filenameglobs.append(file_name_globs)
+        if type(file_name_globs) == type([]):
+            filenameglobs = file_names
+
+
+        # expand everything that might be a glob to a list
+        # of names to track
+        for filenameglob in filenameglobs:
+            filenames = glob.glob(filenameglob)
+            for filename in filenames:
+                filehash[filename] = full_scan
         self.__save(filehash)
         return 1
 
     #==========================================================
 
-    def untrack(self, file_name):
+    def untrack(self, file_name_globs):
         """
         Stop keeping track of a file.
+        file_name_globs can be a single filename, a list of filenames, a filename glob
+           or a list of filename globs
         This routine is tolerant of most errors since we're forgetting about the file anyway.
         """
 
         filehash = self.__load()
-        if file_name in filehash.keys():
-            del filehash[file_name]
+        filenames = filehash.keys()
+        for filename in filenames:
+            if fnmatch.fnmatch(filename, file_name_globs):
+                del filehash[filename]
         self.__save(filehash)
         return 1
 
