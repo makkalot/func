@@ -12,5 +12,6 @@ srpms/
 tars/
 test/test-it.conf*
 test/unittest/data/
+test/unittest/.coverage
 test/unittest/html/
 funcweb/funcweb.egg-info
