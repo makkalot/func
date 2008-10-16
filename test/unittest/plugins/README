@@ -1,0 +1,47 @@
+This is a modified version of the "cover" module that is include in the
+python nosetest module. 
+
+This version adds support for writing out attribution files
+
+To install, run "easy_install .", and it should install
+as a nosetest plugin egg. To use, 
+
+
+
+
+  --with-funccoverage   Enable plugin FuncCoverage:  If you have Ned
+                        Batchelder's coverage module installed, you may
+                        activate a coverage report. The coverage report will
+                        cover any python source module imported after the
+                        start of the test run, excluding modules that match
+                        testMatch. If you want to include those modules too,
+                        use the --cover-tests switch, or set the
+                        NOSE_COVER_TESTS environment variable to a true value.
+                        To restrict the coverage report to modules from a
+                        particular package or packages, use the --cover-
+                        packages switch or the NOSE_COVER_PACKAGES environment
+                        variable.  [NOSE_WITH_FUNCCOVERAGE]
+  --func-cover-package=COVER_PACKAGES
+                        Restrict coverage output to selected packages
+                        [FUNC_NOSE_COVER_PACKAGE]
+  --func-cover-erase    Erase previously collected coverage statistics before
+                        run
+  --func-cover-tests    Include test modules in coverage report
+                        [FUNC_NOSE_COVER_TESTS]
+  --func-cover-annotate
+                        write out annotated files[FUNC_NOSE_COVER_ANNOTATE]
+  --func-cover-dir=COVER_DIR
+                        directory to write data to[FUNC_NOSE_COVER_DIR]
+  --func-cover-inclusive
+                        Include all python files under working directory in
+                        coverage report.  Useful for discovering holes in test
+                        coverage if not all files are imported by the test
+                        suite. [FUNC_NOSE_COVER_INCLUSIVE]
+
+Example:
+
+	
+ nosetests --with-funccoverage --func-cover-dir data/ --func-cover-annotate --func-cover-erase --func-cover-package func -v -d -s test_client.py:TestTest
+
+To generate html'ified coverage reports, run "cover_to_html.py data/ html" from the unittest dir
+
