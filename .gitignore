@@ -11,4 +11,6 @@ rpms/
 srpms/
 tars/
 test/test-it.conf*
+test/unittest/data/
+test/unittest/html/
 funcweb/funcweb.egg-info
