@@ -11,6 +11,7 @@
 ##
 
 import inspect
+import os
 
 from func import logger
 from certmaster.config import read_config, BaseConfig
@@ -48,9 +49,14 @@ class FuncModule(object):
         self.logger = log.logger
 
     def __init_options(self):
-        options_file = '/etc/func/modules/'+self.__class__.__name__+'.conf'
-        self.options = read_config(options_file, self.Config)
+        self.options_file = '/etc/func/modules/'+self.__class__.__name__+'.conf'
+        self.options = read_config(self.options_file, self.Config)
         return
+
+    def save_config(self):
+        fh = open(self.options_file, 'w')
+        self.options.write(fh)
+        return True
 
     def register_rpc(self, handlers, module_name):
         # add the internal methods, note that this means they

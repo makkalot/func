@@ -47,6 +47,17 @@ class Test(func_module.FuncModule):
         """
         return self.options
 
+    def config_save(self):
+	"""
+	Saves the options config
+	"""
+	self.save_config()
+	return self.options
+
+    def config_set(self, key_name, value):
+        setattr(self.options,key_name, value)
+        self.save_config()
+        return self.options
 
 
     def register_method_args(self):

@@ -153,6 +153,20 @@ class TestTest(BaseTest):
 
     def test_config(self):
         result = self.overlord.test.configfoo()
+        config = result[self.th]
+        print config
+        self.assert_on_fault(result)
+
+    def test_config_write(self):
+        result = self.overlord.test.config_save()
+        config = result[self.th]
+        print config
+        self.assert_on_fault(result)
+
+    def test_config_set(self):
+        result = self.overlord.test.config_set("example", 5000)
+        config = result[self.th]
+        print config
         self.assert_on_fault(result)
 
         
