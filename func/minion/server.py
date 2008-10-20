@@ -56,7 +56,8 @@ class XmlRpcInterface(object):
         self.logger = logger.Logger().logger
         self.audit_logger = logger.AuditLogger()
         self.__setup_handlers()
-        
+
+
         # need a reference so we can log ip's, certs, etc
         # self.server = server
 
@@ -74,7 +75,6 @@ class XmlRpcInterface(object):
             except AttributeError, e:
                 self.logger.warning("module %s not loaded, missing register_rpc method" % self.modules[x])
 
-
         # internal methods that we do instead of spreading internal goo
         # all over the modules. For now, at lest -akl
 
@@ -84,6 +84,7 @@ class XmlRpcInterface(object):
         self.handlers["system.listMethods"] = self.list_methods
         self.handlers["system.list_methods"] = self.list_methods
         self.handlers["system.list_modules"] = self.list_modules
+        self.handlers["system.inventory"] = self.inventory
 
     def list_modules(self):
         modules = self.modules.keys()
@@ -94,6 +95,26 @@ class XmlRpcInterface(object):
         methods = self.handlers.keys()
         methods.sort()
         return methods
+
+
+    def inventory(self):
+        inventory = {}
+
+        # FIXME: it's kind of dumb that we dont have a real object
+        # to represent which methods are in which classes, just a list
+        # of modules, and a list of methods. we can match strings to
+        # see which are where, but that seems lame -akl
+        for module in self.modules.keys():
+            inventory[module] = []
+            for method in self.handlers.keys():
+                # string match, ick. 
+                method_bits = method.split('.')
+                method_module = string.join(method_bits[:-1], '.')
+                method_name = method_bits[-1]
+                if method_module == module:
+                    inventory[module].append(method_name)
+
+        return inventory
 
     def get_dispatch_method(self, method):
 
