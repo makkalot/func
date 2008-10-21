@@ -173,7 +173,12 @@ def serve():
     """
     Code for starting the XMLRPC service.
     """
-    server =FuncSSLXMLRPCServer(('', 51234))
+    config = read_config("/etc/func/minion.conf", FuncdConfig)
+    listen_addr = config.listen_addr
+    listen_port = config.listen_port
+    if listen_port == '':
+        listen_port = 51234
+    server =FuncSSLXMLRPCServer((listen_addr, listen_port))
     server.logRequests = 0 # don't print stuff to console
     server.serve_forever()
 
@@ -206,7 +211,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         self.acls = acls_mod.Acls(config=self.config)
         
-        AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, ("", 51234),
+        AuthedXMLRPCServer.AuthedSSLXMLRPCServer.__init__(self, args,
                                                           self.key, self.cert,
                                                           self.ca)
 
