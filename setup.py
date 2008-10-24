@@ -61,7 +61,7 @@ if __name__ == "__main__":
                               (manpath,  ["docs/func-transmit.1.gz"]),
 			      (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
-			      (etcmodpath,  []),
+			      (etcmodpath,  ['etc/Test.conf']),
 			      (varpath,  []),
 			      (aclpath,  [])
                 ],

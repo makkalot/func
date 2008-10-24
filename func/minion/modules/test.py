@@ -59,6 +59,11 @@ class Test(func_module.FuncModule):
         self.save_config()
         return self.options
 
+    def config_get(self, key_name):
+	return getattr(self.options, key_name)
+
+    def config_get_test(self):
+	return self.options.anothersection.testvalue
 
     def register_method_args(self):
         """

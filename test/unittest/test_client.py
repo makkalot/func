@@ -169,7 +169,21 @@ class TestTest(BaseTest):
         print config
         self.assert_on_fault(result)
 
-        
+    def test_config_get_example(self):
+        result = self.overlord.test.config_get("example")
+        config = result[self.th]
+        print config
+        self.assert_on_fault(result)
+
+    def test_config_get(self):
+	result = self.overlord.test.config_get("anothersection.string")
+	print result
+	self.assert_on_fault(result)
+
+    def test_config_get_test(self):
+	result = self.overlord.test.config_get_test()
+	print result
+	self.assert_on_fault(result)        
 
 
 
