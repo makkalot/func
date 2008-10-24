@@ -154,36 +154,52 @@ class TestTest(BaseTest):
     def test_config(self):
         result = self.overlord.test.configfoo()
         config = result[self.th]
-        print config
         self.assert_on_fault(result)
 
     def test_config_write(self):
         result = self.overlord.test.config_save()
         config = result[self.th]
-        print config
         self.assert_on_fault(result)
 
     def test_config_set(self):
         result = self.overlord.test.config_set("example", 5000)
         config = result[self.th]
-        print config
         self.assert_on_fault(result)
 
     def test_config_get_example(self):
         result = self.overlord.test.config_get("example")
         config = result[self.th]
-        print config
         self.assert_on_fault(result)
 
-    def test_config_get(self):
-	result = self.overlord.test.config_get("anothersection.string")
-	print result
+    def test_config_get_string(self):
+	result = self.overlord.test.config_get("string_option")
+        option = result[self.th]
+        print option
+        assert(type(option) == type("foo"))
 	self.assert_on_fault(result)
+
+    def test_config_get_int(self):
+        result = self.overlord.test.config_get("int_option")
+        option = result[self.th]
+        assert(type(option) == type(1))
+        self.assert_on_fault(result)
+
+    def test_config_get_bool(self):
+        result = self.overlord.test.config_get("bool_option")
+        option = result[self.th]
+        assert(type(option) == type(True))
+        self.assert_on_fault(result)
+
+    def test_config_get_float(self):
+        result = self.overlord.test.config_get("float_option")
+        option = result[self.th]
+        assert(type(option) == type(2.71828183))
+        self.assert_on_fault(result)
 
     def test_config_get_test(self):
 	result = self.overlord.test.config_get_test()
-	print result
-	self.assert_on_fault(result)        
+	self.assert_on_fault(result)
+
 
 
 
