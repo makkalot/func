@@ -65,6 +65,7 @@ rm -fr $RPM_BUILD_ROOT
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/async_methods.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
+%config(noreplace) /etc/func/modules/Test.conf
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
