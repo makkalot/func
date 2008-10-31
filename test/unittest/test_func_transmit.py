@@ -12,13 +12,17 @@
 import os
 import socket
 import subprocess
+import sys
 import time
 import unittest
 
 import simplejson
 
 import func.utils
+
+
 from func import yaml
+
 from func import jobthing
 
 
@@ -56,7 +60,7 @@ class BaseTest(object):
 
     def _call_async(self, data):
         data['async'] = True
-        data['nforks'] = 4
+        data['nforks'] = self.nforks
 
         job_id = self._call(data)
 
@@ -74,12 +78,17 @@ class BaseTest(object):
         return result
 
     def _call(self, data):
+        data['async'] = self.async
+        data['nforks'] = self.nforks
+
+
         f = self._serialize(data)
         p = subprocess.Popen(self.ft_cmd,  shell=True,
                              stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         output = p.communicate(input=f)
 
-        return self._deserialize(output[0])
+        ret = self._deserialize(output[0])
+        return ret
 
     def call(self, data):
         if self.async:
@@ -242,7 +251,7 @@ class TestClientGlobJSONAsync(JSONBaseTest, ClientGlobAsync):
 # respect the __test__ attribute, and these modules aren't meant to be
 # invoked as test classes themselves, only as bases for other tests
 class T_estTest(object):
-    __test__ = False
+#    __test__ = False
     
     def _echo_test(self, data):
         result = self.call({'clients':'*',
@@ -261,6 +270,12 @@ class T_estTest(object):
                              'parameters': [1,2]})
         assert result[self.th] == 3
 
+
+    def test_command_run(self):
+        result = self.call({'clients':'*',
+                            'method':'run',
+                            'module': 'command',
+                            'parameters': ['/sbin/ifconfig']})
 
     def test_echo_int(self):
         self._echo_test(37)
@@ -297,12 +312,27 @@ class T_estTestAsync(T_estTest):
     __test__ = False
     async = True
 
-class TestTestYaml(YamlBaseTest, T_estTest):
+class T_estTestCommandRun(T_estTest):
+    async = False
+    def test_command_run(self):
+	result = self.call({'clients':'*',
+#                            'async': False,
+#                            'nforks': 1,
+                             'method': 'run',
+                             'module': 'command',
+                             'parameters': 'ifconfig'})
+        
+
+class TestTestYamlCommandRun(YamlBaseTest, T_estTestCommandRun):
     yaml = True
     def __init__(self):
         super(YamlBaseTest, self).__init__()
 
-        
+
+class TestTestYaml(YamlBaseTest, T_estTest):
+    yaml = True
+    def __init__(self):
+        super(YamlBaseTest, self).__init__()
 
 class TestTestJSON(JSONBaseTest, T_estTest):
     json = True
@@ -320,3 +350,11 @@ class TestTestAsyncYaml(YamlBaseTest, T_estTestAsync):
     async = True
     def __init__(self):
         super(YamlBaseTest,self).__init__()
+
+# we had a bug where setting nforks or async at all
+# was causing stuff to fail, so heres the test case
+class TestTestYamlNforksOne(TestTestYaml):
+    nforks = 1
+    async = False
+
+
