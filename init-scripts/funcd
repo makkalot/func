@@ -67,7 +67,7 @@ RETVAL=0
 
 start() {
     echo -n $"Starting func daemon: "
-    START_DAEMON $PROCESS $CONFIG_ARGS
+    START_DAEMON $DAEMON $CONFIG_ARGS
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
