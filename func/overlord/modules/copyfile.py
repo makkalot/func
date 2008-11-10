@@ -25,3 +25,4 @@ class copyfile(overlord_module.BaseModule):
             else:
                 break
     
+        return True

@@ -226,23 +226,36 @@ class TestCommand(BaseTest):
 	self.assert_on_fault(result)
 	assert result[self.th][1].strip() == "BLIPPYFOO=awesome"
 
+
+
 class TestCopyfile(BaseTest):
     fn = "/tmp/func_test_file"
     dest_fn = "/tmp/func_test_file_dest"
     content = "this is a func test file"
     module = "copyfile"
-    def create_a_file(self):
+    def create_a_file(self, size=1):
+        
         f = open(self.fn, "w")
-        f.write(self.content)
+        f.write(self.content*size)
         f.close()
 
-    def test_copyfile(self):
-        self.create_a_file()
+    def test_local_copyfile(self):
+        result = self.overlord.local.copyfile.send(self.fn, self.dest_fn)
+        print result
+        self.assert_on_fault(result)
+
+
+    def test_copyfile(self, size=1):
+        self.create_a_file(size=size)
         fb = open(self.fn,"r").read()
         data = xmlrpclib.Binary(fb)
         result = self.overlord.copyfile.copyfile(self.dest_fn, data)
         self.assert_on_fault(result)
         assert result[self.th]  == 0
+        
+    def test_copyfile_big(self):
+        # make a file in the ~70 meg range
+        self.test_copyfile(size=100)
         
  
     def test_checksum(self):
