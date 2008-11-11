@@ -236,7 +236,7 @@ class FileTracker(func_module.FuncModule):
                     },
                 'track':{
                     'args':{
-                        'file_name':{
+                        'file_name_globs':{
                             'type':'string',
                             'optional':False,
                             'description':"The file name to track (full path)"
@@ -252,7 +252,7 @@ class FileTracker(func_module.FuncModule):
                     },
                 'untrack':{
                     'args':{
-                        'file_name':{
+                        'file_name_globs':{
                             'type':'string',
                             'optional':False,
                             'description':"The file name to untrack (full path)"
