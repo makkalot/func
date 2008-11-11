@@ -156,7 +156,7 @@ def is_minion(minion_string):
 
 
 # from a comment at http://codecomments.wordpress.com/2008/04/08/converting-a-string-to-a-boolean-value-in-python/
-# basically excepy a string or a bool for the async arg, since func-transmit can be a bit weird about it especially
+# basically except a string or a bool for the async arg, since func-transmit can be a bit weird about it especially
 # if we are using an older version of yaml (and we are...)
 def smart_bool(s):
     if s is True or s is False:
@@ -189,12 +189,15 @@ class Overlord(object):
         self.noglobs     = noglobs
         self.nforks      = nforks
         self.async = smart_bool(async)
-        #self.async       = async
+        #FIXME: async should never ne none, yet it is -akl
+        if async is None:
+            self.async = False
+
         self.delegate    = delegate
         self.mapfile     = mapfile
         
 
-        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs,verbose=self.verbose)
+        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose)
         self.minions = self.minions_class.get_urls()
         if len(self.minions) == 0:
             raise Func_Client_Exception, 'Can\'t find any minions matching \"%s\". ' % self.server_spec
