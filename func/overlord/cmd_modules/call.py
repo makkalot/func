@@ -36,6 +36,7 @@ class Call(base_command.BaseCommand):
     summary = "allows a specific module and method to be called"
     def addOptions(self):
         self.parser.add_option("-v", "--verbose", dest="verbose",
+                               default=self.verbose,
                                action="store_true")
         self.parser.add_option("-x", "--xmlrpc", dest="xmlrpc",
                                help="output return data in XMLRPC format",
@@ -51,9 +52,10 @@ class Call(base_command.BaseCommand):
                                action="store_true")
         self.parser.add_option("-f", "--forks", dest="forks",
                                help="how many parallel processes?  (default 1)",
-                               default=DEFAULT_FORKS)
+                               default=self.forks)
         self.parser.add_option("-a", "--async", dest="async",
                                help="Use async calls?  (default 0)",
+                               default=self.async,
                                action="store_true")
         self.parser.add_option("-n", "--nopoll", dest="nopoll",
                                help="Don't wait for async results",
@@ -66,6 +68,7 @@ class Call(base_command.BaseCommand):
                                action="store_true")
         self.parser.add_option('-d', '--delegate', dest="delegate",
                                help="use delegation to make function call",
+                               default=self.delegate,
                                action="store_true")
 
     def handleOptions(self, options):
