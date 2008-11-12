@@ -34,6 +34,7 @@ class Ping(base_command.BaseCommand):
         """
         # FIXME: verbose and port should be added globally to all sub modules
         self.parser.add_option("-v", "--verbose", dest="verbose",
+                               default=self.verbose,
                                action="store_true")
 
     def handleOptions(self, options):
