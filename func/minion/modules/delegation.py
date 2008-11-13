@@ -13,7 +13,7 @@ import func_module
 import func.overlord.client as fc
 import func.jobthing as jobthing
 
-from func import utils
+from certmaster import utils as cm_utils
 from func.overlord import delegation_tools as dtools
 
 #boolean value appended to job id list to denote direct/delegated calls
@@ -58,7 +58,7 @@ class DelegationModule(func_module.FuncModule):
             else:
                 #These are delegated calls, so we need to strip away the
                 #hash that surrounds the results
-                if utils.is_error(delegation_results[group]):
+                if cm_utils.is_error(delegation_results[group]):
                     result_dict.update(delegation_results)
                 else:
                     result_dict.update(delegation_results[group])
