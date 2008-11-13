@@ -14,17 +14,18 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
-import os
-import random # for testing only
-import time   # for testing only
-import shelve
 import dbm
-import sys
 import fcntl
-import forkbomb
-import utils
+import os
 import pprint
+import shelve
+import sys
+import time
+
+import forkbomb
 from func.CommonErrors import *
+from func import utils
+from certmaster import utils as cm_utils
 
 JOB_ID_RUNNING = 0
 JOB_ID_FINISHED = 1
@@ -202,7 +203,7 @@ def minion_async_run(retriever, method, args):
             rc = function_ref(*args)
         except Exception, e:
             (t, v, tb) = sys.exc_info()
-            rc = utils.nice_exception(t,v,tb)
+            rc = cm_utils.nice_exception(t,v,tb)
 
         __update_status(job_id, JOB_ID_FINISHED, rc)
         os._exit(0)
