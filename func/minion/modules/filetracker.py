@@ -85,7 +85,7 @@ class FileTracker(func_module.FuncModule):
         # accept a single string or list
         filenameglobs.append(file_name_globs)
         if type(file_name_globs) == type([]):
-            filenameglobs = file_names
+            filenameglobs = file_name_globs
 
 
         # expand everything that might be a glob to a list
