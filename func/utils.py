@@ -10,12 +10,9 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
+import inspect
 import os
 import string
-import sys
-import traceback
-import socket
-import inspect
 
 REMOTE_ERROR = "REMOTE_ERROR"
 
