@@ -239,10 +239,10 @@ class TestCopyfile(BaseTest):
         f.write(self.content*size)
         f.close()
 
-    def test_local_copyfile(self):
-        result = self.overlord.local.copyfile.send(self.fn, self.dest_fn)
-        print result
-        self.assert_on_fault(result)
+#    def test_local_copyfile(self):
+#        result = self.overlord.local.copyfile.send(self.fn, self.dest_fn)
+#        print result
+#        self.assert_on_fault(result)
 
 
     def test_copyfile(self, size=1):
@@ -253,9 +253,9 @@ class TestCopyfile(BaseTest):
         self.assert_on_fault(result)
         assert result[self.th]  == 0
         
-    def test_copyfile_big(self):
-        # make a file in the ~70 meg range
-        self.test_copyfile(size=100)
+ #   def test_copyfile_big(self):
+ #       # make a file in the ~70 meg range
+ #       self.test_copyfile(size=100)
         
  
     def test_checksum(self):
@@ -289,11 +289,45 @@ class TestHardware(BaseTest):
 
 class TestFileTracker(BaseTest):
     fn = "/etc/hosts"
+    fn_glob = "/etc/init.d/*"
+    fn_list = ["/etc/hosts", "/etc/func/minion.conf"]
+    fn_glob_list = ["/etc/hosts", "/etc/func/*"]
     module = "filetracker"
     def test_track(self):
         result = self.overlord.filetracker.track(self.fn)
         assert result[self.th] == 1
         self.assert_on_fault(result)
+
+    def test_track_glob(self):
+        result = self.overlord.filetracker.track(self.fn)
+        assert result[self.th] == 1
+        self.assert_on_fault(result)
+
+    def test_untrack_glob(self):
+        result = self.overlord.filetracker.track(self.fn_glob)
+        result = self.overlord.filetracker.untrack(self.fn_glob)
+        self.assert_on_fault(result)
+
+    def test_track_fn_list(self):
+        result = self.overlord.filetracker.track(self.fn_list)
+        assert result[self.th] == 1
+        self.assert_on_fault(result)
+
+    def test_untrack_fn_list(self):
+        result = self.overlord.filetracker.track(self.fn_list)
+        result = self.overlord.filetracker.untrack(self.fn_list)
+        self.assert_on_fault(result)
+
+    def test_track_fn_glob_list(self):
+        result = self.overlord.filetracker.track(self.fn_glob_list)
+        assert result[self.th] == 1
+        self.assert_on_fault(result)
+
+    def test_untrack_fn_glob_list(self):
+        result = self.overlord.filetracker.track(self.fn_glob_list)
+        result = self.overlord.filetracker.untrack(self.fn_glob_list)
+        self.assert_on_fault(result)
+
 
     def test_inventory(self):
         result = self.overlord.filetracker.track(self.fn)
