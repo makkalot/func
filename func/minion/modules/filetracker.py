@@ -110,8 +110,9 @@ class FileTracker(func_module.FuncModule):
         filehash = self.__load()
         filenames = filehash.keys()
         for filename in filenames:
-            if fnmatch.fnmatch(filename, file_name_globs):
-                del filehash[filename]
+            for file_name_glob in file_name_globs:
+                if fnmatch.fnmatch(filename, file_name_glob):
+                    del filehash[filename]
         self.__save(filehash)
         return 1
 
