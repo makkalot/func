@@ -1,0 +1,106 @@
+
+All paths assume default configs
+autosign = no
+listen_addr = 
+listen_port = 51235
+cadir = /etc/pki/certmaster/ca
+cert_dir = /etc/pki/certmaster
+certroot = /var/lib/certmaster/certmaster/certs
+csrroot = /var/lib/certmaster/certmaster/csrs
+cert_extension = cert
+
+
+
+Certmaster starts up first time
+
+certmaster creates a CA cert.
+     1. Makes a keypair in the cadir /etc/pki/certmaster/ca/certmaster.key. 
+        This is a 2048 bit RSA private key stored in PEM format. 
+
+     2. A Certificate Signing Request is created and signed by the private key in
+        /etc/pki/certmaster/certmaster.key
+
+     3. An X509 cert object is created. It's serial number is set based on the
+	contents of /etc/pki/certmaster/ca/serial.txt. The CN and other info is
+        from the CSR created in step 2. This includes it's pubkey. 
+
+     4. A PEM formated CA cert is written to /etc/pki/certmaster/ca/certmaster.crt. It
+	is signed by the private key created in step 1. 
+
+
+     certmaster daemon starts up and waits for connections from minions. minions
+know where the certmater is based on the "certmaster" setting in /etc/certmaster/minion.conf.
+
+
+On the Minion (funcd startup) first time. 
+
+	1. funcd create a private key for the minion. This file is in /etc/pki/certmaster/HOSTNAME.pem. 
+           This is also a 2048 but RSA private key stored in PEM format. 
+
+        2. A Certificate Signing Request is created and stored in /etc/pki/certmaster/HOSTNAME.csr
+           This is signed by the private key (/etc/pki/certmaster/HOSTNAME.pem created in step 1)
+	   This file is also in PEM format. 
+ 
+ 	3. funcd submits the CSR created in step 2 to the certmaster. It does this by passing the
+	   contents of the csr to the xmlrpc funtion wait_for_cert() on the certmaster. 
+
+On The certmaster after it gets a cert signing request
+
+	When the certmaster get a wait_for_cert() call with a csr as the data
+
+	1. The certmaster loads the CSR (transmited in PEM format).
+
+	2. It determines the hostname of the system thats requesting the cert based on the
+	value of the CN of the signing request. Note that this may be different than the hostname
+	the request resolves to on the certmaster, depending on network/dns/etc config. 
+
+	3. Certmaster checks to see if a cert for that hosts already exist. The csr and signed certs
+	for the host are stored on the certmaster in /etc/pki/certmaster/HOSTNAME.csr and /etc/pki/certmaster/HOSTNAME.cert
+
+	If the cert exists already, the request is ignored. If it exist but doesnt match the new request, a fault is raised.
+
+
+	4. The csr request is stored on disk by the certmaster in /etc/pki/certmaster/HOSTNAME.csr in PEM format.
+	(note: if autosigned is turned on, the request is signed and retured to the host as described later)
+
+	If the csr is not autosigned, the certmaster returns false to the minion, and the minion will retry 
+	later. 
+
+	
+On the certmaster host after a minion has made a cert request
+
+	If manual interventions is required to sign a cert (as is the default), the admin of the certmaster
+	must signed the csrs with the "certmaster-ca" utility.
+
+
+	"certmaster-ca --sign HOSTNAME" will sign the csr. 
+
+	The signing process is:
+
+		1. The CSR is read
+		2. The hostname is based on the CN of the CSR
+		3. an X509 object is created with a serial number from /etc/pki/certmater/ca/serial.txt
+		   (this number should increment for every cert signed).
+		4. The file is written to the certmaster certroot in /var/lib/certmaster/certs/HOSTNAME.cert
+	
+
+On the minion after the cert is signed
+
+	If the minion has not received a signed cert, it will request one every 10 seconds. 
+
+	When the minion does receive a signed cert from the certmaster, it will get the signed cert
+	(the contents of /var/lib/certmaster/certs/HOSTNAME.cert on the cermaster) and the contents
+	of the CA request (the contents of /etc/pki/certmaster/ca/certmaster.crt). 
+	The signed cert is saved to /etc/pki/certmaster/HOSTNAME.cert on the minion and the
+	ca cert is saved to /etc/pki/certmaster/ca.cert. 
+
+	Then the funcd server will start up. It uses it's private key ("/etc/pki/certmaster/HOSTNAME.pem"
+	created in minion step 1.  It's signed cert ("/etc/pki/certmaster/HOSTNAME.cert") and the
+	CA cert from the certmaster ("/etc/pki/certmaster/ca.cert")
+
+
+
+
+
+
+
