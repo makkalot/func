@@ -27,15 +27,9 @@ class Command(func_module.FuncModule):
         Runs a command, returning the return code, stdout, and stderr as a tuple.
         NOT FOR USE WITH INTERACTIVE COMMANDS.
         """
-
-        
-        if env:
-            cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
-                                       stderr=sub_process.PIPE, shell=False, 
-                                       close_fds=True, env=env)
-        else:
-            cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE,
-                                       stderr=sub_process.PIPE, shell=False, close_fds=True)
+        cmdref = sub_process.Popen(command, stdout=sub_process.PIPE,
+                                   stderr=sub_process.PIPE, shell=True,
+                                   close_fds=True, env=env)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
 
