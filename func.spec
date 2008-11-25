@@ -27,10 +27,9 @@ BuildRequires: python-setuptools
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
-Url: https://hosted.fedoraproject.org/projects/func/
+Url: https://fedorahosted.org/func/
 
 %description
-
 func is a remote api for mangement, configuration, and monitoring of systems.
 
 %prep
@@ -131,7 +130,7 @@ fi
 
 
 %changelog
-* Fri Jul 18 2008 Adrian Likins <alikins@redhat.com> - 0.23-1
+* Fri Jul 18 2008 Adrian Likins <alikins@redhat.com> - 0.23-2
 - remove requirement for pyyaml, add python-simplejson
 
 * Fri Jul 11 2008 Michael DeHaan <mdehaan@redhat.com> - 0.23-1
