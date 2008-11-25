@@ -30,7 +30,7 @@ class Service(func_module.FuncModule):
 
         filename = os.path.join("/etc/rc.d/init.d/",service_name)
         if os.path.exists(filename):
-            return sub_process.call(["/sbin/service", service_name, command])
+            return sub_process.call(["/sbin/service", service_name, command], close_fds=True)
         else:
             raise codes.FuncException("Service not installed: %s" % service_name)
 
@@ -61,7 +61,7 @@ class Service(func_module.FuncModule):
         only provide whether or not they are running, not specific runlevel info.
         """
 
-        chkconfig = sub_process.Popen(["/sbin/chkconfig", "--list"], stdout=sub_process.PIPE)
+        chkconfig = sub_process.Popen(["/sbin/chkconfig", "--list"], stdout=sub_process.PIPE, close_fds=True)
         data = chkconfig.communicate()[0]
         results = []
         for line in data.split("\n"):
@@ -80,7 +80,7 @@ class Service(func_module.FuncModule):
         """
         Get a list of which services are running, stopped, or disabled.
         """
-        chkconfig = sub_process.Popen(["/sbin/service", "--status-all"], stdout=sub_process.PIPE)
+        chkconfig = sub_process.Popen(["/sbin/service", "--status-all"], stdout=sub_process.PIPE, close_fds=True)
         data = chkconfig.communicate()[0]
         results = []
         for line in data.split("\n"):

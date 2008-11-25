@@ -59,7 +59,7 @@ class NetworkTest(func_module.FuncModule):
 
     def __run_command(self, command, opts=[]):
         full_cmd = [command] + opts
-        cmd = sub_process.Popen(full_cmd, stdout=sub_process.PIPE)
+        cmd = sub_process.Popen(full_cmd, stdout=sub_process.PIPE, close_fds=True)
         return [line for line in cmd.communicate()[0].split('\n')]
 
     def register_method_args(self):

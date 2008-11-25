@@ -29,7 +29,7 @@ class Snmp(func_module.FuncModule):
         """
         command = '%s -c %s %s %s' % (base_snmp_command, rocommunity, hostname, oid)
         
-        cmdref = sub_process.Popen(command.split(),stdout=sub_process.PIPE,stderr=sub_process.PIPE, shell=False)
+        cmdref = sub_process.Popen(command.split(), stdout=sub_process.PIPE, stderr=sub_process.PIPE, shell=False, close_fds=True)
         data = cmdref.communicate()
         return (cmdref.returncode, data[0], data[1])
 

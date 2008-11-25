@@ -36,7 +36,7 @@ class SmartModule(func_module.FuncModule):
 
         flags.replace(";","") # prevent stupidity
 
-        cmd = sub_process.Popen("/usr/sbin/smartd %s" % flags,stdout=sub_process.PIPE,shell=True)
+        cmd = sub_process.Popen("/usr/sbin/smartd %s" % flags,stdout=sub_process.PIPE,shell=True,close_fds=True)
         data = cmd.communicate()[0]
 
         results = []

@@ -18,7 +18,7 @@ class Reboot(func_module.FuncModule):
     description = "Reboots a machine."
 
     def reboot(self, when='now', message=''):
-        return sub_process.call(["/sbin/shutdown", '-r', when, message])
+        return sub_process.call(["/sbin/shutdown", '-r', when, message], close_fds=True)
 
     def register_method_args(self):
         """

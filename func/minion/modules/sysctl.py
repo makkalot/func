@@ -18,7 +18,8 @@ class SysctlModule(func_module.FuncModule):
 
     def __run(self, cmd):
         cmd = sub_process.Popen(cmd.split(), stdout=sub_process.PIPE,
-                                stderr=sub_process.PIPE, shell=False)
+                                stderr=sub_process.PIPE, shell=False,
+                                close_fds=True)
         return [line for line in cmd.communicate()[0].strip().split('\n')]
 
     def list(self):

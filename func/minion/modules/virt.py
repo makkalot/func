@@ -44,7 +44,8 @@ class FuncLibvirtConnection(object):
 
     def __init__(self):
 
-        cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE)
+        cmd = sub_process.Popen("uname -r", shell=True, stdout=sub_process.PIPE,
+                                close_fds=True)
         output = cmd.communicate()[0]
 
         if output.find("xen") != -1:

@@ -36,7 +36,7 @@ class HardwareModule(func_module.FuncModule):
         for easier parsing.  Each device is a entry in the return hash.
         """
 
-        cmd = sub_process.Popen(["/usr/bin/lshal"],shell=False,stdout=sub_process.PIPE)
+        cmd = sub_process.Popen(["/usr/bin/lshal"],shell=False,stdout=sub_process.PIPE,close_fds=True)
         data = cmd.communicate()[0]
 
         data = data.split("\n")

@@ -209,14 +209,16 @@ class ProcessModule(func_module.FuncModule):
         if signal[0] != "-":
             signal = "-%s" % signal
         rc = sub_process.call(["/bin/kill",signal, pid], 
-                              executable="/bin/kill", shell=False)
+                              executable="/bin/kill", shell=False,
+                              close_fds=True)
         print rc
         return rc
 
     def pkill(self,name,level=""):
         # example killall("thunderbird","-9")
         rc = sub_process.call(["/usr/bin/pkill", name, level], 
-                              executable="/usr/bin/pkill", shell=False)
+                              executable="/usr/bin/pkill", shell=False,
+                              close_fds=True)
         return rc
 
     def register_method_args(self):

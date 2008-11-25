@@ -24,7 +24,7 @@ class MountModule(func_module.FuncModule):
     description = "Mounting, unmounting and getting information on mounted filesystems."
 
     def list(self):
-        cmd = sub_process.Popen(["/bin/cat", "/proc/mounts"], executable="/bin/cat", stdout=sub_process.PIPE, shell=False)
+        cmd = sub_process.Popen(["/bin/cat", "/proc/mounts"], executable="/bin/cat", stdout=sub_process.PIPE, shell=False, close_fds=True)
         data = cmd.communicate()[0]
         
         mounts = []
@@ -53,7 +53,7 @@ class MountModule(func_module.FuncModule):
                 os.makedirs(dir)
             except:
                 return False
-        cmd = sub_process.Popen(cmdline, executable="/bin/mount", stdout=sub_process.PIPE, shell=False)
+        cmd = sub_process.Popen(cmdline, executable="/bin/mount", stdout=sub_process.PIPE, shell=False, close_fds=True)
         if cmd.wait() == 0:
             return True
         else:
@@ -65,7 +65,7 @@ class MountModule(func_module.FuncModule):
             return True
 
         if killall:
-            cmd = sub_process.Popen(["/sbin/fuser", "-mk", dir], executable="/sbin/fuser", stdout=sub_process.PIPE, shell=False)
+            cmd = sub_process.Popen(["/sbin/fuser", "-mk", dir], executable="/sbin/fuser", stdout=sub_process.PIPE, shell=False, close_fds=True)
             cmd.wait()
 
         cmdline = ["/bin/umount"]
@@ -75,7 +75,7 @@ class MountModule(func_module.FuncModule):
             cmdline.append("-l")
         cmdline.append(dir)
 
-        cmd = sub_process.Popen(cmdline, executable="/bin/umount", stdout=sub_process.PIPE, shell=False)
+        cmd = sub_process.Popen(cmdline, executable="/bin/umount", stdout=sub_process.PIPE, shell=False, close_fds=True)
         if cmd.wait() == 0:
             return True
         else:
