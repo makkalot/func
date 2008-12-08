@@ -15,6 +15,7 @@ Requires: python >= 2.3
 Requires: pyOpenSSL
 Requires: python-simplejson
 Requires: certmaster >= 0.1
+Requires: logrotate
 BuildRequires: python-devel
 %if %is_suse
 BuildRequires: gettext-devel
@@ -69,6 +70,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
 %dir %{python_sitelib}/func/overlord/cmd_modules
+%dir %{python_sitelib}/func/overlord/modules
 %dir %{python_sitelib}/func/yaml
 %{python_sitelib}/func/minion/*.py*
 %{python_sitelib}/func/overlord/*.py*
@@ -81,6 +83,9 @@ rm -fr $RPM_BUILD_ROOT
 
 # we need to make the spec and setup.py find modules
 # in deep dirs automagically
+
+%dir %{python_sitelib}/func/minion/modules/netapp
+%dir %{python_sitelib}/func/minion/modules/netapp/vol
 %{python_sitelib}/func/minion/modules/*/*.py*
 %{python_sitelib}/func/minion/modules/*/*/*.py*
 
@@ -130,6 +135,10 @@ fi
 
 
 %changelog
+* Mon Dec 8 2008 Adrian Likins <alikins@redhat.com> - 0.24-1
+- claim ownership of all dirs bz#474644
+- add dep on logrotate
+
 * Fri Jul 18 2008 Adrian Likins <alikins@redhat.com> - 0.23-2
 - remove requirement for pyyaml, add python-simplejson
 
