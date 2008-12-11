@@ -77,6 +77,9 @@ class BaseTest:
         assert func.utils.is_error(result[self.th]) == False
 #        assert type(result[self.th]) != xmlrpclib.Fault
 
+    def assert_on_no_fault(self, results):
+        assert func.utils.is_error(results[self.th]) == True
+
     # attrs set so we can skip these via nosetest
     test_module_version.intro = True
     test_module_api_version.intro = True
@@ -100,6 +103,18 @@ class TestTest(BaseTest):
     def test_sleep(self):
         result = self.overlord.test.sleep(1)
         self.assert_on_fault(result)
+
+    def test_explode(self):
+        results = self.overlord.test.explode()
+        print results
+        self.assert_on_no_fault(results)
+
+
+    def test_explode_no_string(self):
+        results = self.overlord.test.explode_no_string()
+        print results
+        self.assert_on_no_fault(results)
+
 
     def _echo_test(self, data):
         result = self.overlord.test.echo(data)
@@ -224,8 +239,32 @@ class TestCommand(BaseTest):
 	result = self.overlord.command.run("env",
 				           {'BLIPPYFOO':'awesome'})
 	self.assert_on_fault(result)
-	assert result[self.th][1].strip() == "BLIPPYFOO=awesome"
+	assert result[self.th][1].find("BLIPPYFOO=awesome") != -1
 
+#    def test_sleep_long(self):
+#        result = self.overlord.command.run("sleep 256")
+#        self.assert_on_fault(result)
+
+    def test_shell_globs(self):
+        result = self.overlord.command.run("ls /etc/cron*")
+        self.assert_on_fault(result)
+
+    def test_shell_pipe(self):
+        result = self.overlord.command.run("echo 'foobar' | grep foo")
+        self.assert_on_fault(result)
+        assert result[self.th][1] == "foobar\n"
+
+
+    def test_shell_redirect(self):
+        result = self.overlord.command.run("mktemp")
+        tmpfile = result[self.th][1].strip()
+        result = self.overlord.command.run("echo foobar >> %s; cat %s" % (tmpfile, tmpfile))
+        self.assert_on_fault(result)
+        assert result[self.th][1] == "foobar\n"
+
+    def test_shell_multiple_commands(self):
+        result = self.overlord.command.run("cal; date; uptime; ls;")
+        self.assert_on_fault(result)
 
 
 class TestCopyfile(BaseTest):
