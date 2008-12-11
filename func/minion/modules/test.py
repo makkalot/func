@@ -32,11 +32,20 @@ class Test(func_module.FuncModule):
         time.sleep(t)
         return time.time()
 
+
     def explode(self):
         """
         Testing remote exception handling is useful
         """
         raise exceptions.Exception("khhhhhhaaaaaan!!!!!!")
+
+
+    def explode_no_string(self):
+        """
+        Testing remote exception handling is useful
+        """
+        raise exceptions.Exception()
+
 
     def echo(self, data):
         """
