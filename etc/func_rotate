@@ -13,6 +13,7 @@
 /var/log/func/func.log {
    missingok
    notifempty
+   copytruncate
    rotate 4
    weekly
 }
