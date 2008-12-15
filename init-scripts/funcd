@@ -66,22 +66,38 @@ fi
 RETVAL=0
 
 start() {
-    echo -n $"Starting func daemon: "
-    START_DAEMON $DAEMON $CONFIG_ARGS
-    RETVAL=$?
-    echo
-    [ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
-    return $RETVAL
+    if [ -f /etc/debian_version ]; then
+	log_begin_msg "Starting func daemon: "
+        start-stop-daemon --exec $DAEMON --start --quiet -- $CONFIG_ARGS > /dev/null
+	RETVAL=$?
+	log_end_msg $RETVAL
+	return $RETVAL
+    else
+	echo -n $"Starting func daemon: "
+	START_DAEMON $DAEMON $CONFIG_ARGS
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$SERVICE
+	return $RETVAL
+    fi
 }
 
 stop() {
-    echo -n $"Stopping func daemon: "
-    killproc $PROCESS
-    RETVAL=$?
-    echo
-    if [ $RETVAL -eq 0 ]; then
-	rm -f /var/lock/subsys/$SERVICE
-        rm -f /var/run/$SERVICE.pid
+    if [ -f /etc/debian_version ]; then
+	log_daemon_msg "Stopping func daemon" "funcd"
+        start-stop-daemon --stop --quiet --pidfile /var/run/funcd.pid --name funcd
+	RETVAL=$?
+        log_end_msg $RETVAL
+	rm -f /var/run/funcd.pid
+    else
+	echo -n $"Stopping func daemon: "
+	killproc $PROCESS
+	RETVAL=$?
+	echo
+	if [ $RETVAL -eq 0 ]; then
+	    rm -f /var/lock/subsys/$SERVICE
+            rm -f /var/run/$SERVICE.pid
+	fi
     fi
 }
 
