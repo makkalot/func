@@ -14,7 +14,7 @@ Group: Applications/System
 Requires: python >= 2.3
 Requires: pyOpenSSL
 Requires: python-simplejson
-Requires: certmaster >= 0.1
+Requires: certmaster >= 0.24
 Requires: logrotate
 BuildRequires: python-devel
 %if %is_suse
@@ -135,6 +135,9 @@ fi
 
 
 %changelog
+* Wed Dec 17 2008 Adrian Likins <alikins@redhat.com> - 0.24-1
+- require certmaster 0.24 
+
 * Mon Dec 8 2008 Adrian Likins <alikins@redhat.com> - 0.24-1
 - claim ownership of all dirs bz#474644
 - add dep on logrotate
