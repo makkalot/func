@@ -9,7 +9,6 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import func_module
-import rpm
 
 class RpmModule(func_module.FuncModule):
 
@@ -27,6 +26,7 @@ class RpmModule(func_module.FuncModule):
         """
         # I have not been able to get flatten=False to work if there 
         # is more than 491 entries in the dict -- ashcrow
+	import rpm
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         results = []
@@ -47,6 +47,7 @@ class RpmModule(func_module.FuncModule):
         """
         Return a list of installed packages that match a pattern
         """
+	import rpm
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         results = []

@@ -11,7 +11,6 @@
 
 import func_module
 
-import yum
 
 # XXX Use internal yum callback or write a useful one.
 class DummyCallback(object):
@@ -26,6 +25,7 @@ class Yum(func_module.FuncModule):
     description = "Package updates through yum."
 
     def update(self, pkg=None):
+	import yum
         ayum = yum.YumBase()
         ayum.doGenericSetup()
         ayum.doRepoSetup()
@@ -53,6 +53,7 @@ class Yum(func_module.FuncModule):
         if type(filter) not in [list, tuple]:
             filter = [filter]
 
+	import yum
         ayum = yum.YumBase()
         ayum.doConfigSetup()
         ayum.doTsSetup()
