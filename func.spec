@@ -4,6 +4,7 @@
 %define python python%{?__python_ver}
 %define __python /usr/bin/%{python}
 
+%{!?python_version: %define python_version %(%{__python} -c "from distutils.sysconfig import get_python_version; print get_python_version()")}
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
 %define is_suse %(test -e /etc/SuSE-release && echo 1 || echo 0)
@@ -14,9 +15,6 @@ Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
 Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 Source0: %{name}-%{version}.tar.gz
-%if 0%{?rhel} == 3
-Patch0: %{name}-%{python}.patch
-%endif
 License: GPLv2+
 Group: Applications/System
 %if 0%{?rhel} == 3
@@ -66,7 +64,7 @@ rm -fr $RPM_BUILD_ROOT
 
 %files
 %defattr(-, root, root, -)
-%if 0%{?fedora} > 8
+%if "%{python_version}" >= "2.5"
 %{python_sitelib}/func*.egg-info
 %endif
 %{_bindir}/funcd
@@ -153,6 +151,12 @@ fi
 
 
 %changelog
+* Mon Jan 19 2009 Adrian Likins <alikins@redhat.com> - 0.24.4
+- make inclusion of egginfo dependant on having python >= 2.5
+- remove need for patch on rhel3+python2.4 cases (distutils should
+  do all the /usr/bin/python renaming now)
+- minor reformatting changes
+
 * Tue Jan 06 2009 Greg Swift <gregswift@gmail.com> - 0.24-3
 - Fixed spec because it was only building in rhel3
 
