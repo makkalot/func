@@ -1,3 +1,8 @@
+%if 0%{?rhel} == 3
+%define __python_ver 2.3
+%endif
+%define python python%{?__python_ver}
+%define __python /usr/bin/%{python}
 
 %{!?python_sitelib: %define python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")}
 
@@ -9,21 +14,31 @@ Source1: version
 Version: %(echo `awk '{ print $1 }' %{SOURCE1}`)
 Release: %(echo `awk '{ print $2 }' %{SOURCE1}`)%{?dist}
 Source0: %{name}-%{version}.tar.gz
+%if 0%{?rhel} == 3
+Patch0: %{name}-%{python}.patch
+%endif
 License: GPLv2+
 Group: Applications/System
+%if 0%{?rhel} == 3
+Requires: %{python}
+Requires: pyOpenSSL-py23
+%else
 Requires: python >= 2.3
 Requires: pyOpenSSL
-Requires: python-simplejson
-Requires: certmaster >= 0.24
+%endif
+Requires: %{python}-simplejson
+Requires: certmaster >= %{version}
 Requires: logrotate
-BuildRequires: python-devel
+BuildRequires: %{python}-devel
 %if %is_suse
 BuildRequires: gettext-devel
 %else
 %if 0%{?fedora} >= 8
 BuildRequires: python-setuptools-devel
 %else
+%if 0%{?rhel} >= 5
 BuildRequires: python-setuptools
+%endif
 %endif
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
@@ -35,6 +50,9 @@ func is a remote api for mangement, configuration, and monitoring of systems.
 
 %prep
 %setup -q
+%if 0%{?rhel} == 3
+%patch0 -p1
+%endif
 
 %build
 %{__python} setup.py build
@@ -135,6 +153,13 @@ fi
 
 
 %changelog
+* Tue Jan 06 2009 Greg Swift <gregswift@gmail.com> - 0.24-3
+- Fixed spec because it was only building in rhel3
+
+* Wed Dec 31 2008 Greg Swift <gregswift@gmail.com> - 0.24-2
+- Patched SPEC to build on rhel3 with python2.3
+- Added Patch0 to handle python2.3 if on rhel3
+
 * Wed Dec 17 2008 Adrian Likins <alikins@redhat.com> - 0.24-1
 - require certmaster 0.24 
 
