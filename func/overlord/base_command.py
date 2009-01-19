@@ -1,4 +1,3 @@
-#!/usr/bin/python
 """
 Copyright 2008, Red Hat, Inc
 Adrian Likins <alikins@redhat.com>

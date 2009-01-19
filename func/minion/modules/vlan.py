@@ -1,4 +1,3 @@
-#!/usr/bin/python
 #
 # Copyright 2008, Stone-IT
 # Jasper Capel <capel@stone-it.com>

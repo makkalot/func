@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 #
 # Copyright 2008
 # Louis Coilliot <louis.coilliot@wazemmes.org>
