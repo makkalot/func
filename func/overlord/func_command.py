@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 ## func command line interface & client lib
 ##
 ## Copyright 2007,2008 Red Hat, Inc
