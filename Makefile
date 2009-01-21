@@ -1,6 +1,7 @@
 VERSION		= $(shell echo `awk '{ print $$1 }' version`)
 RELEASE		= $(shell echo `awk '{ print $$2 }' version`)
 NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
+PYTHON		= /usr/bin/python
 
 MESSAGESPOT=po/messages.pot
 
@@ -13,6 +14,7 @@ DIRS	= func docs examples scripts test test/unittest funcweb
 PYDIRS	= func scripts examples funcweb
 EXAMPLEDIR = examples
 INITDIR	= init-scripts
+
 
 all: rpms
 
@@ -35,7 +37,7 @@ setversion:
 	-echo "$(VERSION) $(RELEASE)" > version
 
 build: clean
-	python setup.py build -f
+	$(PYTHON) setup.py build -f
 
 clean:
 	-rm -f  MANIFEST
@@ -46,7 +48,7 @@ clean:
 	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
 
 clean_hard:
-	-rm -rf $(shell python -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
+	-rm -rf $(shell $(PYTHON) -c "from distutils.sysconfig import get_python_lib; print get_python_lib()")/func 
 
 clean_harder:
 	-rm -rf /etc/pki/func
@@ -57,7 +59,7 @@ clean_hardest: clean_rpms
 
 
 install: build manpage
-	python setup.py install -f
+	$(PYTHON) setup.py install -f
 
 install_hard: clean_hard install
 
@@ -78,7 +80,7 @@ clean_rpms:
 	-rpm -e func
 
 sdist: messages
-	python setup.py sdist
+	$(PYTHON) setup.py sdist
 
 new-rpms: bumprelease rpms
 
@@ -93,7 +95,7 @@ money: clean
 async: install
 	/sbin/service funcd restart
 	sleep 4
-	python test/async_test.py 
+	$(PYTHON) test/async_test.py 
 
 testit: clean
 	-cd test; sh test-it.sh
