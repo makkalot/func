@@ -26,7 +26,7 @@ if __name__ == "__main__":
                 version = VERSION,
                 author = "Lots",
                 author_email = "func-list@redhat.com",
-                url = "https://hosted.fedoraproject.org/projects/func/",
+                url = "https://fedorahosted.org/func/",
                 license = "GPL",
 		scripts = [
                      "scripts/funcd",

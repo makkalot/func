@@ -16,7 +16,7 @@ B<funcd> - deaemon for the Fedora Universal Network Controller
 
 funcd registers itself to a certificate server (certmaster) listed in /etc/certmaster/minion.conf and takes orders from the command line func when that program is run from that certificate server.
 
-Modules and capabilities provided by funcd are specified at https://hosted.fedoraproject.org/projects/func/
+Modules and capabilities provided by funcd are specified at https://fedorahosted.org/func/ 
 
 =head1 OPTIONS
 
@@ -60,7 +60,7 @@ See https://fedorahosted.org/func/wiki/FuncSecurity for additional details.
 
 =head1 ADDITONAL RESOURCES
 
-See the project wiki at https://hosted.fedoraproject.org/projects/func/
+See the project wiki at https://fedorahosted.org/func/
 
 =head1 SEE ALSO
 
@@ -68,6 +68,6 @@ L<func(1)>, L<certmaster(1)>, L<certmaster-ca(1)>, L<func-transmit(1)>
 
 =head1 AUTHOR
 
-Various, see https://hosted.fedoraproject.org/projects/func
+Various, see https://fedorahosted.org/func/
 
 

@@ -46,7 +46,7 @@ BuildRequires: checkpolicy, selinux-policy-devel
 %endif
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 BuildArch: noarch
-Url: https://hosted.fedoraproject.org/projects/func/
+Url: https://fedorahosted.org/func/ 
 %description
 
 Web interface for managing systems controlled by Func

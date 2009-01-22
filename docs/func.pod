@@ -103,12 +103,12 @@ called.  See the project page (linked below) for more information.
 
 =head1 ADDITONAL RESOURCES
 
-See https://hosted.fedoraproject.org/projects/func/ for more information, including information on scripting func from Python.
+See https://fedorahosted.org/func/  for more information, including information on scripting func from Python.
 
 See also the manpages for "func-inventory", "funcd", "certmaster", "certmaster-ca", and "func-transmit".
 
 =head1 AUTHOR
 
-Various. See https://hosted.fedoraproject.org/projects/func
+Various. See https://fedorahosted.org/func/
 
 

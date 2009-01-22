@@ -58,7 +58,7 @@ RPM be installed.
 
 =head1 ADDITONAL RESOURCES
 
-See https://hosted.fedoraproject.org/projects/func/ for more information.
+See https://fedorahosted.org/func/ for more information.
 
 See also the manpages for "func", "funcd", "certmaster", "certmaster-ca", and "func-transmit".
 
