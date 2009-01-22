@@ -58,13 +58,15 @@ See https://fedorahosted.org/func/wiki/FuncSecurity for additional details.
 
 =item B</etc/func/minion-acl.d/>		directory for ACL files
 
+=back
+
 =head1 ADDITONAL RESOURCES
 
 See the project wiki at https://fedorahosted.org/func/
 
 =head1 SEE ALSO
 
-L<func(1)>, L<certmaster(1)>, L<certmaster-ca(1)>, L<func-transmit(1)>
+C<func(1)>, C<certmaster(1)>, C<certmaster-ca(1)>, C<func-transmit(1)>
 
 =head1 AUTHOR
 
