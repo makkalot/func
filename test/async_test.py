@@ -47,10 +47,7 @@ def __tester(async,test):
            elif code == jobthing.JOB_ID_PARTIAL:
                print "task reports partial status, %s elapsed, results = %s" % (delta, results)
            elif code == jobthing.JOB_ID_FINISHED:
-               print "(non-async) task complete, %s elapsed, results = %s" % (delta, results)
-               return
-           elif code == jobthing.JOB_ID_FINISHED:
-               print "(async) task complete, %s elapsed, results = %s" % (delta, results)
+               print "task complete, %s elapsed, results = %s" % (delta, results)
                return
            else:
                print "job not found: %s, %s elapased" % (code, delta)
