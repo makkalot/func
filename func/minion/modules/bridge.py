@@ -152,6 +152,8 @@ class Bridge(func_module.FuncModule):
             brlist = self.list()
             if brname not in brlist:
                 exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+                if exitcode == 0:
+                    os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "setfd", brname, "0" ] )
             else:
                 # Bridge already exists, return 0 anyway.
                 exitcode = 0
@@ -166,7 +168,7 @@ class Bridge(func_module.FuncModule):
         if brname not in self.ignorebridges:
             filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
             fp = open(filename, "w")
-            filelines = [ "DEVICE=%s\n" % brname, "TYPE=Bridge\n", "ONBOOT=yes\n" ]
+            filelines = [ "DEVICE=%s\n" % brname, "TYPE=Bridge\n", "ONBOOT=yes\n", "DELAY=0\n" ]
             if ipaddr != None:
                 filelines.append("IPADDR=%s\n" % ipaddr)
             if netmask != None:
