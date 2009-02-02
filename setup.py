@@ -59,11 +59,12 @@ if __name__ == "__main__":
                               (manpath,  ["docs/func-inventory.1.gz"]),
                               (manpath,  ["docs/funcd.1.gz"]),
                               (manpath,  ["docs/func-transmit.1.gz"]),
-			      (rotpath,  ['etc/func_rotate']),
+                              (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
-			      (etcmodpath,  ['etc/Test.conf']),
-			      (varpath,  []),
-			      (aclpath,  [])
+                              (etcmodpath,  ['etc/Test.conf']),
+                              (etcmodpath,  ['etc/bridge.conf']),
+                              (varpath,  []),
+                              (aclpath,  [])
                 ],
                 description = SHORT_DESC,
                 long_description = LONG_DESC
