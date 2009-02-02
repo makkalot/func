@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #
 # Copyright 2008, Stone-IT
 # Jasper Capel <capel@stone-it.com>
@@ -20,21 +21,22 @@
 import func_module
 import os, re
 
+class Config(BaseConfig):
+    ignorebridges = ListOption()
+    brctl = Option("/usr/sbin/brctl")
+    ip = Option("/sbin/ip")
+    ifup = Option("/sbin/ifup")
+    ifdown = Option("/sbin/ifdown")
+
 class Bridge(func_module.FuncModule):
-    version = "0.0.2"
+    version = "0.0.3"
     api_version = "0.0.2"
     description = "Func module for Bridge management"
 
     # A list of bridge names that should be ignored. You can use this if you
     # have bridges that should never be touched by func.
-    # This should go the the module-specific configuration file in the future.
     # Will ignore virbr0 by default, as it's managed by libvirtd, it's probably
     # a bad idea to touch it.
-    ignorebridges = [ "virbr0" ]
-    brctl = "/usr/sbin/brctl"
-    ip = "/sbin/ip"
-    ifup = "/sbin/ifup"
-    ifdown = "/sbin/ifdown"
 
     def list(self, listvif=True):
         # Returns a dictionary. Elements look like this:
@@ -44,7 +46,7 @@ class Bridge(func_module.FuncModule):
 
         retlist = {}
 
-        command = self.brctl + " show"
+        command = self.options.brctl + " show"
 
         fp = os.popen(command)
 
@@ -151,9 +153,9 @@ class Bridge(func_module.FuncModule):
         if brname not in self.ignorebridges:
             brlist = self.list()
             if brname not in brlist:
-                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addbr", brname ] )
+                exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "addbr", brname ] )
                 if exitcode == 0:
-                    os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "setfd", brname, "0" ] )
+                    os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "setfd", brname, "0" ] )
             else:
                 # Bridge already exists, return 0 anyway.
                 exitcode = 0
@@ -177,7 +179,7 @@ class Bridge(func_module.FuncModule):
                 filelines.append("GATEWAY=%s\n" % gateway)
             fp.writelines(filelines)
             fp.close()
-            exitcode = os.spawnv(os.P_WAIT, self.ifup, [ self.ifup, brname ] )
+            exitcode = os.spawnv(os.P_WAIT, self.options.ifup, [ self.options.ifup, brname ] )
         else:
             exitcode = -1
         return exitcode
@@ -188,7 +190,7 @@ class Bridge(func_module.FuncModule):
         if brname not in self.ignorebridges:
             brlist = self.list()
             if ifname not in brlist[brname]:
-                exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "addif", brname, ifname ] )
+                exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "addif", brname, ifname ] )
             else:
                 # Interface is already a member of this bridge, return 0
                 # anyway.
@@ -237,7 +239,7 @@ class Bridge(func_module.FuncModule):
         if brname not in self.ignorebridges:
             # This needs some more error checking. :)
             self.down_bridge(brname)
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "delbr", brname ] )
+            exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "delbr", brname ] )
         else:
             exitcode = -1
 
@@ -257,7 +259,7 @@ class Bridge(func_module.FuncModule):
     def delete_interface(self, brname, ifname):
         # Deletes an interface from a bridge
         if brname not in self.ignorebridges:
-            exitcode = os.spawnv(os.P_WAIT, self.brctl, [ self.brctl, "delif", brname, ifname ] )
+            exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "delif", brname, ifname ] )
         else:
             exitcode = -1
 
@@ -412,7 +414,7 @@ class Bridge(func_module.FuncModule):
         # Set the MAC address of the interface we're adding to the bridge to
         # FE:FF:FF:FF:FF:FF. This is consistent with the behaviour of the
         # Xen network-bridge script.
-        setaddrret = os.spawnv(os.P_WAIT, self.ip, [ self.ip, "link", "set", ifname, "address", "fe:ff:ff:ff:ff:ff" ])
+        setaddrret = os.spawnv(os.P_WAIT, self.options.ip, [ self.options.ip, "link", "set", ifname, "address", "fe:ff:ff:ff:ff:ff" ])
         if addbrret or addifret or setaddrret:
             return -1
         else:
@@ -439,7 +441,7 @@ class Bridge(func_module.FuncModule):
         exitcode = 0
 
         for ifname in interfaces:
-            retcode = os.spawnv(os.P_WAIT, self.ip, [self.ip, "link", "set", ifname, updown ] )
+            retcode = os.spawnv(os.P_WAIT, self.options.ip, [self.options.ip, "link", "set", ifname, updown ] )
             if retcode != 0:
                 exitcode = retcode
 
