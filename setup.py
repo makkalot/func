@@ -62,8 +62,8 @@ if __name__ == "__main__":
                               (rotpath,  ['etc/func_rotate']),
                               (logpath,  []),
                               (etcmodpath,  ['etc/Test.conf']),
-                              (etcmodpath,  ['etc/bridge.conf']),
-                              (etcmodpath,  ['etc/vlan.conf']),
+                              (etcmodpath,  ['etc/Bridge.conf']),
+                              (etcmodpath,  ['etc/Vlan.conf']),
                               (varpath,  []),
                               (aclpath,  [])
                 ],
