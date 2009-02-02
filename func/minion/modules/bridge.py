@@ -67,7 +67,7 @@ class Bridge(func_module.FuncModule):
             if len(elements) > 1:
                 # Line containing a new bridge name + interface
                 curbr = elements[0]
-                if not curbr in self.ignorebridges:
+                if not curbr in self.options.ignorebridges:
                     if len(elements) == 3:
                         # This is a bridge without connected devices
                         retlist[elements[0]] = [ ]
@@ -83,7 +83,7 @@ class Bridge(func_module.FuncModule):
             elif len(elements) == 1:
                 # Dictionary key containing interface name should already
                 # exist, append the interface.
-                if not curbr in self.ignorebridges:
+                if not curbr in self.options.ignorebridges:
                     if not vifpattern.match(elements[0]) and listvif == True:
                         retlist[curbr].append(elements[0])
     
@@ -147,7 +147,7 @@ class Bridge(func_module.FuncModule):
     
     def add_bridge(self, brname):
         # Creates a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             brlist = self.list()
             if brname not in brlist:
                 exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "addbr", brname ] )
@@ -164,7 +164,7 @@ class Bridge(func_module.FuncModule):
     def add_bridge_permanent(self, brname, ipaddr=None, netmask=None, gateway=None):
         # Creates a permanent bridge (writes to
         # /etc/sysconfig/network-scripts)
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
             fp = open(filename, "w")
             filelines = [ "DEVICE=%s\n" % brname, "TYPE=Bridge\n", "ONBOOT=yes\n", "DELAY=0\n" ]
@@ -184,7 +184,7 @@ class Bridge(func_module.FuncModule):
 
     def add_interface(self, brname, ifname):
         # Adds an interface to a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             brlist = self.list()
             if ifname not in brlist[brname]:
                 exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "addif", brname, ifname ] )
@@ -233,7 +233,7 @@ class Bridge(func_module.FuncModule):
 
     def delete_bridge(self, brname):
         # Deletes a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             # This needs some more error checking. :)
             self.down_bridge(brname)
             exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "delbr", brname ] )
@@ -245,7 +245,7 @@ class Bridge(func_module.FuncModule):
     def delete_bridge_permanent(self, brname):
         # Deletes a bridge permanently
         filename = "/etc/sysconfig/network-scripts/ifcfg-%s" % brname
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             returncode = self.delete_bridge(brname)
             if os.path.exists(filename):
                 os.remove(filename)
@@ -255,7 +255,7 @@ class Bridge(func_module.FuncModule):
     
     def delete_interface(self, brname, ifname):
         # Deletes an interface from a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             exitcode = os.spawnv(os.P_WAIT, self.options.brctl, [ self.options.brctl, "delif", brname, ifname ] )
         else:
             exitcode = -1
@@ -266,7 +266,7 @@ class Bridge(func_module.FuncModule):
         # Permanently deletes interface from bridge
         iffilename = "/etc/sysconfig/network-scripts/ifcfg-%s" % ifname
 
-        if brname in self.ignorebridges:
+        if brname in self.options.ignorebridges:
             exitcode = -1
         elif os.path.exists(iffilename):
             # This only works if the interface itself is permanent
@@ -295,7 +295,7 @@ class Bridge(func_module.FuncModule):
 
     def delete_all_interfaces(self, brname):
         # Deletes all interfaces from a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             bridgelist = self.list()
             if brname in bridgelist:
                 # Does this bridge exist?
@@ -313,7 +313,7 @@ class Bridge(func_module.FuncModule):
 
     def delete_all_interfaces_permanent(self, brname):
         # Permanently deletes all interfaces from a bridge
-        if brname not in self.ignorebridges:
+        if brname not in self.options.ignorebridges:
             bridgelist = self.list_permanent()
             if brname in bridgelist:
                 exitcode = 0
