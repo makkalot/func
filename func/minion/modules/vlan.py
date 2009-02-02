@@ -32,7 +32,7 @@ class Vlan(func_module.FuncModule):
         # You can use this if you have VLAN IDs which are reserved for internal
         # use, which should never be touched by func.
         # Use strings here, not integers!
-        ignorevlans = ListOptions()
+        ignorevlans = ListOption()
         vconfig = Option("/sbin/vconfig")
         ip = Option("/sbin/ip")
         ifup = Option("/sbin/ifup")
