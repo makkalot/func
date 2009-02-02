@@ -20,23 +20,20 @@
 
 import func_module
 import os, re
+from certmaster.config import BaseConfig, Option, ListOption
 
-class Config(BaseConfig):
-    ignorebridges = ListOption()
-    brctl = Option("/usr/sbin/brctl")
-    ip = Option("/sbin/ip")
-    ifup = Option("/sbin/ifup")
-    ifdown = Option("/sbin/ifdown")
 
 class Bridge(func_module.FuncModule):
     version = "0.0.3"
     api_version = "0.0.2"
     description = "Func module for Bridge management"
 
-    # A list of bridge names that should be ignored. You can use this if you
-    # have bridges that should never be touched by func.
-    # Will ignore virbr0 by default, as it's managed by libvirtd, it's probably
-    # a bad idea to touch it.
+    class Config(BaseConfig):
+        ignorebridges = ListOption()
+        brctl = Option("/usr/sbin/brctl")
+        ip = Option("/sbin/ip")
+        ifup = Option("/sbin/ifup")
+        ifdown = Option("/sbin/ifdown")
 
     def list(self, listvif=True):
         # Returns a dictionary. Elements look like this:
