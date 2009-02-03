@@ -21,14 +21,18 @@
 Func module for VLAN management
 """
 
+__author__ = "Jasper Capel <capel@stone-it.com>"
+__version__ = "0.0.3"
+__api_version__ = "0.0.2"
+
 import func_module
 import os, re
 from certmaster.config import BaseConfig, Option, ListOption
 
 
 class Vlan(func_module.FuncModule):
-    version = "0.0.3"
-    api_version = "0.0.2"
+    version = __version__
+    api_version = __api_version__
     description = "Func module for VLAN management"
 
     class Config(BaseConfig):
