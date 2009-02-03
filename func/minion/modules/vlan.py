@@ -17,6 +17,10 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 # 02110-1301  USA
 
+"""
+Func module for VLAN management
+"""
+
 import func_module
 import os, re
 from certmaster.config import BaseConfig, Option, ListOption
