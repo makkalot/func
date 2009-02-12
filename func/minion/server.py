@@ -267,12 +267,28 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         return peer_cert.get_subject().CN
     
 
+def excepthook(exctype, value, tracebackobj):
+    exctype_blurb = "Exception occured: %s" % exctype
+    excvalue_blurb = "Exception value: %s" % value
+    exctb_blurb = "Exception Info:\n%s" % string.join(traceback.format_list(traceback.extract_tb(tracebackobj)))
+
+    print exctype_blurb
+    print excvalue_blurb
+    print exctb_blurb
+
+    log = logger.Logger().logger 
+    log.info(exctype_blurb)
+    log.info(excvalue_blurb)
+    log.info(exctb_blurb)
+
+
 def main(argv):
 
     """
     Start things up.
     """
 
+    sys.excepthook = excepthook
     if len(sys.argv) > 1 and sys.argv[1] == "--list-modules":
         module_names = module_loader.load_modules().keys()
         module_names.sort()
