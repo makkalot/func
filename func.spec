@@ -152,6 +152,9 @@ fi
 
 
 %changelog
+* Wed Feb 18 2009 Adrian Likins <alikins@redhat.com> - 0.24-4
+- remove version file
+
 * Mon Jan 19 2009 Adrian Likins <alikins@redhat.com> - 0.24.4
 - make inclusion of egginfo dependant on having python >= 2.5
 - remove need for patch on rhel3+python2.4 cases (distutils should
