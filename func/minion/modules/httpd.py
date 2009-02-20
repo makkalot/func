@@ -65,3 +65,36 @@ class Httpd(func_module.FuncModule):
         Issue a graceful restart to the httpd service.
         """
         return self.service.Service()._Service__command(Httpd.HTTPD_SERVICE_NAME, 'graceful')
+
+
+    def register_method_args(self):
+        return {
+                'graceful':{
+                    'args':{},
+                    'description':"Issue a graceful restart to the httpd service."
+                    },
+                'server_status':{
+                    'args': {'host':{
+                                'type':'string',
+                                'optional':True,
+                                'default':"localhost",
+                                'description':'hostname of the http server to check status of'
+                              },
+                             'request':{
+                                 'type':'string',
+                                 'optional':True,
+                                 'default':'server-status',
+                                 'description':'path to the url server status page'
+                                 },
+                             'ssl': {
+                                 'type':'boolean',
+                                 'optional':True,
+                                 'default':False,
+                                 'description':'True if the server is an ssl server'
+                                 }
+                             },
+                                 
+
+                    'description':'Check the httpd status on a server'
+                    }
+                }
