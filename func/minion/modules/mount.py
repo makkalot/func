@@ -156,6 +156,6 @@ class MountModule(func_module.FuncModule):
                         'description':"To flatten check."
                         }
                     },
-                    'description':"Th einventory part of that module"
+                    'description':"The inventory part of that module"
                     }
                 }
