@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #
 # Copyright 2008
 # Louis Coilliot <louis.coilliot@wazemmes.org>
@@ -10,7 +12,8 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import func_module
-from os import path as ospath 
+from os import path as ospath,getenv as osgetenv 
+from time import strftime
 
 def lstripstr(the_string,the_prefix):
     """Return a copy of the string with leading prefix removed."""
@@ -57,14 +60,14 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             from augeas import Augeas
             aug=Augeas()
         except Exception, e: return str(e)
-
-        path=hierarchy+entryPath+'/'
+        # yes, entryPath.rstrip('/')+'/' is really needed (i.e. entryPath=/)
+        path=(hierarchy+entryPath.rstrip('/')+'/'+param).rstrip('/')
         try:
-            matchtest=aug.match(path+param) 
+            matchtest=aug.match(path) 
         except Exception, e: return str(e)
         if matchtest:
             try:
-                pvalue=aug.get(path+param) 
+                pvalue=aug.get(path) 
                 #aug.close()
             except Exception, e: return str(e)
         else:
@@ -75,7 +78,7 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             # The node doesn't have a value
             pvalue='(none)'
 
-        return { 'path': entryPath, 'parameter': param, 'value': pvalue }
+        return { 'path': entryPath, 'parameter': param, 'value': pvalue, 'hierarchy': hierarchy }
 
 
     def set(self,entryPath,param='',pvalue='',hierarchy='/files'):
@@ -86,12 +89,12 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             aug=Augeas()
         except Exception, e: return str(e)
 
-        path=hierarchy+entryPath
+        path=(hierarchy+entryPath.rstrip('/')+'/'+param).rstrip('/')
 
         try:
-            aug.set(path+"/"+param,pvalue)
+            aug.set(path,pvalue)
         except Exception, e: return str(e)
-        # Here is a little workaround for a bug in save for augeas 0.3.2.
+        # Here is a little workaround for a bug in save for augeas.
         # In the future this won't be necessary anymore.
         try:
             aug.save()
@@ -103,11 +106,11 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
         except Exception, e: return str(e)
 
         try:
-            pvalue=aug.get(path+"/"+param)
+            pvalue=aug.get(path)
             #aug.close()
         except Exception, e: return str(e)
 
-        return { 'path': entryPath, 'parameter': param, 'value': pvalue }
+        return { 'path': entryPath, 'parameter': param, 'value': pvalue, 'hierarchy': hierarchy  }
 
 
     def match(self,entryPath,param='',pvalue='',hierarchy='/files'):
@@ -118,19 +121,19 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             aug=Augeas()
         except Exception, e: return str(e)
 
-        path=hierarchy+entryPath
-        childpath=path+'/*/'
+        path=(hierarchy+entryPath.rstrip('/')+'/'+param).rstrip('/')
+        childpath=(hierarchy+entryPath.rstrip('/')+'/*/'+param).rstrip('/')
+
         if pvalue:
             try:
-                matchlist  = [ ospath.dirname(lstripstr(item,'/files')) for item in aug.match(path+'/'+param) + aug.match(childpath+'/'+param) if ( aug.get(item) == pvalue ) ]
+                matchlist = [ ospath.dirname(lstripstr(item,'/files')) for item in aug.match(path) + aug.match(childpath) if ( aug.get(item) == pvalue ) ]
                 #aug.close()
             except Exception, e: return str(e)
         else:
             try:
-                matchlist = [ ospath.dirname(lstripstr(item,'/files')) for item in aug.match(path+'/'+param) + aug.match(childpath+'/'+param) ]
+                matchlist = [ ospath.dirname(lstripstr(item,'/files')) for item in aug.match(path) + aug.match(childpath) ]
                 #aug.close()
             except Exception, e: return str(e)
-
         return matchlist
 
 
@@ -141,12 +144,11 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             from augeas import Augeas
             aug=Augeas()
         except Exception, e: return str(e)
-
-        path=hierarchy+entryPath
+        path=hierarchy+entryPath.rstrip('/')+'/*'
         # We can't use a dict here because the same key can appear many times.
         nodes=[]
         try:
-            for match in aug.match(path+'/*'):
+            for match in aug.match(path):
                 pvalue=aug.get(match)
                 if not pvalue:
                     pvalue='(none)'
@@ -157,7 +159,7 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
         #    aug.close()
         #except Exception, e: return str(e)
 
-        return { 'path': entryPath, 'nodes': nodes }
+        return { 'path': entryPath, 'nodes': nodes, 'hierarchy': hierarchy }
 
 
     # print is a reserved word so we use printconf instead
@@ -171,7 +173,7 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
         except Exception, e: return str(e)
         matches = recurmatch(aug, path)
         # Here we loose the benefit of the generator function:
-        return { 'path': entryPath, 'nodes':[ [lstripstr(p,'/files'),attr] for (p,attr) in matches ] }
+        return { 'path': entryPath, 'nodes':[ [lstripstr(p,'/files'),attr] for (p,attr) in matches ], 'hierarchy': hierarchy }
 
 
 
@@ -183,14 +185,14 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             aug=Augeas()
         except Exception, e: return str(e)
 
-        path=hierarchy+entryPath
+        path=(hierarchy+entryPath.rstrip('/')+'/'+param).rstrip('/')
         
         try:
-            result=aug.remove(path+"/"+param)
+            result=aug.remove(path)
             #aug.close()
         except Exception, e: return str(e)
-        # Here is a little workaround for a bug in save for augeas 0.3.2.
-        # In the future this won't be necessary anymore. 
+        # Here is a little workaround for a bug in save for augeas.
+        # In the future this should not be necessary anymore. 
         try:
             aug.save()
         except:
@@ -205,6 +207,28 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
             msg = repr(result)+' node(s) removed.'
         return msg 
 
+    def getenv(self,varname):
+        """Get an environment variable."""
+        varvalue=osgetenv(varname)
+        if varvalue == None:
+            varvalue = '(none)'
+        return { varname : varvalue  }
+
+    def backup(self,entryPath):
+        """Backup a file with a timestamp. Cautious before applying modifications on a configuration file."""
+        try:
+            import shutil 
+        except Exception, e: return str(e)
+        backupPath=entryPath+'.'+strftime('%Y%m%d-%H%M')
+        try:
+            if not ospath.exists(backupPath):
+                shutil.copy(entryPath, backupPath)
+                msg='File '+entryPath+' backed up to '+ backupPath
+            else:
+                msg='Backup file '+backupPath+' already exists'
+        except (OSError, IOError), e: return str(e)
+        return msg 
+    
 
     def register_method_args(self):
         """
@@ -343,6 +367,26 @@ with the help of Augeas, a configuration API (cf http://augeas.net)"""
                             }
                         },
                     'description':"Delete a parameter (and all its children) in a config. file."
+                    },
+                'getenv':{
+                    'args':{
+                        'varname':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'The name of the environment variable to get',
+                            }
+                        },
+                    'description':"Get an environment variable."
+                    },
+                'backup':{
+                    'args':{
+                        'entryPath':{
+                            'type':'string',
+                            'optional':False,
+                            'description':'The path to the config. file',
+                            }
+                        },
+                    'description':"Backup a file with a timestamp."
                     }
                 }
 
