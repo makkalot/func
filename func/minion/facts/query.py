@@ -1,24 +1,132 @@
 from func.minion.facts.query_utils import Q
+from copy import deepcopy
 
 class FuncQuery(object):
-    def __init__(self,q_object=None):
+    """
+    Is an object that u can pass Q objects to make it fetch
+    some results about some variables. FuncQuery is kind of 
+    orm but not exactly the exec_query returns True of False
+    that is what is all about. For example passing variables
+    to FuncQuery like temperature=21,uname="2.6.27.15" will 
+    control on target machine if temperature is 21 and uname
+    is the expected if 2 of them are true the result will be
+    true and u will query the rest of the methods u requested
+    """
+    def __init__(self,q_object=None,pull_result=None):
         self.q = q_object
+        #pull result variable is kind of important
+        #it can be an object or a method which will
+        #return back a True or False statement
+        self.pull_result = None
+
+    def __getattribute__(self,name):
+        """
+        Making it kind of proxy object to the Q object
+        """
+        try:
+            return object.__getattribute__(self, name)
+        except AttributeError:
+            return object.__getattribute__(self.q,name)
+    
+    def _clone(self,klass=None,q_object=None,pull_result=None):
+        """
+        When querying filter and other cool methods
+        we always return back a object ,it is better
+        it tobe a fresh one ...
+        """
+        if klass is None:
+            klass = self.__class__
+        c = klass(q_object,pull_result)
+        return c
+
+
+    def __or__(self,other):
+        if not isinstance(other,FuncQuery):
+            raise IncompatibleTypeOperation("You can not or an object which is not type of FuncQuery")
+        tmp_q = self.q | other.q
+        fresh_query = self._clone(q_object=tmp_q,pull_result=self.pull_result)
+        return fresh_query
+
+    def __and__(self,other):
+        if not isinstance(other,FuncQuery):
+            raise IncompatibleTypeOperation("You can not or an object which is not type of FuncQuery")
+        tmp_q = self.q & other.q
+        fresh_query = self._clone(q_object=tmp_q,pull_result=self.pull_result)
+        return fresh_query
+
+    def filter(self,*args,**kwargs):
+        """
+        The filter method is the one that will be used most
+        of the time by end user
+        """
+        temp_q = Q(*args,**kwargs)
+        if self.q:
+            current_q = deepcopy(self.q)
+        else:
+            current_q = None
+        
+        if not current_q:
+            current_q = temp_q
+        else:
+            current_q.add(temp_q,"AND")
+        
+        fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
+        return fresh_query
+
+    def exclude(self,*args,**kwargs):
+        """
+        Useful when you want to ignore some of the things
+        in query,the exclude iverts the query
+        """
+        temp_q = ~Q(*args,**kwargs)
+        
+        if self.q:
+            current_q = deepcopy(self.q)
+        else:
+            current_q = None
+        
+        if not self.q:
+            current_q = temp_q
+        else:
+            current_q.add(temp_q,"AND")
+        fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
+        return fresh_query
+    
+    def set_compexq(self,q_object,connector=None):
+        """
+        Sometimes we need some complex queries ORed
+        ANDed and etc, that is for that
+        """
+        if not connector or not self.q:
+            current_q = deepcopy(q_object)
+        else:
+            current_q = deepcopy(self.q)
+            current_q.add(q_object,connector)
+        fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
+        return fresh_query
 
     def exec_query(self):
+        """
+        The part that will say it is True or it is False
+        """
         if not self.q:
             raise Exception("You should set up some query object before executing it")
         return self.__main_traverse(self.q)
+    result = property(exec_query)
 
     def __traverse_query(self,node):
-        x=[] 
+        logic_results=[] 
         for n in node.children:
             if not type(n) == tuple and not type(n) == list:
-                result = self.traverser(n)
-                x.append(self.logic_operation(n,result))
+                result = self.__traverse_query(n)
+                logic_results.append(self.logic_operation(n,result))
             else:
                 #here you will do some work
-                x.append(n[1])
-        return x
+                if not self.pull_result:
+                    logic_results.append(n[1])
+                else:
+                    logic_results.append(self.pull_result(n))
+        return logic_results
 
     def __main_traverse(self,q_ob):
         """
@@ -41,10 +149,14 @@ class FuncQuery(object):
                 if node.connector == "AND":
                     tmp_res = tmp_res & res
                 else:
-                    tmp_re = tmp_res | res
+                    tmp_res = tmp_res | res
+                if node.negated:
+                    tmp_res = not tmp_res
         return tmp_res
     
     def __str__(self):
         return str(self.q)
 
 
+class IncompatibleTypeOperation(Exception):
+    pass
