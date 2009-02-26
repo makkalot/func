@@ -1,7 +1,7 @@
 from func.minion.facts.query_utils import Q
 from copy import deepcopy
 
-class FuncQuery(object):
+class BaseFuncQuery(object):
     """
     Is an object that u can pass Q objects to make it fetch
     some results about some variables. FuncQuery is kind of 
@@ -38,17 +38,24 @@ class FuncQuery(object):
             klass = self.__class__
         c = klass(q_object,pull_result)
         return c
+    
+    def exec_query(self):
+        """
+        The part that will say it is True or it is False
+        """
+        raise Exception("Not implemted method you should subclass and override that method")
+    result = property(exec_query)
 
 
     def __or__(self,other):
-        if not isinstance(other,FuncQuery):
+        if not isinstance(other,BaseFuncQuery):
             raise IncompatibleTypeOperation("You can not or an object which is not type of FuncQuery")
         tmp_q = self.q | other.q
         fresh_query = self._clone(q_object=tmp_q,pull_result=self.pull_result)
         return fresh_query
 
     def __and__(self,other):
-        if not isinstance(other,FuncQuery):
+        if not isinstance(other,BaseFuncQuery):
             raise IncompatibleTypeOperation("You can not or an object which is not type of FuncQuery")
         tmp_q = self.q & other.q
         fresh_query = self._clone(q_object=tmp_q,pull_result=self.pull_result)
@@ -104,7 +111,16 @@ class FuncQuery(object):
             current_q.add(q_object,connector)
         fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
         return fresh_query
+    
+    def __str__(self):
+        return str(self.q)
 
+class FuncLogicQuery(BaseFuncQuery):
+    """
+    Will be used to decide if a method will be
+    invoked on minion side ...
+    """
+    
     def exec_query(self):
         """
         The part that will say it is True or it is False
@@ -153,10 +169,14 @@ class FuncQuery(object):
                 if node.negated:
                     tmp_res = not tmp_res
         return tmp_res
-    
-    def __str__(self):
-        return str(self.q)
 
+class FuncDataQuery(BaseFuncQuery):
+    """
+    A class which is desgined with intention to be used
+    for query minion results, and idea which will be cool
+    but needs an extreme branch :)
+    """
+    pass
 
 class IncompatibleTypeOperation(Exception):
     pass

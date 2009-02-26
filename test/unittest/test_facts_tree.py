@@ -1,14 +1,14 @@
-from func.minion.facts.query import FuncQuery 
+from func.minion.facts.query import FuncLogicQuery 
 from func.minion.facts.query_utils import Q
 
 class TestFactsTree(object):
    
     def setUp(self):
-        self.q1 = FuncQuery(Q(a=True,b=True))
-        self.q2 = FuncQuery(Q(a=False,b=True))
-        self.q3 = FuncQuery(Q(a=True,b=False))
-        self.q4 = FuncQuery(Q(a=False,b=False))
-        self.q_negated = FuncQuery(~Q(a=False,b=False))
+        self.q1 = FuncLogicQuery(Q(a=True,b=True))
+        self.q2 = FuncLogicQuery(Q(a=False,b=True))
+        self.q3 = FuncLogicQuery(Q(a=True,b=False))
+        self.q4 = FuncLogicQuery(Q(a=False,b=False))
+        self.q_negated = FuncLogicQuery(~Q(a=False,b=False))
 
     def test_print_facts_tree(self):
         """
