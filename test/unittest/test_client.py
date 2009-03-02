@@ -16,6 +16,7 @@ import xmlrpclib
 import func.overlord.client as fc
 import func.utils
 import socket
+from func.minion.facts.overlord_query import OverlordQueryProxy
 
 
 
@@ -23,6 +24,7 @@ class BaseTest:
     # assume we are talking to localhost
     # th = socket.gethostname()
     th = socket.getfqdn()
+
     nforks=1
     async=False
 
@@ -87,6 +89,8 @@ class BaseTest:
     test_module_list_methods.intro = True
     test_module_inventory.intro = True
     test_module_get_method_args.intro = True
+
+
 
 class TestTest(BaseTest):
     module = "test"
@@ -215,6 +219,12 @@ class TestTest(BaseTest):
 	result = self.overlord.test.config_get_test()
 	self.assert_on_fault(result)
 
+class TestTestOverlordQueryProxy(TestTest):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 
@@ -266,6 +276,13 @@ class TestCommand(BaseTest):
         result = self.overlord.command.run("cal; date; uptime; ls;")
         self.assert_on_fault(result)
 
+class TestCommandOverlordQueryProxy(TestCommand):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
 
 class TestCopyfile(BaseTest):
     fn = "/tmp/func_test_file"
@@ -305,7 +322,15 @@ class TestCopyfile(BaseTest):
         result = self.overlord.copyfile.checksum(self.dest_fn)
         self.assert_on_fault(result)
         assert result[self.th] == "b36a8040e44c16605d7784cdf1b3d9ed04ea7f55"
-        
+
+class TestCopyfileOverlordQueryProxy(TestCopyfile):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
+       
 
 class TestHardware(BaseTest):
     module = "hardware"
@@ -325,6 +350,13 @@ class TestHardware(BaseTest):
     def test_info_no_devices(self):
         result = self.overlord.hardware.info(False)
         self.assert_on_fault(result)
+
+class TestHardwareOverlordQueryProxy(TestHardware):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 class TestFileTracker(BaseTest):
     fn = "/etc/hosts"
@@ -385,6 +417,13 @@ class TestFileTracker(BaseTest):
             if i[0] == self.fn:
                 assert "%s was not properly untracked" % self.fn
 
+class TestFileTrackerOverlordQueryProxy(TestFileTracker):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
 
 class TestMount(BaseTest):
     module = "mount"
@@ -393,6 +432,13 @@ class TestMount(BaseTest):
         self.assert_on_fault(result)
 
     # INSERT some clever way to test mount here
+
+class TestMountOverlordQueryProxy(TestMount):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 class TestNetworkTest(BaseTest):
@@ -426,6 +472,13 @@ class TestNetworkTest(BaseTest):
         result = self.overlord.networktest.isportopen(self.th, 51234)
         self.assert_on_fault(result)
 
+class TestNetworkTestOverlordQueryProxy(TestNetworkTest):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
 
 class TestProcess(BaseTest):
     module = "process"
@@ -439,6 +492,13 @@ class TestProcess(BaseTest):
 
     # FIXME: how to test kill/pkill? start a process with
     #        command and then kill it?
+
+class TestProcessOverlordQueryProxy(TestProcess):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 class TestService(BaseTest):
@@ -462,6 +522,14 @@ class TestService(BaseTest):
 
         #FIXME: whats a good way to test starting/stoping services without
         #       doing bad things? -akl
+
+class TestServiceOverlordQueryProxy(TestService):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
 
 class TestRpm(BaseTest):
     module = "rpms"
@@ -499,6 +567,12 @@ class TestRpm(BaseTest):
         result = self.overlord.rpms.glob("*", False)
         self.assert_on_fault(result)
 
+class TestRpmOverlordQueryProxy(TestRpm):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 class TestSmart(BaseTest):
@@ -506,7 +580,14 @@ class TestSmart(BaseTest):
     def test_info(self):
         result = self.overlord.smart.info()
         self.assert_on_fault(result)
-    
+
+class TestSmartOverlordQueryProxy(TestSmart):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+   
 
 class TestSysctl(BaseTest):
     module = "sysctl"
@@ -517,6 +598,13 @@ class TestSysctl(BaseTest):
     def test_get(self):
         result = self.overlord.sysctl.get("kernel.max_lock_depth")
         self.assert_on_fault(result)
+
+class TestSysctlOverlordQueryProxy(TestSysctl):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 class TestYum(BaseTest):
     module = "yumcmd"
@@ -535,6 +623,13 @@ class TestYum(BaseTest):
         self.assert_on_fault(results)
         results_no_filter = self.overlord.yumcmd.check_update()
         assert results == results_no_filter
+
+class TestYumOverlordQueryProxy(TestYum):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 # this fails on fc6, need to test on newer yum to see whats up
 #    def test_update_non_existent_package(self):
@@ -555,6 +650,13 @@ class TestIptables(BaseTest):
     def test_policy(self):
         result = self.overlord.iptables.policy()
 
+class TestIptablesOverlordQueryProxy(TestIptables):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
+
 
 class TestIptablesPort(BaseTest):
     module = "iptables.port"
@@ -562,6 +664,13 @@ class TestIptablesPort(BaseTest):
     def test_inventory(self):
         results = self.overlord.iptables.port.inventory()
         # doesnt have an inventory, so er... -akl
+
+class TestIptablesPortOverlordQueryProxy(TestIptablesPort):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 #class TestHttpd(BaseTest):
 #    module = "httpd"
@@ -606,6 +715,12 @@ class TestEchoTest(BaseTest):
         self.assert_on_fault(result)
 
 
+class TestEchoTestOverlordQueryProxy(TestEchoTest):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 
@@ -638,6 +753,13 @@ class TestSystem(BaseTest):
 
     def test_module_get_method_args(self):
         pass
+
+class TestSystemOverlordQueryProxy(TestSystem):
+    def setUp(self):
+        self.overlord = OverlordQueryProxy(None,None,self.th,
+                                    nforks=self.nforks,
+                                    async=self.async)
+
 
 
 #import time
