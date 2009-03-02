@@ -60,7 +60,10 @@ class BaseFuncQuery(object):
         tmp_q = self.q & other.q
         fresh_query = self._clone(q_object=tmp_q,pull_result=self.pull_result)
         return fresh_query
-
+    
+    def __nonzero__(self):
+        return bool(self.q)
+    
     def filter(self,*args,**kwargs):
         """
         The filter method is the one that will be used most
@@ -155,7 +158,6 @@ class FuncLogicQuery(BaseFuncQuery):
         """
         Just computes the logic of current list
         """
-        #TODO add negate thing also
 
         tmp_res = None
         for res in logic_list:
