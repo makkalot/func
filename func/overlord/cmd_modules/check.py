@@ -20,10 +20,12 @@ import urllib2
 
 from func.overlord import base_command
 from certmaster import utils
+from func import utils as func_utils
 from func.minion import sub_process
 from certmaster.config import read_config
 from certmaster.commonconfig import MinionConfig
 from func.commonconfig import FuncdConfig
+
 
 
 class CheckAction(base_command.BaseCommand):
@@ -55,7 +57,7 @@ class CheckAction(base_command.BaseCommand):
         else:
            print "SCAN RESULTS:"
 
-        hostname = utils.get_hostname()
+        hostname = func_utils.get_hostname_by_route()
         print "* FQDN is detected as %s, verify that is correct" % hostname
         self.check_iptables()
 

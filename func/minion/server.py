@@ -29,12 +29,14 @@ from certmaster.commonconfig import CMConfig
 from func import logger
 from certmaster import certs
 import func.jobthing as jobthing
+from func import utils as func_utils
 
 # our modules
 import AuthedXMLRPCServer
 import codes
 import func.module_loader as module_loader
 import func.minion.acls as acls_mod
+
 
 from certmaster import utils
 from certmaster import requester
@@ -202,7 +204,8 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         self.modules = module_loader.load_modules()
 
         XmlRpcInterface.__init__(self)
-        hn = utils.get_hostname()
+        hn = func_utils.get_hostname_by_route()
+
         self.key = "%s/%s.pem" % (self.cm_config.cert_dir, hn)
         self.cert = "%s/%s.cert" % (self.cm_config.cert_dir, hn)
         self.ca = "%s/ca.cert" % self.cm_config.cert_dir

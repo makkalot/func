@@ -12,6 +12,7 @@ import func_module
 import func.overlord.client as fc
 from certmaster import certmaster as certmaster
 from certmaster import utils as cm_utils
+from func import utils as func_utils
 
 class OverlordModule(func_module.FuncModule):
 
@@ -35,7 +36,7 @@ class OverlordModule(func_module.FuncModule):
             cm = certmaster.CertMaster()
             current_minions = cm.get_signed_certs()
         for current_minion in current_minions:
-            if current_minion in cm_utils.get_hostname():
+            if current_minion in func_utils.get_hostname_by_route():
                 maphash[current_minion] = {} #prevent infinite recursion
             else:
                 next_hop = fc.Overlord(current_minion)

@@ -33,6 +33,7 @@ import func.jobthing as jobthing
 from func.CommonErrors import *
 import func.module_loader as module_loader
 from func.overlord import overlord_module
+from import utils as func_utils
 
 # ===================================
 # defaults
@@ -222,7 +223,7 @@ class Overlord(object):
           # raise FuncClientError
         ol_key = '%s/certmaster.key' % self.config.cadir
         ol_crt = '%s/certmaster.crt' % self.config.cadir
-        myname = utils.get_hostname(talk_to_certmaster=False)
+        myname = func_utils.get_hostname_by_route()
 
         # FIXME: should be config -akl?
         # maybe /etc/pki/func is a variable somewhere?

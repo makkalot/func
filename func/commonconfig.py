@@ -24,3 +24,4 @@ class FuncdConfig(BaseConfig):
 
     listen_addr = Option('')
     listen_port = IntOption('51234')
+    minion_name = Option('')
