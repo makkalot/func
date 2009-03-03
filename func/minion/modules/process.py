@@ -221,6 +221,10 @@ class ProcessModule(func_module.FuncModule):
                               close_fds=True)
         return rc
 
+    def loadavg(self):
+        return open("/proc/loadavg", "r").readline().strip().split(" ")
+
+
     def register_method_args(self):
         """
         Implementing the argument getter
@@ -270,5 +274,9 @@ class ProcessModule(func_module.FuncModule):
                             }
                         },
                     "description":"Kill an app with supplying a name and level"
-                    }
+                    },
+                'loadavg':{
+                    'args':{}, 
+                    'description':"Returns a list of loadavg details."
+                },
                 }
