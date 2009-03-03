@@ -24,7 +24,8 @@ Work in progress
 """
 
 # if new releases come out or old ones go away, edit here
-PROCESS_RELEASES = [ "devel", "F-9", "F-8", "EL-5", "EL-4" ]
+#PROCESS_RELEASES = [ "devel", "F-9", "F-8", "EL-5", "EL-4" ]
+PROCESS_RELEASES = [ "devel" ]
 
 import optparse
 import os
@@ -92,11 +93,11 @@ print "found tarball: %s" % tarfile
 
 # find a version file, if any
 versionfile = None
-versearch = os.path.join(projdir,"version")
-if os.path.exists(versearch):
-   print "found a version file: %s" % versearch
-   versionfile = versearch
-print "found version file: %s" % versionfile
+#versearch = os.path.join(projdir,"version")
+#if os.path.exists(versearch):
+#   print "found a version file: %s" % versearch
+#   versionfile = versearch
+#print "found version file: %s" % versionfile
 
 # find a specfile
 specsearch = "%s/*.spec" % projdir

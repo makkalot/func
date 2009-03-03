@@ -1,0 +1,95 @@
+Here is a brief overview of using the module confmgt_augeas for func.
+
+This module relies on Augeas (htt://augeas.net).
+Augeas is a configuration API, for handling (set, get, list...) the parameters of  configuration files on the func minions.
+
+It is inspired from the 'Quick tour' of Augeas (http://augeas.net/tour.html) 
+
+Below, the guinea pig minion is named 'kermit'.
+
+- Set a parameter in a configuration file: i.e. PermitRootLogin yes in sshd_config
+func 'kermit' call confmgt_augeas set '/etc/ssh/sshd_config' 'PermitRootLogin' 'yes'
+
+{'kermit': {'parameter': 'PermitRootLogin',
+            'path': '/etc/ssh/sshd_config',
+            'value': 'yes'}
+}
+
+The arguments are config. file, parameter and value.
+
+
+- Get a parameter in a configuration file: i.e. port in sshd_config
+func 'kermit' call confmgt_augeas get '/etc/ssh/sshd_config' 'Port'
+
+The arguments are config. file and parameter.
+
+
+{'kermit': {'parameter': 'Port',
+            'path': '/etc/ssh/sshd_config',
+            'value': '22'}
+}
+
+
+Most actions involve a file, a parameter, and a value.
+But Augeas purists would perhaps prefer using the very graceful path-like syntax of Augeas.
+They can do so:
+func 'kermit' call confmgt_augeas get '/etc/ssh/sshd_config/Port'
+
+{'kermit': {'parameter': 'Port',
+            'path': '/etc/ssh/sshd_config',
+            'value': '22'}
+}
+
+
+
+- Make sshd accept an additional environment variable
+The example is in python this time.
+
+In sshd_config some settings can be repeated in the file, and values are accumulated. These values are best viewed as arrays.
+
+To illustrate this, we will add a new environment variable FOO to the AcceptEnv setting in /etc/ssh/sshd_config. 
+
+These values are mapped into a tree (see http://augeas.net for more details on augeas schemas, tree an d path expressions).
+
+import func.overlord.client as fc
+c = fc.Client("kermit")
+print c.confmgt_augeas.printconf('/etc/ssh/sshd_config/AcceptEnv')
+
+If sshd_config on minion 'kermit' contains:
+
+AcceptEnv LANG LC_CTYPE
+AcceptEnv LC_IDENTIFICATION LC_ALL FOO
+
+You'll get:
+
+{'kermit': 
+  {'path': '/etc/ssh/sshd_config/AcceptEnv', 
+   'nodes':
+     [
+      ['/etc/ssh/sshd_config/AcceptEnv', '(none)'],
+      ['/etc/ssh/sshd_config/AcceptEnv[1]/1', 'LANG'],
+      ['/etc/ssh/sshd_config/AcceptEnv[1]/2', 'LC_CTYPE'],
+      ['/etc/ssh/sshd_config/AcceptEnv[2]/3', 'LC_IDENTIFICATION'],
+      ['/etc/ssh/sshd_config/AcceptEnv[2]/4', 'LC_ALL'],
+     ]
+  }
+}
+
+To add a new variable FOO at the end of the last AcceptEnv line, we perform
+
+print c.confmgt_augeas.set('/etc/ssh/sshd_config/AcceptEnv[last()]','10000','FOO')
+
+Which gives:
+
+{'kermit': {'path': '/etc/ssh/sshd_config/AcceptEnv[last()]', 'parameter': '10000', 'value': 'FOO'}}
+
+After the action (on the target minion), sshd_config contains:
+
+AcceptEnv LANG LC_CTYPE
+AcceptEnv LC_IDENTIFICATION LC_ALL FOO
+
+The addition of [last()] to AcceptEnv in the path tells Augeas that we are talking about the last node named AcceptEnv. Augeas requires that for a set. The path expression corresponds either to an existing node, or to no node at all (in which case a new node is created).
+
+'10000' is 'very big' to be sure we add the value in last position.
+
+

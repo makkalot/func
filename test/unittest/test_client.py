@@ -563,6 +563,16 @@ class TestIptablesPort(BaseTest):
         results = self.overlord.iptables.port.inventory()
         # doesnt have an inventory, so er... -akl
 
+#class TestHttpd(BaseTest):
+#    module = "httpd"
+#    def test_server_status(self):
+#        result = self.overlord.httpd.server_status()
+#        self.assert_on_fault(result)
+#
+#    def test_graceful(self):
+#        result = self.overlord.httpd.graceful()
+#        self.assert_on_fault(result)
+
         
 class TestEchoTest(BaseTest):
     module = "echo"
