@@ -1,0 +1,70 @@
+=head1 NAME
+
+func-build-map -- Builds/augments delegation map of all available func minions
+
+=head1 SYNOPSIS
+
+func-build-map [-a|--append] [-o|--onlyalive] [-v|--verbose]
+
+=head1 DESCRIPTION
+
+Func's delegation feature allows an overlord to execute commands through proxies (minions which also run as overlords) to reduce XMLRPC overhead and the amount of time required to execute commands over large Func networks.
+
+To accomplish this task, Func needs to know where each proxy and minion sits in the Func network, and for the sake of expediency, this data is stored within a map file on the overlord.
+
+func-build-map, when run on an overlord, recursively probes through one's Func network, discovering its topology.  When complete, it stores a mapfile, encoded in YAML, in /var/lib/func/map.
+
+If you utilize delegation frequently, we recommend running this tool as a cron job to ensure that your mapfile remains up to date with changes in your Func network topology.
+
+=head1 DELEGATION
+
+Run without arguments, func-build-map will rewrite any mapfile currently sitting
+in /var/lib/func.
+
+To delegate commands, this mapfile must be created and kept updated. It is hence
+recommended to run this as a daily cron job on the highest overlord.
+
+Note: Minions not yet in the map file will not be reached by delegation calls.
+
+
+=head1 -a, --append
+
+Combines new Func network topology data with data from the old map file, performing a tree merge.  If this merge fails, it replaces the old mapfile with a fresh version.
+
+=head1 -o, --onlyalive
+
+Pings all minions and proxies and returns a map containing those which return those pings.  Useful for Func network diagnostics and for those who maintain networks where minions are frequently switched on and off.
+
+=head1 -v, --verbose
+
+Gives additional information as to what func-build-map is doing
+
+=head1 DELEGATES
+
+To get started with delegation via the Python API, try the following code:
+
+  import func.overlord.client as fc
+  my_overlord = fc.Overlord("<your glob>", delegate=True)
+
+If you want to use an alternative delegation map file, you can add the argument
+mapfile=<your mapfile location> to the Overlord constructor to tell it to pull
+the mapping data out of it instead.
+
+From this point, you can treat your delegating overlord object in the same
+manner as a non-delegating overlord. Minions that exist under multiple layers
+of overlords will appear as if they existed directly beneath your master
+overlord, so make some function calls and play around with it!
+
+=head1 ADDITIONAL RESOURCES
+
+See https://fedorahosted.org/func/ for more information.
+
+For feature-specific info, visit https://fedorahosted.org/func/wiki/DelegationModule.
+
+=head1 SEE ALSO
+
+func-create-module(1), func-transmit(1), func-inventory(1), func(1), funcd(1).
+
+=head1 AUTHOR
+
+Steve Salevan <ssalevan@redhat.com>, Nima Talebi <nima@it.net.au>
