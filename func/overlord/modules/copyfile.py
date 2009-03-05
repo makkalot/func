@@ -1,7 +1,10 @@
-from func.overlord import overlord_module
+
 import os
 import stat
+import sys
 import xmlrpclib
+
+from func.overlord import overlord_module
 
 class copyfile(overlord_module.BaseModule):
     def send(self, localpath, remotepath, bufsize=60000):
