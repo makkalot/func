@@ -1,0 +1,9 @@
+#   Funcd: (Fedora Unified Network Controller)
+#   ------------------------
+
+check process funcd with pidfile /var/run/funcd.pid
+    start program = "/etc/init.d/funcd start"
+    stop  program = "/etc/init.d/funcd stop"
+    if failed host 127.0.0.1 port 51234 type tcp then restart
+    if 5 restarts within 5 cycles then timeout
+
