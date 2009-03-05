@@ -14,16 +14,14 @@ DIRS	= func docs examples scripts test test/unittest funcweb
 PYDIRS	= func scripts examples funcweb
 EXAMPLEDIR = examples
 INITDIR	= init-scripts
-
+MANPAGES = funcd func func-inventory func-transmit func-build-map func-create-module
 
 all: rpms
 
 
 manpage:
-	pod2man --center="funcd" --release="" ./docs/funcd.pod | gzip -c > ./docs/funcd.1.gz
-	pod2man --center="func" --release="" ./docs/func.pod | gzip -c > ./docs/func.1.gz
-	pod2man --center="func-inventory" --release="" ./docs/func-inventory.pod | gzip -c > ./docs/func-inventory.1.gz
-	pod2man --center="func-transmit" --release="" ./docs/func-transmit.pod | gzip -c > ./docs/func-transmit.1.gz
+	for manpage in $(MANPAGES); do (pod2man --center=$$manpage --release="" ./docs/$$manpage.pod | gzip -c > ./docs/$$manpage.1.gz); done
+
 
 messages:
 	xgettext -k_ -kN_ -o $(MESSAGESPOT) $(POTFILES)
