@@ -12,6 +12,7 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import inspect
 import os
+import socket
 import string
 
 from certmaster.config import read_config
@@ -84,9 +85,10 @@ def get_hostname_by_route():
     # try to find the hostname of the ip we're listening on
     if minion_config.listen_addr:
         try:
-            hostname = socket.gethostbyaddr(listen_addr)
+            (hostname, aliases, ips) = socket.gethostbyaddr(listen_addr)
         except:
             hostname = None
+     
 
     # in an ideal world, this would return exactly what we want: the most meaningful hostname
     # for a system, but that is often not that case
@@ -123,10 +125,13 @@ def get_hostname_by_route():
            hostname = remote_hostname
            # print "DEBUG: HOSTNAME FROM CERTMASTER == %s" % hostname
         s.close()
+        return hostname
     except:
         s.close()
-        raise
+        # something failed, reverse dns, etc
 
-    # print "DEBUG: final hostname=%s" % hostname
-    return hostname
+
+    # all else has failed to get a good hostname, so just return
+    # an ip address
+    return socket.gethostbyname(socket.gethostname())
     

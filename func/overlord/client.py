@@ -33,7 +33,7 @@ import func.jobthing as jobthing
 from func.CommonErrors import *
 import func.module_loader as module_loader
 from func.overlord import overlord_module
-from import utils as func_utils
+from func import utils as func_utils
 
 # ===================================
 # defaults
