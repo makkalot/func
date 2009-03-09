@@ -1,6 +1,6 @@
-from func.minion.facts.modules.fact_module import BaseFactModule
-
-class HardwareFacts(BaseFactModule):
+import fact_module
+import sys
+class HardwareFacts(fact_module.BaseFactModule):
     """
     Will give some basic info abouut hardware things
     """
