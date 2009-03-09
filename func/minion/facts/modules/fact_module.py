@@ -17,7 +17,6 @@ class BaseFactModule(object):
         self.logger = log.logger
     
     def register_facts(self,fact_callers,module_name):
-        
         for attr in dir(self):
             if self.__is_public_valid_method(attr):
                 fact_method = getattr(self, attr)
@@ -26,7 +25,7 @@ class BaseFactModule(object):
                     method_tag = getattr(fact_method,"tag")
                     if fact_callers.has_key(method_tag):
                         self.logger.info("Facts has registered the tag : %s before, it was overriden"%method_tag)
-                        fact_callers[method_tag] = fact_method
+                    fact_callers[method_tag] = fact_method
                         
     def __is_public_valid_method(self,attr):
         return is_public_valid_method(self, attr, blacklist=['register_facts'])
