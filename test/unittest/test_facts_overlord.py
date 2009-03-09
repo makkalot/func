@@ -23,6 +23,15 @@ class TestOverlordQueryProxy(object):
                                     nforks=self.nforks,
                                     async=self.async)
 
+        self.negated_q = FuncLogicQuery(
+                (~Q(a=True,b=True)| Q(c=True,b=False))&
+                Q(e=True,f=False)
+                )
+        
+        self.negated_q2 = FuncLogicQuery(
+                ~Q(a=True,b=True)| Q(c=True,b=False)
+                )
+
 
     def test_serialize(self):
         """
@@ -30,7 +39,14 @@ class TestOverlordQueryProxy(object):
         """
         self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.query)
         print self.tmp_proxy.serialize_query()
+        
+        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.negated_q)
+        print self.tmp_proxy.serialize_query()
     
+        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.negated_q2)
+        print self.tmp_proxy.serialize_query()
+    
+
 
     #def test_chain_send(self):
     #    self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.query)
