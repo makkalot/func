@@ -43,10 +43,14 @@ class OverlordQueryProxy(object):
         results=[] 
         for n in q_object.children:
             if not type(n) == tuple and not type(n) == list:
-                results.append([n.connector,self.__recurse_traverser(n)])
+                if n.negated:
+                    results.append(["NOT",[n.connector,self.__recurse_traverser(n)]])
+                else:
+                    results.append([n.connector,self.__recurse_traverser(n)])
             else:
                 #here you will do some work
-                results.extend(n)
+                for ch in xrange(0,len(n),2):
+                    results.append(n[ch:ch+2])
 
         return results
     
