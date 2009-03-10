@@ -176,7 +176,7 @@ def batch_run(pool, callback, nforks,**extra_args):
         # we now have a list of job id's for each minion, kill the task
         os._exit(0)
 
-def minion_async_run(retriever, method, args):
+def minion_async_run(retriever, method, args,minion_query=None):
     """
     This is a simpler invocation for minion side async usage.
     """
@@ -199,8 +199,18 @@ def minion_async_run(retriever, method, args):
             os._exit(0)
 
         try:
-            function_ref = retriever(method)
-            rc = function_ref(*args)
+            if type(args[0]) == dict and args[0].has_key('__fact__'):
+                fact_result = minion_query.exec_query(args[0]['__fact__'],True)
+            else:
+                function_ref = retriever(method)
+                rc = function_ref(*args)
+                
+            if fact_result[0]: #that means we have True from query so can go on
+                function_ref = retriever(method)
+                rc = function_ref(*args[1:])
+                rc = [{'__fact__':fact_result},rc]
+            else:
+                rc =  [{'__fact__':fact_result}]
         except Exception, e:
             (t, v, tb) = sys.exc_info()
             rc = cm_utils.nice_exception(t,v,tb)
