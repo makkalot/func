@@ -194,12 +194,16 @@ class FuncXMLRPCServer(SimpleXMLRPCServer.SimpleXMLRPCServer, XmlRpcInterface):
         SimpleXMLRPCServer.SimpleXMLRPCServer.__init__(self, args)
         XmlRpcInterface.__init__(self)
 
-
+from func.minion.facts.minion_query import *
 class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
                           XmlRpcInterface):
     def __init__(self, args):
         self.allow_reuse_address = True
         self.modules = module_loader.load_modules()
+        
+        #load facts methods
+        self.fact_methods = load_fact_methods()
+        self.minion_query = FactsMinion(method_fact_list=self.fact_methods) 
 
         XmlRpcInterface.__init__(self)
         hn = utils.get_hostname()
@@ -254,9 +258,19 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
 
         try:
             if not async_dispatch:
-                return self.get_dispatch_method(method)(*params)
+                #check if we send some queries 
+                if type(params[0]) == dict and params[0].has_key('__fact__'):
+                   fact_result = self.minion_query.exec_query(params[0]['__fact__'],True)
+                else:
+                    return self.get_dispatch_method(method)(*params)
+
+                if fact_result[0]: #that means we have True from query so can go on
+                    method_result = self.get_dispatch_method(method)(*params[1:])
+                    return [{'__fact__':fact_result},method_result]
+                else:
+                    return [{'__fact__':fact_result}]
             else:
-                return jobthing.minion_async_run(self.get_dispatch_method, method, params)
+                return jobthing.minion_async_run(self.get_dispatch_method, method, params,self.minion_query)
         except:
             (t, v, tb) = sys.exc_info()
             rc = utils.nice_exception(t, v, tb)
