@@ -16,7 +16,7 @@ import socket
 import string
 
 from certmaster.config import read_config
-from certmaster.commonconfig import CMConfig
+from certmaster.commonconfig import MinionConfig
 from commonconfig import FuncdConfig
 
 
@@ -110,10 +110,10 @@ def get_hostname_by_route():
     # try to find the hostname attached to the ip of the interface that we use
     # to talk to the certmaster
     cm_config_file = '/etc/certmaster/minion.conf'
-    cm_config = read_config(config_file, CMConfig)
+    cm_config = read_config(cm_config_file, MinionConfig)
 
-    server = config.certmaster
-    port = config.certmaster_port
+    server = cm_config.certmaster
+    port = cm_config.certmaster_port
 
     try:
         s = socket.socket()

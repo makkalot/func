@@ -113,7 +113,8 @@ rm -fr $RPM_BUILD_ROOT
 %{_mandir}/man1/func-inventory.1.gz
 %{_mandir}/man1/funcd.1.gz
 %{_mandir}/man1/func-transmit.1.gz
-
+%{_mandir}/man1/func-build-map.1.gz
+%{_mandir}/man1/func-create-module.1.gz
 
 %post
 # for suse 
