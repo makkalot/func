@@ -73,7 +73,11 @@ class OverlordQueryProxy(object):
                 #create the serialized thing to be sent with all of
                 #them as a first argument so other side gateway can
                 #take and process it before real method is theree
-                return CommandAutomagic(self, [name], self.overlord.nforks)
+                if hasattr(self.overlord,name):
+                    try:
+                        return object.__getattribute__(self.overlord,name)
+                    except AttributeError:
+                        return CommandAutomagic(self, [name], self.overlord.nforks)
     
     def filter(self,*args,**kwargs):
         """
