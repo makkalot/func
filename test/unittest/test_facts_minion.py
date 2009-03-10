@@ -102,15 +102,225 @@ class TestFactsMinion(object):
             if counter%10 == 0:
                 print "%d of %d completed "%(counter,HOW_MANY)
     
-    def test_longer_des(self):
+    #def test_longer_des(self):
+    #    """
+    #    Uncomment that method for longer tests 
+    #    probably u wont need that sterss tessts
+    #    """
+
+     #   HOW_MANY = 50
+
+     #   for x in xrange(0,50):
+     #       self.test_deserialize()
+     #       print "%d of %d completed of BIG TEST "%(x,HOW_MANY)
+
+from func.minion.facts.minion_query import *
+class TestQueryKeyword(object):
+    """
+    Testing the query words here when add a new keyword
+    please add here its test ...
+    """
+    def __init__(self):
+        self.fact_keyword = QueryKeyword()
+
+    def __prepare_overlord_word(self,overlord_tuple):
+        overlord_keyword = overlord_tuple[0].split("__")
+        if len(overlord_keyword) > 1:
+            self.keyword = overlord_keyword[1]
+        else:
+            self.keyword = ""
+        self.overlord_value = overlord_tuple[1]
+
+
+
+    def test_keyword_contains(self):
         """
-        Uncomment that method for longer tests 
-        probably u wont need that sterss tessts
+        Test if it contains 
         """
+        fact_value = "os f9 2.16"
+        overlord_tuple = ("os__contains","f9")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__contains","nonexisting")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
-        HOW_MANY = 50
+    
+    def test_keyword_icontains(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "os f9 2.16"
+        overlord_tuple = ("os__icontains","F9")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__icontains","nonexisting")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
-        for x in xrange(0,50):
-            self.test_deserialize()
-            print "%d of %d completed of BIG TEST "%(x,HOW_MANY)
+    def test_keyword_iexact(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora9"
+        overlord_tuple = ("os__iexact","FeDorA9")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__iexact","nonexisting")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
+    def test_keyword_iexact(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os__startswith","fed")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__startswith","nonexisting")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+    
+    def test_keyword_gt(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os__gt","fedora101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gt","fedora")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+
+        fact_value = 100
+        overlord_tuple = ("os__gt",101)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gt","101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gt","100")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+        overlord_tuple = ("os__gt",100)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+    
+    def test_keyword_gte(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os__gte","fedora10")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gte","fedora")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+
+        fact_value = 100
+        overlord_tuple = ("os__gte",100)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gte","101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gte","100")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+
+    def test_keyword_lte(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os__lte","fedora10")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__gte","fedora")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+
+        fact_value = 100
+        overlord_tuple = ("os__lte",100)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os__lte","101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+        overlord_tuple = ("os__lte","100")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+
+    def test_keyword_lt(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os__lt","fedora10")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+        overlord_tuple = ("os__lt","fedora")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+
+
+        fact_value = 100
+        overlord_tuple = ("os__lt",100)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+        overlord_tuple = ("os__lt","101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+        overlord_tuple = ("os__lt","33")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+
+    def test_keyword_lt(self):
+        """
+        Test if it contains 
+        """
+        fact_value = "fedora10"
+        overlord_tuple = ("os","fedora10")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os","fedora")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+
+
+        fact_value = 100
+        overlord_tuple = ("os",100)
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        
+        overlord_tuple = ("os","101")
+        self.__prepare_overlord_word(overlord_tuple)
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        
+   
