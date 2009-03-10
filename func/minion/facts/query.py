@@ -17,7 +17,7 @@ class BaseFuncQuery(object):
         #pull result variable is kind of important
         #it can be an object or a method which will
         #return back a True or False statement
-        self.pull_result = None
+        self.pull_result = pull_result
 
     def __getattribute__(self,name):
         """
@@ -25,7 +25,7 @@ class BaseFuncQuery(object):
         """
         try:
             return object.__getattribute__(self, name)
-        except AttributeError:
+        except AttributeError,e:
             return object.__getattribute__(self.q,name)
     
     def _clone(self,klass=None,q_object=None,pull_result=None):
@@ -44,6 +44,7 @@ class BaseFuncQuery(object):
         The part that will say it is True or it is False
         """
         raise Exception("Not implemted method you should subclass and override that method")
+    
     result = property(exec_query)
 
 
@@ -123,13 +124,22 @@ class FuncLogicQuery(BaseFuncQuery):
     Will be used to decide if a method will be
     invoked on minion side ...
     """
-    
+    def exec_query_with_facts(self):
+        """
+        Sometimes you may need to see facts as
+        values ...
+        """
+        return (self.exec_query(),self.fact_dict)
+
     def exec_query(self):
         """
         The part that will say it is True or it is False
         """
+        self.fact_dict = {}
         if not self.q:
             raise Exception("You should set up some query object before executing it")
+        
+
         return self.__main_traverse(self.q)
     result = property(exec_query)
 
@@ -144,7 +154,13 @@ class FuncLogicQuery(BaseFuncQuery):
                 if not self.pull_result:
                     logic_results.append(n[1])
                 else:
-                    logic_results.append(self.pull_result(n))
+                    logic_pull = self.pull_result(n) 
+                    #append the result if True or False
+                    #print "What i append for logic ? ",logic_pull[0]
+                    logic_results.append(logic_pull[0])
+                    #keep also the fact value user may want to see em
+                    for fact_name,fact_value in logic_pull[1].iteritems():
+                        self.fact_dict[fact_name] = fact_value
         return logic_results
 
     def __main_traverse(self,q_ob):
