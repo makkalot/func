@@ -9,8 +9,10 @@ class FactsMinion(object):
     """
     VALID_QUERY_KEYS = ["AND","OR","NOT"]
 
-    def __init__(self,fact_query=None):
-        self.fact_query = fact_query or FuncLogicQuery()
+    def __init__(self,fact_query=None,method_fact_list=None):
+        self.fact_query = fact_query
+        self.keyword_query = QueryKeyword()
+        self.method_fact_list = method_fact_list
 
     def deserialize(self,q_list):
         """
@@ -18,7 +20,56 @@ class FactsMinion(object):
         and converts into a FuncLogicQuery so facts can be
         pulled ...
         """
-        return self.__traverse_deserialize(q_list)
+        q_result = self.__traverse_deserialize(q_list)
+        if not self.fact_query:
+            self.fact_query = FuncLogicQuery(q_result,self.pull_facts)
+        else:
+            if self.fact_query.q.connector == "OR":
+                self.fact_query = self.fact_query | FuncLogicQuery(q_result,self.pull_facts)
+            else:
+                self.fact_query = self.fact_query & FuncLogicQuery(q_result,self.pull_facts)
+
+        return q_result
+
+    def exec_query(self,q_list,include_results=False):
+        """
+        The magic method which gives the final result of that
+        query with values in it if requested...
+        """
+        self.deserialize(q_list)
+        if not include_results:
+            return self.fact_query.result
+        else:
+            return self.fact_query.exec_query_with_facts()
+
+    def pull_facts(self,overlord_tuple):
+        """
+        Pull facts is kind of callback method which
+        is called by FuncLogicQuery when does the logic
+        query operation in its recursive traversing ...
+        That way we dont put all the pulling operations in
+        FuncLogicQuery but making it pluggable by calling from
+        outside ...
+        """
+        keyword_tuple = overlord_tuple[0].split("__")
+        overlord_value = overlord_tuple[1]
+     
+        if len(keyword_tuple) > 1:
+            keyword = keyword_tuple[1]
+        else:
+            keyword = ""
+        fact_name = keyword_tuple[0]
+        
+        if not self.method_fact_list.has_key(fact_name):
+            raise MinionQueryError("None existing Fact method or tag required %s "%fact_name)
+       
+        fact_value = self.method_fact_list[fact_name]()
+
+        #we have the result with fact now it is time to resolve it
+        logic_fact = self.keyword_query.resolve(keyword,overlord_value,fact_value)
+       
+        #the return part is a tuple (logic_Value which is True or Fale and fact_name and value dictionary )
+        return (logic_fact,{fact_name:fact_value})
 
     def __traverse_deserialize(self,traverse_object):
         """
@@ -194,7 +245,7 @@ class QueryKeyword(object):
         """
         A greater keyword
         """
-        if overlord_value > fact_value:
+        if overlord_value < fact_value:
             return True
         else:
             return False
@@ -204,7 +255,8 @@ class QueryKeyword(object):
         """
         A greater keyword
         """
-        if overlord_value >= fact_value:
+        if overlord_value <= fact_value:
+            #print "Comparing %s -- %s "%(overlord_value,fact_value)
             return True
         else:
             return False
@@ -213,7 +265,7 @@ class QueryKeyword(object):
         """
         A less keyword
         """
-        if overlord_value < fact_value:
+        if overlord_value > fact_value:
             return True
         else:
             return False
@@ -222,7 +274,7 @@ class QueryKeyword(object):
         """
         A less equal keyword
         """
-        if overlord_value <= fact_value:
+        if overlord_value >= fact_value:
             return True
         else:
             return False
