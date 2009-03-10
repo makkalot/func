@@ -116,3 +116,130 @@ def load_fact_methods():
     return fact_methods
 
 
+class QueryKeyword(object):
+    """
+    That class is for resolving 
+    incoming keywords and doing comparison stuff
+
+    Ex: query_ob.filter(uname__contains="f9") the contains
+    word will be recognized by that class in will return True if it
+    contains that word ,easy and fun stuff, If people need to add more
+    fun keywords for FuncQuery that is the right place to do that
+    """
+
+    def __init__(self):
+        pass
+
+    def resolve(self,keyword,overlord_value,fact_value):
+        """
+        That method is what will be called from outside
+        """
+        if not hasattr(self,"keyword_%s"%keyword):
+            raise NonExistingQueryKeyword("The keyword %s used in query is not a valid one"%keyword)
+        return getattr(self,"keyword_%s"%keyword)(self.__convert_input(overlord_value,fact_value),fact_value)
+
+    def __convert_input(self,overlord_value,fact_value):
+        """
+        If the overlord value that comes from client is
+        not the same as facts we should do some convention ..
+        """
+        if type(overlord_value) != type(fact_value):
+            fact_type = type(fact_value)
+            return fact_type(overlord_value)
+        else:
+            return overlord_value
+
+    def keyword_contains(self,overlord_value,fact_value):
+        """
+        A simple method for contains, which checks if the 
+        fact_value contains the overlord_value
+        """
+
+        res = fact_value.find(overlord_value)
+        if res == -1:
+            return False
+        else:
+            return True
+        
+    def keyword_icontains(self,overlord_value,fact_value):
+        """
+        A simple method for contains, which checks if the 
+        fact_value contains the overlord_value (case insensitive)
+        """
+        res = fact_value.lower().find(overlord_value.lower())
+        if res == -1:
+            return False
+        else:
+            return True
+
+    def keyword_iexact(self,overlord_value,fact_value):
+        """
+        Looks for an iexact match
+        """
+        if overlord_value.lower() == fact_value.lower():
+            return True
+        else:
+            return False
+
+    def keyword_startswith(self,overlord_value,fact_value):
+        """
+        A typical python start with keyword implementation
+        """
+        if fact_value.startswith(overlord_value):
+            return True
+        else:
+            return False
+
+    def keyword_gt(self,overlord_value,fact_value):
+        """
+        A greater keyword
+        """
+        if overlord_value > fact_value:
+            return True
+        else:
+            return False
+
+    
+    def keyword_gte(self,overlord_value,fact_value):
+        """
+        A greater keyword
+        """
+        if overlord_value >= fact_value:
+            return True
+        else:
+            return False
+    
+    def keyword_lt(self,overlord_value,fact_value):
+        """
+        A less keyword
+        """
+        if overlord_value < fact_value:
+            return True
+        else:
+            return False
+        
+    def keyword_lte(self,overlord_value,fact_value):
+        """
+        A less equal keyword
+        """
+        if overlord_value <= fact_value:
+            return True
+        else:
+            return False
+    
+    def keyword_(self,overlord_value,fact_value):
+        """
+        A == keyword the default behaviour
+        """
+        if overlord_value == fact_value:
+            return True
+        else:
+            return False
+
+
+
+class NonExistingQueryKeyword(Exception):
+    pass
+
+class MinionQueryError(Exception):
+    pass
