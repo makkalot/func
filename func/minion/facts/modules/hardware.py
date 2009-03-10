@@ -15,7 +15,7 @@ class HardwareFacts(fact_module.BaseFactModule):
         """
         The runlevel of the system
         """
-        return self.defaultRunlevel
+        return str(self.host.defaultRunlevel)
 
     #for easier acces be creful should be unique
     run_level.tag = "runlevel"
