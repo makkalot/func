@@ -6,12 +6,10 @@ import func.overlord.client as fc
 from copy import copy
 
 def test_load_facts():
-    pass
-    #print load_facts_modules()
+    load_facts_modules()
 
 def test_load_fact_methods():
-    pass
-    #print load_fact_methods()
+    load_fact_methods()
 
 def generate_queries(how_many):
     """
@@ -71,6 +69,8 @@ class TestFactsMinion(object):
                 nforks=self.nforks,
                 async=self.async)
         
+        #load em
+        self.fact_methods = load_fact_methods()
         
     def test_deserialize(self):
         """
@@ -101,6 +101,20 @@ class TestFactsMinion(object):
             assert cp_serialized == serialized_again
             if counter%10 == 0:
                 print "%d of %d completed "%(counter,HOW_MANY)
+
+    def test_fact_pull(self):
+        #here we assume overlord is sending the data ..
+        q_d = {'hardware.run_level__lt':6,'hardware.run_level__gt':2}
+        query = Q(**q_d)
+        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=FuncLogicQuery(query))
+        serialized = self.tmp_proxy.serialize_query()
+        
+        min_q = FactsMinion(method_fact_list=self.fact_methods)
+        final_query = min_q.exec_query(serialized)
+        final_query_with_values = min_q.exec_query(serialized,True)
+
+        print "The result without values ",final_query
+        print "The result with values ",final_query_with_values
     
     #def test_longer_des(self):
     #    """
@@ -173,7 +187,7 @@ class TestQueryKeyword(object):
         self.__prepare_overlord_word(overlord_tuple)
         assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
-    def test_keyword_iexact(self):
+    def test_keyword_startswith(self):
         """
         Test if it contains 
         """
@@ -194,21 +208,21 @@ class TestQueryKeyword(object):
         fact_value = "fedora10"
         overlord_tuple = ("os__gt","fedora101")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
         
         overlord_tuple = ("os__gt","fedora")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
 
 
         fact_value = 100
         overlord_tuple = ("os__gt",101)
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
         
         overlord_tuple = ("os__gt","101")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
         
         overlord_tuple = ("os__gt","100")
         self.__prepare_overlord_word(overlord_tuple)
@@ -228,9 +242,9 @@ class TestQueryKeyword(object):
         self.__prepare_overlord_word(overlord_tuple)
         assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
         
-        overlord_tuple = ("os__gte","fedora")
-        self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        #overlord_tuple = ("os__gte","fedora")
+        #self.__prepare_overlord_word(overlord_tuple)
+        #assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
 
 
         fact_value = 100
@@ -240,7 +254,7 @@ class TestQueryKeyword(object):
         
         overlord_tuple = ("os__gte","101")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
         
         overlord_tuple = ("os__gte","100")
         self.__prepare_overlord_word(overlord_tuple)
@@ -255,7 +269,7 @@ class TestQueryKeyword(object):
         self.__prepare_overlord_word(overlord_tuple)
         assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
         
-        overlord_tuple = ("os__gte","fedora")
+        overlord_tuple = ("os__lte","fedora")
         self.__prepare_overlord_word(overlord_tuple)
         assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
@@ -267,7 +281,7 @@ class TestQueryKeyword(object):
         
         overlord_tuple = ("os__lte","101")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
         
         overlord_tuple = ("os__lte","100")
         self.__prepare_overlord_word(overlord_tuple)
@@ -284,7 +298,7 @@ class TestQueryKeyword(object):
         
         overlord_tuple = ("os__lt","fedora")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
 
         fact_value = 100
@@ -294,13 +308,13 @@ class TestQueryKeyword(object):
         
         overlord_tuple = ("os__lt","101")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
         
         overlord_tuple = ("os__lt","33")
         self.__prepare_overlord_word(overlord_tuple)
-        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == True
+        assert self.fact_keyword.resolve(self.keyword,self.overlord_value,fact_value) == False
 
-    def test_keyword_lt(self):
+    def test_keyword(self):
         """
         Test if it contains 
         """
