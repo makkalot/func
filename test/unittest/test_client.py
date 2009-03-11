@@ -24,7 +24,7 @@ class BaseTest:
     # assume we are talking to localhost
     # th = socket.gethostname()
     th = socket.getfqdn()
-
+    
     nforks=1
     async=False
 
@@ -721,6 +721,42 @@ class TestEchoTestOverlordQueryProxy(TestEchoTest):
                                     nforks=self.nforks,
                                     async=self.async)
 
+
+class TestFactsModule(BaseTest):
+    module = "fact"
+
+    def test_list_fact_modules(self):
+        result=self.overlord.fact.list_fact_modules()
+        print result
+        self.assert_on_fault(result)
+
+    def test_list_fact_methods(self):
+        result=self.overlord.fact.list_fact_methods()
+        print result
+        self.assert_on_fault(result)
+
+    def test_show_fact_module(self):
+        modules = self.overlord.fact.list_fact_modules().values()
+        print "Modules to run for show fact module are ",modules
+        for module in modules[0]:
+            result = self.overlord.fact.show_fact_module(module)
+            print result
+            self.assert_on_fault(result)
+    
+    def test_show_fact_method(self):
+        methods = self.overlord.fact.list_fact_methods().values()
+        print "Methods to run for show fact method are ",methods
+        for method in methods[0]:
+            result = self.overlord.fact.show_fact_method(method)
+            print result
+            self.assert_on_fault(result)
+
+    def test_fact_call(self):
+        methods = self.overlord.fact.list_fact_methods().values()
+        for method in methods[0]:
+            result = self.overlord.fact.call_fact(method)
+            print result
+            self.assert_on_fault(result)
 
 
 
