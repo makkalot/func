@@ -58,7 +58,8 @@ class TestOverlordQueryProxy(object):
         query = FuncLogicQuery(Q(runlevel__lt=6,runlevel__gt=2)) 
         self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=query)
         res = self.tmp_proxy.hardware.info()
-        print res
+        print self.tmp_proxy.display_active(res)
+        print self.tmp_proxy.display_active(res,with_facts=True)
 
     def test_async_chain_send(self):
         query = FuncLogicQuery(Q(runlevel__lt=6,runlevel__gt=2)) 
@@ -68,6 +69,7 @@ class TestOverlordQueryProxy(object):
         import time
         time.sleep(5)
         print "The final stuff is ",self.tmp_proxy.job_status(res)
+        print "The final stuff is ",self.tmp_proxy.job_status(res,with_facts=True)
 
 
 
