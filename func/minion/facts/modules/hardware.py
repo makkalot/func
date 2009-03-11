@@ -4,6 +4,8 @@ class HardwareFacts(fact_module.BaseFactModule):
     """
     Will give some basic info abouut hardware things
     """
+    version = "0.0.1"
+    description = "A modules that supplies hardware facts"
 
     def __init__(self):
         sys.path.append("/usr/share/smolt/client")
@@ -19,4 +21,7 @@ class HardwareFacts(fact_module.BaseFactModule):
 
     #for easier acces be creful should be unique
     run_level.tag = "runlevel"
+    run_level.description = "Shows the runlevel of the system"
+    run_level.usage = "Can be used with all keywords"
+
 
