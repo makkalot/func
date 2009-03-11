@@ -259,7 +259,7 @@ class FuncSSLXMLRPCServer(AuthedXMLRPCServer.AuthedSSLXMLRPCServer,
         try:
             if not async_dispatch:
                 #check if we send some queries 
-                if type(params[0]) == dict and params[0].has_key('__fact__'):
+                if len(params)>0 and type(params[0]) == dict and params[0].has_key('__fact__'):
                    fact_result = self.minion_query.exec_query(params[0]['__fact__'],True)
                 else:
                     return self.get_dispatch_method(method)(*params)
