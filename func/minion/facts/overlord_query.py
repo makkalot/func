@@ -103,4 +103,37 @@ class OverlordQueryProxy(object):
         #give back the reference
         return self
     
+    def job_status(self, jobid,with_facts=False):
+        """
+        Overriden because we need to get results which
+        only has True result from their fact queries,that
+        was the reason we created the facts ...
+        """
+        status,async_result = self.overlord.job_status(jobid)
+        if not self.fact_query:
+            #that will use the default overlord job_status
+            return (status,async_result)
+        else:
+            return (status,self.display_active(async_result,with_facts))
+
+
+
+    def display_active(self,result,with_facts=False):
+        """
+        When we got all of the resultsfrom minions we may need
+        to display only the parts that match the facts query
+        """
+        final_display = {}
+        for minion_name,minion_result in result.iteritems():
+            #CAUTION ugly if statements around :)
+            if type(minion_result) == list and type(minion_result[0]) == dict and minion_result[0].has_key('__fact__') and minion_result[0]['__fact__'][0] == True:
+                if with_facts:
+                    final_display[minion_name] = minion_result
+                else:
+                    final_display[minion_name] = minion_result[1:][0]
+            else:
+                print "No facts found in result "
+                return result
+
+        return final_display
 
