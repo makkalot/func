@@ -74,7 +74,6 @@ class CommandAutomagic(object):
             #here get the serializaed object and add
             #at the top of the args ...
             args =[{'__fact__':self.clientref.serialize_query()}]+list(args)
-            print "The args like ",args
             return self.clientref.overlord.run(module,method,args,nforks=self.nforks)
         else:
             return self.clientref.run(module,method,args,nforks=self.nforks)
