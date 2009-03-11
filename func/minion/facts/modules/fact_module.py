@@ -8,6 +8,10 @@ class BaseFactModule(object):
     of FuncModule but registers modules with 
     different convention and style ..
     """
+    version = "0.0.0"
+    description = "Base module of all facts"
+
+
 
     def __init__(self):
         pass
