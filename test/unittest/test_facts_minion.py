@@ -113,8 +113,8 @@ class TestFactsMinion(object):
         final_query = min_q.exec_query(serialized)
         final_query_with_values = min_q.exec_query(serialized,True)
 
-        print "The result without values ",final_query
-        print "The result with values ",final_query_with_values
+        #print "The result without values ",final_query
+        #print "The result with values ",final_query_with_values
     
     #def test_longer_des(self):
     #    """
