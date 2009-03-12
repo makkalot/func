@@ -2,12 +2,13 @@ from func.minion.facts.overlord_query import OverlordQueryProxy
 from func.minion.facts.query_utils import Q
 from func.minion.facts.query import FuncLogicQuery 
 import func.overlord.client as fc
+import socket
 
 class TestOverlordQueryProxy(object):
     
     # assume we are talking to localhost
-    th = "localhost.localdomain"
-    #th = socket.getfqdn()
+    #th = "localhost.localdomain"
+    th = socket.getfqdn()
     nforks=1
     async=False
 
@@ -74,8 +75,8 @@ class TestOverlordQueryProxy(object):
 
 class TestFactModule(object):
     # assume we are talking to localhost
-    th = "localhost.localdomain"
-    #th = socket.getfqdn()
+    #th = "localhost.localdomain"
+    th = socket.getfqdn()
     nforks=1
     async=False
 
@@ -83,7 +84,7 @@ class TestFactModule(object):
     rest_keywords = ['contains','icontains','iexact','startswith']
     
     def __init__(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -94,7 +95,7 @@ class TestFactModule(object):
         """
         Setting up a new fresh instance
         """
-        self.overlord_query = OverlordQueryProxy(None,None,self.th,
+        self.overlord_query = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
     
