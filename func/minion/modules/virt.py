@@ -17,6 +17,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 # service control module.  API docs on how
 # to use this to come.
 
+# xml modules
+import StringIO
+from xml.dom import minidom
+
 # other modules
 import os
 import sub_process
@@ -355,3 +359,89 @@ class Virt(func_module.FuncModule):
 
         self.__get_conn()
         return self.conn.get_status(vmid)
+
+
+    def get_xml(self, vmid):
+        """
+	Recieve a Vm id as input
+        Return an xml describing vm config returned by a libvirt call
+	"""
+	conn = libvirt.openReadOnly(None)
+	if conn == None:
+		return (-1,'Failed to open connection to the hypervisor')
+	try:
+		domV = conn.lookupByName(vmid)
+	except:
+		return (-1,'Failed to find the main domain')
+	return domV.XMLDesc(0)
+
+
+    def get_graphics(self,vmid,xml='None'):
+	"""
+	Recieve a Vm id as input
+	Read machine informations from xml config,
+	return a key/val map containing only graphics properties
+	"""
+	out = {'autoport': 'None', 'keymap': 'None', 'type': 'vnc', 'port': 'None', 'listen': 'None'}
+	myregex = '\<graphics(?P<graphics>[^"]*)/\>'
+	if(xml=='None'):
+	    xml = self.get_xml(vmid)
+	else:
+	    xml = "<domain>\n"+xml+"\n</domain>"
+	ssock = StringIO.StringIO(xml)
+	doc = minidom.parse(ssock)
+	for node in doc.getElementsByTagName("domain"):
+	    graphics = node.getAttribute("devices")
+	    L = node.getElementsByTagName("graphics")
+	    for node2 in L:
+		for k in node2.attributes.keys():
+		    out[k] = node2.getAttribute(k)
+	return out
+
+
+    def set_graphics(self,vmid,xml):
+	"""
+	Recieve a Vm id and a piece of xml as input
+	Set vnc address and parameters of vm in xml config file
+	Return 0 if config has been correctly written
+	"""
+	try:
+	   conn = libvirt.openReadOnly(None)
+	   tmp = conn.getType()
+	except:
+	   return (-1,'Failed to open connection to the hypervisor')
+	strxml = self.get_graphics(vmid,xml)
+	str = "vfb = [ \"vncunused=1, "
+
+	for el in strxml:
+	    if(strxml[el] != 'None'):
+		if(el == 'port'):
+		    str = "%s%s=\'%s\', " % (str,"vncdisplay",(int(strxml[el])-5900))
+		else:
+		    str = "%s%s=\'%s\', " % (str,el,strxml[el])
+	str = "%s\" ]" % str.rstrip(' ').rstrip(',')
+
+	if(tmp == "Xen"):
+	    if os.path.exists("/etc/xen/%s" % vmid):
+		return os.system("sed -i 's/^vfb.*/%s/g' /etc/xen/%s" % (str,vmid))
+	    else:
+		return (-1,'Config file /etc/xen/%s not found' % vmid)
+	else:
+	    if os.path.exists("/etc/libvirt/qemu/%s.xml" % vmid):
+		xml = self.get_xml(vmid)
+		ssock = StringIO.StringIO(xml)
+		doc = minidom.parse(ssock)
+		for node in doc.getElementsByTagName("domain"):
+		    graphics = node.getAttribute("devices")
+		    L = node.getElementsByTagName("graphics")
+		    for node2 in L:
+			for el in strxml:
+                            if(strxml[el] != 'None'):
+                                node2.setAttribute(el,strxml[el])
+		output_xml = open("/etc/libvirt/qemu/%s.xml" % vmid, 'w')
+		output_xml.write(node.toxml())
+		return 0
+	    else:
+		return (-1,'Config file /etc/libvirt/qemu/%s.xml not found' % vmid)
+	return (-2,'Unmatched Condition in set_graphics method')
+
