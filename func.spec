@@ -90,6 +90,8 @@ rm -fr $RPM_BUILD_ROOT
 %dir %{python_sitelib}/func/overlord/modules
 %dir %{python_sitelib}/func/yaml
 %{python_sitelib}/func/minion/*.py*
+%{python_sitelib}/func/minion/facts/*.py*
+%{python_sitelib}/func/minion/facts/modules/*.py*
 %{python_sitelib}/func/overlord/*.py*
 %{python_sitelib}/func/overlord/cmd_modules/*.py*
 %{python_sitelib}/func/overlord/modules/*.py*

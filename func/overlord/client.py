@@ -68,7 +68,15 @@ class CommandAutomagic(object):
             raise AttributeError("no method called: %s" % ".".join(self.base))
         module = self.base[0]
         method = ".".join(self.base[1:])
-        return self.clientref.run(module,method,args,nforks=self.nforks)
+        #here we will inject some variables that will do the facts stuff
+        from func.minion.facts.overlord_query import OverlordQueryProxy
+        if isinstance(self.clientref,OverlordQueryProxy) and self.clientref.fact_query:
+            #here get the serializaed object and add
+            #at the top of the args ...
+            args =[{'__fact__':self.clientref.serialize_query()}]+list(args)
+            return self.clientref.overlord.run(module,method,args,nforks=self.nforks)
+        else:
+            return self.clientref.run(module,method,args,nforks=self.nforks)
 
 # ===================================
 # this is a module level def so we can use it and isServer() from
@@ -262,7 +270,6 @@ class Overlord(object):
         # WARNING: any missing values in Overlord's source will yield
         # strange errors with this engaged.  Be aware of that.
         """
-
         return CommandAutomagic(self, [name], self.nforks)
 
     # -----------------------------------------------
