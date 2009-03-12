@@ -23,8 +23,7 @@ from func.minion.facts.overlord_query import OverlordQueryProxy
 class BaseTest:
     # assume we are talking to localhost
     # th = socket.gethostname()
-    th = socket.getfqdn()
-    
+    th = socket.getfqdn()    
     nforks=1
     async=False
 
@@ -221,7 +220,7 @@ class TestTest(BaseTest):
 
 class TestTestOverlordQueryProxy(TestTest):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -278,7 +277,7 @@ class TestCommand(BaseTest):
 
 class TestCommandOverlordQueryProxy(TestCommand):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -325,7 +324,7 @@ class TestCopyfile(BaseTest):
 
 class TestCopyfileOverlordQueryProxy(TestCopyfile):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -353,7 +352,7 @@ class TestHardware(BaseTest):
 
 class TestHardwareOverlordQueryProxy(TestHardware):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -419,7 +418,7 @@ class TestFileTracker(BaseTest):
 
 class TestFileTrackerOverlordQueryProxy(TestFileTracker):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -435,7 +434,7 @@ class TestMount(BaseTest):
 
 class TestMountOverlordQueryProxy(TestMount):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -474,7 +473,7 @@ class TestNetworkTest(BaseTest):
 
 class TestNetworkTestOverlordQueryProxy(TestNetworkTest):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -495,7 +494,7 @@ class TestProcess(BaseTest):
 
 class TestProcessOverlordQueryProxy(TestProcess):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -525,7 +524,7 @@ class TestService(BaseTest):
 
 class TestServiceOverlordQueryProxy(TestService):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -569,7 +568,7 @@ class TestRpm(BaseTest):
 
 class TestRpmOverlordQueryProxy(TestRpm):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -583,7 +582,7 @@ class TestSmart(BaseTest):
 
 class TestSmartOverlordQueryProxy(TestSmart):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -601,7 +600,7 @@ class TestSysctl(BaseTest):
 
 class TestSysctlOverlordQueryProxy(TestSysctl):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -626,7 +625,7 @@ class TestYum(BaseTest):
 
 class TestYumOverlordQueryProxy(TestYum):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -652,7 +651,7 @@ class TestIptables(BaseTest):
 
 class TestIptablesOverlordQueryProxy(TestIptables):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -667,7 +666,7 @@ class TestIptablesPort(BaseTest):
 
 class TestIptablesPortOverlordQueryProxy(TestIptablesPort):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -717,7 +716,7 @@ class TestEchoTest(BaseTest):
 
 class TestEchoTestOverlordQueryProxy(TestEchoTest):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -792,7 +791,7 @@ class TestSystem(BaseTest):
 
 class TestSystemOverlordQueryProxy(TestSystem):
     def setUp(self):
-        self.overlord = OverlordQueryProxy(None,None,self.th,
+        self.overlord = OverlordQueryProxy(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
