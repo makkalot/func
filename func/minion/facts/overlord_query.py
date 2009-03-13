@@ -10,17 +10,20 @@ class OverlordQueryProxy(object):
     class and do the stuff invisibly to the
     user
     """
-    def __init__(self,overlord_obj=None,fact_query=None,*args,**kwargs):
+    def __init__(self,*args,**kwargs):
         """
         You can pass progrmatically a overlord object or
         you can construct one as you do normally ...
         """
         #some initialization stuff here ...
-        if overlord_obj:
-            self.overlord = overlord_obj
-        elif kwargs:
+        if kwargs.has_key('overlord_obj'):
+            self.overlord = kwargs['overlord_obj']
+        else:
             self.overlord = Overlord(*args,**kwargs)
         
+        fact_query = None
+        if kwargs.has_key('fact_query'):
+            fact_query = kwargs['fact_query']
         self.fact_query = fact_query or FuncLogicQuery()
         
         #print "These are : ",self.overlord
@@ -89,7 +92,7 @@ class OverlordQueryProxy(object):
         #give back the reference
         return self
 
-    def exclude(self):
+    def exclude(self,*args,**kwargs):
         """
         Exclude the things from set
         and give back a reference 
@@ -126,13 +129,13 @@ class OverlordQueryProxy(object):
         final_display = {}
         for minion_name,minion_result in result.iteritems():
             #CAUTION ugly if statements around :)
-            if type(minion_result) == list and type(minion_result[0]) == dict and minion_result[0].has_key('__fact__') and minion_result[0]['__fact__'][0] == True:
-                if with_facts:
-                    final_display[minion_name] = minion_result
-                else:
-                    final_display[minion_name] = minion_result[1:][0]
+            if type(minion_result) == list and type(minion_result[0]) == dict and minion_result[0].has_key('__fact__') :
+                if minion_result[0]['__fact__'][0] == True:
+                    if with_facts:
+                        final_display[minion_name] = minion_result
+                    else:
+                        final_display[minion_name] = minion_result[1:][0]
             else:
-                print "No facts found in result "
                 return result
 
         return final_display

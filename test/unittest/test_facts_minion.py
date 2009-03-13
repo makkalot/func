@@ -4,6 +4,7 @@ from func.minion.facts.query_utils import Q
 from func.minion.facts.query import FuncLogicQuery 
 import func.overlord.client as fc
 from copy import copy
+import socket
 
 def test_load_facts():
     load_facts_modules()
@@ -58,7 +59,8 @@ class TestFactsMinion(object):
     Test the minion side of the query proxy
     """
     # assume we are talking to localhost
-    th = "localhost.localdomain"
+    #th = "localhost.localdomain"
+    th = socket.getfqdn()    
     #th = socket.getfqdn()
     nforks=1
     async=False
