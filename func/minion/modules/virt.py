@@ -383,7 +383,6 @@ class Virt(func_module.FuncModule):
 	return a key/val map containing only graphics properties
 	"""
 	out = {'autoport': 'None', 'keymap': 'None', 'type': 'vnc', 'port': 'None', 'listen': 'None'}
-	myregex = '\<graphics(?P<graphics>[^"]*)/\>'
 	if(xml=='None'):
 	    xml = self.get_xml(vmid)
 	else:
