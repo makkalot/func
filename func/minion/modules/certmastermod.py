@@ -13,6 +13,8 @@
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
 
+import os
+
 # our modules
 import func_module
 from certmaster import certmaster as certmaster
@@ -59,6 +61,58 @@ class CertMasterModule(func_module.FuncModule):
            cm.remove_this_cert(x)
         return True
 
+    def peering_enabled(self):
+        """
+        Return config value for "peering"
+        """
+        return certmaster.CertMaster().cfg.peering
+
+    def known_peers(self):
+        """
+        Return a list of (host, sha) tuples for each known peer
+
+        Re-uses copyfile module for checksum.
+        """
+        import func.minion.modules.copyfile as copyfile
+        cm = certmaster.CertMaster()
+        files = cm.get_peer_certs()
+        cf = copyfile.CopyFile()
+
+        results = []
+        for f in files:
+            hostname = os.path.basename(f)
+            hostname = hostname.replace('.' + cm.cfg.cert_extension, "")
+            digest = cf.checksum(f)
+            results.append((hostname, digest))
+
+        return results
+
+    def remove_peer_certs(self, peers):
+        """
+        Remove the peer certificates for each host in 'peers'
+        """
+        cm = certmaster.CertMaster()
+        for p in peers:
+            certname = "%s.%s" % (p, cm.cfg.cert_extension)
+            certname = os.path.join(cm.cfg.peerroot, certname)
+#            try:
+            os.unlink(certname)
+#            except OSError:
+                # cert doesn't exist
+#                pass
+        return True
+
+    def copy_peer_cert(self, peer, certblob):
+        """
+        Install certblob as the certificate for peer
+        """
+        import func.minion.modules.copyfile as copyfile
+        cm = certmaster.CertMaster()
+        certname = '%s.%s' % (peer, cm.cfg.cert_extension)
+        path = os.path.join(cm.cfg.peerroot, certname)
+        cf = copyfile.CopyFile()
+        return cf.copyfile(path, certblob)
+
     def __listify(self, list_of_hosts):
         if type(list_of_hosts) is type([]):
             return list_of_hosts
@@ -96,5 +150,26 @@ class CertMasterModule(func_module.FuncModule):
                         'list_of_hosts':list_of_hosts
                         },
                     'description':"Clean the certs for specified hosts"
+                    },
+                'peering_enabled':{
+                    'args':{},
+                    'description':"Whether or not peering is enabled"
+                    },
+                'known_peers':{
+                    'args':{},
+                    'description':"What peers are known"
+                    },
+                'remove_peer_certs':{
+                    'args':{
+                        'peers':'List of peers to remove',
+                        },
+                    'description':'Remove peer certificate for one or more peers'
+                    },
+                'copy_peer_cert':{
+                    'args':{
+                        'peer':'Name of the peer',
+                        'certblob':'Certificate data',
+                        },
+                    'description':'Copy certblob for peer'
                     }
                 }
