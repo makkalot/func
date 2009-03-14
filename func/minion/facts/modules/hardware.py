@@ -8,6 +8,7 @@ class HardwareFacts(fact_module.BaseFactModule):
     description = "A modules that supplies hardware facts"
 
     def __init__(self):
+        super(HardwareFacts,self).__init__()
         sys.path.append("/usr/share/smolt/client")
         import smolt
         hardware = smolt.Hardware()
@@ -21,8 +22,6 @@ class HardwareFacts(fact_module.BaseFactModule):
 
     #for easier acces be creful should be unique
     run_level.tag = "runlevel"
-    run_level.description = "Shows the runlevel of the system"
-    run_level.usage = "Can be used with all keywords"
 
     def os_name(self):
         """
@@ -32,8 +31,6 @@ class HardwareFacts(fact_module.BaseFactModule):
     
     #for easier acces be creful should be unique
     os_name.tag = "os"
-    os_name.description = "Shows the os of the system"
-    os_name.usage = "Can be used with all keywords better with string related"
 
     
     def cpu_vendor(self):
@@ -43,8 +40,6 @@ class HardwareFacts(fact_module.BaseFactModule):
         return str(self.host.cpuVendor)
 
     cpu_vendor.tag = "cpuvendor"
-    cpu_vendor.description = "Shows the cpu_vendor of the system"
-    cpu_vendor.usage = "Can be used with all keywords better with string related"
 
     
     def cpu_model(self):
@@ -54,8 +49,6 @@ class HardwareFacts(fact_module.BaseFactModule):
         return str(self.host.cpuModel)
  
     cpu_model.tag = "cpumodel"
-    cpu_model.description = "Shows the cpu_model of the system"
-    cpu_model.usage = "Can be used with all keywords better with string related"
 
     def kernel_version(self):
         """
@@ -64,8 +57,6 @@ class HardwareFacts(fact_module.BaseFactModule):
         return str(self.host.kernelVersion)
     
     kernel_version.tag = "kernel"
-    kernel_version.description = "Shows the kernel version of the system"
-    kernel_version.usage = "Can be used with all keywords"
 
 
 
