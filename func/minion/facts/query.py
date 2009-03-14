@@ -83,6 +83,26 @@ class BaseFuncQuery(object):
         
         fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
         return fresh_query
+    
+    def filter_or(self,*args,**kwargs):
+        """
+        The filter method is the one that will be used most
+        of the time by end user
+        """
+        temp_q = Q(*args,**kwargs)
+        temp_q.connector = "OR"
+        if self.q:
+            current_q = deepcopy(self.q)
+        else:
+            current_q = None
+        
+        if not current_q:
+            current_q = temp_q
+        else:
+            current_q.add(temp_q,"OR")
+        
+        fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
+        return fresh_query
 
     def exclude(self,*args,**kwargs):
         """
