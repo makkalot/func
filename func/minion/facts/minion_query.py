@@ -154,14 +154,17 @@ def load_facts_modules():
     """
     return load_modules(path=FACTS_MODULES,main_class=fact_module.BaseFactModule)
 
-def load_fact_methods():
+def load_fact_methods(abort_on_conflict = False):
     """
     Loads the fact methods
     """
     fact_methods = {}
     loaded_modules = load_facts_modules()
     for module_name,module in loaded_modules.iteritems():
-        module.register_facts(fact_methods,module_name)
+        res = module.register_facts(fact_methods,module_name,abort_on_conflict)
+        # a control if we have some conflict with loading facts
+        if res:
+            return "Errror when registering %s.%s "%(module_name,res)
 
     #get the fact methods 
     return fact_methods

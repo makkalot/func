@@ -14,13 +14,13 @@ class BaseFactModule(object):
 
 
     def __init__(self):
-        pass
+        self.__init_log()
     
     def __init_log(self):
         log = logger.Logger()
         self.logger = log.logger
     
-    def register_facts(self,fact_callers,module_name):
+    def register_facts(self,fact_callers,module_name,abort_on_conflict=False):
         for attr in dir(self):
             if self.__is_public_valid_method(attr):
                 fact_method = getattr(self, attr)
@@ -29,6 +29,8 @@ class BaseFactModule(object):
                     method_tag = getattr(fact_method,"tag")
                     if fact_callers.has_key(method_tag):
                         self.logger.info("Facts has registered the tag : %s before, it was overriden"%method_tag)
+                        if abort_on_conflict:
+                            return getattr(fact_method,"__name__",method_tag)
                     fact_callers[method_tag] = fact_method
                         
     def __is_public_valid_method(self,attr):

@@ -626,9 +626,14 @@ class TestFactsModule(BaseTest):
         self.assert_on_fault(result)
 
     def test_list_fact_methods(self):
-        result=self.overlord.fact.list_fact_methods()
+        # we want to catch the case if haveconflicts ...
+        result=self.overlord.fact.list_fact_methods(True)
         print result
         self.assert_on_fault(result)
+        if type(result[self.th])==str:
+            print "You have conflict "
+            print result
+        assert type(result[self.th])!=str
 
     def test_show_fact_module(self):
         modules = self.overlord.fact.list_fact_modules().values()
