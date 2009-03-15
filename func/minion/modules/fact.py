@@ -21,7 +21,7 @@ class FactsModule(func_module.FuncModule):
         List facts that are availible in that system
         """
         methods = minion_query.load_fact_methods(abort_on_conflict)
-        if type(methods) == dict:
+        if not methods.has_key('__conflict__'):
             return methods.keys()
         else:
             return methods

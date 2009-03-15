@@ -21,6 +21,8 @@ class BaseFactModule(object):
         self.logger = log.logger
     
     def register_facts(self,fact_callers,module_name,abort_on_conflict=False):
+        # a dictionary to catch the conflicts
+        conflicts = {}
         for attr in dir(self):
             if self.__is_public_valid_method(attr):
                 fact_method = getattr(self, attr)
@@ -30,8 +32,17 @@ class BaseFactModule(object):
                     if fact_callers.has_key(method_tag):
                         self.logger.info("Facts has registered the tag : %s before, it was overriden"%method_tag)
                         if abort_on_conflict:
-                            return getattr(fact_method,"__name__",method_tag)
+                            if not conflicts.has_key(method_tag):
+                                conflicts[method_tag] = []
+                            conflicts[method_tag].append(getattr(fact_method,"__name__","default"))
+                            if getattr(fact_callers[method_tag],"__name__","default") not in conflicts[method_tag]:
+                                conflicts[method_tag].append(getattr(fact_callers[method_tag],"__name__","default"))
+
                     fact_callers[method_tag] = fact_method
+
+        #if there is conflict show it
+        if abort_on_conflict:
+            return conflicts
                         
     def __is_public_valid_method(self,attr):
         return is_public_valid_method(self, attr, blacklist=['register_facts'])

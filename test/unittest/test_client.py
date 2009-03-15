@@ -630,10 +630,8 @@ class TestFactsModule(BaseTest):
         result=self.overlord.fact.list_fact_methods(True)
         print result
         self.assert_on_fault(result)
-        if type(result[self.th])==str:
-            print "You have conflict "
-            print result
-        assert type(result[self.th])!=str
+        if type(result[self.th])==dict and result[self.th].has_key('__conflict__'):
+            raise Exception("You have conflict in tags run fact.list_fact_methods for more info : %s"%result)
 
     def test_show_fact_module(self):
         modules = self.overlord.fact.list_fact_modules().values()

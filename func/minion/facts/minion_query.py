@@ -164,7 +164,7 @@ def load_fact_methods(abort_on_conflict = False):
         res = module.register_facts(fact_methods,module_name,abort_on_conflict)
         # a control if we have some conflict with loading facts
         if res:
-            return "Errror when registering %s.%s "%(module_name,res)
+            return {'__conflict__':res}
 
     #get the fact methods 
     return fact_methods
