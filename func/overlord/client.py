@@ -562,6 +562,53 @@ class Overlord(object):
         #give back the reference 
         #maybe i should give back a new instance instead of ref.
         return self
+    
+    def and_and(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        self.overlord_query.fact_query=self.overlord_query.fact_query.and_and(*args,**kwargs)
+        #give back the reference 
+        #maybe i should give back a new instance instead of ref.
+        return self
+    
+    def and_or(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        self.overlord_query.fact_query=self.overlord_query.fact_query.and_or(*args,**kwargs)
+        #give back the reference 
+        #maybe i should give back a new instance instead of ref.
+        return self
+
+
+    def or_or(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        self.overlord_query.fact_query=self.overlord_query.fact_query.or_or(*args,**kwargs)
+        #give back the reference 
+        #maybe i should give back a new instance instead of ref.
+        return self
+    
+    def or_and(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        self.overlord_query.fact_query=self.overlord_query.fact_query.or_and(*args,**kwargs)
+        #give back the reference 
+        #maybe i should give back a new instance instead of ref.
+        return self
+
+
 
     def set_complexq(self,q_object,connector=None):
         self.overlord_query.fact_query=self.overlord_query.fact_query.set_compexq(q_object,connector)
