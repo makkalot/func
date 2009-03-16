@@ -71,8 +71,6 @@ class BaseFuncQuery(object):
         if inside_connector == "OR":
             #because the default is AND
             temp_q.connector = inside_connector
-        print "The tmpq is like ",temp_q
-        print "The tmpq is like INSIDE CONNECTOR ",inside_connector
         if self.q:
             current_q = deepcopy(self.q)
         else:
@@ -87,7 +85,6 @@ class BaseFuncQuery(object):
                 current_q = current_q & temp_q
 
         fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
-        print "The final query is like : ",fresh_query
         return fresh_query
     
 
