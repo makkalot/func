@@ -50,6 +50,9 @@ class Call(base_command.BaseCommand):
         self.parser.add_option("-p", "--pickle", dest="pickle",
                                help="output return data in python pickle format",
                                action="store_true")
+        self.parser.add_option("-b", "--basic", dest="basic",
+                               help="output return data with minimal, basic formating",
+                               action="store_true")
         self.parser.add_option("-f", "--forks", dest="forks",
                                help="how many parallel processes?  (default 1)",
                                default=self.forks)
@@ -106,6 +109,16 @@ class Call(base_command.BaseCommand):
         if self.options.pickle:
             import pickle
             return pickle.dumps(data)
+
+        if self.options.basic:
+            output = ""
+            (minion,results) = data
+            output += '**** Results for %s (return value: %d) ****\n' % (minion, results[0])
+            output += results[1]
+            if results[2].strip() not in (None, ''):
+                output += '**** Output to STDERR ****\n'
+                output += results[2]
+            return output
 
         return  pprint.pformat(data)
 
