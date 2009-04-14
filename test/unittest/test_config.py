@@ -88,28 +88,35 @@ class TestConfig:
 #        cfg = config.read_config(self.config_file, ConfigTest)
     
     def test_config_option(self):
+        assert type(self.cfg.option) == type('')
         assert self.exp.option == self.cfg.option
     
     def test_config_int_option(self):
+        assert type(self.cfg.int_option) == type(4)
         assert self.exp.int_option == self.cfg.int_option
 
     def test_config_bool_option_true(self):
+        assert type(self.cfg.bool_option_true) == type(True)
         assert self.exp.bool_option_true == self.cfg.bool_option_true
 
     def test_config_bool_option_false(self):
         assert self.exp.bool_option_false == self.cfg.bool_option_false
 
     def test_config_bool_option(self):
+        assert type(self.cfg.bool_option) == type(True)
         print self.exp.bool_option, self.cfg.bool_option
         assert self.exp.bool_option == self.cfg.bool_option
 
     def test_config_list_option(self):
+        assert type(self.cfg.list_option) == type([])
         assert self.exp.list_option == self.cfg.list_option
 
     def test_config_url_list_option(self):
+        assert type(self.cfg.url_list_option) == type([])
         assert self.exp.url_list_option == self.cfg.url_list_option
 
     def test_config_float_option(self):
+        assert type(self.cfg.float_option) == type(1.2345)
         assert self.exp.float_option == self.cfg.float_option
 
 # FIXME: not sure why this is different, but we don't use this option type anyway
