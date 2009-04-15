@@ -95,11 +95,11 @@ class CertMasterModule(func_module.FuncModule):
         for p in peers:
             certname = "%s.%s" % (p, cm.cfg.cert_extension)
             certname = os.path.join(cm.cfg.peerroot, certname)
-#            try:
-            os.unlink(certname)
-#            except OSError:
+            try:
+                os.unlink(certname)
+            except OSError:
                 # cert doesn't exist
-#                pass
+                pass
         return True
 
     def copy_peer_cert(self, peer, certblob):
