@@ -12,8 +12,9 @@
 ##
 ##
 
-
 import logging
+import os
+
 from certmaster.config import read_config
 from func.commonconfig import FuncdConfig
 
@@ -43,6 +44,14 @@ class Logger(Singleton):
         self.logger = logging.getLogger("svc")
 
     def _setup_handlers(self, logfilepath="/var/log/func/func.log"):
+
+        # we try to log module loading and whatnot, even if we aren't
+        # root, so if we can't write to the log file, ignore it
+        # this lets "--help" work as a user
+        # https://fedorahosted.org/func/ticket/75
+        if not os.access(logfilepath, os.W_OK):
+            return
+
         handler = logging.FileHandler(logfilepath, "a")
         self.logger.setLevel(self.loglevel)
         formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
