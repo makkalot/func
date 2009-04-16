@@ -54,10 +54,9 @@ class Ping(base_command.BaseCommand):
 
         for server in servers:
 
-            overlord_obj = client.Overlord(server,port=self.port,
+            overlord_obj = client.Overlord(server,
                                            interactive=False,
                                            verbose=self.verbose,
-                                           config=self.config,
                                            noglobs=True)
 
             results = overlord_obj.run("test", "ping", [])

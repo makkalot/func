@@ -33,15 +33,17 @@ class SSLXMLRPCServerProxy(xmlrpclib.ServerProxy):
 
 
 class FuncServer(SSLXMLRPCServerProxy):
-    def __init__(self, uri, pem=None, crt=None, ca=None):
+    def __init__(self, uri, pem=None, crt=None, ca=None, timeout=None):
         self.pem = pem
         self.crt = crt
         self.ca = ca
+        self.timeout = timeout
 
         SSLXMLRPCServerProxy.__init__(self, uri,
                                       self.pem,
                                       self.crt,
-                                      self.ca)
+                                      self.ca,
+                                      self.timeout)
 
 
 if __name__ == "__main__":

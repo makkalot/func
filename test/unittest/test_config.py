@@ -11,17 +11,35 @@ from test_client import BaseTest
 
 # a test config class we can do mean thigns to
 
+# NOTE: _empty options are disabled at the moment, need a more
+# clever way to test those cases
+
 config_file_1 = """
 [main]
 option = this is an option from the file
+#option_empty = 
+
 int_option = 2222
+#int_option_empty = 
+
+
 bool_option_true = True
 bool_option_false = False
 bool_option = False
+#bool_option_empty = 
+
 list_option = seven,eight,nine
+#list_option_empty = 
+
 url_list_option = http://www.redhat.com, http://www.fedoraproject.org
+#url_list_option_empty = 
+
 float_option = 2.7182
+#float_option_empty = 
+float_option_int = 5
+
 bytes_option = 2001M
+#bytes_option_empty = 
 
 """
 
@@ -60,17 +78,37 @@ class ConfigFileWriteValues(ConfigFileValues):
 
 class ConfigTest(config.BaseConfig):
     option = config.Option("this is an option")
+ #   option_empty = config.Option()
+
     int_option = config.IntOption(1111)
+#    int_option_empty = config.IntOption()
+#    int_option_float = config.IntOption(1)
+
     bool_option = config.BoolOption(True)
     bool_option_true = config.BoolOption(True)
     bool_option_false = config.BoolOption(False)
+#    bool_option_empty = config.BoolOption()
 
     list_option = config.ListOption(["one", "two", "three"])
+#    list_option_empty = config.ListOption()
+
     url_list_option = config.UrlListOption(["https://fedorahosted.org/func/", "http://www.redhat.com"])
+#    url_list_option_empty = config.UrlListOption()
+
     float_option = config.FloatOption(3.14159)
-    #selection_option
+    float_option_empty = config.FloatOption()
+    float_option_int = config.FloatOption(1.0)
+ 
+   #selection_option
     bytes_option = config.BytesOption("123M")
+#    bytes_option_empty = config.BytesOption()
     
+
+# FIXME: we need a test fixture for testing the config file parsing
+# since it's currently kind of all of nothing if an error occurs, so
+# we need to be able to build up a variety of test config files, load
+# them, and see what happens. Aka, one test case per config file
+
 
 class TestConfig:
     module = "config"
@@ -95,6 +133,10 @@ class TestConfig:
         assert type(self.cfg.int_option) == type(4)
         assert self.exp.int_option == self.cfg.int_option
 
+#    def test_config_int_option_float(self):
+#        print self.cfg.int_option_float
+#        assert type(self.cfg.int_option_float) == type(4)
+
     def test_config_bool_option_true(self):
         assert type(self.cfg.bool_option_true) == type(True)
         assert self.exp.bool_option_true == self.cfg.bool_option_true
@@ -118,6 +160,16 @@ class TestConfig:
     def test_config_float_option(self):
         assert type(self.cfg.float_option) == type(1.2345)
         assert self.exp.float_option == self.cfg.float_option
+
+    def test_config_float_option_empty(self):
+        print "bloop"
+        print self.cfg.float_option_empty
+        assert self.cfg.float_option_empty == None
+
+    def test_config_float_option_int(self):
+        print "blip"
+        print self.cfg.float_option_int
+        
 
 # FIXME: not sure why this is different, but we don't use this option type anyway
 #    def test_config_bytes_option(self):

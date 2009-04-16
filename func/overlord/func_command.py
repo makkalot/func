@@ -23,13 +23,14 @@ class FuncCommandLine(command.Command):
     name = "func"
     usage = "func [--options] \"hostname glob\" module method [arg1] [arg2] ... "
 
+    socket_timeout = None
     subCommandClasses = []
 
     def __init__(self):
         modules = module_loader.load_modules('func/overlord/cmd_modules/', base_command.BaseCommand)
         for x in modules.keys():
            self.subCommandClasses.append(modules[x].__class__)
-        command.Command.__init__(self)
+        command.Command.__init__(self, parentCommand=FuncCommandLine)
 
     def do(self, args):
         pass
@@ -37,6 +38,8 @@ class FuncCommandLine(command.Command):
     def addOptions(self):
         self.parser.add_option('', '--version', action="store_true",
             help="show version information")
+        self.parser.add_option('-t', '--timeout', dest="timeout", type="float",
+                               help="Set default socket timeout in seconds")
 
     # just some ugly goo to try to guess if arg[1] is hostnamegoo or
     # a command name
@@ -63,3 +66,6 @@ class FuncCommandLine(command.Command):
         if options.version:
             #FIXME
             sys.stderr.write("version is NOT IMPLEMENTED YET\n")
+
+        if options.timeout:
+            self.socket_timeout = options.timeout

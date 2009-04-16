@@ -54,6 +54,7 @@ if __name__ == "__main__":
                 ],
                 data_files = [(initpath, ["init-scripts/funcd"]),
                               (etcpath,  ["etc/minion.conf",
+					  "etc/overlord.conf",
 					  "etc/async_methods.conf"]),
                               (manpath,  ["docs/func.1.gz",
 					  "docs/func-inventory.1.gz",

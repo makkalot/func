@@ -10,6 +10,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
+import sys
 
 import command
 import client
@@ -20,8 +21,6 @@ from func import commonconfig
 
 DEFAULT_PORT = 51234
 DEFAULT_MAPLOC = "/var/lib/func/map"
-# FIXME
-CONFIG_FILE="/etc/func/minion.conf"
 
 class BaseCommand(command.Command):
     """ wrapper class for commands with some convience functions, namely
@@ -40,15 +39,12 @@ class BaseCommand(command.Command):
     # listening on, though this is probably workable for most
     # cases. Though it should probably be a different config
     # file, since FuncdConfig is for the minion server, not
-    config = read_config(CONFIG_FILE, commonconfig.FuncdConfig)
-    port = config.listen_port
     def getOverlord(self):
         self.overlord_obj = client.Overlord(self.server_spec,
-                                            port=self.port,
                                             interactive=self.interactive,
                                             verbose=self.verbose,
-                                            config=self.config,
                                             async=self.async,
                                             nforks=self.forks,
                                             delegate=self.delegate,
-                                            mapfile=self.mapfile)
+                                            mapfile=self.mapfile,
+                                            timeout=self.parentCommand.socket_timeout)

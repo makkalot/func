@@ -79,6 +79,7 @@ rm -fr $RPM_BUILD_ROOT
 %dir /etc/func/modules/
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/async_methods.conf
+%config(noreplace) /etc/func/overlord.conf
 %config(noreplace) /etc/logrotate.d/func_rotate
 %config(noreplace) /etc/func/modules/Test.conf
 %config(noreplace) /etc/func/modules/Bridge.conf
@@ -153,6 +154,9 @@ fi
 
 
 %changelog
+* Thu Apr 16 2009 Adrian Likins <alikins@redhat.com> - 0.24-5
+- add an overlord.conf file
+
 * Wed Feb 18 2009 Adrian Likins <alikins@redhat.com> - 0.24-5
 - remove version file
 

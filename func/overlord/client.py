@@ -22,6 +22,7 @@ import func.yaml as yaml
 from certmaster.commonconfig import CMConfig
 from certmaster import utils
 from certmaster.config import read_config, CONFIG_FILE
+from func.commonconfig import FuncdConfig, FUNCD_CONFIG_FILE, OverlordConfig, OVERLORD_CONFIG_FILE
 
 import sslclient
 
@@ -39,7 +40,11 @@ from func import utils as func_utils
 # defaults
 # TO DO: some of this may want to come from config later
 
+# this can also be set in /etc/func/minion.conf:listen_port
 DEFAULT_PORT = 51234
+#override in /etc/func/overlord.conf.
+DEFAULT_TIMEOUT = None
+
 FUNC_USAGE = "Usage: %s [ --help ] [ --verbose ] target.example.org module method arg1 [...]"
 DEFAULT_MAPLOC = "/var/lib/func/map"
 DELEGATION_METH = "delegation.run"
@@ -89,7 +94,7 @@ class Minions(object):
         self.delegate = delegate
         self.minionmap = minionmap
 
-        self.config = read_config(CONFIG_FILE, CMConfig)
+        self.cm_config = read_config(CONFIG_FILE, CMConfig)
         self.group_class = groups.Groups(filename=groups_file)
         
         self.all_hosts = []
@@ -107,11 +112,11 @@ class Minions(object):
             #if there is some string from group glob just skip it
             if each_gloob.startswith('@'):
                 continue
-            actual_gloob = "%s/%s.%s" % (self.config.certroot, each_gloob, self.config.cert_extension)
+            actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
             certs = glob.glob(actual_gloob)
             # pull in peers if enabled for minion-to-minion
-            if self.config.peering:
-                peer_gloob = "%s/%s.%s" % (self.config.peerroot, each_gloob, self.config.cert_extension)
+            if self.cm_config.peering:
+                peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
                 certs += glob.glob(peer_gloob)
 
             for cert in certs:
@@ -122,10 +127,10 @@ class Minions(object):
                     self.all_certs.append(cert)
 		    # use basename to trim off any excess /'s, fix
 		    # ticket #53 "Trailing slash in certmaster.conf confuses glob function
-                    certname = os.path.basename(cert.replace(self.config.certroot, ""))
-                    if self.config.peering:
-                        certname = os.path.basename(certname.replace(self.config.peerroot, ""))
-                    host = certname[:-(len(self.config.cert_extension) + 1)]
+                    certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
+                    if self.cm_config.peering:
+                        certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
+                    host = certname[:-(len(self.cm_config.cert_extension) + 1)]
                     self.all_hosts.append(host)
 
     def get_all_hosts(self):
@@ -176,7 +181,7 @@ class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
-        delegate=False, mapfile=DEFAULT_MAPLOC):
+        delegate=False, mapfile=DEFAULT_MAPLOC, timeout=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -185,16 +190,36 @@ class Overlord(object):
         @noglobs -- specifies server_spec is not a glob, and run should return single values
         @config -- optional config object
         """
-        self.config  = config
+
+        self.config  = read_config(FUNCD_CONFIG_FILE, FuncdConfig)
+
+        self.cm_config = config
         if config is None:
-            self.config  = read_config(CONFIG_FILE, CMConfig)
-    
+            self.cm_config = read_config(CONFIG_FILE, CMConfig)
+
+        self.overlord_config = read_config(OVERLORD_CONFIG_FILE, OverlordConfig)
+
 
         self.server_spec = server_spec
+
+        # we could make this settable in overlord.conf as well
         self.port        = port
+        if self.config.listen_port:
+            self.port    = self.config.listen_port
+
         self.verbose     = verbose
         self.interactive = interactive
         self.noglobs     = noglobs
+                
+        # the default
+        self.timeout = DEFAULT_TIMEOUT
+        # the config file
+        if self.overlord_config.socket_timeout != 0.0:
+            self.timeout = self.overlord_config.socket_timeout
+        # commandline
+        if timeout:
+            self.timeout = timeout
+
         self.nforks      = nforks
         self.async = smart_bool(async)
         #FIXME: async should never ne none, yet it is -akl
@@ -228,17 +253,17 @@ class Overlord(object):
           # certmaster key, cert, ca
           # funcd key, cert, ca
           # raise FuncClientError
-        ol_key = '%s/certmaster.key' % self.config.cadir
-        ol_crt = '%s/certmaster.crt' % self.config.cadir
+        ol_key = '%s/certmaster.key' % self.cm_config.cadir
+        ol_crt = '%s/certmaster.crt' % self.cm_config.cadir
         myname = func_utils.get_hostname_by_route()
 
         # FIXME: should be config -akl?
         # maybe /etc/pki/func is a variable somewhere?
         fd_key = '/etc/pki/certmaster/%s.pem' % myname
         fd_crt = '/etc/pki/certmaster/%s.cert' % myname
-        self.ca = '%s/certmaster.crt' % self.config.cadir
+        self.ca = '%s/certmaster.crt' % self.cm_config.cadir
         if not os.access(self.ca, os.R_OK):
-            self.ca = '%s/ca.cert' % self.config.cert_dir
+            self.ca = '%s/ca.cert' % self.cm_config.cert_dir
         if client_key and client_cert and ca:        
             if (os.access(client_key, os.R_OK) and os.access(client_cert, os.R_OK)
                             and os.access(ca, os.R_OK)):
@@ -406,7 +431,7 @@ class Overlord(object):
         
         def process_server(bucketnumber, buckets, server):
             
-            conn = sslclient.FuncServer(server, self.key, self.cert, self.ca )
+            conn = sslclient.FuncServer(server, self.key, self.cert, self.ca, self.timeout)
             # conn = xmlrpclib.ServerProxy(server)
 
             if self.interactive:

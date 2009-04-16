@@ -14,8 +14,10 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 """
 
 
-from certmaster.config import BaseConfig, BoolOption, Option, IntOption
+from certmaster.config import BaseConfig, BoolOption, Option, IntOption, FloatOption
 
+FUNCD_CONFIG_FILE="/etc/func/minion.conf"
+OVERLORD_CONFIG_FILE="/etc/func/overlord.conf"
 
 class FuncdConfig(BaseConfig):
     log_level = Option('INFO')
@@ -25,3 +27,6 @@ class FuncdConfig(BaseConfig):
     listen_addr = Option('')
     listen_port = IntOption('51234')
     minion_name = Option('')
+
+class OverlordConfig(BaseConfig):
+    socket_timeout = FloatOption(0)
