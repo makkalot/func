@@ -21,7 +21,7 @@ from gettext import gettext
 _ = gettext
 
 from func import logger
-logger = logger.Logger().logger
+
 
 from inspect import isclass
 from func.minion.modules import func_module
@@ -41,6 +41,7 @@ def module_walker(topdir):
     return module_files
 
 def load_methods(path, main_class, parent_class=None):
+    log = logger.Logger().logger
     methods = {}
     modules = load_modules(path, main_class, parent_class=parent_class)
     for x in modules.keys():
@@ -50,6 +51,7 @@ def load_methods(path, main_class, parent_class=None):
     return methods
 
 def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule, blacklist=None, parent_class=None):
+    log = logger.Logger().logger
     python_path = distutils.sysconfig.get_python_lib()
     module_file_path = "%s/%s" % (python_path, path)
     (mod_path, mod_dir) = os.path.split(os.path.normpath(module_file_path))
@@ -95,7 +97,7 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
             for obj in dir(blip):
                 attr = getattr(blip, obj)
                 if isclass(attr) and issubclass(attr, main_class):
-                    logger.debug("Loading %s module" % attr)
+                    log.debug("Loading %s module" % attr)
                     if parent_class:
                         mods[mod_imp_name] = attr(parent_class)
                     else:
@@ -104,12 +106,12 @@ def load_modules(path='func/minion/modules/', main_class=func_module.FuncModule,
         except ImportError, e:
             # A module that raises an ImportError is (for now) simply not loaded.
             errmsg = _("Could not load %s module: %s")
-            logger.warning(errmsg % (mod_imp_name, e))
+            log.warning(errmsg % (mod_imp_name, e))
             bad_mods[mod_imp_name] = True
             continue
         except:
             errmsg = _("Could not load %s module")
-            logger.warning(errmsg % (mod_imp_name))
+            log.warning(errmsg % (mod_imp_name))
             bad_mods[mod_imp_name] = True
             continue
 
