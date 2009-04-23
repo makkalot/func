@@ -499,6 +499,9 @@ class TestRpm(BaseTest):
         result = self.overlord.rpms.glob("*", False)
         self.assert_on_fault(result)
 
+    def test_verify(self):
+        result = self.overlord.rpms.verify("bash")
+        self.assert_on_fault(result)
 
 
 class TestSmart(BaseTest):
