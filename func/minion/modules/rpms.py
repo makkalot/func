@@ -1,5 +1,7 @@
 # Copyright 2007, Red Hat, Inc
 # Michael DeHaan <mdehaan@redhat.com>
+# Copyright 2009
+# Milton Paiva Neto <milton.paiva@gmail.com>
 #
 # This software may be freely redistributed under the terms of the GNU
 # general public license.
@@ -26,7 +28,7 @@ class RpmModule(func_module.FuncModule):
         """
         # I have not been able to get flatten=False to work if there 
         # is more than 491 entries in the dict -- ashcrow
-	import rpm
+        import rpm
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         results = []
@@ -43,11 +45,35 @@ class RpmModule(func_module.FuncModule):
                 results.append([name, epoch, version, release, arch])
         return results
 
+    def verify(self, pattern='', flatten=True):
+        """
+        Returns information on the verified package(s).
+        """        
+        import rpm
+        import yum
+        from re import split
+        ts = rpm.TransactionSet()
+        mi = (ts.dbMatch() if pattern == '' else self.glob(pattern))
+        results = []
+        for hdr in mi:
+            name = hdr['name'] if pattern == '' else split("\s",hdr)[0]
+            if flatten:                
+                yb = yum.YumBase()
+                pkgs = yb.rpmdb.searchNevra(name)
+                for pkg in pkgs:
+                    errors = pkg.verify()
+                    for fn in errors.keys():
+                        for prob in errors[fn]:
+                            results.append('%s %s %s' % (name, fn, prob.message))
+            else:
+                results.append("%s-%s-%s.%s" % (name, version, release, arch))
+        return results
+
     def glob(self, pattern, flatten=True):
         """
         Return a list of installed packages that match a pattern
         """
-	import rpm
+        import rpm
         ts = rpm.TransactionSet()
         mi = ts.dbMatch()
         results = []
@@ -73,7 +99,6 @@ class RpmModule(func_module.FuncModule):
         """
         Implementing the method argument getter
         """
-
         return {
                 'inventory':{
                     'args':{
@@ -85,6 +110,17 @@ class RpmModule(func_module.FuncModule):
                             }
                         },
                     'description':"Returns information on all installed packages"
+                    },
+                'verify':{
+                    'args':{
+                        'flatten':{
+                            'type':'boolean',
+                            'optional':True,
+                            'default':True,
+                            'description':"Print clean in difss"
+                            }
+                        },
+                    'description':"Returns information on the verified package(s)"
                     },
                 'glob':{
                     'args':{
