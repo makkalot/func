@@ -82,6 +82,28 @@ def get_hostname_by_route():
     if minion_config.minion_name:
         return minion_config.minion_name
 
+    # try to find the hostname attached to the ip of the interface that we use
+    # to talk to the certmaster
+    cm_config_file = '/etc/certmaster/minion.conf'
+    cm_config = read_config(cm_config_file, MinionConfig)
+
+    server = cm_config.certmaster
+    port = cm_config.certmaster_port
+
+    try:
+        s = socket.socket()
+        s.settimeout(5)
+        s.connect((server, port))
+        (intf, port) = s.getsockname()
+        remote_hostname = socket.gethostbyaddr(intf)[0]
+        if remote_hostname not in ['localhost', 'localhost.localdomain']:
+           hostname = remote_hostname
+           s.close()
+           return hostname
+    except:
+        s.close()
+        # something failed, reverse dns, etc
+
     # try to find the hostname of the ip we're listening on
     if minion_config.listen_addr:
         try:
@@ -89,7 +111,6 @@ def get_hostname_by_route():
         except:
             hostname = None
      
-
     # in an ideal world, this would return exactly what we want: the most meaningful hostname
     # for a system, but that is often not that case
     if hostname is None:
@@ -106,30 +127,7 @@ def get_hostname_by_route():
     if ip != "127.0.0.1" and hostname is not None:
         return hostname
             
-    # if the hostname is still bogus
-    # try to find the hostname attached to the ip of the interface that we use
-    # to talk to the certmaster
-    cm_config_file = '/etc/certmaster/minion.conf'
-    cm_config = read_config(cm_config_file, MinionConfig)
-
-    server = cm_config.certmaster
-    port = cm_config.certmaster_port
-
-    try:
-        s = socket.socket()
-        s.settimeout(5)
-        s.connect((server, port))
-        (intf, port) = s.getsockname()
-        remote_hostname = socket.gethostbyaddr(intf)[0]
-        if remote_hostname != "localhost":
-           hostname = remote_hostname
-           # print "DEBUG: HOSTNAME FROM CERTMASTER == %s" % hostname
-        s.close()
-        return hostname
-    except:
-        s.close()
-        # something failed, reverse dns, etc
-
+  
 
     # all else has failed to get a good hostname, so just return
     # an ip address
