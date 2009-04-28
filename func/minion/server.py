@@ -36,6 +36,7 @@ import AuthedXMLRPCServer
 import codes
 import func.module_loader as module_loader
 import func.minion.acls as acls_mod
+from func import utils as futils
 
 
 from certmaster import utils
@@ -306,7 +307,8 @@ def main(argv):
         print "serving...\n"
 
     try:
-        requester.request_cert()
+        hn = futils.get_hostname_by_route()
+        requester.request_cert(hn)
         serve()
     except codes.FuncException, e:
         print >> sys.stderr, 'error: %s' % e
