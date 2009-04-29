@@ -95,11 +95,13 @@ def get_hostname_by_route():
         s.settimeout(5)
         s.connect((server, port))
         (intf, port) = s.getsockname()
-        remote_hostname = socket.gethostbyaddr(intf)[0]
-        if remote_hostname not in ['localhost', 'localhost.localdomain']:
-           hostname = remote_hostname
-           s.close()
-           return hostname
+         # this can fail if there is no reverse DNS available
+        intf_hostname = socket.gethostbyaddr(intf)[0]
+        ip = socket.gethostbyname(intf_hostname)
+        # not talking via localhost? good enough...
+        if ip != '127.0.0.1':
+            s.close()
+            return intf_hostname
     except:
         s.close()
         # something failed, reverse dns, etc
