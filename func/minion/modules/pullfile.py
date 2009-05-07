@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-#
 # pullfile.py
 #
 # Copyright 2009, Stone-IT
