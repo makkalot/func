@@ -220,7 +220,7 @@ class Vlan(func_module.FuncModule):
         vlanid -- ID for this vlan (string, example: "1100")
         """
         vintfname = interface + "." + str(vlanid)
-        if vlanid not in self.ignorevlans:
+        if vlanid not in self.options.ignorevlans:
             exitcode = os.spawnv(os.P_WAIT, self.options.ip, [ self.options.ip, "link", "set", vintfname, "down" ])
         else:
             exitcode = -1
