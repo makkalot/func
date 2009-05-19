@@ -15,7 +15,7 @@ class GroupFileBuilder(object):
         if os.access(self.filename, os.R_OK):
             os.unlink(self.filename)
         self.cp = ConfigParser.SafeConfigParser()
-        
+
     def create(self, group_dict):
         # dict is a dict of section names, whose values
         # are a list of tuples of key=value
@@ -24,7 +24,7 @@ class GroupFileBuilder(object):
             self.cp.add_section(section)
             for host_option,hosts in section_value.iteritems():
                 self.cp.set(section,host_option,",".join(hosts))
-        
+
         #save the changes
         fo = open(self.filename, "w")
         self.cp.write(fo)
@@ -35,7 +35,7 @@ class TestGroupsBase(object):
     def setUp(self):
         self.minions = fc.Minions("*", groups_file=GROUP_TEST)
         import os
-        
+
         #we want a fresh copy :)
         if os.path.exists(GROUP_TEST):
             os.remove(GROUP_TEST)
@@ -48,11 +48,11 @@ class TestGroupsBase(object):
         self.test_dict = {
             "home_group":['first','second','third']
             }
-            
-       
+
+
         #create the file
         self.gfb.create(self.the_groups_dict)
-   
+
 
     def test_get_groups(self):
         #will reset on every test
@@ -72,33 +72,33 @@ class TestGroupsBase(object):
         result = self.minions.group_class.get_groups()
         self.test_dict["home_group"].append("fourth")
         self.test_dict["home_group"].append("sixth")
-        
+
         #print "The result we got is : ",result
         #print "The current into memory is : ",self.test_dict
         assert self.test_dict == result
-        
+
         self.minions.group_class.add_hosts_to_group("home_group","wormy;troll")
         self.test_dict["home_group"].append("wormy")
         self.test_dict["home_group"].append("troll")
         assert self.test_dict == result
-        
+
 
     def test_add_host_to_group(self):
         self.setUp()
-        
+
         self.minions.group_class.add_host_to_group("home_group","bloop")
         result = self.minions.group_class.get_groups()
         self.test_dict["home_group"].append("bloop")
         assert self.test_dict == result
-        
+
     def test_add_host_list(self):
-        
+
         self.setUp()
         self.minions.group_class.add_host_list("home_group",["bloop","woop","zoo"])
         self.test_dict["home_group"].extend(["bloop","woop","zoo"])
         result = self.minions.group_class.get_groups()
         assert self.test_dict == result
-       #add one for save 
+       #add one for save
         self.minions.group_class.add_host_list("home_group",["hey.com"],save = True)
         result = self.minions.group_class.get_groups()
         assert result == self.util_save_change()
@@ -109,7 +109,7 @@ class TestGroupsBase(object):
         self.minions.group_class.add_host_to_group("home_group","bloop")
         self.minions.group_class.save_changes()
         result = self.minions.group_class.get_groups()
-        
+
         assert result == self.util_save_change()
 
     def test_remove_group(self):
@@ -121,12 +121,12 @@ class TestGroupsBase(object):
         self.test_dict["lab_group"].append("bloop")
 
         assert self.test_dict == result
-        
+
         self.minions.group_class.remove_group("lab_group")
         result = self.minions.group_class.get_groups()
         del self.test_dict["lab_group"]
         assert self.test_dict == result
-            
+
         #what if activated the save changes
         self.minions.group_class.add_group("lab_group")
         self.minions.group_class.add_host_to_group("lab_group","bloop")
@@ -134,7 +134,7 @@ class TestGroupsBase(object):
         self.minions.group_class.remove_group("lab_group",save = True)
         result = self.minions.group_class.get_groups()
         assert result == self.util_save_change()
-       
+
 
 
     def test_remove_host(self):
@@ -147,7 +147,7 @@ class TestGroupsBase(object):
         #if activated the save changes ON
         self.minions.group_class.remove_host("home_group","second",save = True)
         result = self.minions.group_class.get_groups()
-        
+
         #print "The result we got is : ",result
         #print "The data from file is :i ",self.util_save_change()
         assert result == self.util_save_change()
@@ -159,7 +159,7 @@ class TestGroupsBase(object):
         self.test_dict["home_group"].remove("second")
         result = self.minions.group_class.get_groups()
         assert self.test_dict == result
-        
+
         #also check the save situation
         self.minions.group_class.add_host_to_group("home_group","bloop")
         self.minions.group_class.remove_host_list("home_group",["bloop"],save = True)
@@ -172,12 +172,12 @@ class TestGroupsBase(object):
         self.minions.group_class.add_group("lab_group")
         self.test_dict["lab_group"]=[]
         result = self.minions.group_class.get_groups()
-        
+
         #print "The result after adding the group is : ",result
         #print "The current test dict is : ",self.test_dict
         #if you have chosen to save the changes ?
         assert self.test_dict == result
-        
+
         self.minions.group_class.add_group("data_group",save = True)
         self.test_dict["data_group"]=[]
         result = self.minions.group_class.get_groups()
@@ -199,7 +199,7 @@ class TestGroupsBase(object):
         return result
 
     def test_get_hosts_by_group_glob(self):
-        
+
         self.setUp()
         spec = "@home_group;some*.com"
         tmp_minions = fc.Minions(spec, groups_file=GROUP_TEST)
@@ -215,10 +215,10 @@ class TestMinionGroups(object):
     def setUp(self):
         from certmaster.certmaster import CertMaster
         cm = CertMaster()
-       
+
         #firstly create a group of some real ones
         self.signed_certs = cm.get_signed_certs()
-        
+
         #we want a fresh copy :)
         if os.path.exists(GROUP_TEST):
             os.remove(GROUP_TEST)
@@ -231,11 +231,11 @@ class TestMinionGroups(object):
         self.test_dict = {
             "home_group":self.signed_certs
             }
-            
-       
+
+
         #create the file
         self.gfb.create(self.the_groups_dict)
-   
+
 
         #print "The signet certs are : ",cm.get_signed_certs()
         #self.spec = "@home_group;some*.com"
@@ -253,3 +253,107 @@ class TestMinionGroups(object):
         #print "The result is : ",result
         #print "The home group is : ",self.test_dict["home_group"]
         assert result == self.test_dict["home_group"]
+
+
+class TestSubgroups(object):
+
+    def setUp(self):
+        self.minions = fc.Minions("*", groups_file=GROUP_TEST)
+        import os
+
+        #we want a fresh copy :)
+        if os.path.exists(GROUP_TEST):
+            os.remove(GROUP_TEST)
+
+        self.gfb = GroupFileBuilder()
+        self.the_groups_dict = {
+            "home_group":{'host':['first','second']},
+            "my_subgroup":{'host':['third'], 'subgroup':['home_group']},
+            "my_subgroup2":{'subgroup':['home_group']},
+            }
+
+        self.test_dict = {
+            "home_group":['first','second'],
+            "my_subgroup":['third'],
+            "my_subgroup2":[]
+            }
+
+        self.test_dict_subgroup = {
+            "my_subgroup":['home_group'],
+            "my_subgroup2":['home_group']
+            }
+
+        #create the file
+        self.gfb.create(self.the_groups_dict)
+
+
+    def test_get_groups(self):
+        self.setUp()
+        assert self.test_dict == self.minions.group_class.get_groups(), self.minions.group_class.get_groups()
+
+    def test_get_subgroups(self):
+        self.setUp()
+        assert self.test_dict_subgroup == self.minions.group_class.get_subgroups()
+
+    def test_get_group_names(self):
+        self.setUp()
+        result = self.minions.group_class.get_group_names()
+        assert self.test_dict.keys() == result
+
+
+    def test_add_subgroups_to_group(self):
+        self.setUp()
+        self.minions.group_class.add_subgroups_to_group("my_subgroup","sub1,sub2")
+        result = self.minions.group_class.get_subgroups()
+        self.test_dict_subgroup["my_subgroup"].append("sub1")
+        self.test_dict_subgroup["my_subgroup"].append("sub2")
+
+        assert self.test_dict_subgroup == result
+
+    def test_add_subgroup_to_group(self):
+        self.setUp()
+
+        self.minions.group_class.add_subgroup_to_group("my_subgroup","bloop")
+        result = self.minions.group_class.get_subgroups()
+        self.test_dict_subgroup["my_subgroup"].append("bloop")
+        assert self.test_dict_subgroup == result
+
+    def test_add_subgroup_list(self):
+        self.setUp()
+        self.minions.group_class.add_subgroup_list("my_subgroup",["bloop","woop","zoo"])
+        self.test_dict_subgroup["my_subgroup"].extend(["bloop","woop","zoo"])
+        assert self.test_dict_subgroup == self.minions.group_class.get_subgroups()
+
+        # check if main groups wasn't changed
+        assert self.test_dict == self.minions.group_class.get_groups()
+
+    def test_save_changes(self):
+        self.setUp()
+        self.minions.group_class.add_host_to_group("home_group","bloop")
+        self.minions.group_class.save_changes()
+        tmp_minions = fc.Minions("*", groups_file=GROUP_TEST)
+
+        assert self.minions.group_class.get_groups() == tmp_minions.group_class.get_groups()
+        assert self.minions.group_class.get_subgroups() == tmp_minions.group_class.get_subgroups()
+
+    def test_remove_subgroup(self):
+        self.setUp()
+        assert True == self.minions.group_class.remove_subgroup("my_subgroup", "home_group")
+        del self.test_dict_subgroup["my_subgroup"]
+        assert self.test_dict_subgroup == self.minions.group_class.get_subgroups()
+
+    def test_remove_subgroup_list(self):
+        self.setUp()
+        self.minions.group_class.remove_subgroup_list("my_subgroup",["home_group","non_existing"])
+        del self.test_dict_subgroup["my_subgroup"]
+        assert self.test_dict_subgroup == self.minions.group_class.get_subgroups()
+
+    def test_get_hosts_by_group_glob(self):
+        self.setUp()
+        spec = "@my_subgroup"
+        tmp_minions = fc.Minions(spec, groups_file=GROUP_TEST)
+        assert tmp_minions.group_class.get_hosts_by_group_glob(spec) == ['third', 'first','second']
+
+        spec = "@my_subgroup2"
+        tmp_minions = fc.Minions(spec, groups_file=GROUP_TEST)
+        assert tmp_minions.group_class.get_hosts_by_group_glob(spec) == ['first','second']
