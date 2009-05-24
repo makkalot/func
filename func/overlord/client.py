@@ -552,7 +552,6 @@ class Overlord(object):
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter(*args,**kwargs)
         
-        print "The current query is ",self.overlord_query.fact_query
         #give back the fresh reference 
         return fresh_overlord
     
@@ -565,7 +564,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter_or(*args,**kwargs)
-        print "The current query is ",self.overlord_query.fact_query
 
         #give back the fresh reference 
         return fresh_overlord
@@ -579,7 +577,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_and(*args,**kwargs)
-        print "The current query is ",self.overlord_query.fact_query
         
         #give back the fresh reference 
         return fresh_overlord
@@ -595,7 +592,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_or(*args,**kwargs)
-        print "The current query is ",self.overlord_query.fact_query
 
         #give back the fresh reference 
         return fresh_overlord
@@ -609,7 +605,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_or(*args,**kwargs)
-        print "The current query is ",self.overlord_query.fact_query
 
         #give back the fresh reference 
         return fresh_overlord
@@ -624,7 +619,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_and(*args,**kwargs)
-        print "The current query is ",self.overlord_query.fact_query
 
         #give back the fresh reference 
         return fresh_overlord
@@ -633,7 +627,6 @@ class Overlord(object):
         #create a fresh overlord 
         fresh_overlord = self._clone()
         fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.set_compexq(q_object,connector)
-        print "The current query is ",self.overlord_query.fact_query
 
         #give back the fresh reference 
         return fresh_overlord
