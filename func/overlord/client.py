@@ -547,10 +547,14 @@ class Overlord(object):
         the minion directly just gives back a 
         reference to the same object ANDED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.filter(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter(*args,**kwargs)
+        
+        print "The current query is ",self.overlord_query.fact_query
+        #give back the fresh reference 
+        return fresh_overlord
     
     def filter_or(self,*args,**kwargs):
         """
@@ -558,10 +562,13 @@ class Overlord(object):
         the minion directly just gives back a 
         reference to the same object ORED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.filter_or(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter_or(*args,**kwargs)
+        print "The current query is ",self.overlord_query.fact_query
+
+        #give back the fresh reference 
+        return fresh_overlord
     
     def and_and(self,*args,**kwargs):
         """
@@ -569,10 +576,15 @@ class Overlord(object):
         the minion directly just gives back a 
         reference to the same object ORED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.and_and(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_and(*args,**kwargs)
+        print "The current query is ",self.overlord_query.fact_query
+        
+        #give back the fresh reference 
+        return fresh_overlord
+
+        
     
     def and_or(self,*args,**kwargs):
         """
@@ -580,22 +592,28 @@ class Overlord(object):
         the minion directly just gives back a 
         reference to the same object ORED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.and_or(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_or(*args,**kwargs)
+        print "The current query is ",self.overlord_query.fact_query
 
-
+        #give back the fresh reference 
+        return fresh_overlord
+        
     def or_or(self,*args,**kwargs):
         """
         Filter The facts and doesnt call
         the minion directly just gives back a 
         reference to the same object ORED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.or_or(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_or(*args,**kwargs)
+        print "The current query is ",self.overlord_query.fact_query
+
+        #give back the fresh reference 
+        return fresh_overlord
+
     
     def or_and(self,*args,**kwargs):
         """
@@ -603,19 +621,47 @@ class Overlord(object):
         the minion directly just gives back a 
         reference to the same object ORED
         """
-        self.overlord_query.fact_query=self.overlord_query.fact_query.or_and(*args,**kwargs)
-        #give back the reference 
-        #maybe i should give back a new instance instead of ref.
-        return self
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_and(*args,**kwargs)
+        print "The current query is ",self.overlord_query.fact_query
 
-
+        #give back the fresh reference 
+        return fresh_overlord
 
     def set_complexq(self,q_object,connector=None):
-        self.overlord_query.fact_query=self.overlord_query.fact_query.set_compexq(q_object,connector)
-        #give back the reference
-        return self
-    
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.set_compexq(q_object,connector)
+        print "The current query is ",self.overlord_query.fact_query
 
+        #give back the fresh reference 
+        return fresh_overlord
+    
+    def _clone(self,klass=None):
+        """
+        That method is for situations where we use query stuff
+        when querying it is important to return a fresh object of 
+        Overlord instead of working on the same oone,so we can 
+        work on one instance which reproduces many temporary ones
+        """
+        from copy import copy
+        if klass is None:
+            klass = self.__class__
+        
+        #create a fresh copy
+        c = klass(copy(self.server_spec),
+                  port=copy(self.port),
+                  verbose=copy(self.verbose),
+                  interactive=copy(self.interactive),
+                  config = copy(self.config),
+                  noglobs = copy(self.noglobs),
+                  nforks = copy(self.nforks),
+                  async = copy(self.async),
+                  delegate=copy(self.delegate),
+                  mapfile = copy(self.mapfile)
+                )
+        return c
 
 class Client(Overlord):
     def __init__(self, *args, **kwargs):
