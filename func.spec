@@ -11,8 +11,8 @@
 
 Summary: Remote management framework
 Name: func
-Version: 0.24 
-Release: 5%{?dist}
+Version: 0.25
+Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 License: GPLv2+
 Group: Applications/System
@@ -57,6 +57,8 @@ func is a remote api for mangement, configuration, and monitoring of systems.
 %install
 test "x$RPM_BUILD_ROOT" != "x" && rm -rf $RPM_BUILD_ROOT
 %{__python} setup.py install --prefix=/usr --root=$RPM_BUILD_ROOT
+touch $RPM_BUILD_ROOT/var/log/func/func.log
+touch $RPM_BUILD_ROOT/var/log/func/audit.log
 
 %clean
 rm -fr $RPM_BUILD_ROOT
@@ -108,7 +110,13 @@ rm -fr $RPM_BUILD_ROOT
 %{python_sitelib}/func/minion/modules/*/*/*.py*
 
 %dir /var/log/func
+%attr(0600,root,root) %config(noreplace) %verify(not md5 size mtime) /var/log/func/func.log
+%attr(0600,root,root) %config(noreplace) %verify(not md5 size mtime) /var/log/func/audit.log
+
 %dir /var/lib/func
+
+#%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/log/prelink/prelink.log
+
 %doc AUTHORS README LICENSE
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/func-inventory.1.gz
@@ -133,7 +141,9 @@ else
         ln -sf /etc/init.d/funcd /etc/rc.d/rc${i}.d/k01funcd
    done
 fi
-
+# fix perms on log files
+chmod 600 /var/log/func/func.log
+chmod 600 /var/log/func/audit.log
 # upgrade old installs if needed
 #/usr/bin/update-func
 
@@ -154,6 +164,11 @@ fi
 
 
 %changelog
+* Wed May 27 2009 Adrian Likins <alikins@redhat.com> = 0.25-1
+- add /var/log/func/*.log files to spec
+- add a post section to chmod any log files with bogus perms
+  
+
 * Thu Apr 16 2009 Adrian Likins <alikins@redhat.com> - 0.24-5
 - add an overlord.conf file
 
