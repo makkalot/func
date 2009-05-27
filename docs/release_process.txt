@@ -1,0 +1,67 @@
+This is just an attempt to note what a release needs, mainly
+so I don't forget.
+
+
+- tag the git tree for the release
+	git tag -a release_name
+	
+	release name is of the form v0.25
+
+	see "git tag -l" for examples of existing tags
+
+	probably want to wait until you know the latter steps
+	work correctly before tagging.
+
+- rev the version (version is set in setup.py, funcs.spec, and the
+Makefile. I really hate having this in three places but my previous
+approach ('version' file) was frowned upon by fedora build system
+
+- build a tarball (I currently just use "make" or "make rpms"
+and use the tarball from rpm-build/)
+
+- write up the release notes
+	More is better. See "git log" and func trace timeline for
+	a start.
+
+- push the tarball to it's upstream home. Currently it's at
+	http://people.fedoraproject.org/~alikins/files/func/
+	
+  But it can move if need be. Just update the trac wiki Releases page.
+
+- build the rpms for fedora/epel
+
+	I mostly use the "pusher.py" script for this, as it automates
+	most of this somewhat tedious process. 
+
+	There is a lot of setup needed before it will run correctly
+	however. You need to get a fedora package maintainer setup
+	up and running. The fedora devel docs go into more detail
+	about this.
+
+	Check the PROCESS_RELEASES variable in pusher.py. This defines
+	what releases to build packages for. You may need to update
+	this if new releases are available as targets since the last
+	time it was built.
+
+	Run it like:
+
+		./pusher.py --cvs ~/cvs/func --prof ~/src/func
+
+	--cvs points to your checkout of the fedora "dist-cvs" tree
+	for func
+	
+	Currently that is cvsroot :ext:USERNAME@cvs.fedoraproject.org:/cvs/pkgs
+
+	See http://fedoraproject.org/wiki/Using_Fedora_CVS
+
+	--proj just points to a git checkout of the project that you
+	have built the rpms for (pusher.py assume PROJECT/rpm-build exists
+	and has been populated)
+
+- once the packages have been built, they need to be pushed into the
+fedora update system
+
+- EPEL packages are mostly pulled automatically if they have been built for
+EPEL with "plague" (pusher.py builds for this automatically if a rhel target has been put into "PROCESS_RELEASES" in pusher.py
+
+
