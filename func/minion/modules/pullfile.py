@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+#
 # pullfile.py
 #
 # Copyright 2009, Stone-IT
@@ -25,7 +27,7 @@ from urllib2 import Request, urlopen, URLError
 
 class PullFile(func_module.FuncModule):
 
-    version = "0.0.1"
+    version = "0.0.2"
     api_version = "0.0.1"
     description = "Download remote file and save locally"
 
@@ -44,3 +46,19 @@ class PullFile(func_module.FuncModule):
             f.close()
             webFile.close()
         return 0
+
+    def get(self, inFile, outFile):
+        try:
+            req = Request(inFile)
+            webFile = urlopen(req)
+        except URLError:
+            raise codes.FuncException("Error retrieving file")
+        try:
+            f = open(outFile, 'w')
+        except IOError:
+            raise codes.FuncException("Error opening local file")
+        f.write(webFile.read())
+        f.close()
+        webFile.close()
+        return 0
+
