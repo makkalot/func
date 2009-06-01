@@ -65,12 +65,12 @@ class BaseFuncQuery(object):
     def __nonzero__(self):
         return bool(self.q)
     
-    def filter(self,*args,**kwargs):
-        """
-        The filter method is the one that will be used most
-        of the time by end user
-        """
+    def __main_filter(self,outside_connector,inside_connector,*args,**kwargs):
+        
         temp_q = Q(*args,**kwargs)
+        if inside_connector == "OR":
+            #because the default is AND
+            temp_q.connector = inside_connector
         if self.q:
             current_q = deepcopy(self.q)
         else:
@@ -79,10 +79,56 @@ class BaseFuncQuery(object):
         if not current_q:
             current_q = temp_q
         else:
-            current_q.add(temp_q,"AND")
-        
+            if outside_connector == "OR":
+                current_q = current_q | temp_q
+            else:
+                current_q = current_q & temp_q
+
         fresh_query = self._clone(q_object=current_q,pull_result=self.pull_result)
         return fresh_query
+    
+
+
+    def filter(self,*args,**kwargs):
+        """
+        The filter method is the one that will be used most
+        of the time by end user
+        """
+        return self.__main_filter("AND","AND",*args,**kwargs)
+           
+    def filter_or(self,*args,**kwargs):
+        """
+        The filter method is the one that will be used most
+        of the time by end user
+        """
+        return self.__main_filter("OR","OR",*args,**kwargs)
+            
+    def and_and(self,*args,**kwargs):
+        """
+        AND inside and connect with AND
+        """
+        return self.__main_filter("AND","AND",*args,**kwargs)
+
+    def and_or(self,*args,**kwargs):
+        """
+        AND inside and connect with AND
+        """
+        return self.__main_filter("AND","OR",*args,**kwargs)
+
+    
+    def or_or(self,*args,**kwargs):
+        """
+        AND inside and connect with AND
+        """
+        return self.__main_filter("OR","OR",*args,**kwargs)
+
+    def or_and(self,*args,**kwargs):
+        """
+        AND inside and connect with AND
+        """
+        return self.__main_filter("OR","AND",*args,**kwargs)
+
+
 
     def exclude(self,*args,**kwargs):
         """

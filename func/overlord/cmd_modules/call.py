@@ -30,6 +30,130 @@ config_file = '/etc/func/async_methods.conf'
 class CallConfig(BaseConfig):
     force_async = ListOption('')
 
+#Facts parser and utility class
+
+class FactsCommand(object):
+    """
+    That class takes the params that are entered from commandline for
+    facts and parses and converts them to usable Overlord fact arguments
+    """
+
+    __valid_operators = {
+                        "=":"",
+                        "<":"lt",
+                        ">":"gt",
+                        } 
+    __valid_c_operators={
+            
+                        "<=":"lte",
+                        ">=":"gte"
+                        }
+
+    __valid_keywords = {
+                        "in":"contains",
+                        "ini":"icontains",
+                        }
+
+    def do(self,filter,filteror,*args,**kwargs ):
+        """
+        The action part
+        """
+        if not filter and not filteror:
+            return False
+        elif filter and filteror:
+            return False
+        
+        tmp_arg = filter or filteror
+        parse_result = self.__parse_fact_args(tmp_arg)
+        if not parse_result:
+            return False
+        return parse_result
+
+
+    def __parse_fact_args(self,args):
+        """
+        Parses the format of the arguments which is like 
+        keyword=value,keyword<value,value in keyword
+        """
+        comma_separated = args.split(",")
+        if not self.__is_coma_ok(comma_separated):
+            return False
+        
+        final_dict = {}
+
+        for com_key in comma_separated:
+            res = self.__convert_keyword(com_key)
+            if not res:
+                self.outputUsage()
+                return False
+
+            final_dict[res[0]]=res[1]
+        
+        return final_dict
+
+
+    def __is_coma_ok(self,comma_list):
+        """
+        Chechs if the comma separated expression is ok
+        """
+        for c in comma_list:
+            if not c:
+                self.outputUsage()
+                return False
+        return True
+    
+    def __convert_keyword(self,keyword):
+        """
+        Convert keyword to a ready to use Overlord parameter
+        """
+        keyword = keyword.strip()
+        
+        #check for space first
+        if keyword.find(" ")!=-1:
+            #do the keyword operations first
+            tmp_kw = keyword.split()
+            return self.__join_keyword(tmp_kw,self.__valid_keywords)
+           
+        else:
+            for op in self.__valid_c_operators:
+                if keyword.find(op)!=-1:
+                    tmp_kw = keyword.split(op)
+                    return self.__join_keyword(tmp_kw,self.__valid_c_operators,op) 
+            #do the operator things
+            for op in self.__valid_operators:
+                if keyword.find(op)!=-1:
+                    tmp_kw = keyword.split(op)
+                    return self.__join_keyword(tmp_kw,self.__valid_operators,op) 
+        return False
+    
+    def __join_keyword(self,tmp_kw,valid_set,operator=None):
+        """
+        A common util operation we do
+        """
+        if not operator:
+            if not len(tmp_kw) == 3:
+                return False
+            else:
+                value = tmp_kw[2]
+                operator = tmp_kw[1]
+
+        else:
+            if not len(tmp_kw) == 2:
+                return False
+            else:
+                value = tmp_kw[1]
+        
+
+        #doing that trick to not to loose some of the oprators when showing
+        if not operator.strip() in valid_set.keys():
+                return False
+        
+        if operator in self.__valid_keywords.keys():
+            return "".join([value.strip(),"__",valid_set[operator.strip()]]),tmp_kw[0].strip()
+        else:
+            return "".join([tmp_kw[0].strip(),"__",valid_set[operator.strip()]]),value.strip()
+
+
 class Call(base_command.BaseCommand):
     name = "call"
     usage = "call module method name arg1 arg2..."
@@ -70,7 +194,13 @@ class Call(base_command.BaseCommand):
                                help="use delegation to make function call",
                                default=self.delegate,
                                action="store_true")
-
+        self.parser.add_option("", "--filter", dest="filter",
+                               help="use filter to and minion facts",
+                               action="store")
+        self.parser.add_option("", "--filteror", dest="filteror",
+                               help="use filteror to or minion facts",
+                                action="store")
+        
     def handleOptions(self, options):
         self.options = options
         self.verbose = options.verbose
@@ -148,9 +278,29 @@ class Call(base_command.BaseCommand):
         
         self.server_spec = self.parentCommand.server_spec
         self.getOverlord()
+        
+        #the facts part inserted here
+        if self.options.filter or self.options.filteror:
+            facts = FactsCommand()
+            result_fact = facts.do(self.options.filter,self.options.filteror)
+            if not result_fact:
+                self.outputUsage()
+                return
+        
+        if self.options.filter:
+            #print "The result facts are : ",result_fact
+            self.overlord_obj=self.overlord_obj.filter(**result_fact)
+        elif self.options.filteror:
+            self.overlord_obj=self.overlord_obj.filter_or(**result_fact)
+        
+
+        #end of the facts parsing
 
         if not self.options.jobstatus:
-            results = self.overlord_obj.run(self.module, self.method, self.method_args)
+            if self.options.filter or self.options.filteror:
+                results = self.overlord_obj.run(self.module, self.method,[{'__fact__':self.overlord_obj.overlord_query.serialize_query()}]+list(self.method_args))
+            else:
+                results = self.overlord_obj.run(self.module, self.method, self.method_args)
         else:
             (return_code, async_results) = self.overlord_obj.job_status(self.module)
             res = self.format_return((return_code, async_results))
@@ -176,3 +326,5 @@ class Call(base_command.BaseCommand):
     def print_results(self, res):
         for i in res.iteritems():
             print self.format_return(i)
+
+

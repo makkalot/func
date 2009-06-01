@@ -1,4 +1,4 @@
-from func.minion.facts.overlord_query import OverlordQueryProxy
+from func.minion.facts.overlord_query import OverlordQuery
 from func.minion.facts.query_utils import Q
 from func.minion.facts.query import FuncLogicQuery 
 import func.overlord.client as fc
@@ -20,6 +20,17 @@ class TestOverlordQueryProxy(object):
                 Q(c=True,b=False)
                 )
         
+       
+        self.negated_q = FuncLogicQuery(
+                (~Q(a=True,b=True)| Q(c=True,b=False))&
+                Q(e=True,f=False)
+                )
+        
+        self.negated_q2 = FuncLogicQuery(
+                ~Q(a=True,b=True)| Q(c=True,b=False)
+                )
+
+    def setUp(self):
         self.overlord = fc.Overlord(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
@@ -30,47 +41,33 @@ class TestOverlordQueryProxy(object):
 
 
 
-        self.negated_q = FuncLogicQuery(
-                (~Q(a=True,b=True)| Q(c=True,b=False))&
-                Q(e=True,f=False)
-                )
-        
-        self.negated_q2 = FuncLogicQuery(
-                ~Q(a=True,b=True)| Q(c=True,b=False)
-                )
-
 
     def test_serialize(self):
         """
         Testing the serialzation thing
         """
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.query)
+        self.tmp_proxy = OverlordQuery(fact_query=self.query)
         self.tmp_proxy.serialize_query()
         
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.negated_q)
+        self.tmp_proxy = OverlordQuery(fact_query=self.negated_q)
         self.tmp_proxy.serialize_query()
     
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=self.negated_q2)
+        self.tmp_proxy = OverlordQuery(fact_query=self.negated_q2)
         self.tmp_proxy.serialize_query()
     
 
 
     def test_chain_send(self):
-        query = FuncLogicQuery(Q(runlevel__lt=6,runlevel__gt=2)) 
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=query)
-        res = self.tmp_proxy.hardware.info()
-        self.tmp_proxy.display_active(res)
-        self.tmp_proxy.display_active(res,with_facts=True)
+        query = Q(runlevel__lt=6,runlevel__gt=2) 
+        print self.overlord.set_complexq(query).hardware.info()
 
     def test_async_chain_send(self):
-        query = FuncLogicQuery(Q(runlevel__lt=6,runlevel__gt=2)) 
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.async_overlord,fact_query=query)
-        res = self.tmp_proxy.hardware.info()
+        query = Q(runlevel__lt=6,runlevel__gt=2) 
+        res = self.async_overlord.set_complexq(query).hardware.info()
         print res
         import time
         time.sleep(5)
-        self.tmp_proxy.job_status(res)
-        self.tmp_proxy.job_status(res,with_facts=True)
+        self.async_overlord.job_status(res)
 
 
 class TestFactModule(object):
@@ -84,7 +81,7 @@ class TestFactModule(object):
     rest_keywords = ['contains','icontains','iexact','startswith']
     
     def __init__(self):
-        self.overlord = OverlordQueryProxy(self.th,
+        self.overlord = fc.Overlord(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
 
@@ -95,7 +92,7 @@ class TestFactModule(object):
         """
         Setting up a new fresh instance
         """
-        self.overlord_query = OverlordQueryProxy(self.th,
+        self.overlord_query = fc.Overlord(self.th,
                                     nforks=self.nforks,
                                     async=self.async)
     
@@ -130,10 +127,10 @@ class TestFactModule(object):
             #print "The result is ",result
 
             #do some assertion here ..
-            active_res = self.overlord_query.display_active(result)
+            active_res = result
             self.assert_on_fault(active_res)
-            active_res =  self.overlord_query.display_active(result,with_facts=True)
-            assert active_res[self.th][0]['__fact__'][0] == True
+            #active_res =  self.overlord_query.display_active(result,with_facts=True)
+            #assert active_res[self.th][0]['__fact__'][0] == True
 
     
     def __make_it_less_or_greater(self,value,type_cmp):

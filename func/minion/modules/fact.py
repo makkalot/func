@@ -16,11 +16,15 @@ class FactsModule(func_module.FuncModule):
         """
         return minion_query.load_facts_modules().keys()
     
-    def list_fact_methods(self):
+    def list_fact_methods(self,abort_on_conflict=False):
         """
         List facts that are availible in that system
         """
-        return minion_query.load_fact_methods().keys()
+        methods = minion_query.load_fact_methods(abort_on_conflict)
+        if not methods.has_key('__conflict__'):
+            return methods.keys()
+        else:
+            return methods
 
     def show_fact_module(self,module_name):
         """
@@ -45,9 +49,7 @@ class FactsModule(func_module.FuncModule):
             if name == method_name:
                 return {
                         'name':name,
-                        'description':getattr(method,"description",""),
                         'tag':getattr(method,"tag",""),
-                        'usage':getattr(method,"usage","")
                         }
         return {}
 

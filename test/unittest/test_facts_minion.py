@@ -1,5 +1,5 @@
 from func.minion.facts.minion_query import *
-from func.minion.facts.overlord_query import OverlordQueryProxy
+from func.minion.facts.overlord_query import OverlordQuery
 from func.minion.facts.query_utils import Q
 from func.minion.facts.query import FuncLogicQuery 
 import func.overlord.client as fc
@@ -83,14 +83,14 @@ class TestFactsMinion(object):
         for query in generate_queries(HOW_MANY):
             #print query
             counter = counter +1
-            self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=FuncLogicQuery(query))
+            self.tmp_proxy = OverlordQuery(fact_query=FuncLogicQuery(query))
             serialized = self.tmp_proxy.serialize_query()
             cp_serialized = copy(serialized)
             
             min_q = FactsMinion()
             de_q = min_q.deserialize(serialized)
             #print "From REAL_Q object",self.query
-            self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=FuncLogicQuery(de_q))
+            self.tmp_proxy = OverlordQuery(fact_query=FuncLogicQuery(de_q))
             serialized_again = self.tmp_proxy.serialize_query()
             
             #print "BEFORE : ",cp_serialized
@@ -108,7 +108,7 @@ class TestFactsMinion(object):
         #here we assume overlord is sending the data ..
         q_d = {'hardware.run_level__lt':6,'hardware.run_level__gt':2}
         query = Q(**q_d)
-        self.tmp_proxy = OverlordQueryProxy(overlord_obj=self.overlord,fact_query=FuncLogicQuery(query))
+        self.tmp_proxy = OverlordQuery(fact_query=FuncLogicQuery(query))
         serialized = self.tmp_proxy.serialize_query()
         
         min_q = FactsMinion(method_fact_list=self.fact_methods)

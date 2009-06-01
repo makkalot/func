@@ -33,7 +33,7 @@ import func.jobthing as jobthing
 from func.CommonErrors import *
 import func.module_loader as module_loader
 from func.overlord import overlord_module
-
+from func.minion.facts.overlord_query import OverlordQuery
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
@@ -69,14 +69,11 @@ class CommandAutomagic(object):
         module = self.base[0]
         method = ".".join(self.base[1:])
         #here we will inject some variables that will do the facts stuff
-        from func.minion.facts.overlord_query import OverlordQueryProxy
-        if isinstance(self.clientref,OverlordQueryProxy) and self.clientref.fact_query:
+        if self.clientref.overlord_query.fact_query:
             #here get the serializaed object and add
             #at the top of the args ...
-            args =[{'__fact__':self.clientref.serialize_query()}]+list(args)
-            return self.clientref.overlord.run(module,method,args,nforks=self.nforks)
-        else:
-            return self.clientref.run(module,method,args,nforks=self.nforks)
+            args =[{'__fact__':self.clientref.overlord_query.serialize_query()}]+list(args)
+        return self.clientref.run(module,method,args,nforks=self.nforks)
 
 # ===================================
 # this is a module level def so we can use it and isServer() from
@@ -204,6 +201,8 @@ class Overlord(object):
         self.delegate    = delegate
         self.mapfile     = mapfile
         
+        #overlord_query stuff
+        self.overlord_query = OverlordQuery()
 
         self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose)
         self.minions = self.minions_class.get_urls()
@@ -278,7 +277,12 @@ class Overlord(object):
         """
         Use this to acquire status from jobs when using run with async client handles
         """
-        return jobthing.job_status(jobid, client_class=Overlord)
+        status,async_result = jobthing.job_status(jobid, client_class=Overlord)
+        if not self.overlord_query.fact_query:
+            #that will use the default overlord job_status
+            return (status,async_result)
+        else:
+            return (status,self.overlord_query.display_active(async_result))
 
     # -----------------------------------------------
 
@@ -322,7 +326,11 @@ class Overlord(object):
                 raise AttributeError("No such local method: %s" % method)
 
         if not self.delegate: #delegation is turned off, so run normally
-            return self.run_direct(module, method, args, nforks)
+            minion_result = self.run_direct(module, method, args, nforks)
+            if self.overlord_query.fact_query:
+                return self.overlord_query.display_active(minion_result)
+            else:
+                return minion_result
         
         delegatedhash = {}
         directhash = {}
@@ -532,7 +540,121 @@ class Overlord(object):
             if x > max:
                 max = x
         return max
+    
+    def filter(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ANDED
+        """
 
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter(*args,**kwargs)
+        
+        #give back the fresh reference 
+        return fresh_overlord
+    
+    def filter_or(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.filter_or(*args,**kwargs)
+
+        #give back the fresh reference 
+        return fresh_overlord
+    
+    def and_and(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_and(*args,**kwargs)
+        
+        #give back the fresh reference 
+        return fresh_overlord
+
+        
+    
+    def and_or(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.and_or(*args,**kwargs)
+
+        #give back the fresh reference 
+        return fresh_overlord
+        
+    def or_or(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_or(*args,**kwargs)
+
+        #give back the fresh reference 
+        return fresh_overlord
+
+    
+    def or_and(self,*args,**kwargs):
+        """
+        Filter The facts and doesnt call
+        the minion directly just gives back a 
+        reference to the same object ORED
+        """
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.or_and(*args,**kwargs)
+
+        #give back the fresh reference 
+        return fresh_overlord
+
+    def set_complexq(self,q_object,connector=None):
+        #create a fresh overlord 
+        fresh_overlord = self._clone()
+        fresh_overlord.overlord_query.fact_query = self.overlord_query.fact_query.set_compexq(q_object,connector)
+
+        #give back the fresh reference 
+        return fresh_overlord
+    
+    def _clone(self,klass=None):
+        """
+        That method is for situations where we use query stuff
+        when querying it is important to return a fresh object of 
+        Overlord instead of working on the same oone,so we can 
+        work on one instance which reproduces many temporary ones
+        """
+        from copy import copy
+        if klass is None:
+            klass = self.__class__
+        
+        #create a fresh copy
+        c = klass(copy(self.server_spec),
+                  port=copy(self.port),
+                  verbose=copy(self.verbose),
+                  interactive=copy(self.interactive),
+                  config = copy(self.config),
+                  noglobs = copy(self.noglobs),
+                  nforks = copy(self.nforks),
+                  async = copy(self.async),
+                  delegate=copy(self.delegate),
+                  mapfile = copy(self.mapfile)
+                )
+        return c
 
 class Client(Overlord):
     def __init__(self, *args, **kwargs):
