@@ -11,7 +11,7 @@
 
 Summary: Remote management framework
 Name: func
-Version: 0.25
+Version: 0.24.9
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 License: GPLv2+

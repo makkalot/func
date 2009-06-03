@@ -1,4 +1,4 @@
-VERSION		= 0.25 
+VERSION		= 0.24.9 
 RELEASE		= 1
 NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 PYTHON		= /usr/bin/python
