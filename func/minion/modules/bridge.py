@@ -97,8 +97,9 @@ class Bridge(func_module.FuncModule):
                 # Dictionary key containing interface name should already
                 # exist, append the interface.
                 if not curbr in self.options.ignorebridges:
-                    if not vifpattern.match(elements[0]) and listvif == True:
-                        retlist[curbr].append(elements[0])
+                    if vifpattern.match(elements[0]) and listvif == False:
+			continue
+		    retlist[curbr].append(elements[0])
     
         return retlist
 
