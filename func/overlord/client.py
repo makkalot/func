@@ -380,13 +380,22 @@ class Overlord(object):
                         completedhash.update(async_results)
                         del directhash[minion]
                 time.sleep(0.1) #pause a bit so we don't flood our minions
-            return completedhash
+            if self.overlord_query.fact_query:
+                return self.overlord_query.display_active(completedhash)
+            else:
+                return completedhash
+        
+
         
         #we didn't instantiate this Overlord in async mode, so we just return the
         #result hash
         completedhash.update(delegatedhash)
         completedhash.update(directhash)
-        return completedhash
+        
+        if self.overlord_query.fact_query:
+            return self.overlord_query.display_active(completedhash)
+        else:
+            return completedhash
         
         
     # -----------------------------------------------
