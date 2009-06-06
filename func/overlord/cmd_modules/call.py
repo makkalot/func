@@ -84,7 +84,7 @@ class FactsCommand(object):
         for com_key in comma_separated:
             res = self.__convert_keyword(com_key)
             if not res:
-                self.outputUsage()
+                #self.outputUsage()
                 return False
 
             final_dict[res[0]]=res[1]
@@ -98,7 +98,7 @@ class FactsCommand(object):
         """
         for c in comma_list:
             if not c:
-                self.outputUsage()
+                #self.outputUsage()
                 return False
         return True
     
@@ -313,7 +313,6 @@ class Call(base_command.BaseCommand):
                 print "JOB_ID:", pprint.pformat(results)
                 return results
             else:
-                
                 return self.overlord_obj.local.utils.async_poll(results, self.print_results)
 
         # dump the return code stuff atm till we figure out the right place for it
