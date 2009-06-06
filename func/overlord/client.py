@@ -33,7 +33,7 @@ import func.jobthing as jobthing
 from func.CommonErrors import *
 import func.module_loader as module_loader
 from func.overlord import overlord_module
-from func.minion.facts.overlord_query import OverlordQuery
+from func.minion.facts.overlord_query import OverlordQuery,display_active_facts
 # ===================================
 # defaults
 # TO DO: some of this may want to come from config later
@@ -69,7 +69,7 @@ class CommandAutomagic(object):
         module = self.base[0]
         method = ".".join(self.base[1:])
         #here we will inject some variables that will do the facts stuff
-        if self.clientref.overlord_query.fact_query:
+        if self.clientref.overlord_query.fact_query and module != "local":
             #here get the serializaed object and add
             #at the top of the args ...
             args =[{'__fact__':self.clientref.overlord_query.serialize_query()}]+list(args)
@@ -280,7 +280,7 @@ class Overlord(object):
         status,async_result = jobthing.job_status(jobid, client_class=Overlord)
         if not self.overlord_query.fact_query:
             #that will use the default overlord job_status
-            return (status,async_result)
+            return (status,display_active_facts(async_result))
         else:
             return (status,self.overlord_query.display_active(async_result))
 
