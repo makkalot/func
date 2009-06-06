@@ -3,6 +3,28 @@
 
 from func.minion.facts.query import FuncLogicQuery
 
+def display_active_facts(result,with_facts=False):
+    """
+    When we got all of the resultsfrom minions we may need
+    to display only the parts that match the facts query
+    """
+    
+    if type(result) != dict:
+        return result
+    
+    final_display = {}
+    for minion_name,minion_result in result.iteritems():
+        #CAUTION ugly if statements around :)
+        if type(minion_result) == list and type(minion_result[0]) == dict and minion_result[0].has_key('__fact__') :
+            if minion_result[0]['__fact__'][0] == True:
+                if with_facts:
+                    final_display[minion_name] = minion_result
+                else:
+                    final_display[minion_name] = minion_result[1:][0]
+        else:
+            return result
+    return final_display
+
 class OverlordQuery(object):
     """
     That class will encapsulate the Overlord
@@ -54,23 +76,9 @@ class OverlordQuery(object):
     
     def display_active(self,result,with_facts=False):
         """
-        When we got all of the resultsfrom minions we may need
-        to display only the parts that match the facts query
+        Get active ones only
         """
-        if type(result) != dict:
-            return result
+        return display_active_facts(result,with_facts)
 
-        final_display = {}
-        for minion_name,minion_result in result.iteritems():
-            #CAUTION ugly if statements around :)
-            if type(minion_result) == list and type(minion_result[0]) == dict and minion_result[0].has_key('__fact__') :
-                if minion_result[0]['__fact__'][0] == True:
-                    if with_facts:
-                        final_display[minion_name] = minion_result
-                    else:
-                        final_display[minion_name] = minion_result[1:][0]
-            else:
-                return result
 
-        return final_display
 
