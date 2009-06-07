@@ -5,8 +5,13 @@ from func.minion.facts.query import FuncLogicQuery
 
 def display_active_facts(result,with_facts=False):
     """
-    When we got all of the resultsfrom minions we may need
+    When we got all of the results from minions we may need
     to display only the parts that match the facts query
+
+    @type  with_facts : boolean
+    @param with_facts : If you want to see the incoming fact values
+                        that should be True,but it may make sense for
+                        Python API only .
     """
     
     if type(result) != dict:
@@ -27,9 +32,10 @@ def display_active_facts(result,with_facts=False):
 
 class OverlordQuery(object):
     """
-    That class will encapsulate the Overlord
-    class and do the stuff invisibly to the
-    user
+    That is the overlord part of the facts query
+    which will be included in Overlord class.The
+    most important duty will be to convert FuncLogicQuery
+    objects to lists so can be transferred over the wire:)
     """
     def __init__(self,*args,**kwargs):
         """
@@ -59,6 +65,11 @@ class OverlordQuery(object):
         Recuresvily traverse the Q object and return
         back a list like structure which is ready tobe
         sent ...
+
+        @type  q_object : FuncLogicQuery
+        @param q_object : FuncLogicQuery
+        
+        @return : list of fact logic
         """
         results=[] 
         for n in q_object.children:
@@ -77,7 +88,13 @@ class OverlordQuery(object):
     def display_active(self,result,with_facts=False):
         """
         Get active ones only
+        
+        @type  with_facts : boolean
+        @param with_facts : If you want to see the incoming fact values
+                        that should be True,but it may make sense for
+                        Python API only .
         """
+        
         return display_active_facts(result,with_facts)
 
 

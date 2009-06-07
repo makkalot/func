@@ -6,7 +6,8 @@ class BaseFactModule(object):
     The base fact module  which is clever
     enough to register the facts it is kind
     of FuncModule but registers modules with 
-    different convention and style ..
+    different convention and style .. Look
+    into other modules to get the idea ...
     """
     version = "0.0.0"
     description = "Base module of all facts"
@@ -22,6 +23,16 @@ class BaseFactModule(object):
     
     def register_facts(self,fact_callers,module_name,abort_on_conflict=False):
         # a dictionary to catch the conflicts
+        """
+        Be careful not override that method in your classes!
+
+        @param abort_on_conflict : Fact methods use a system called global tagging
+                                   So it maybe easy to get conflicts (having 2 facts)
+                                   with tha same name so when that is True it will
+                                   tell user that something is wrong. There is no need
+                                   to worry about the unittests will vcatch if sth bad 
+                                   happens ...
+        """
         conflicts = {}
         for attr in dir(self):
             if self.__is_public_valid_method(attr):
