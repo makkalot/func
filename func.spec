@@ -11,7 +11,7 @@
 
 Summary: Remote management framework
 Name: func
-Version: 0.24.9
+Version: 0.25
 Release: 1%{?dist}
 Source0: %{name}-%{version}.tar.gz
 License: GPLv2+
@@ -117,7 +117,7 @@ rm -fr $RPM_BUILD_ROOT
 
 #%attr(0644,root,root) %verify(not md5 size mtime) %ghost %config(missingok,noreplace) /var/log/prelink/prelink.log
 
-%doc AUTHORS README LICENSE
+%doc AUTHORS README LICENSE CHANGES
 %{_mandir}/man1/func.1.gz
 %{_mandir}/man1/func-inventory.1.gz
 %{_mandir}/man1/funcd.1.gz
@@ -164,7 +164,10 @@ fi
 
 
 %changelog
-* Wed May 27 2009 Adrian Likins <alikins@redhat.com> = 0.25-1
+* Wed Jun 10 2009 Adrian Likins <alikins@redhat.com> - 0.25-1
+- add CHANGES to spec file
+
+* Wed May 27 2009 Adrian Likins <alikins@redhat.com> - 0.25-1
 - add /var/log/func/*.log files to spec
 - add a post section to chmod any log files with bogus perms
   
