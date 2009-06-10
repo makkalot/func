@@ -1,0 +1,230 @@
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import scoped_session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+Base = declarative_base()
+class Group(Base):
+    """
+    Group Table
+    """
+    __tablename__ = 'groups'
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String,nullable=False)
+    
+    def __init__(self,name):
+        self.name = name
+        
+    def __repr__(self):
+        return "<Group('%s')>" % (self.name)
+
+class Host(Base):
+    """
+    Hosts Table
+    """
+
+    __tablename__ = 'hosts'
+    
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    group_id = Column(Integer, ForeignKey('groups.id'))
+    
+    group = relation(User, backref=backref('hosts', order_by=id))
+    
+    def __init__(self, name,group_id):
+        self.name = name
+        self.group_id = group_id
+    
+    def __repr__(self):
+        return "<Host('%s')>" % self.name
+
+
+CONF_FILE = "/etc/certmaster/certmaster.conf"
+DB_PATH = "/var/lib/certmaster/groups.db"
+from certmaster.config import read_config
+from certmaster.commonconfig import CMConfig
+from func.overlord.group.base import BaseBackend
+import os
+
+class SqliteBackend(BaseBackend):
+    """
+    Sqlite backend for groups api
+    """
+
+    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH*args,**kwargs):
+        """
+        Initializing the database if it doesnt exists it is created and
+        connection opened for serving nothing special
+
+        @param conf_file : Configuration file
+        @param db_file   : Place of the database file override if needed
+        """
+        self.config = conf_file or CONF_FILE
+        self.config = read_config(self.config,CMConfig)
+        self.db_path = self.config.group_db or db_file or DB_PATH
+
+        if os.path.exists(self.db_path):
+            #we have it so dont have to create the databases
+            engine = create_engine('sqlite:///%s'%self.db_path, echo=True)
+        else:
+            engine = create_engine('sqlite:///%s'%self.db_path, echo=True)
+            Base.metadata.create_all(engine)
+
+        #create a session for querying
+        Session = scoped_session(sessionmaker(bind=engine))
+        self.session = Session()
+    
+    def add_group(self,group,save=True):
+        """
+        Adds a group
+        """
+        #check for group first
+        group = self._group_exists(group)
+        if not group[0]:
+            return group
+        else:
+            group = group[1]
+        
+        #add the group
+        self.session.add(Group(group.name))
+        self._check_commit(save)
+        return (True,'')
+    
+    def add_host_to_group(self,group,host,save=True):
+        """
+        Adds a host to a group
+        """
+        #check for group first
+        group = self._group_exists(group)
+        if not group[0]:
+            return group
+        else:
+            group = group[1]
+
+        
+         #check for dupliate
+         host_db = None
+         try:
+            host_db=self.session.query(Host).filter_by(name=host,group_id=group.id).one()
+        except Exception,e:
+            #we dont have it so we can add it
+            self.session.add(Host(host,group.id))
+            self._check_commit(save)
+
+        if host_db:
+            return (False,"The host is already in database %s "%host)
+        else:
+            return (True,'')
+    
+    def remove_group(self,group,save=True):
+        """
+        Removes a group
+        """
+       #check for group first
+        group = self._group_exists(group)
+        if not group[0]:
+            return group
+        else:
+            group = group[1]
+        
+        session.delete(group)
+        self._check_commit(save)
+        return (True,'')
+
+
+    def remove_host(self,group,host,save=True):
+        """
+        Remove a host from groups
+        """
+        #check for group first
+        group = self._group_exists(group)
+        if not group[0]:
+            return group
+        else:
+            group = group[1]
+
+         #check for dupliate
+         host_db = None
+         try:
+            host_db=self.session.query(Host).filter_by(name=host,group_id=group.id).one()
+        except Exception,e:
+            #we dont have it so we can add it
+            return (False,str(e))
+            
+        self.session.delete(host_db)
+        self._check_commit(save)
+    
+    def save_changes(self):
+        """
+        Save the stuff that is in memory
+        """
+        self._check_commit()
+
+    
+    def get_groups(self,pattern=None,exact=True):
+        """
+        Get a set of groups
+        """
+        if not pattern:
+            #that means we want all of them
+            return [g.name g in self.session.query(Group).all]
+        else:
+            if not exact:
+                return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
+            else:
+                return [g.name g in session.query(Group).filter(name=pattern).all()]
+    
+    def get_hosts(self,pattern=None,group=None,exact=True):
+        """
+        Get a set of groups
+        """
+        if not pattern:
+            #if there is no pattern there are 2 possible options
+            if group:
+                group = self._group_exists(group)
+                if not group[0]:
+                    return []
+                else:
+                    group = group[1]
+                    return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).all()]
+            else:
+                return [h.name for h in self.session.query(Host).all()]
+        else:
+            #there is some pattern so we should go for it
+            if group:
+                group = self._group_exists(group)
+                if not group[0]:
+                    return []
+                else:
+                    group = group[1]
+
+                if exact:
+                    return [h.name for h in self.session.query(Host).filter_by.(name=pattern,group_id=group.id).all()]
+                else:
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).all()]
+            else:
+                if exact:
+                    return [h.name for h in self.session.query(Host).filter_by.(name=pattern).all()]
+                else:
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).all()]
+
+    def _check_commit(self,commit=True):
+        """
+        A simple util that checks if we should commit
+        """
+        if commit:
+            self.session.commit()
+
+    def _group_exists(self,group):
+        """
+        Checks if a group already exists
+        """
+        try:
+            group=self.session.query(Group).filter_by(name=group).one()
+            return (True,group)
+        except Exception,e::
+            return (False,str(e))
+

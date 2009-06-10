@@ -1,0 +1,204 @@
+## func command line interface & client lib
+##
+## Copyright 2007,2008 Red Hat, Inc
+## Adrian Likins <alikins@redhat.com>
+## +AUTHORS
+##
+## This software may be freely redistributed under the terms of the GNU
+## general public license.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program; if not, write to the Free Software
+## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+##
+
+
+# this module lets you define groups of systems to work with from the
+# commandline. It uses an "ini" style config parser like:
+
+#[groupname]
+#host = foobar, baz, blip
+#subgroup = blippy; flozzy
+
+# Subgrouping is supported only one level down, but group can have both
+# hosts and many subgroups with other hosts
+
+import ConfigParser
+import sys
+GROUP_FILE = "/etc/func/groups"
+
+
+from func.overlord.group.base import BaseBackend
+
+class ConfBackend(BaseBackend):
+    """
+    That backend uses a configuraton file for 
+    keeping the stuff
+    """
+    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH*args,**kwargs):
+        """
+        Initializing the database if it doesnt exists it is created and
+        connection opened for serving nothing special
+
+        @param conf_file : Configuration file
+        """
+        self.config = conf_file or CONF_FILE
+        self.__groups = {}
+        self.__subgroups = {}
+        self.__parse()
+
+
+    
+    def __parse(self):
+
+        self.cp = ConfigParser.SafeConfigParser()
+        self.cp.read(self.config)
+
+        #loop through the group_names
+        for section in self.cp.sections():
+            options = self.cp.options(section)
+            for option in options:
+                if option == "host":
+                    self.add_hosts_to_group(section, self.cp.get(section, option))
+                if option == "subgroup":
+                    self.add_subgroups_to_group(section, self.cp.get(section, option))
+    
+        
+    def add_host_to_group(self,group,host,save=True):
+        """
+        Adds a host to a group
+        """
+        if not self.__groups.has_key(group):
+            self.__groups[group] = []
+
+        #dont want duplicates
+        if not host in self.__groups[group]:
+            self.__groups[group].append(host)
+
+        if save:
+            self.save_changes()
+
+    def add_subgroup_to_group(self,group,subgroup,save=True):
+        """
+        Here you can add more than one subgroup to a given group
+        """
+        if group not in self.__groups:
+            self.__groups[group] = []
+
+        if group not in self.__subgroups:
+            self.__subgroups[group] = []
+
+        #dont want duplicates
+        if subgroup not in self.__subgroups[group]:
+            self.__subgroups[group].append(subgroup)
+
+        if save:
+            self.save_changes()
+    
+    def add_group(self,group,save=True):
+        """
+        Adds a group
+        """
+        if self.__groups.has_key(group):
+            return (False,"Group name : %s already exists")
+        #create with an empty list
+        self.__groups[group] = []
+        if save:
+            self.save_changes()
+
+        return (True,'') #success
+
+    def remove_group(self,group,save=True):
+        """
+        Removes a group
+        """
+        if not self.__groups.has_key(group):
+            return (False,"Group name : %s doesnt exist"%group)
+        #delete that entry
+        if group_name in self.cp.sections():
+            #if we have it also here should remove it
+            if self.cp.has_section(group):
+                self.cp.remove_section(group)
+        #delete the entry
+        del self.__groups[group]
+
+        if group_name in self.__subgroups:
+            del self.__subgroups[group_name]
+
+        #Do you want to store it ?
+        if save:
+            self.save_changes()
+        return (True,'')
+
+    def remove_host(self,group,host,save=True):
+        """
+        Remove a host from groups
+        """
+        if not self.__groups.has_key(group) or not host in self.__groups[group]:
+            return (False,"Non existing group or name")
+        
+        #remove the machine from there
+        self.__groups[group].remove(host)
+        #save to config file
+        if save:
+            self.save_changes()
+
+        return (True,'')
+
+    def remove_subgroup(self,group,subgroup,save=True):
+        """
+        Remove a subgroup
+        """
+        if not self.__subgroups.has_key(group) or not subgroup in self.__subgroups[group]:
+            return (False,"Non existing group or name")
+
+        #remove the machine from there
+        self.__subgroups[group].remove(subgroup)
+
+        # remove subgroup if it is empty
+        if not self.__subgroups[group]:
+            del self.__subgroups[group]
+
+        #save to config file
+        if save:
+            self.save_changes()
+
+        return (True,'')
+
+    def save_changes(self):
+        """
+        Write changes to disk
+        """
+        for group_name,group_hosts in self.__groups.iteritems():
+            #if we have added a new group add it to config object
+            if not group_name in self.cp.sections():
+                self.cp.add_section(group_name)
+            self.cp.set(group_name,"host",",".join(group_hosts))
+            if group_name in self.__subgroups:
+                self.cp.set(group_name,"subgroup",",".join(self.__subgroups[group_name]))
+            #print "Im in save changes and here i have : ",self.cp.get(group_name,"host")
+
+        #store tha changes
+        conf_file = open(self.__filename, "w")
+        self.cp.write(conf_file)
+
+    
+    def get_groups(self,pattern=None,exact=True):
+        """
+        Get a set of groups
+        """
+        raise NotImplementedError
+
+    def get_hosts(self,pattern=None,group=None,exact=True):
+
+        """
+        Get a set of groups
+        """
+        raise NotImplementedError
+    
+    def get_subgroups(self,pattern=None,group=None,exact=True):
+        """
+        Simple getter
+        """
+        raise NotImplementedError
+
