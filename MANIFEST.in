@@ -7,4 +7,4 @@ recursive-include po *.pot
 include AUTHORS
 include LICENSE
 include README
-
+include CHANGES
