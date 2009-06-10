@@ -109,7 +109,7 @@ def get_hostname_by_route():
     # try to find the hostname of the ip we're listening on
     if minion_config.listen_addr:
         try:
-            (hostname, aliases, ips) = socket.gethostbyaddr(listen_addr)
+            (hostname, aliases, ips) = socket.gethostbyaddr(minion_config.listen_addr)
         except:
             hostname = None
      
