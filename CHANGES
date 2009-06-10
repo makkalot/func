@@ -1,0 +1,139 @@
+Changes in 0.25
+
+bugs fixed:
+     
+
+	https://fedorahosted.org/func/ticket/76:
+		umask not set correctly
+		(fixed, change in certmaster/utils.py)
+
+	https://fedorahosted.org/func/ticket/72: 
+		cli timeout needed
+
+	https://fedorahosted.org/func/ticket/70:
+		func/certmaster need a exception handler to catch and log exceptions
+
+	https://fedorahosted.org/func/ticket/75:
+		func --help as non-root gives traceback
+
+	https://fedorahosted.org/func/ticket/74:
+		Need permissions on logfile to run func --help
+
+	https://fedorahosted.org/func/ticket/69:
+		Incorrect homepage field in setup.py
+
+	some untracked bug fixes:
+	     	- init script lsb functions werent returning proper exit codes
+		- more changes to how a minion finds it's hostname
+		- remove the use of the "version" file in the build to
+		be a bit friendlier to the automated fedora build tools
+		- remove #! paths from most stuff except what needs it
+		- Fixed bridge module listing issue when vifX.Y interfaces were present in brctl show	
+
+Features added:
+	- pullfile module added by Léon Keijser
+	- add some subgroup capabilities to the grouping functionality
+	- add support for --timeout command line option and socket_timeout
+	option to /etc/func/overlord.conf
+	- add /etc/func/overlord.conf
+	- add "minion_name" config option to specify the hostname the
+	minion should use
+	- rpm module now has a "verify" method, (Milton Paiva Neto)
+	- func --help sh
+	- add "minion-to-minion" support (see https://fedorahosted.org/func/wiki/MinionToMinion)
+	- add --basic support to "func call"
+	- support for setting up vnc in the virt module
+	- support for getting/setting libvirt xml directly (Simone Pucci)
+	- man pages for all executables now (Nima Talebi, Steve Salevan)
+	- include a monit config file
+	- loadavg method for process module
+	- users.py unix user and group module (Gregory Masseau)
+	- add an augeas module (Louis Coilliot)
+	- add an httpd module (John Eckersberg)
+	- add bridge and vlan modules (Jasper Capel)
+	- add some support for rhel3 [using python2.3] (Greg Swift)
+	- if we get a cert request that doesn't match the current key, throw
+	a more useful error message
+	
+
+Misc Changes:
+     
+
+
+New Contributors
+	Léon Keijser, Milton Paiva Neto,  Wouter Spee, James Cammarata, 
+	Simone Pucci, Nima Talebi, Gregory Masseau, Greg Swift
+
+
+
+Changes in 0.24
+
+
+bugs fixed:
+	https://fedorahosted.org/func/ticket/67:
+		 func passes open fd's to child process
+
+	https://fedorahosted.org/func/ticket/31: 
+	        ports are hardcoded thoughtout app
+
+		ports are now configurable, see https://fedorahosted.org/func/wiki/PortInfo
+
+	https://fedorahosted.org/func/ticket/65: 
+		logrotate remove acls every week
+
+		(patch from lfoppiano)
+
+	https://fedorahosted.org/func/ticket/66:
+		 Init script does not run properly in debian/ubuntu
+		
+		(patch from tbielawa)
+
+	https://fedorahosted.org/func/ticket/60:
+		 ValueError: substring not found' traceback caused by certain minions
+		
+		(fixed with changes to certmaster in certmaster-0.24)
+	
+	https://fedorahosted.org/func/ticket/61:
+		 "show" sub command fails/ module_loader needs to load multiple classes per module
+
+	https://fedorahosted.org/func/ticket/32: 
+		Copyfile implementation needs improvements for large files.
+		
+		(patch from kadamski)
+
+
+	https://bugzilla.redhat.com/show_bug.cgi?id=474644: 
+		unowned directories in func spec
+
+	Some untracked bug fixes:
+		- func-transmit sometimes sends bools as strings, so work aroung it
+		- init scripts use proper $DAEMON invocation
+		- Client api was failing when init'ed with ASync=None
+		- jobthing.py cleanups
+		- fixed "local" client api namespace
+		- minion module config useage cleanup and tested and documented
+		- updates/fixes to bridge/vlan modules
+		- init script lsb functions werent returning proper exit codes
+		- more changes to how a minion finds it's hostname
+				
+
+Features added:
+
+	- command.run changes to allow shell wildcards and redirects, test cases added
+	- ports that func/certmaster run on are now configurable
+	- filetracker module now supports globs
+	- func_getargs.py module added for more introspection support
+	- system.inventory() method that returns a list of all available modules/methods for use
+	  with func-inventory
+	- djangoctrl module added by Steve Milner
+	- pullfile module added by Léon Keijser
+	- add some subgroup capabilities to the grouping functionality
+
+
+other misc changes
+	- lots of new test cases, support for running code coverage for unit tests
+	- lots of code cleanup
+	- some new docs (sslInfo, PortInfo, AixSetupGuide)
+
+New Contributors
+	Silas Sewell, Louis Coilliot, Jasper Capel, Léon Keijser, Milton Paiva Neto
