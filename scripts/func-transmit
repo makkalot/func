@@ -80,9 +80,13 @@ def write_data(format, data):
         output = yaml.dump(data)
     print output
 
+class FuncTransmitOptionParser(optparse.OptionParser):
+    def get_version(self):
+	return file("/etc/func/version").read().strip()
+
 def main(argv):
 # load input parameters
-    parser = optparse.OptionParser()
+    parser = FuncTransmitOptionParser(version=True)
     parser.add_option("-j","--json",
                       help="Json Parser",
                       action="store_true",
