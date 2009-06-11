@@ -141,6 +141,14 @@ class Minions(object):
                 tmp_hosts.add(host)
         return tmp_hosts,tmp_certs
 
+    
+    def get_hosts_for_spec(self,spec):
+        """
+        Be careful when editting that method it will be used
+        also by groups api to pull machines to have better
+        glob control there ...
+        """
+        return self._get_hosts_for_spec(spec)[0]
 
 
 
