@@ -44,7 +44,6 @@ class ConfBackend(BaseBackend):
         """
         self.config = conf_file or CONF_FILE
         self.__groups = {}
-        self.__subgroups = {}
         self.__parse()
 
 
@@ -78,23 +77,7 @@ class ConfBackend(BaseBackend):
         if save:
             self.save_changes()
 
-    def add_subgroup_to_group(self,group,subgroup,save=True):
-        """
-        Here you can add more than one subgroup to a given group
-        """
-        if group not in self.__groups:
-            self.__groups[group] = []
-
-        if group not in self.__subgroups:
-            self.__subgroups[group] = []
-
-        #dont want duplicates
-        if subgroup not in self.__subgroups[group]:
-            self.__subgroups[group].append(subgroup)
-
-        if save:
-            self.save_changes()
-    
+   
     def add_group(self,group,save=True):
         """
         Adds a group
@@ -145,26 +128,7 @@ class ConfBackend(BaseBackend):
 
         return (True,'')
 
-    def remove_subgroup(self,group,subgroup,save=True):
-        """
-        Remove a subgroup
-        """
-        if not self.__subgroups.has_key(group) or not subgroup in self.__subgroups[group]:
-            return (False,"Non existing group or name")
-
-        #remove the machine from there
-        self.__subgroups[group].remove(subgroup)
-
-        # remove subgroup if it is empty
-        if not self.__subgroups[group]:
-            del self.__subgroups[group]
-
-        #save to config file
-        if save:
-            self.save_changes()
-
-        return (True,'')
-
+    
     def save_changes(self):
         """
         Write changes to disk
@@ -183,22 +147,63 @@ class ConfBackend(BaseBackend):
         self.cp.write(conf_file)
 
     
-    def get_groups(self,pattern=None,exact=True):
+    def get_groups(self,pattern=None,exact=True,exclude=None):
         """
         Get a set of groups
         """
-        raise NotImplementedError
+        if not pattern:
+            #return all of them
+            if not exclude:
+                return self.__groups.keys()
+            else:
+                return list(set(self.__groups.keys()).difference(set(exclude)))
+        else:
+            #it seems there is a pattern
+            if not exact:
+                #there is no mean to check here for
+                #exclude list ...
+                for g in self.__groups.keys():
+                    if g == pattern:
+                        return [g]
+                return []
+            else:
+                if not exclude:
+                    tmp_l = set()
+                    for g in self.__groups.keys():
+                        if pattern in g:
+                            tmp_l.add(g)
+                    return list(tmp_l)
+                else:
+                    tmp_l = set()
+                    for g in self.__groups.keys():
+                        if pattern in g:
+                            tmp_l.add(g)
+                    return list(tmp_l.difference(set(exclude)))
 
-    def get_hosts(self,pattern=None,group=None,exact=True):
+            #shouldnt come here actually
+            return []
+
+
+    def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
 
         """
         Get a set of groups
         """
-        raise NotImplementedError
+        group = self.get_groups(pattern=group,exact=True)
+        if not group or len(group)>1:
+            return []
+
+        hosts = self.__groups[group]
+
+        if pattern:
+            if exact:
+                pass
+            else:
+                if exclude:
+                    pass
+                else:
+                    pass
+        else:
+            pass
     
-    def get_subgroups(self,pattern=None,group=None,exact=True):
-        """
-        Simple getter
-        """
-        raise NotImplementedError
-
+    
