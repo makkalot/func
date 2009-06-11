@@ -36,8 +36,6 @@ class FuncCommandLine(command.Command):
         pass
 
     def addOptions(self):
-        self.parser.add_option('', '--version', action="store_true",
-            help="show version information")
         self.parser.add_option('-t', '--timeout', dest="timeout", type="float",
                                help="Set default socket timeout in seconds")
 
@@ -63,9 +61,5 @@ class FuncCommandLine(command.Command):
         # maybe a class variable self.data on Command?
 
     def handleOptions(self, options):
-        if options.version:
-            #FIXME
-            sys.stderr.write("version is NOT IMPLEMENTED YET\n")
-
         if options.timeout:
             self.socket_timeout = options.timeout
