@@ -1,5 +1,6 @@
-VERSION		= 0.25 
+VERSION		= 0.25
 RELEASE		= 1
+DATE		= $(shell date)
 NEWRELEASE	= $(shell echo $$(($(RELEASE) + 1)))
 PYTHON		= /usr/bin/python
 
@@ -18,7 +19,14 @@ MANPAGES = funcd func func-inventory func-transmit func-build-map func-create-mo
 
 all: rpms
 
+versionfile:
+	echo "version:" $(VERSION) > etc/version
+	echo "release:" $(RELEASE) >> etc/version
+	echo "source build date:" $(DATE) >> etc/version
+	echo "git commit:" $(shell git log -n 1 --pretty="format:%H") >> etc/version
+	echo "git date:" $(shell git log -n 1 --pretty="format:%cd") >> etc/version
 
+#	echo $(shell git log -n 1 --pretty="format:git commit: %H from \(%cd\)") >> etc/version 
 manpage:
 	for manpage in $(MANPAGES); do (pod2man --center=$$manpage --release="" ./docs/$$manpage.pod | gzip -c > ./docs/$$manpage.1.gz); done
 
@@ -28,7 +36,7 @@ messages:
 	sed -i'~' -e 's/SOME DESCRIPTIVE TITLE/func/g' -e 's/YEAR THE PACKAGE'"'"'S COPYRIGHT HOLDER/2007 Red Hat, inc. /g' -e 's/FIRST AUTHOR <EMAIL@ADDRESS>, YEAR/Adrian Likins <alikins@redhat.com>, 2007/g' -e 's/PACKAGE VERSION/func $(VERSION)-$(RELEASE)/g' -e 's/PACKAGE/func/g' $(MESSAGESPOT)
 
 
-build: clean
+build: clean versionfile
 	$(PYTHON) setup.py build -f
 
 clean:
@@ -37,6 +45,7 @@ clean:
 	-rm -rf *~
 	-rm -rf rpm-build/
 	-rm -rf docs/*.gz
+	-rm -f etc/version
 	-for d in $(DIRS); do ($(MAKE) -C $$d clean ); done
 
 clean_hard:
