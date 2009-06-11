@@ -84,7 +84,7 @@ class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
                  just_fqdns=False, groups_file=None,
-                 delegate=False, minionmap={}):
+                 delegate=False, minionmap={},exclude_spec=None):
 
         self.spec = spec
         self.port = port
@@ -93,50 +93,86 @@ class Minions(object):
         self.just_fqdns = just_fqdns
         self.delegate = delegate
         self.minionmap = minionmap
+        self.exclude_spec = exclude_spec
 
         self.cm_config = read_config(CONFIG_FILE, CMConfig)
         self.group_class = groups.Groups(filename=groups_file)
         
-        self.all_hosts = []
-        self.all_certs = []
+        #lets make them sets so we dont loop again and again
+        self.all_hosts = set()
+        self.all_certs = set()
         self.all_urls = []
 
     def _get_new_hosts(self):
-        self.new_hosts = self.group_class.get_hosts_by_group_glob(self.spec)
+        self.new_hosts = self._get_group_hosts(self.spec)
         return self.new_hosts
 
-    def _get_all_hosts(self):
-        seperate_gloobs = self.spec.split(";")
-        seperate_gloobs = seperate_gloobs + self.new_hosts
+    def _get_group_hosts(self,spec):
+        return self.self.group_class.get_hosts_by_group_glob(spec)
+
+    def _get_hosts_for_spec(self,seperate_gloobs):
+        """
+        Gets the hosts and certs for proper spec
+        """
+        tmp_hosts = set()
+        tmp_certs = set()
         for each_gloob in seperate_gloobs:
-            #if there is some string from group glob just skip it
             if each_gloob.startswith('@'):
                 continue
+            
             actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
             certs = glob.glob(actual_gloob)
             # pull in peers if enabled for minion-to-minion
             if self.cm_config.peering:
                 peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
                 certs += glob.glob(peer_gloob)
-
+            
             for cert in certs:
                 #if the spec includes some groups and also it includes some *
                 #may cause some duplicates so should check that
                 #For example spec = "@home_group;*" will give lots of duplicates as a result
-                if not cert in self.all_certs:
-                    self.all_certs.append(cert)
-		    # use basename to trim off any excess /'s, fix
-		    # ticket #53 "Trailing slash in certmaster.conf confuses glob function
-                    certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
-                    if self.cm_config.peering:
-                        certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
-                    host = certname[:-(len(self.cm_config.cert_extension) + 1)]
-                    self.all_hosts.append(host)
+                tmp_certs.add(cert)
+		        # use basename to trim off any excess /'s, fix
+		        # ticket #53 "Trailing slash in certmaster.conf confuses glob function
+                certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
+                if self.cm_config.peering:
+                    certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
+                host = certname[:-(len(self.cm_config.cert_extension) + 1)]
+                tmp_hosts.add(host)
+        return tmp_hosts,tmp_certs
+
+
+
+
+    def _get_all_hosts(self):
+        """
+        Gets hosts that are included and excluded by user
+        a better orm like spec so user may say 
+        func "*" --exclude "www.*;@mygroup" ...
+        """
+        included_part = self._get_hosts_for_spec(self.spec.split(";")+self.new_hosts)
+        self.all_certs=self.all_certs.union(included_part[1])
+        self.all_hosts=self.all_hosts.union(included_part[0])
+        
+        #excluded ones
+        if self.exclude_spec:
+            #get first groups ypu dont want to run :
+            group_exclude = self._get_group_hosts(self.exclude_spec)
+            excluded_part = self._get_hosts_for_spec(self.exclude_spec.split(";")+group_exclude)
+            self.all_certs = self.all_certs.difference(excluded_part[1])
+            self.all_hosts = self.all_hosts.difference(excluded_part[0])
+
+
 
     def get_all_hosts(self):
+        """
+        Get current host list
+        """
         self._get_new_hosts()
         self._get_all_hosts()
-        return self.all_hosts
+
+        #we keep it all the time as a set so 
+        return list(self.all_hosts)
 
     def get_urls(self):
         self._get_new_hosts()
