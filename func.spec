@@ -75,10 +75,12 @@ rm -fr $RPM_BUILD_ROOT
 %{_bindir}/func-transmit
 %{_bindir}/func-build-map
 #%{_bindir}/update-func
+
 /etc/init.d/funcd
 %dir %{_sysconfdir}/%{name}
 %dir %{_sysconfdir}/%{name}/minion-acl.d/
 %dir /etc/func/modules/
+
 %config(noreplace) /etc/func/minion.conf
 %config(noreplace) /etc/func/async_methods.conf
 %config(noreplace) /etc/func/overlord.conf
@@ -86,6 +88,8 @@ rm -fr $RPM_BUILD_ROOT
 %config(noreplace) /etc/func/modules/Test.conf
 %config(noreplace) /etc/func/modules/Bridge.conf
 %config(noreplace) /etc/func/modules/Vlan.conf
+%config /etc/func/version
+
 %dir %{python_sitelib}/func
 %dir %{python_sitelib}/func/minion
 %dir %{python_sitelib}/func/overlord
@@ -164,6 +168,9 @@ fi
 
 
 %changelog
+* Thu Jun 11 2009 Adrian Likins <alikins@redhat.com> - 0.25-1
+- add /etc/func/version
+
 * Wed Jun 10 2009 Adrian Likins <alikins@redhat.com> - 0.25-1
 - add CHANGES to spec file
 
