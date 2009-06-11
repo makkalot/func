@@ -10,12 +10,7 @@ class BaseBackend(object):
         """
         raise NotImplementedError
 
-    def add_subgroup_to_group(self,group,subgroup,save=True):
-        """
-        Here you can add more than one subgroup to a given group
-        """
-        raise NotImplementedError
-    
+   
     def add_group(self,group,save=True):
         """
         Adds a group
@@ -34,34 +29,24 @@ class BaseBackend(object):
         """
         raise NotImplementedError
 
-    def remove_subgroup(self,group,subgroup,save=True):
-        """
-        Remove a subgroup
-        """
-        raise NotImplementedError
-    
+        
     def save_changes(self):
         """
         Push the stuff that is in memory
         """
         raise NotImplementedError
 
-    def get_groups(self,pattern=None,exact=True):
+    def get_groups(self,pattern=None,exact=True,exclude=None):
         """
         Get a set of groups
         """
         raise NotImplementedError
 
-    def get_hosts(self,pattern=None,group=None,exact=True):
+    def get_hosts(self,pattern=None,group=None,exact=True,exclude=NotImplementedError):
 
         """
         Get a set of groups
         """
         raise NotImplementedError
     
-    def get_subgroups(self,pattern=None,group=None,exact=True):
-        """
-        Simple getter
-        """
-        raise NotImplementedError
-
+    
