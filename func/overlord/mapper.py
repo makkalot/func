@@ -25,6 +25,10 @@ from func import utils
 
 DEFAULT_TREE = "/var/lib/func/map"
 
+class MapperOptionParser(optparse.OptionParser):
+    def get_version(self):
+        return file("/etc/func/version").read().strip()
+
 class MapperTool(object):
 
     def __init__(self):
@@ -32,7 +36,7 @@ class MapperTool(object):
     
     def run(self,args):
     
-        p = optparse.OptionParser()
+        p = MapperOptionParser(version=True)
         #currently not implemented
         p.add_option("-a", "--append",
                      dest="append",
