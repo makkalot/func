@@ -22,6 +22,7 @@ import pprint
 import xmlrpclib
 from func.minion import sub_process
 import func.overlord.client as func_client
+from func.overlord.command import FuncOptionParser
 import func.utils as utils
 
 DEFAULT_TREE = "/var/lib/func/inventory/"
@@ -34,7 +35,7 @@ class FuncInventory(object):
 
     def run(self,args): 
 
-        p = optparse.OptionParser()
+        p = FuncOptionParser(version=True)
         p.add_option("-v", "--verbose",
                      dest="verbose",
                      action="store_true",
