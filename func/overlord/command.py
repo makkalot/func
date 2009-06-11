@@ -56,7 +56,11 @@ class CommandHelpFormatter(optparse.IndentedHelpFormatter):
             ret += "\n" + "\n".join(commandDesc) + "\n"
         return ret
 
-class CommandOptionParser(optparse.OptionParser):
+class FuncOptionParser(optparse.OptionParser):
+    def get_version(self):
+        return file("/etc/func/version").read().strip()
+
+class CommandOptionParser(FuncOptionParser):
     """
     I parse options as usual, but I explicitly allow setting stdout
     so that our print_help() method (invoked by default with -h/--help)
