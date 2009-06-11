@@ -164,7 +164,7 @@ class SqliteBackend(BaseBackend):
         self._check_commit()
 
     
-    def get_groups(self,pattern=None,exact=True):
+    def get_groups(self,pattern=None,exact=True,exclude=None):
         """
         Get a set of groups
         """
@@ -177,7 +177,7 @@ class SqliteBackend(BaseBackend):
             else:
                 return [g.name g in session.query(Group).filter(name=pattern).all()]
     
-    def get_hosts(self,pattern=None,group=None,exact=True):
+    def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
         """
         Get a set of groups
         """
