@@ -301,6 +301,10 @@ def main(argv):
             print "\t" + foo
         sys.exit(0)
 
+    if "--version" in sys.argv or "-v" in sys.argv:
+        print >> sys.stderr, file("/etc/func/version").read().strip()
+        sys.exit(0)
+
     if "daemon" in sys.argv or "--daemon" in sys.argv:
         utils.daemonize("/var/run/funcd.pid")
     else:
