@@ -70,12 +70,17 @@ class CommandOptionParser(optparse.OptionParser):
     # we're overriding the built-in file, but we need to since this is
     # the signature from the base class
     __pychecker__ = 'no-shadowbuiltin'
+
     def print_help(self, file=None):
         # we are overriding a parent method so we can't do anything about file
         __pychecker__ = 'no-shadowbuiltin'
         if file is None:
             file = self._stdout
         file.write(self.format_help())
+
+    def get_version(self):
+        return file("/etc/func/version").read().strip()
+
 
 class Command:
     """
@@ -162,6 +167,7 @@ class Command:
         description = self.description or self.summary
         self.parser = CommandOptionParser(
             usage=usage, description=description,
+            version=True,
             formatter=formatter)
         self.parser.set_stdout(self.stdout)
         self.parser.disable_interspersed_args()
@@ -218,7 +224,6 @@ class Command:
             # command
             args = [args[1], args[0]]
 
-
         # if we have args that we need to deal with, do it now
         # before we start looking for subcommands
         self.handleArguments(args)
@@ -267,6 +272,7 @@ class Command:
         Used when the options or arguments were missing or wrong.
         """
         self.parser.print_usage(file=self.stderr)
+
 
     def handleOptions(self, options):
         """
