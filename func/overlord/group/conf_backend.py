@@ -35,7 +35,7 @@ class ConfBackend(BaseBackend):
     That backend uses a configuraton file for 
     keeping the stuff
     """
-    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH*args,**kwargs):
+    def __init__(self,conf_file = CONF_FILE,*args,**kwargs):
         """
         Initializing the database if it doesnt exists it is created and
         connection opened for serving nothing special
