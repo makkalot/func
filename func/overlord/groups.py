@@ -2,6 +2,12 @@ from func.overlord.client import Minions
 import fnmatch
 
 def get_hosts_spec(spec):
+    """
+    A simple call to Minions class to be
+    able to use globbing in groups when
+    querying ...
+    """
+
     m = Minions(spec)
     return m.get_hosts_for_spec(spec)
 
@@ -22,12 +28,17 @@ class Groups(object):
         pass
 
     def __parse_strings(self, hoststring):
+        """
+        the host string maybe in 2 forms
+        the first one is i it can be comma separated into the
+        configuration file the second one 
+        is it can be ; separated and entered from
+        commandline so should consider both situations
+
+        @param hoststring : String to be parsed
+        """
         hosts = []
-        #the host string maybe in 2 forms
-        #the first one is i it can be comma separated into the
-        #configuration file
-        #the second one is it can be ; separated and entered from
-        #commandline so should consider both situations
+       
         if hoststring.find(';') != -1:
             bits = hoststring.split(';')
         elif hoststring.find(',') != -1:
@@ -39,26 +50,31 @@ class Groups(object):
                 hosts.append(hoststring)
             return hosts
 
-        #now append the good ones
-        for bit in bits:
-            bit = bit.strip().split(' ')
-            for host in bit:
-                if host not in hosts:
-                    hosts.append(host.strip())
+        return list(set(bits))
 
-        return hosts
     
     def add_group(self,group_name,save=False):
         """
         Adding a new group
+
+        @param group_name : Group to be added
+        @param save       : Save now or keep in memory and save later
         """
+
         return self.backend.add_group(group_name,save) 
 
    
-    def add_hosts_to_group_glob(self,group,hoststring,save=True,exclude_string=None):
+    def add_hosts_to_group_glob(self,group,hoststring,exclude_string=None):
         """
         With that method we will be able add lots of machines by single
         glob string ...
+
+        @param group : Group name that will add the hosts
+        @param hoststring : Glob string to be added you can
+                            add something like "www*" easy and fast
+        @param save       : Save now or keep in memory and save later
+        @param exclude_string :Glob string to be excluded you can
+                            add something like "www*" easy and fast
         """
         hoststring = get_hosts_spec(hoststring)
         if exclude_string :
@@ -66,15 +82,18 @@ class Groups(object):
             hoststring = hoststring.difference(e_s)
 
         #add them to backend
-        self.add_host_list(group,hoststring,save)
+        self.add_host_list(group,hoststring)
 
-    def add_hosts_to_group(self, group, hoststring, save = False):
+    def add_hosts_to_group(self, group, hoststring):
         """
         Here you can add more than one hosts to a given group
+        
+        @param group : Group name that will add the hosts
+        @param hoststring : A string in form of "host1;host2" or comma
+                            separated one (will be parsed) ...
+        
         """
         hosts = self.__parse_strings(hoststring)
-
-
         for host in hosts:
             self.add_host_to_group(group, host,save)
         self.save_changes()
@@ -82,13 +101,21 @@ class Groups(object):
     def add_host_to_group(self, group, host, save = False):
         """
         Add a single host to group
+
+        @param group : Group name that will add the hosts
+        @param save  : Save now or keep in memory and save later
+        @param host  : Host to be added
         """
         return self.backend.add_host_to_group(group,host,save)
 
-    def add_host_list(self,group,host_list, save = False):
+    def add_host_list(self,group,host_list):
         """
         Similar as other add methods but accepts a list of hosts
         instead of some strings
+        
+        @param group : Group name that will add the hosts
+        @param host_list  : Host list
+
         """
         if type(host_list) != list:
             sys.stderr.write("We accept only lists for for add_host_list method")
@@ -98,80 +125,113 @@ class Groups(object):
             self.add_host_to_group(group, host)
         
         self.save_changes()
-
-    def add_subgroup_to_group(self, group, subgroup, save = False):
-        """
-        Add a single subgroup to group
-        """
-        self.backend.add_subgroup_to_group(group,subgroup,save)
     
-    def add_subgroup_list(self,group,subgroup_list, save = False):
-        """
-        Similar as other add methods but accepts a list of subgroups
-        instead of some strings
-        """
-        if type(subgroup_list) != list:
-            sys.stderr.write("We accept only lists for for add_subgroup_list method")
-            return
-
-        for subgroup in subgroup_list:
-            self.add_subgroup_to_group(group, subgroup)
-
-        if save:
-            self.save_changes()
-
+    
     def get_groups(self,pattern=None,exact=True,exclude=None):
         """
-        Simple getter
+        Get a list fo groups according to args
+
+        @param pattern : A string to match name of the group
+        @param exact   : When true pattern matching is exact
+                        else it gets the ones that are related
+        @param exclude : A list of excluded groups useful in globbing
         """
-        return self.backend.get_groups
+        return self.backend.get_groups(pattern,exact,exclude)
+
+    def get_groups_glob(self,group_string,exclude_string=None):
+        """
+        Get groups via glob strings
+
+        @param group_string   : The ones that we want to pull
+        @param exclude_string : The ones we dont want
+        """
+        all_groups = self.get_groups()
+        match_groups = fnmatch.filter(all_groups,group_str)
+        exclude_groups = fnmatch.filter(all_groups,exclude_string)
+         
+        return list(set(match_groups).difference(set(exclude_groups)))
+
 
     def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
         """
-        Getting the hosts in a proper pattern or what is
+        Getting the list of hosts according to args
+        
+        @param pattern : A string to match name of the host
+        @param exact   : When true pattern matching is exact
+                        else it gets the ones that are related
+        @param exclude : A list of excluded hosts useful in globbing
         """
-        pass
+        
+        return self.backend.get_hosts(pattern,group,exact,exclude)
 
     def get_group_names(self):
         """
         Getting the groups names
+        HERE ONLY FOR API COMPATIBILITY
+        use get_groups() instead of that one
         """
-        return self.__groups.keys()
+        return self.get_groups()
+
+    
+    def _get_host_list_from_glob(self,group_globs,include_host):
+        """
+        A private util method that is responsible for
+        extracting a list of hosts from a glob str
+        """
+        for group_glob in group_globs:
+            if group_glob[0] == "@":
+                continue
+            group_glob = group_glob[1:]
+            #we seek for @group:ww* thing here
+            if group_glob.find(":")!=-1:
+                group_str,host_str = group_glob.split(":")
+                hosts = get_hosts_spec(host_str)
+                include_host.union(set(self.get_hosts(pattern=hosts,group=group_glob,exact=True)))
+            else:
+                include_host.union(set(self.get_hosts(group=group_glob)))
+        
+        return include_host
+
+    def get_hosts_glob(self,host_string,exclude_string=None):
+        """
+        Get hosts via globbing
+
+        @param host_string : The string that includes the hosts we
+                             want.Example @grname:ww*;@gr2
+        @param exclude_string :The string that includes the hosts we
+                             dont want.Example @grname:ww*;@gr2
+        """
+
+        group_globs = host_string.split(';')
+        include_host = set()
+        include_host = self._get_host_list_from_glob(group_globs,include_host)
+        
+        #if you have a list to exclude
+        if exclude_string:
+            exclude_globs = exclude_string.split(';')
+            exclude_host = set()
+            exclude_host = self._get_host_list_from_glob(exclude_globs,exclude_host)
+            return list(include_host.difference(exclude_host))
+        else:
+            return list(include_host)
+
 
     def get_hosts_by_group_glob(self, group_glob_str):
         """
-        What is that one ?
+        Here only for API COMPATIBILITY ...
+        use more advanced one get_hosts_glob() method
         """
-        #split it if we have more than one
-        group_gloobs = group_glob_str.split(';')
-        hosts = []
-        for group_gloob in group_gloobs:
-            #the group globs are signed by @
-            if not group_gloob[0] == "@":
-                continue
-            if self.__groups.has_key(group_gloob[1:]):
-                hosts.extend(self.__groups[group_gloob[1:]])
-                if group_gloob[1:] in self.__subgroups:
-                    for subgroup in self.__subgroups[group_gloob[1:]]:
-                        hosts.extend(self.__groups[subgroup])
-            else:
-                sys.stderr.write("group %s not defined\n" % group_gloob)
-
-        # Because of subgroups, there is a possibility to get duplicates.
-        # Remove them in Python 2.3 compatible way (by not using sets).
-        unique_hosts = []
-        for item in hosts:
-            if not item in unique_hosts:
-                unique_hosts.append(item)
-
-        return unique_hosts
-
-   
-    def remove_group(self,group_name,save=False):
+        return self.get_hosts_glob()
+          
+    def remove_group(self,group,save=False):
         """
         Removing a group if needed
+        
+        @param group : Group to be removed
+        @param save  : Save now or keep in memory and save later
         """
-        return self.backend.remove_group(group_name,save)
+        
+        return self.backend.remove_group(group,save)
 
     def remove_group_glob(self,group_str,save=False):
         """
@@ -180,6 +240,8 @@ class Groups(object):
         #firstly get all groups availible
         all_groups = self.get_groups()
         remove_groups = fnmatch.filter(all_groups,group_str)
+        #remove them
+        self.remove_group_list(remove_group)
 
     def remove_group_list(self,group_list,save = False):
         """
@@ -233,8 +295,6 @@ class Groups(object):
         self.backend.save_changes()
 
     
-def main():
-    Groups("/tmp/testgroups").show()
 
 if __name__ == "__main__":
-    main()
+    pass
