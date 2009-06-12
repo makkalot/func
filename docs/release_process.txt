@@ -2,6 +2,13 @@ This is just an attempt to note what a release needs, mainly
 so I don't forget.
 
 
+- test the tree
+	- testit.sh/unittests
+
+- rev the version (version is set in setup.py, funcs.spec, and the
+Makefile. I really hate having this in three places but my previous
+approach ('version' file) was frowned upon by fedora build system
+
 - tag the git tree for the release
 	git tag -a release_name
 	
@@ -12,18 +19,24 @@ so I don't forget.
 	probably want to wait until you know the latter steps
 	work correctly before tagging.
 
-- rev the version (version is set in setup.py, funcs.spec, and the
-Makefile. I really hate having this in three places but my previous
-approach ('version' file) was frowned upon by fedora build system
+- push the tags upstream
+	- by default git doesnt sync tags on push so:
+
+		git push --tags
+
 
 - build a tarball (I currently just use "make" or "make rpms"
 and use the tarball from rpm-build/)
+
+- make a checksum of the tarball
+	for example:
+	sha256sum tarball > tarball.sha256 
 
 - write up the release notes
 	More is better. See "git log" and func trace timeline for
 	a start.
 
-- push the tarball to it's upstream home. Currently it's at
+- push the tarball and chksum files to it's upstream home. Currently it's at
 	http://people.fedoraproject.org/~alikins/files/func/
 	
   But it can move if need be. Just update the trac wiki Releases page.
