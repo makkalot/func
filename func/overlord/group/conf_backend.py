@@ -58,9 +58,9 @@ class ConfBackend(BaseBackend):
             options = self.cp.options(section)
             for option in options:
                 if option == "host":
-                    self.add_hosts_to_group(section, self.cp.get(section, option))
+                    self.add_hosts_to_group(section, self.cp.get(section, option),save=False)
                 if option == "subgroup":
-                    self.add_subgroups_to_group(section, self.cp.get(section, option))
+                    self.add_subgroups_to_group(section, self.cp.get(section, option),save=False)
     
         
     def add_host_to_group(self,group,host,save=True):
@@ -105,9 +105,6 @@ class ConfBackend(BaseBackend):
         #delete the entry
         del self.__groups[group]
 
-        if group_name in self.__subgroups:
-            del self.__subgroups[group_name]
-
         #Do you want to store it ?
         if save:
             self.save_changes()
@@ -138,9 +135,6 @@ class ConfBackend(BaseBackend):
             if not group_name in self.cp.sections():
                 self.cp.add_section(group_name)
             self.cp.set(group_name,"host",",".join(group_hosts))
-            if group_name in self.__subgroups:
-                self.cp.set(group_name,"subgroup",",".join(self.__subgroups[group_name]))
-            #print "Im in save changes and here i have : ",self.cp.get(group_name,"host")
 
         #store tha changes
         conf_file = open(self.__filename, "w")
@@ -149,35 +143,45 @@ class ConfBackend(BaseBackend):
     
     def get_groups(self,pattern=None,exact=True,exclude=None):
         """
-        Get a set of groups
+        Get a list of groups
+
+        @param pattern : You may request to get an exact host or
+                         a one in proper pattern .
+        @param exact   : Related to pattern if you should do exact 
+                         matching or related one.
+        @param exclude : A list to be excluded from final set
+
         """
         if not pattern:
             #return all of them
             if not exclude:
                 return self.__groups.keys()
             else:
+                #get the difference of 2 sets 
                 return list(set(self.__groups.keys()).difference(set(exclude)))
         else:
             #it seems there is a pattern
-            if not exact:
+            if exact:
                 #there is no mean to check here for
                 #exclude list ...
                 for g in self.__groups.keys():
                     if g == pattern:
                         return [g]
                 return []
-            else:
-                if not exclude:
+
+            else:#not exact match
+                if not exclude:#there is no list to exclude
                     tmp_l = set()
                     for g in self.__groups.keys():
-                        if pattern in g:
+                        if pattern.lower() in g.lower():
                             tmp_l.add(g)
                     return list(tmp_l)
                 else:
                     tmp_l = set()
                     for g in self.__groups.keys():
-                        if pattern in g:
+                        if pattern.lower() in g.lower():
                             tmp_l.add(g)
+                    #get the difference of 2 sets
                     return list(tmp_l.difference(set(exclude)))
 
             #shouldnt come here actually
@@ -187,23 +191,53 @@ class ConfBackend(BaseBackend):
     def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
 
         """
-        Get a set of groups
+        Get a set of hosts
+        
+        @param pattern : You may request to get an exact host or
+                         a one in proper pattern .
+        @param exact   : Related to pattern if you should do exact 
+                         matching or related one.
+        @param exclude : A list to be excluded from final set
         """
         group = self.get_groups(pattern=group,exact=True)
         if not group or len(group)>1:
             return []
 
         hosts = self.__groups[group]
-
-        if pattern:
-            if exact:
-                pass
+        
+        if not pattern:
+            #return all of them
+            if not exclude:
+                return hosts
             else:
-                if exclude:
-                    pass
-                else:
-                    pass
+                #get the difference of 2 sets 
+                return list(set(hosts()).difference(set(exclude)))
         else:
-            pass
-    
+            #it seems there is a pattern
+            if exact:
+                #there is no mean to check here for exclude list ...
+                for g in hosts():
+                    if g == pattern:
+                        return [g]
+                return []
+
+            else:#not exact match
+                if not exclude:#there is no list to exclude
+                    tmp_l = set()
+                    for g in hosts():
+                        if pattern.lower() in g.lower():
+                            tmp_l.add(g)
+                    return list(tmp_l)
+                else:
+                    tmp_l = set()
+                    for g in hosts():
+                        if pattern.lower() in g.lower():
+                            tmp_l.add(g)
+                    #get the difference of 2 sets
+                    return list(tmp_l.difference(set(exclude)))
+
+            #shouldnt come here actually
+            return []
+
+
     
