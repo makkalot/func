@@ -5,13 +5,14 @@ class BaseFuncQuery(object):
     """
     Is an object that u can pass Q objects to make it fetch
     some results about some variables. FuncQuery is kind of 
-    orm but not exactly the exec_query returns True of False
+    orm but not exactly.The exec_query returns True of False
     that is what is all about. For example passing variables
     to FuncQuery like temperature=21,uname="2.6.27.15" will 
     control on target machine if temperature is 21 and uname
     is the expected if 2 of them are true the result will be
     true and u will query the rest of the methods u requested
     """
+    
     def __init__(self,q_object=None,pull_result=None):
         self.q = q_object
         #pull result variable is kind of important
@@ -22,6 +23,9 @@ class BaseFuncQuery(object):
     def __getattribute__(self,name):
         """
         Making it kind of proxy object to the Q object
+        
+        @type name : Not specified
+        @param name: Attribute requested
         """
         try:
             return object.__getattribute__(self, name)
@@ -33,7 +37,17 @@ class BaseFuncQuery(object):
         When querying filter and other cool methods
         we always return back a object ,it is better
         it tobe a fresh one ...
+
+        @type  klass: Class
+        @param klass: The object itself to be cloned
+
+        @type  q_object : Q
+        @param q_object : Q object to be copied
+
+        @type  pull_result : Method
+        @param pull_result : Copy the reference that actually pulls
         """
+        
         if klass is None:
             klass = self.__class__
         c = klass(q_object,pull_result)
@@ -41,7 +55,7 @@ class BaseFuncQuery(object):
     
     def exec_query(self):
         """
-        The part that will say it is True or it is False
+        The part that will say if it is True or it is False
         """
         raise Exception("Not implemted method you should subclass and override that method")
     
@@ -66,7 +80,12 @@ class BaseFuncQuery(object):
         return bool(self.q)
     
     def __main_filter(self,outside_connector,inside_connector,*args,**kwargs):
-        
+        """
+        Common OR and AND operation we do.
+
+        @param outside_connector : The connector between two chained query
+        @param inside_connector  : The connector inside the query
+        """
         temp_q = Q(*args,**kwargs)
         if inside_connector == "OR":
             #because the default is AND
@@ -92,14 +111,14 @@ class BaseFuncQuery(object):
     def filter(self,*args,**kwargs):
         """
         The filter method is the one that will be used most
-        of the time by end user
+        of the time by end user ANDs the args inside.
         """
         return self.__main_filter("AND","AND",*args,**kwargs)
            
     def filter_or(self,*args,**kwargs):
         """
         The filter method is the one that will be used most
-        of the time by end user
+        of the time by end user ORs the args inside.
         """
         return self.__main_filter("OR","OR",*args,**kwargs)
             
@@ -111,20 +130,20 @@ class BaseFuncQuery(object):
 
     def and_or(self,*args,**kwargs):
         """
-        AND inside and connect with AND
+        OR inside and connect with AND
         """
         return self.__main_filter("AND","OR",*args,**kwargs)
 
     
     def or_or(self,*args,**kwargs):
         """
-        AND inside and connect with AND
+        OR inside and connect with OR
         """
         return self.__main_filter("OR","OR",*args,**kwargs)
 
     def or_and(self,*args,**kwargs):
         """
-        AND inside and connect with AND
+        AND inside and connect with OR
         """
         return self.__main_filter("OR","AND",*args,**kwargs)
 
@@ -133,7 +152,8 @@ class BaseFuncQuery(object):
     def exclude(self,*args,**kwargs):
         """
         Useful when you want to ignore some of the things
-        in query,the exclude iverts the query
+        in query,the exclude iverts the query NOT used so
+        much ...
         """
         temp_q = ~Q(*args,**kwargs)
         
@@ -152,7 +172,8 @@ class BaseFuncQuery(object):
     def set_compexq(self,q_object,connector=None):
         """
         Sometimes we need some complex queries ORed
-        ANDed and etc, that is for that
+        ANDed and etc, that is for that ONLY for
+        API users ....
         """
         if not connector or not self.q:
             current_q = deepcopy(q_object)
@@ -190,6 +211,12 @@ class FuncLogicQuery(BaseFuncQuery):
     result = property(exec_query)
 
     def __traverse_query(self,node):
+        """
+        A recursive method that will be responsible for traversing
+        complex Q object.
+
+        @param node : Q node
+        """
         logic_results=[] 
         for n in node.children:
             if not type(n) == tuple and not type(n) == list:
@@ -212,6 +239,8 @@ class FuncLogicQuery(BaseFuncQuery):
     def __main_traverse(self,q_ob):
         """
         Collects the final stuff
+        
+        @param q_ob : Q node
         """
         tmp_res = self.__traverse_query(q_ob)
         return self.logic_operation(q_ob,tmp_res)
@@ -219,6 +248,8 @@ class FuncLogicQuery(BaseFuncQuery):
     def logic_operation(self,node,logic_list):
         """
         Just computes the logic of current list
+
+        @return : True or False
         """
 
         tmp_res = None
