@@ -4,6 +4,7 @@ from sqlalchemy.orm import relation, backref
 from sqlalchemy.orm import scoped_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import not_
 
 Base = declarative_base()
 class Group(Base):
@@ -167,50 +168,71 @@ class SqliteBackend(BaseBackend):
     def get_groups(self,pattern=None,exact=True,exclude=None):
         """
         Get a set of groups
+        
+        @param pattern : You may request to get an exact host or
+                         a one in proper pattern .
+        @param exact   : Related to pattern if you should do exact 
+                         matching or related one.
+        @param exclude : A list to be excluded from final set
         """
         if not pattern:
             #that means we want all of them
-            return [g.name g in self.session.query(Group).all]
+            if not exclude:
+                return [g.name g in self.session.query(Group).all()]
+            else:
+                return [g.name g in self.session.query(Group).filter(not_(Group.name.in_(exclude))).all()]
+
         else:
             if not exact:
-                return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
+                if not exclude:
+                    return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
+                else:
+                    return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).filter(not_(Group.name.in_(exclude))).all()]
+
             else:
-                return [g.name g in session.query(Group).filter(name=pattern).all()]
+                return [g.name g in session.query(Group).filter_by(name=pattern).all()]
     
+        return []
+
     def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
         """
-        Get a set of groups
+        Get a set of hosts
+
+        @param pattern : You may request to get an exact host or
+                         a one in proper pattern .
+        @param exact   : Related to pattern if you should do exact 
+                         matching or related one.
+        @param exclude : A list to be excluded from final set
         """
+        group = self._group_exists(group)
+        if not group[0]:
+            return []
+        else:
+            group = group[1]
+
         if not pattern:
             #if there is no pattern there are 2 possible options
-            if group:
-                group = self._group_exists(group)
-                if not group[0]:
-                    return []
-                else:
-                    group = group[1]
-                    return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).all()]
+            if not exclude:
+                return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).all()]
             else:
-                return [h.name for h in self.session.query(Host).all()]
+                return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
+
         else:
             #there is some pattern so we should go for it
-            if group:
-                group = self._group_exists(group)
-                if not group[0]:
-                    return []
+            if exact:
+                if type(pattern)==list or type(pattern)==set:
+                    #it seems we got a list to pull from database
+                    return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).filter(Host.name.in_(pattern)).all()]
                 else:
-                    group = group[1]
-
-                if exact:
                     return [h.name for h in self.session.query(Host).filter_by.(name=pattern,group_id=group.id).all()]
-                else:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).all()]
-            else:
-                if exact:
-                    return [h.name for h in self.session.query(Host).filter_by.(name=pattern).all()]
-                else:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).all()]
 
+            else:
+                if not exclude:
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).all()]
+                else:
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
+        
+        return []
     def _check_commit(self,commit=True):
         """
         A simple util that checks if we should commit
