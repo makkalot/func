@@ -1,4 +1,6 @@
 from func.overlord.client import Minions
+from func.overlord.group.base import choose_backend
+
 import fnmatch
 
 def get_hosts_spec(spec):
@@ -13,12 +15,12 @@ def get_hosts_spec(spec):
 
 class Groups(object):
 
-    def __init__(self, filename=None):
+    def __init__(self,*args,**kwargs):
         """
-        Get the file into the memory
+        Initialize the backend you are going to use
         """
         #initialize here the backend
-        self.backend = None
+        self.backend = choose_backend(**kwargs)
 
 
     def show(self):
