@@ -49,4 +49,25 @@ class BaseBackend(object):
         """
         raise NotImplementedError
     
-    
+
+CONF_FILE = "/etc/certmaster/certmaster.conf"
+from certmaster.config import read_config
+from certmaster.commonconfig import CMConfig
+
+def choose_backend(backend=None,conf_file=None,db_file=None):
+    """
+    Chooses a backend accoding to params or what is
+    supplied ...
+    """
+
+    config = read_config(CONF_FILE,CMConfig)
+    backend = backend or config.backend or "sqlite"
+
+    if backend == "sqlite":
+        from func.overlord.group.sqlite_backend import SqliteBackend
+        return SqliteBackend(db_file=db_file)
+    elif backend == "conf":
+        from func.overlord.group.conf_backend import ConfBackend
+        return ConfBackend(conf_file=conf_file)
+    else:
+        raise Exception("No valida backend options supplied")
