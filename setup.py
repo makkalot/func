@@ -43,6 +43,7 @@ if __name__ == "__main__":
 			    "%s/overlord" % NAME,
 			    "%s/overlord/cmd_modules" % NAME,
                             "%s/overlord/modules" % NAME,
+                            "%s/overlord/group" % NAME,
                             "%s/minion/modules" % NAME,
                             "%s/yaml" % NAME,
                             # FIXME if there's a clean/easy way to recursively
