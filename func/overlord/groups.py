@@ -27,7 +27,15 @@ class Groups(object):
         """
         Prints some info about current structure
         """
-        pass
+        groups = self.get_groups()
+        for g in groups:
+            print "Group : %s"%g
+            hosts = self.get_hosts(group=g)
+            for h in hosts:
+                print "\t Host : %s "%h
+        
+
+            
 
     def __parse_strings(self, hoststring):
         """
