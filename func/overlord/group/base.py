@@ -70,4 +70,4 @@ def choose_backend(backend=None,conf_file=None,db_file=None):
         from func.overlord.group.conf_backend import ConfBackend
         return ConfBackend(conf_file=conf_file)
     else:
-        raise Exception("No valida backend options supplied")
+        raise Exception("No valid backend options supplied")
