@@ -63,7 +63,7 @@ class Groups(object):
         return list(set(bits))
 
     
-    def add_group(self,group_name,save=False):
+    def add_group(self,group_name,save=True):
         """
         Adding a new group
 
@@ -108,7 +108,7 @@ class Groups(object):
             self.add_host_to_group(group, host,save)
         self.save_changes()
 
-    def add_host_to_group(self, group, host, save = False):
+    def add_host_to_group(self, group, host, save =True):
         """
         Add a single host to group
 
@@ -233,7 +233,7 @@ class Groups(object):
         """
         return self.get_hosts_glob()
           
-    def remove_group(self,group,save=False):
+    def remove_group(self,group,save=True):
         """
         Removing a group if needed
         
@@ -267,7 +267,7 @@ class Groups(object):
         self.save_changes()
 
 
-    def remove_host(self,group_name,host,save=False):
+    def remove_host(self,group_name,host,save=True):
         """
         Removes a proper host from the conf file
         """
