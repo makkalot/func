@@ -104,17 +104,15 @@ class SqliteBackend(BaseBackend):
             return group
         else:
             group = group[1]
-
-        
-         #check for dupliate
-         host_db = None
-         try:
+        #check for dupliate
+        host_db = None
+        try:
             host_db=self.session.query(Host).filter_by(name=host,group_id=group.id).one()
         except Exception,e:
             #we dont have it so we can add it
             self.session.add(Host(host,group.id))
             self._check_commit(save)
-
+        
         if host_db:
             return (False,"The host is already in database %s "%host)
         else:
@@ -146,15 +144,14 @@ class SqliteBackend(BaseBackend):
             return group
         else:
             group = group[1]
-
-         #check for dupliate
-         host_db = None
-         try:
+        #check for dupliate
+        host_db = None
+        try:
             host_db=self.session.query(Host).filter_by(name=host,group_id=group.id).one()
         except Exception,e:
             #we dont have it so we can add it
             return (False,str(e))
-            
+        
         self.session.delete(host_db)
         self._check_commit(save)
     
@@ -178,19 +175,19 @@ class SqliteBackend(BaseBackend):
         if not pattern:
             #that means we want all of them
             if not exclude:
-                return [g.name g in self.session.query(Group).all()]
+                return [g.name for g in self.session.query(Group).all()]
             else:
-                return [g.name g in self.session.query(Group).filter(not_(Group.name.in_(exclude))).all()]
+                return [g.name for g in self.session.query(Group).filter(not_(Group.name.in_(exclude))).all()]
 
         else:
             if not exact:
                 if not exclude:
-                    return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
+                    return [g.name for g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
                 else:
-                    return [g.name g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).filter(not_(Group.name.in_(exclude))).all()]
+                    return [g.name for g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).filter(not_(Group.name.in_(exclude))).all()]
 
             else:
-                return [g.name g in session.query(Group).filter_by(name=pattern).all()]
+                return [g.name for g in session.query(Group).filter_by(name=pattern).all()]
     
         return []
 
@@ -213,24 +210,24 @@ class SqliteBackend(BaseBackend):
         if not pattern:
             #if there is no pattern there are 2 possible options
             if not exclude:
-                return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).all()]
+                return [h.name for h in self.session.query(Host).filter_by(group_id=group.id).all()]
             else:
-                return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
+                return [h.name for h in self.session.query(Host).filter_by(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
 
         else:
             #there is some pattern so we should go for it
             if exact:
                 if type(pattern)==list or type(pattern)==set:
                     #it seems we got a list to pull from database
-                    return [h.name for h in self.session.query(Host).filter_by.(group_id=group.id).filter(Host.name.in_(pattern)).all()]
+                    return [h.name for h in self.session.query(Host).filter_by(group_id=group.id).filter(Host.name.in_(pattern)).all()]
                 else:
-                    return [h.name for h in self.session.query(Host).filter_by.(name=pattern,group_id=group.id).all()]
+                    return [h.name for h in self.session.query(Host).filter_by(name=pattern,group_id=group.id).all()]
 
             else:
                 if not exclude:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).all()]
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by(group_id=group.id).all()]
                 else:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by.(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
         
         return []
     def _check_commit(self,commit=True):
@@ -247,6 +244,6 @@ class SqliteBackend(BaseBackend):
         try:
             group=self.session.query(Group).filter_by(name=group).one()
             return (True,group)
-        except Exception,e::
+        except Exception,e:
             return (False,str(e))
 
