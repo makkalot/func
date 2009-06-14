@@ -70,11 +70,13 @@ class ConfBackend(BaseBackend):
         #dont want duplicates
         if not host in self.__groups[group]:
             self.__groups[group].append(host)
+        else:
+            return (False,"Host is already in database : %s"%host)
 
         if save:
             self.save_changes()
-
-   
+        return (True,"")
+    
     def add_group(self,group,save=True):
         """
         Adds a group
