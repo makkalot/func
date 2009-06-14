@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey,Column,Integer,String
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.orm import scoped_session
 from sqlalchemy import create_engine
@@ -14,7 +14,7 @@ class Group(Base):
     __tablename__ = 'groups'
     
     id = Column(Integer, primary_key=True)
-    name = Column(String,nullable=False)
+    name = Column(String(100),nullable=False)
     
     def __init__(self,name):
         self.name = name
@@ -30,10 +30,10 @@ class Host(Base):
     __tablename__ = 'hosts'
     
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String(100), nullable=False)
     group_id = Column(Integer, ForeignKey('groups.id'))
     
-    group = relation(User, backref=backref('hosts', order_by=id))
+    group = relation(Group, backref=backref('hosts', order_by=id))
     
     def __init__(self, name,group_id):
         self.name = name
@@ -55,7 +55,7 @@ class SqliteBackend(BaseBackend):
     Sqlite backend for groups api
     """
 
-    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH*args,**kwargs):
+    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH,*args,**kwargs):
         """
         Initializing the database if it doesnt exists it is created and
         connection opened for serving nothing special
@@ -65,13 +65,13 @@ class SqliteBackend(BaseBackend):
         """
         self.config = conf_file or CONF_FILE
         self.config = read_config(self.config,CMConfig)
-        self.db_path = self.config.group_db or db_file or DB_PATH
+        self.db_path = db_file or self.config.group_db or DB_PATH
 
         if os.path.exists(self.db_path):
             #we have it so dont have to create the databases
-            engine = create_engine('sqlite:///%s'%self.db_path, echo=True)
+            engine = create_engine('sqlite:///%s'%self.db_path)
         else:
-            engine = create_engine('sqlite:///%s'%self.db_path, echo=True)
+            engine = create_engine('sqlite:///%s'%self.db_path)
             Base.metadata.create_all(engine)
 
         #create a session for querying
@@ -83,14 +83,12 @@ class SqliteBackend(BaseBackend):
         Adds a group
         """
         #check for group first
-        group = self._group_exists(group)
-        if not group[0]:
-            return group
-        else:
-            group = group[1]
+        gr = self._group_exists(group)
+        if gr[0]:
+            return (False,"Group already exists %s "%(gr[1]))
         
         #add the group
-        self.session.add(Group(group.name))
+        self.session.add(Group(group))
         self._check_commit(save)
         return (True,'')
     
@@ -242,8 +240,11 @@ class SqliteBackend(BaseBackend):
         Checks if a group already exists
         """
         try:
-            group=self.session.query(Group).filter_by(name=group).one()
-            return (True,group)
+            group=self.session.query(Group).filter_by(name=group).all()
+            if group and len(group)==1:
+                return (True,group[0])
+            else:
+                return (False,"")
         except Exception,e:
             return (False,str(e))
 

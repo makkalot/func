@@ -1,5 +1,6 @@
-from func.overlord.groups import Group
+from func.overlord.groups import Groups
 from certmaster.config import read_config, CONFIG_FILE
+from certmaster.commonconfig import CMConfig
 import os
 import fnmatch
 
@@ -20,13 +21,13 @@ class BaseMinions(object):
         
         final_list = []
         for m in xrange(howmany):
-            tmp_f = open("%s/%s.%s" % (self.cm_config.certroot,str(m), self.cm_config.cert_extension,"w"))
+            tmp_f = open("%s/%s.%s" % (cm_config.certroot,str(m),cm_config.cert_extension),"w")
             tmp_f.close()
             final_list.append(str(m))
         print "%d dummy minions created "%howmany
         return final_list
 
-    def clean_dummy_minions(self,howmany):
+    def clean_dummy_minions(self,howmany=None):
         """
         Deletes a lots of minions garbage
         """
@@ -35,7 +36,7 @@ class BaseMinions(object):
         howmany = howmany or 10000 #it is a good default number
 
         for m in xrange(howmany):
-            tmp_f = "%s/%s.%s" % (self.cm_config.certroot,str(m), self.cm_config.cert_extension)
+            tmp_f = "%s/%s.%s" % (cm_config.certroot,str(m), cm_config.cert_extension)
             if os.path.exists(tmp_f):
                 os.remove(tmp_f)
 
@@ -54,11 +55,11 @@ class BaseGroupT(object):
                 ]
         gr_list = []
         for b in backends:
-            gr_list.append(Group(**b))
+            gr_list.append(Groups(**b))
 
         return gr_list
     
-    def clean_test_files(self,path):
+    def clean_t_files(self,path):
         """
         Clean the initialized stuff
         """
@@ -73,8 +74,8 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         Will be called after every
         """
         #clean current files
-        self.clean_test_files(TEST_DB_FILE)
-        self.clean_test_files(TEST_CONF_FILE)
+        self.clean_t_files(TEST_DB_FILE)
+        self.clean_t_files(TEST_CONF_FILE)
         
         #destroy and create minions
         self.clean_dummy_minions()
@@ -87,10 +88,10 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         """
         adds a single group item
         """
-        for g in groups:
-            assert g.add_group("group1")[0] == True
+        for g in self.groups:
+            assert g.add_group("group1")[0]== True
 
-        for g in groups:
+        for g in self.groups:
             assert g.add_group("group1")[0] == False
 
 

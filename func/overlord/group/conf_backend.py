@@ -35,7 +35,7 @@ class ConfBackend(BaseBackend):
     That backend uses a configuraton file for 
     keeping the stuff
     """
-    def __init__(self,conf_file = CONF_FILE,*args,**kwargs):
+    def __init__(self,conf_file = GROUP_FILE,*args,**kwargs):
         """
         Initializing the database if it doesnt exists it is created and
         connection opened for serving nothing special
@@ -58,11 +58,8 @@ class ConfBackend(BaseBackend):
             options = self.cp.options(section)
             for option in options:
                 if option == "host":
-                    self.add_hosts_to_group(section, self.cp.get(section, option),save=False)
-                if option == "subgroup":
-                    self.add_subgroups_to_group(section, self.cp.get(section, option),save=False)
-    
-        
+                    self.add_host_to_group(section, self.cp.get(section, option),save=False)
+                        
     def add_host_to_group(self,group,host,save=True):
         """
         Adds a host to a group
@@ -83,7 +80,7 @@ class ConfBackend(BaseBackend):
         Adds a group
         """
         if self.__groups.has_key(group):
-            return (False,"Group name : %s already exists")
+            return (False,"Group name : %s already exists"%group)
         #create with an empty list
         self.__groups[group] = []
         if save:
@@ -137,7 +134,7 @@ class ConfBackend(BaseBackend):
             self.cp.set(group_name,"host",",".join(group_hosts))
 
         #store tha changes
-        conf_file = open(self.__filename, "w")
+        conf_file = open(self.config, "w")
         self.cp.write(conf_file)
 
     
