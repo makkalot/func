@@ -244,7 +244,7 @@ class SqliteBackend(BaseBackend):
             if group and len(group)==1:
                 return (True,group[0])
             else:
-                return (False,"")
+                return (False,"Not existing group name")
         except Exception,e:
             return (False,str(e))
 

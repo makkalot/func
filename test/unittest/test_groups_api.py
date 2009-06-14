@@ -90,8 +90,20 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         """
         for g in self.groups:
             assert g.add_group("group1")[0]== True
-
-        for g in self.groups:
             assert g.add_group("group1")[0] == False
 
+    
+    
+    def test_add_host_to_group(self):
+        """
+        adds a host test
+        """
+        g_name = "group1"
+
+        for g in self.groups:
+            g.add_group(g_name)
+            assert g.add_host_to_group(g_name,"host1")[0] == True
+            assert g.add_host_to_group(g_name,"host1")[0] == False
+            
+            
 
