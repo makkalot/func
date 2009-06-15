@@ -97,18 +97,18 @@ class SqliteBackend(BaseBackend):
         Adds a host to a group
         """
         #check for group first
-        group = self._group_exists(group)
-        if not group[0]:
-            return group
-        else:
-            group = group[1]
+        #group = self._group_exists(group)
+        #if not group[0]:
+        #    return group
+        #else:
+        #    group = group[1]
         #check for dupliate
         host_db = None
         try:
-            host_db=self.session.query(Host).filter_by(name=host,group_id=group.id).one()
+            host_db=self.session.query(Host).filter(Host.group.has(Group.name==group)).filter_by(name=host).one()
         except Exception,e:
             #we dont have it so we can add it
-            self.session.add(Host(host,group.id))
+            self.session.add(Host(host,self.session.query(Group).filter_by(name=group).one().id))
             self._check_commit(save)
         
         if host_db:
