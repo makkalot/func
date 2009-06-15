@@ -1,6 +1,6 @@
 from func.overlord.client import Minions
 from func.overlord.group.base import choose_backend
-
+import sys
 import fnmatch
 
 def get_hosts_spec(spec):
@@ -92,7 +92,7 @@ class Groups(object):
             hoststring = hoststring.difference(e_s)
 
         #add them to backend
-        self.add_host_list(group,hoststring)
+        self.add_host_list(group,list(hoststring))
 
     def add_hosts_to_group(self, group, hoststring):
         """
@@ -105,7 +105,7 @@ class Groups(object):
         """
         hosts = self.__parse_strings(hoststring)
         for host in hosts:
-            self.add_host_to_group(group, host,save)
+            self.add_host_to_group(group, host)
         self.save_changes()
 
     def add_host_to_group(self, group, host, save =True):
@@ -127,8 +127,8 @@ class Groups(object):
         @param host_list  : Host list
 
         """
-        if type(host_list) != list:
-            sys.stderr.write("We accept only lists for for add_host_list method")
+        if type(host_list) != list and type(host_list)!=set:
+            sys.stderr.write("We accept only lists for for add_host_list method we got %s : %s "%(host_list,type(host_list)))
             return
 
         for host in host_list:
