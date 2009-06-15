@@ -1,4 +1,4 @@
-from func.overlord.groups import Groups
+from func.overlord.groups import Groups,get_hosts_spec
 from certmaster.config import read_config, CONFIG_FILE
 from certmaster.commonconfig import CMConfig
 import os
@@ -17,7 +17,7 @@ class BaseMinions(object):
         """
 
         cm_config = read_config(CONFIG_FILE, CMConfig)
-        howmany = howmany or 10000 #it is a good default number
+        howmany = howmany or 100 #it is a good default number
         
         final_list = []
         for m in xrange(howmany):
@@ -33,7 +33,7 @@ class BaseMinions(object):
         """
 
         cm_config = read_config(CONFIG_FILE, CMConfig)
-        howmany = howmany or 10000 #it is a good default number
+        howmany = howmany or 100 #it is a good default number
 
         for m in xrange(howmany):
             tmp_f = "%s/%s.%s" % (cm_config.certroot,str(m), cm_config.cert_extension)
@@ -83,7 +83,14 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         #get groups
         self.groups = self.get_group_objects()
     
-    
+    def teardown(self):
+        """
+        Clean the stuff
+        """
+        self.clean_dummy_minions()
+        self.clean_t_files(TEST_DB_FILE)
+        self.clean_t_files(TEST_CONF_FILE)
+        
     def test_add_group(self):
         """
         adds a single group item
@@ -115,4 +122,47 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             g.add_group(g_name)
             g.add_hosts_to_group(g_name,"host1,host2,host3")
             g.add_hosts_to_group(g_name,"host5;host7;host8")
+    
+    def test_add_host_list(self):
+        """
+        Test adding hosts via list
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_host_list(g_name,["host1","host2","host3"])
+            g.add_host_list(g_name,["host1","host2","host3"])
+            g.add_host_list(g_name,["host4","host5","host6"])
+
+    def test_add_hosts_to_group(self):
+        """
+        Test globbing addition
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_hosts_to_group_glob(g_name,"*") #add all of them
+
+        #lets check if all of them are in
+        for g in self.groups:
+            for h in self.current_minions:
+                if self.current_minions.index(h) %10 == 0:
+                    print "Tests completed : ",self.current_minions.index(h)
+                assert g.add_host_to_group(g_name,h)[0] == False
+        
+        #clear again so we can test exclude thing
+        self.teardown()
+        self.setUp()
+        
+        #print "Testing exclude string ...."
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_hosts_to_group_glob(g_name,"*",exclude_string="*[1,3,5,7,9]")
+            #add all of them
+            for h in self.current_minions:
+                #print "Checking for : ",h
+                if int(h)%2==0:
+                    assert g.add_host_to_group(g_name,h)[0] == False
+                else:
+                    assert g.add_host_to_group(g_name,h)[0] == True
 
