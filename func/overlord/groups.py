@@ -156,11 +156,13 @@ class Groups(object):
         @param exclude_string : The ones we dont want
         """
         all_groups = self.get_groups()
-        match_groups = fnmatch.filter(all_groups,group_str)
-        exclude_groups = fnmatch.filter(all_groups,exclude_string)
-         
-        return list(set(match_groups).difference(set(exclude_groups)))
+        match_groups = fnmatch.filter(all_groups,group_string)
 
+        if exclude_string:
+            exclude_groups = fnmatch.filter(all_groups,exclude_string)
+            return list(set(match_groups).difference(set(exclude_groups)))
+        else:
+            return match_groups
 
     def get_hosts(self,pattern=None,group=None,exact=True,exclude=None):
         """
