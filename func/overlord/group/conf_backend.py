@@ -42,7 +42,7 @@ class ConfBackend(BaseBackend):
 
         @param conf_file : Configuration file
         """
-        self.config = conf_file or CONF_FILE
+        self.config = conf_file or GROUP_FILE
         self.__groups = {}
         self.__parse()
 
