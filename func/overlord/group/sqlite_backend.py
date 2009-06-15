@@ -14,7 +14,7 @@ class Group(Base):
     __tablename__ = 'groups'
     
     id = Column(Integer, primary_key=True)
-    name = Column(String(100),nullable=False)
+    name = Column(String(100),nullable=False,unique=True)
     
     def __init__(self,name):
         self.name = name
@@ -30,7 +30,7 @@ class Host(Base):
     __tablename__ = 'hosts'
     
     id = Column(Integer, primary_key=True)
-    name = Column(String(100), nullable=False)
+    name = Column(String(100), nullable=False,unique=True)
     group_id = Column(Integer, ForeignKey('groups.id'))
     
     group = relation(Group, backref=backref('hosts', order_by=id))
@@ -67,6 +67,9 @@ class SqliteBackend(BaseBackend):
         self.config = read_config(self.config,CMConfig)
         self.db_path = db_file or self.config.group_db or DB_PATH
 
+        self._recreate_session()
+
+    def _recreate_session(self):
         if os.path.exists(self.db_path):
             #we have it so dont have to create the databases
             engine = create_engine('sqlite:///%s'%self.db_path)
@@ -77,6 +80,7 @@ class SqliteBackend(BaseBackend):
         #create a session for querying
         Session = scoped_session(sessionmaker(bind=engine))
         self.session = Session()
+
     
     def add_group(self,group,save=True):
         """
@@ -96,25 +100,14 @@ class SqliteBackend(BaseBackend):
         """
         Adds a host to a group
         """
-        #check for group first
-        #group = self._group_exists(group)
-        #if not group[0]:
-        #    return group
-        #else:
-        #    group = group[1]
-        #check for dupliate
-        host_db = None
         try:
-            host_db=self.session.query(Host).filter(Host.group.has(Group.name==group)).filter_by(name=host).one()
-        except Exception,e:
-            #we dont have it so we can add it
             self.session.add(Host(host,self.session.query(Group).filter_by(name=group).one().id))
             self._check_commit(save)
+        except Exception,e:
+            self._recreate_session()
+            return (False,"The host is already in database %s : %s "%(host,e))
         
-        if host_db:
-            return (False,"The host is already in database %s "%host)
-        else:
-            return (True,'')
+        return (True,'')
     
     def remove_group(self,group,save=True):
         """
