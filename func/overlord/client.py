@@ -83,7 +83,7 @@ class CommandAutomagic(object):
 class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
-                 just_fqdns=False, groups_file=None,
+                 just_fqdns=False, groups_backend="conf",
                  delegate=False, minionmap={},exclude_spec=None):
 
         self.spec = spec
@@ -96,7 +96,7 @@ class Minions(object):
         self.exclude_spec = exclude_spec
 
         self.cm_config = read_config(CONFIG_FILE, CMConfig)
-        self.group_class = groups.Groups(filename=groups_file)
+        self.group_class = groups.Groups(backend=groups_backend)
         
         #lets make them sets so we dont loop again and again
         self.all_hosts = set()
@@ -110,7 +110,7 @@ class Minions(object):
     def _get_group_hosts(self,spec):
         return self.self.group_class.get_hosts_by_group_glob(spec)
 
-    def _get_hosts_for_spec(self,seperate_gloobs):
+    def _get_hosts_for_specs(self,seperate_gloobs):
         """
         Gets the hosts and certs for proper spec
         """
@@ -119,29 +119,40 @@ class Minions(object):
         for each_gloob in seperate_gloobs:
             if each_gloob.startswith('@'):
                 continue
-            
-            actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
-            certs = glob.glob(actual_gloob)
-            # pull in peers if enabled for minion-to-minion
-            if self.cm_config.peering:
-                peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
-                certs += glob.glob(peer_gloob)
-            
-            for cert in certs:
-                #if the spec includes some groups and also it includes some *
-                #may cause some duplicates so should check that
-                #For example spec = "@home_group;*" will give lots of duplicates as a result
-                tmp_certs.add(cert)
-		        # use basename to trim off any excess /'s, fix
-		        # ticket #53 "Trailing slash in certmaster.conf confuses glob function
-                certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
-                if self.cm_config.peering:
-                    certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
-                host = certname[:-(len(self.cm_config.cert_extension) + 1)]
-                tmp_hosts.add(host)
+            h,c = self._get_hosts_for_spec(each_gloob)
+            tmp_hosts.union(h)
+            tmp_certs.union(c)
+
         return tmp_hosts,tmp_certs
 
-    
+    def _get_hosts_for_spec(self,each_gloob):
+        """
+        Pull only for specified spec
+        """
+        #these will be returned
+        tmp_certs = set()
+        tmp_hosts = set()
+
+        actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
+        certs = glob.glob(actual_gloob)
+        
+        # pull in peers if enabled for minion-to-minion
+        if self.cm_config.peering:
+            peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
+            certs += glob.glob(peer_gloob)
+            
+        for cert in certs:
+            tmp_certs.add(cert)
+            # use basename to trim off any excess /'s, fix
+            # ticket #53 "Trailing slash in certmaster.conf confuses glob function
+            certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
+            if self.cm_config.peering:
+                certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
+            host = certname[:-(len(self.cm_config.cert_extension) + 1)]
+            tmp_hosts.add(host)
+
+        return tmp_hosts,tmp_certs
+
     def get_hosts_for_spec(self,spec):
         """
         Be careful when editting that method it will be used
@@ -158,7 +169,7 @@ class Minions(object):
         a better orm like spec so user may say 
         func "*" --exclude "www.*;@mygroup" ...
         """
-        included_part = self._get_hosts_for_spec(self.spec.split(";")+self.new_hosts)
+        included_part = self._get_hosts_for_specs(self.spec.split(";")+self.new_hosts)
         self.all_certs=self.all_certs.union(included_part[1])
         self.all_hosts=self.all_hosts.union(included_part[0])
         
@@ -166,7 +177,7 @@ class Minions(object):
         if self.exclude_spec:
             #get first groups ypu dont want to run :
             group_exclude = self._get_group_hosts(self.exclude_spec)
-            excluded_part = self._get_hosts_for_spec(self.exclude_spec.split(";")+group_exclude)
+            excluded_part = self._get_hosts_for_specs(self.exclude_spec.split(";")+group_exclude)
             self.all_certs = self.all_certs.difference(excluded_part[1])
             self.all_hosts = self.all_hosts.difference(excluded_part[0])
 
