@@ -173,12 +173,12 @@ class SqliteBackend(BaseBackend):
         else:
             if not exact:
                 if not exclude:
-                    return [g.name for g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).all()]
+                    return [g.name for g in self.session.query(Group).filter(Group.name.like("".join(["%",pattern,"%"]))).all()]
                 else:
-                    return [g.name for g in session.query(Group).filter_by(Group.name.like("%%s%"%pattern)).filter(not_(Group.name.in_(exclude))).all()]
+                    return [g.name for g in self.session.query(Group).filter(Group.name.like("".join(["%",pattern,"%"]))).filter(not_(Group.name.in_(exclude))).all()]
 
             else:
-                return [g.name for g in session.query(Group).filter_by(name=pattern).all()]
+                return [g.name for g in self.session.query(Group).filter_by(name=pattern).all()]
     
         return []
 
@@ -216,9 +216,9 @@ class SqliteBackend(BaseBackend):
 
             else:
                 if not exclude:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by(group_id=group.id).all()]
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("".join(["%",pattern,"%"]))).filter_by(group_id=group.id).all()]
                 else:
-                    return [h.name for h in self.session.query(Host).filter(Host.name.like("%%s%"%pattern)).filter_by(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
+                    return [h.name for h in self.session.query(Host).filter(Host.name.like("".join(["%",pattern,"%"]))).filter_by(group_id=group.id).filter(not_(Host.name.in_(exclude))).all()]
         
         return []
     def _check_commit(self,commit=True):
