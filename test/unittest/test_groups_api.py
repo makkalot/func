@@ -134,7 +134,7 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             g.add_host_list(g_name,["host1","host2","host3"])
             g.add_host_list(g_name,["host4","host5","host6"])
 
-    def test_add_hosts_to_group(self):
+    def test_add_hosts_to_group_glob(self):
         """
         Test globbing addition
         """
@@ -165,4 +165,53 @@ class TestGroupApi(BaseGroupT,BaseMinions):
                     assert g.add_host_to_group(g_name,h)[0] == False
                 else:
                     assert g.add_host_to_group(g_name,h)[0] == True
+
+    
+    def test_get_groups(self):
+        """
+        test get groups
+        """
+        for g in self.groups:
+            g.add_group("group1")
+            g.add_group("group2")
+            #get all groups
+            grs = g.get_groups()
+            assert grs == ["group1","group2"]
+            
+            #get one
+            tmg = g.get_groups(pattern="group1")
+            assert tmg == ["group1"]
+            
+            tmg = g.get_groups(pattern="gr",exact=False)
+            assert tmg == ["group1","group2"]
+            
+            tmg = g.get_groups(pattern="gr",exact=False,exclude=["group2"])
+            assert tmg == ["group1"]
+            
+            #test also an empty one
+            tmg = g.get_groups(pattern="group3")
+            assert tmg == []
+            
+   
+    def test_get_groups_glob(self):
+       """
+       Globbing in groups
+       """
+       for g in self.groups:
+            g.add_group("group1")
+            g.add_group("group2")
+            #get all groups
+            grs = g.get_groups_glob("*")
+            assert grs == ["group1","group2"]
+            
+            #get one
+            tmg = g.get_groups_glob("*[1]")
+            assert tmg == ["group1"]
+            
+            tmg = g.get_groups_glob("*",exclude_string="*[2]")
+            assert tmg == ["group1"]
+            
+            #test also an empty one
+            tmg = g.get_groups_glob("*[3]")
+            assert tmg == []
 
