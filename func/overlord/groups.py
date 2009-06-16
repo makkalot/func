@@ -233,7 +233,7 @@ class Groups(object):
         Here only for API COMPATIBILITY ...
         use more advanced one get_hosts_glob() method
         """
-        return self.get_hosts_glob()
+        return self.get_hosts_glob(group_glob_str)
           
     def remove_group(self,group,save=False):
         """
