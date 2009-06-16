@@ -264,8 +264,96 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             hosts = g.get_hosts_glob("@group1:[1-5][0-9];@group1:[6-9][0-9]",exclude_string="@group1:[1-8][0-9];@group1:[9][0-9]")
             assert self._t_compare_arrays(hosts,list(range(10))) == True
 
+    def test_remove_group(self):
+        """
+        remove group test
+        """
+        for g in self.groups:
+            g.add_group("group1")
+            #removing the group
+            assert g.remove_group("group1")[0] == True
+            assert g.remove_group("group1")[0] == False
+            grs = g.get_groups_glob("*")
+            assert grs == []
+
+    def test_remove_group_list(self):
+        """
+        remove a list of groups
+        """
+
+        for g in self.groups:
+            g.add_group("group1")
+            g.add_group("group2")
+            #removing the group
+            g.remove_group_list(["group1","group2"])
+            grs = g.get_groups_glob("*")
+            assert grs == []
+    
+    def test_remove_group_glob(self):
+        """
+        Remove groups by glob
+        """
+        for g in self.groups:
+            g.add_group("group1")
+            g.add_group("group2")
+            #removing the group
+            g.remove_group_glob("gr*")
+            grs = g.get_groups_glob("*")
+            assert grs == []
+    
+    def test_remove_host(self):
+        """
+        remove host test
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_host_list(g_name,["host1","host2","host3"])
+            
+            assert g.remove_host(g_name,"host1")[0] == True 
+            assert g.remove_host(g_name,"host1")[0] == False 
+            hosts = g.get_hosts(group=g_name)
+            assert self._t_compare_arrays(hosts,["host2","host3"])
+            assert g.remove_host(g_name,"host2")[0] ==True
+            hosts = g.get_hosts(group=g_name)
+            assert self._t_compare_arrays(hosts,["host3"])
 
     
+    def test_remove_host_list(self):
+        """
+        Remove the host list
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_host_list(g_name,["host1","host2","host3"])
+            g.remove_host_list(g_name,["host1","host2"])
+            hosts = g.get_hosts(group=g_name)
+            assert hosts == ["host3"]
+    
+    def test_remove_host_glob(self):
+        """
+        Remove hosts bu glob
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            
+            g.remove_host_glob("group1","*")
+            hosts = g.get_hosts_glob("@group1")
+            assert hosts==[]
+            
+            g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            #try subgroupping thing on the fly
+            g.remove_host_glob("group1","[0-9][0-9]")
+            hosts = g.get_hosts_glob("@group1:*")
+            assert self._t_compare_arrays(hosts,list(range(10))) == True
+            #try the exclude string
+            g.remove_host_glob("group1","*",exclude_string="[0-9][0-9]")
+            hosts = g.get_hosts_glob("@group1:*")
+            assert self._t_compare_arrays(hosts,list(range(10))) == True
+
     def _t_compare_arrays(self,one,two):
         for o in one:
             if not o in two:
