@@ -120,7 +120,7 @@ class SqliteBackend(BaseBackend):
         else:
             group = group[1]
         
-        session.delete(group)
+        self.session.delete(group)
         self._check_commit(save)
         return (True,'')
 
@@ -145,6 +145,7 @@ class SqliteBackend(BaseBackend):
         
         self.session.delete(host_db)
         self._check_commit(save)
+        return (True,"")
     
     def save_changes(self):
         """

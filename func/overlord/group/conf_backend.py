@@ -97,7 +97,7 @@ class ConfBackend(BaseBackend):
         if not self.__groups.has_key(group):
             return (False,"Group name : %s doesnt exist"%group)
         #delete that entry
-        if group_name in self.cp.sections():
+        if group in self.cp.sections():
             #if we have it also here should remove it
             if self.cp.has_section(group):
                 self.cp.remove_section(group)
