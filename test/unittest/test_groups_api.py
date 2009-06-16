@@ -176,14 +176,14 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             g.add_group("group2")
             #get all groups
             grs = g.get_groups()
-            assert grs == ["group1","group2"]
+            assert self._t_compare_arrays(grs,["group1","group2"]) == True
             
             #get one
             tmg = g.get_groups(pattern="group1")
-            assert tmg == ["group1"]
+            assert tmg==["group1"]
             
             tmg = g.get_groups(pattern="gr",exact=False)
-            assert tmg == ["group1","group2"]
+            assert self._t_compare_arrays(tmg,["group1","group2"])==True
             
             tmg = g.get_groups(pattern="gr",exact=False,exclude=["group2"])
             assert tmg == ["group1"]
@@ -202,7 +202,7 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             g.add_group("group2")
             #get all groups
             grs = g.get_groups_glob("*")
-            assert grs == ["group1","group2"]
+            assert self._t_compare_arrays(grs,["group1","group2"]) == True
             
             #get one
             tmg = g.get_groups_glob("*[1]")
@@ -214,4 +214,60 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             #test also an empty one
             tmg = g.get_groups_glob("*[3]")
             assert tmg == []
+    
+    def test_get_hosts(self):
+        """
+        Get hosts tests
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_host_list(g_name,["host1","host2","host3"])
+            
+            hosts = g.get_hosts(group=g_name)
+            assert self._t_compare_arrays(hosts,["host1","host2","host3"]) == True
 
+            #get only one
+            host = g.get_hosts(pattern="host1",group=g_name)
+            assert host == ["host1"]
+            
+            #get pattern
+            host = g.get_hosts(pattern="ho",group=g_name,exact=False)
+            assert self._t_compare_arrays(host,["host1","host2","host3"]) == True
+
+            host = g.get_hosts(pattern="ho",group=g_name,exact=False,exclude=["host1","host2"])
+            assert host==["host3"]
+
+            #an empty test also
+            host = g.get_hosts(pattern="host4")
+            assert host==[]
+
+    def test_get_hosts_glob(self):
+        """
+        test hosts for glob strings
+        """
+        g_name = "group1"
+        for g in self.groups:
+            g.add_group(g_name)
+            g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            
+            hosts = g.get_hosts_glob("@group1")
+            assert self._t_compare_arrays(hosts,self.current_minions) == True
+            
+            #try subgroupping thing on the fly
+            hosts = g.get_hosts_glob("@group1:[0-9]")
+            assert self._t_compare_arrays(hosts,list(range(10))) == True
+
+            #try the exclude string
+            hosts = g.get_hosts_glob("@group1",exclude_string="@group1:[0-9][0-9]")
+            assert self._t_compare_arrays(hosts,list(range(10))) == True
+            hosts = g.get_hosts_glob("@group1:[1-5][0-9];@group1:[6-9][0-9]",exclude_string="@group1:[1-8][0-9];@group1:[9][0-9]")
+            assert self._t_compare_arrays(hosts,list(range(10))) == True
+
+
+    
+    def _t_compare_arrays(self,one,two):
+        for o in one:
+            if not o in two:
+                return False
+        return True
