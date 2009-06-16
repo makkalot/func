@@ -253,14 +253,14 @@ class Groups(object):
         all_groups = self.get_groups()
         remove_groups = fnmatch.filter(all_groups,group_str)
         #remove them
-        self.remove_group_list(remove_group)
+        self.remove_group_list(remove_groups)
 
     def remove_group_list(self,group_list,save = False):
         """
         Removes a group of list
         """
 
-        if type(host_list) != list:
+        if type(group_list) != list:
             sys.stderr.write("We accept only lists for for remove_group_list method")
             return False
         
@@ -273,7 +273,7 @@ class Groups(object):
         """
         Removes a proper host from the conf file
         """
-        return self.backend.remove_group(group_name,host,save)
+        return self.backend.remove_host(group_name,host,save)
     
     
     def remove_host_glob(self,group_name,host_str,save=False,exclude_string=None):
@@ -283,14 +283,14 @@ class Groups(object):
             host_str = host_str.difference(e_s)
 
         #remove the list completely
-        self.remove_host_list(group_name,host_str,save)    
+        self.remove_host_list(group_name,host_str)    
 
-    def remove_host_list(self,group,host_list,save = False):
+    def remove_host_list(self,group,host_list):
         """
         Remove a whole list from the conf file of hosts
         """
 
-        if type(host_list) != list or type(host_list) != set :
+        if type(host_list) != list and type(host_list) != set :
             sys.stderr.write("We accept only lists for for remove_host_list method")
             return False
 
