@@ -202,7 +202,7 @@ class ConfBackend(BaseBackend):
         if not group or len(group)>1:
             return []
 
-        hosts = self.__groups[group]
+        hosts = self.__groups[group[0]]
         
         if not pattern:
             #return all of them
@@ -215,7 +215,7 @@ class ConfBackend(BaseBackend):
             #it seems there is a pattern
             if exact:
                 #there is no mean to check here for exclude list ...
-                for g in hosts():
+                for g in hosts:
                     if g == pattern:
                         return [g]
                 return []
@@ -223,13 +223,13 @@ class ConfBackend(BaseBackend):
             else:#not exact match
                 if not exclude:#there is no list to exclude
                     tmp_l = set()
-                    for g in hosts():
+                    for g in hosts:
                         if pattern.lower() in g.lower():
                             tmp_l.add(g)
                     return list(tmp_l)
                 else:
                     tmp_l = set()
-                    for g in hosts():
+                    for g in hosts:
                         if pattern.lower() in g.lower():
                             tmp_l.add(g)
                     #get the difference of 2 sets
