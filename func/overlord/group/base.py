@@ -61,7 +61,7 @@ def choose_backend(backend=None,conf_file=None,db_file=None):
     """
 
     config = read_config(CONF_FILE,CMConfig)
-    backend = backend or config.backend or "sqlite"
+    backend = backend or config.backend or "conf"
 
     if backend == "sqlite":
         from func.overlord.group.sqlite_backend import SqliteBackend
