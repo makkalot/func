@@ -1,4 +1,3 @@
-from func.overlord.client import Minions
 from func.overlord.group.base import choose_backend
 import sys
 import fnmatch
@@ -9,6 +8,7 @@ def get_hosts_spec(spec):
     able to use globbing in groups when
     querying ...
     """
+    from func.overlord.client import Minions
 
     m = Minions(spec)
     return m.get_hosts_for_spec(spec)
@@ -31,8 +31,9 @@ class Groups(object):
         for g in groups:
             print "Group : %s"%g
             hosts = self.get_hosts(group=g)
-            for h in hosts:
-                print "\t Host : %s "%h
+            if hosts:
+                for h in hosts:
+                    print "\t Host : %s "%h
         
 
             
@@ -191,16 +192,18 @@ class Groups(object):
         extracting a list of hosts from a glob str
         """
         for group_glob in group_globs:
-            if group_glob[0] == "@":
+            if group_glob[0] != "@":
                 continue
             group_glob = group_glob[1:]
             #we seek for @group:ww* thing here
             if group_glob.find(":")!=-1:
                 group_str,host_str = group_glob.split(":")
                 hosts = get_hosts_spec(host_str)
-                include_host.union(set(self.get_hosts(pattern=hosts,group=group_glob,exact=True)))
+                #print "The hosts are ",hosts
+                include_host=include_host.union(set(self.get_hosts(pattern=hosts,group=group_str,exact=True)))
             else:
-                include_host.union(set(self.get_hosts(group=group_glob)))
+                include_host=include_host.union(set(self.get_hosts(group=group_glob)))
+                #print "The include host is like ",include_host
         
         return include_host
 
