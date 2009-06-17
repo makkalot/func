@@ -58,7 +58,10 @@ class ConfBackend(BaseBackend):
             options = self.cp.options(section)
             for option in options:
                 if option == "host":
-                    self.add_host_to_group(section, self.cp.get(section, option),save=False)
+                    hosts = self.cp.get(section,option)
+                    hosts = hosts.split(",")
+                    for h in hosts:
+                        self.add_host_to_group(section,h,save=False)
                         
     def add_host_to_group(self,group,host,save=True):
         """
@@ -69,7 +72,8 @@ class ConfBackend(BaseBackend):
 
         #dont want duplicates
         if not host in self.__groups[group]:
-            self.__groups[group].append(host)
+            if host:
+                self.__groups[group].append(host)
         else:
             return (False,"Host is already in database : %s"%host)
 
@@ -198,15 +202,19 @@ class ConfBackend(BaseBackend):
                          matching or related one.
         @param exclude : A list to be excluded from final set
         """
+        #print "Caling %s:%s"%(pattern,group)
         group = self.get_groups(pattern=group,exact=True)
+        #print "The group we got is : ",group
         if not group or len(group)>1:
             return []
 
         hosts = self.__groups[group[0]]
-        
+        #print "The hosts we got are ",hosts 
+
         if not pattern:
             #return all of them
             if not exclude:
+                #print "Returning back the hosts ",hosts
                 return hosts
             else:
                 #get the difference of 2 sets 
@@ -215,9 +223,17 @@ class ConfBackend(BaseBackend):
             #it seems there is a pattern
             if exact:
                 #there is no mean to check here for exclude list ...
-                for g in hosts:
-                    if g == pattern:
-                        return [g]
+                if type(pattern)==str:
+                    for g in hosts:
+                        if g == pattern:
+                            return [g]
+                else:
+                    #sometimes we pass all list to compare em
+                    tmp = []
+                    for p in pattern:
+                        if p in hosts:
+                            tmp.append(p)
+                    return tmp
                 return []
 
             else:#not exact match
