@@ -359,3 +359,8 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             if not o in two:
                 return False
         return True
+
+if __name__ == "__main__":
+    b = BaseMinions()
+    b.create_dummy_minions()
+    #b.clean_dummy_minions()
