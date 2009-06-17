@@ -108,7 +108,7 @@ class Minions(object):
         return self.new_hosts
 
     def _get_group_hosts(self,spec):
-        return self.self.group_class.get_hosts_by_group_glob(spec)
+        return self.group_class.get_hosts_by_group_glob(spec)
 
     def _get_hosts_for_specs(self,seperate_gloobs):
         """
