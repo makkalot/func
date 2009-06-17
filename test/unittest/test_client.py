@@ -22,7 +22,6 @@ import socket
 class BaseTest:
     # assume we are talking to localhost
     th = socket.gethostname()
-#    th = socket.getfqdn()
     nforks=1
     async=False
 
@@ -87,6 +86,8 @@ class BaseTest:
     test_module_list_methods.intro = True
     test_module_inventory.intro = True
     test_module_get_method_args.intro = True
+
+
 
 class TestTest(BaseTest):
     module = "test"
@@ -217,7 +218,6 @@ class TestTest(BaseTest):
 
 
 
-
 class TestCommand(BaseTest):
     module = "command"
     def test_echo(self):
@@ -305,7 +305,9 @@ class TestCopyfile(BaseTest):
         result = self.overlord.copyfile.checksum(self.dest_fn)
         self.assert_on_fault(result)
         assert result[self.th] == "b36a8040e44c16605d7784cdf1b3d9ed04ea7f55"
-        
+
+
+       
 
 class TestHardware(BaseTest):
     module = "hardware"
@@ -325,6 +327,7 @@ class TestHardware(BaseTest):
     def test_info_no_devices(self):
         result = self.overlord.hardware.info(False)
         self.assert_on_fault(result)
+
 
 class TestFileTracker(BaseTest):
     fn = "/etc/hosts"
@@ -441,6 +444,7 @@ class TestProcess(BaseTest):
     #        command and then kill it?
 
 
+
 class TestService(BaseTest):
     module = "service"
     def test_inventory(self):
@@ -462,6 +466,8 @@ class TestService(BaseTest):
 
         #FIXME: whats a good way to test starting/stoping services without
         #       doing bad things? -akl
+
+
 
 class TestRpm(BaseTest):
     module = "rpms"
@@ -509,7 +515,8 @@ class TestSmart(BaseTest):
     def test_info(self):
         result = self.overlord.smart.info()
         self.assert_on_fault(result)
-    
+
+   
 
 class TestSysctl(BaseTest):
     module = "sysctl"
@@ -520,6 +527,7 @@ class TestSysctl(BaseTest):
     def test_get(self):
         result = self.overlord.sysctl.get("kernel.max_lock_depth")
         self.assert_on_fault(result)
+
 
 class TestYum(BaseTest):
     module = "yumcmd"
@@ -538,6 +546,7 @@ class TestYum(BaseTest):
         self.assert_on_fault(results)
         results_no_filter = self.overlord.yumcmd.check_update()
         assert results == results_no_filter
+
 
 # this fails on fc6, need to test on newer yum to see whats up
 #    def test_update_non_existent_package(self):
@@ -609,6 +618,45 @@ class TestEchoTest(BaseTest):
         self.assert_on_fault(result)
 
 
+
+class TestFactsModule(BaseTest):
+    module = "fact"
+
+    def test_list_fact_modules(self):
+        result=self.overlord.fact.list_fact_modules()
+        print result
+        self.assert_on_fault(result)
+
+    def test_list_fact_methods(self):
+        # we want to catch the case if haveconflicts ...
+        result=self.overlord.fact.list_fact_methods(True)
+        print result
+        self.assert_on_fault(result)
+        if type(result[self.th])==dict and result[self.th].has_key('__conflict__'):
+            raise Exception("You have conflict in tags run fact.list_fact_methods for more info : %s"%result)
+
+    def test_show_fact_module(self):
+        modules = self.overlord.fact.list_fact_modules().values()
+        print "Modules to run for show fact module are ",modules
+        for module in modules[0]:
+            result = self.overlord.fact.show_fact_module(module)
+            print result
+            self.assert_on_fault(result)
+    
+    def test_show_fact_method(self):
+        methods = self.overlord.fact.list_fact_methods().values()
+        print "Methods to run for show fact method are ",methods
+        for method in methods[0]:
+            result = self.overlord.fact.show_fact_method(method)
+            print result
+            self.assert_on_fault(result)
+
+    def test_fact_call(self):
+        methods = self.overlord.fact.list_fact_methods().values()
+        for method in methods[0]:
+            result = self.overlord.fact.call_fact(method)
+            print result
+            self.assert_on_fault(result)
 
 
 
