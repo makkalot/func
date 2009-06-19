@@ -64,7 +64,7 @@ class Groups(object):
         return list(set(bits))
 
     
-    def add_group(self,group_name,save=False):
+    def add_group(self,group_name,save=True):
         """
         Adding a new group
 
@@ -106,7 +106,7 @@ class Groups(object):
         """
         hosts = self.__parse_strings(hoststring)
         for host in hosts:
-            self.add_host_to_group(group, host)
+            self.add_host_to_group(group, host,save=False)
         self.save_changes()
 
     def add_host_to_group(self, group, host, save =True):
@@ -238,7 +238,7 @@ class Groups(object):
         """
         return self.get_hosts_glob(group_glob_str)
           
-    def remove_group(self,group,save=False):
+    def remove_group(self,group,save=True):
         """
         Removing a group if needed
         
@@ -248,7 +248,7 @@ class Groups(object):
         
         return self.backend.remove_group(group,save)
 
-    def remove_group_glob(self,group_str,save=False):
+    def remove_group_glob(self,group_str):
         """
         Removing group via a glob
         """
@@ -258,7 +258,7 @@ class Groups(object):
         #remove them
         self.remove_group_list(remove_groups)
 
-    def remove_group_list(self,group_list,save = False):
+    def remove_group_list(self,group_list):
         """
         Removes a group of list
         """
@@ -268,18 +268,18 @@ class Groups(object):
             return False
         
         for g in group_list:
-            self.remove_group(g)
+            self.remove_group(g,save=False)
         self.save_changes()
 
 
-    def remove_host(self,group_name,host,save=False):
+    def remove_host(self,group_name,host,save=True):
         """
         Removes a proper host from the conf file
         """
         return self.backend.remove_host(group_name,host,save)
     
     
-    def remove_host_glob(self,group_name,host_str,save=False,exclude_string=None):
+    def remove_host_glob(self,group_name,host_str,exclude_string=None):
         host_str = get_hosts_spec(host_str)
         if exclude_string:
             e_s = get_hosts_spec(exclude_string)
@@ -298,7 +298,7 @@ class Groups(object):
             return False
 
         for host in host_list:
-            self.remove_host(group,host)
+            self.remove_host(group,host,save=False)
 
         self.save_changes()
 
