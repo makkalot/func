@@ -55,7 +55,7 @@ class SqliteBackend(BaseBackend):
     Sqlite backend for groups api
     """
 
-    def __init__(self,conf_file = CONF_FILE,db_file=DB_PATH,*args,**kwargs):
+    def __init__(self,conf_file = None,db_file=None,*args,**kwargs):
         """
         Initializing the database if it doesnt exists it is created and
         connection opened for serving nothing special
