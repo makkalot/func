@@ -4,6 +4,10 @@ from certmaster.commonconfig import CMConfig
 import os
 import fnmatch
 
+from func.overlord.group.conf_backend import ConfBackend
+from func.overlord.group.sqlite_backend import SqliteBackend
+       
+
 TEST_DB_FILE = "/tmp/test_sqlite.db"
 TEST_CONF_FILE = "/tmp/test_conf.conf"
 
@@ -44,17 +48,33 @@ class BaseMinions(object):
 
 
 class BaseGroupT(object):
+    
+    backends = [
+                {'backend':'sqlite','db_file':TEST_DB_FILE},
+                {'backend':'conf','conf_file':TEST_CONF_FILE}
+                ]
+    
+    def refresh_backend(self,g_object):
+        """
+        Here you should add your object in if statements
+        """
+        from func.overlord.group.conf_backend import ConfBackend
+        from func.overlord.group.sqlite_backend import SqliteBackend
+       
+        if isinstance(g_object.backend,ConfBackend):
+            return Groups(**self.backends[1])
+        elif isinstance(g_object.backend,SqliteBackend):
+            return Groups(**self.backends[0])
+        else:
+            return None
 
     def get_group_objects(self):
         """
         Initializer
         """
-        backends = [
-                {'backend':'sqlite','db_file':TEST_DB_FILE},
-                {'backend':'conf','conf_file':TEST_CONF_FILE}
-                ]
+        
         gr_list = []
-        for b in backends:
+        for b in self.backends:
             gr_list.append(Groups(**b))
 
         return gr_list
@@ -96,7 +116,8 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         adds a single group item
         """
         for g in self.groups:
-            assert g.add_group("group1")[0]== True
+            assert g.add_group("group1",save=True)[0]== True
+            g = self.refresh_backend(g)
             assert g.add_group("group1")[0] == False
 
     
@@ -110,6 +131,7 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         for g in self.groups:
             g.add_group(g_name)
             assert g.add_host_to_group(g_name,"host1")[0] == True
+            g = self.refresh_backend(g)
             assert g.add_host_to_group(g_name,"host1")[0] == False
             
             
@@ -120,7 +142,9 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_hosts_to_group(g_name,"host1,host2,host3")
+            g = self.refresh_backend(g)
             g.add_hosts_to_group(g_name,"host5;host7;host8")
     
     def test_add_host_list(self):
@@ -130,8 +154,11 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host1","host2","host3"])
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host1","host2","host3"])
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host4","host5","host6"])
 
     def test_add_hosts_to_group_glob(self):
@@ -141,30 +168,40 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            g = self.refresh_backend(g)
 
-        #lets check if all of them are in
+        self.groups = self.get_group_objects()        
         for g in self.groups:
             for h in self.current_minions:
                 if self.current_minions.index(h) %10 == 0:
                     print "Tests completed : ",self.current_minions.index(h)
                 assert g.add_host_to_group(g_name,h)[0] == False
-        
+                #print "Let see IT ",g.add_host_to_group(g_name,h)[0]
+                g = self.refresh_backend(g)
+       
         #clear again so we can test exclude thing
         self.teardown()
         self.setUp()
         
         #print "Testing exclude string ...."
+
+        self.groups = self.get_group_objects()        
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_hosts_to_group_glob(g_name,"*",exclude_string="*[1,3,5,7,9]")
+            g = self.refresh_backend(g)
             #add all of them
             for h in self.current_minions:
                 #print "Checking for : ",h
                 if int(h)%2==0:
                     assert g.add_host_to_group(g_name,h)[0] == False
+                    g = self.refresh_backend(g)
                 else:
                     assert g.add_host_to_group(g_name,h)[0] == True
+                    g = self.refresh_backend(g)
 
     
     def test_get_groups(self):
@@ -173,7 +210,9 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         """
         for g in self.groups:
             g.add_group("group1")
+            g = self.refresh_backend(g)
             g.add_group("group2")
+            g = self.refresh_backend(g)
             #get all groups
             grs = g.get_groups()
             assert self._t_compare_arrays(grs,["group1","group2"]) == True
@@ -199,7 +238,9 @@ class TestGroupApi(BaseGroupT,BaseMinions):
        """
        for g in self.groups:
             g.add_group("group1")
+            g = self.refresh_backend(g)
             g.add_group("group2")
+            g = self.refresh_backend(g)
             #get all groups
             grs = g.get_groups_glob("*")
             assert self._t_compare_arrays(grs,["group1","group2"]) == True
@@ -222,7 +263,9 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host1","host2","host3"])
+            g = self.refresh_backend(g)
             
             hosts = g.get_hosts(group=g_name)
             assert self._t_compare_arrays(hosts,["host1","host2","host3"]) == True
@@ -249,7 +292,9 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            g = self.refresh_backend(g)
             
             hosts = g.get_hosts_glob("@group1")
             assert self._t_compare_arrays(hosts,self.current_minions) == True
@@ -270,9 +315,12 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         """
         for g in self.groups:
             g.add_group("group1")
+            g = self.refresh_backend(g)
             #removing the group
             assert g.remove_group("group1")[0] == True
+            g = self.refresh_backend(g)
             assert g.remove_group("group1")[0] == False
+            g = self.refresh_backend(g)
             grs = g.get_groups_glob("*")
             assert grs == []
 
@@ -283,9 +331,12 @@ class TestGroupApi(BaseGroupT,BaseMinions):
 
         for g in self.groups:
             g.add_group("group1")
+            g = self.refresh_backend(g)
             g.add_group("group2")
+            g = self.refresh_backend(g)
             #removing the group
             g.remove_group_list(["group1","group2"])
+            g = self.refresh_backend(g)
             grs = g.get_groups_glob("*")
             assert grs == []
     
@@ -295,9 +346,12 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         """
         for g in self.groups:
             g.add_group("group1")
+            g = self.refresh_backend(g)
             g.add_group("group2")
+            g = self.refresh_backend(g)
             #removing the group
             g.remove_group_glob("gr*")
+            g = self.refresh_backend(g)
             grs = g.get_groups_glob("*")
             assert grs == []
     
@@ -308,13 +362,18 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host1","host2","host3"])
+            g = self.refresh_backend(g)
             
             assert g.remove_host(g_name,"host1")[0] == True 
+            g = self.refresh_backend(g)
             assert g.remove_host(g_name,"host1")[0] == False 
+            g = self.refresh_backend(g)
             hosts = g.get_hosts(group=g_name)
             assert self._t_compare_arrays(hosts,["host2","host3"])
             assert g.remove_host(g_name,"host2")[0] ==True
+            g = self.refresh_backend(g)
             hosts = g.get_hosts(group=g_name)
             assert self._t_compare_arrays(hosts,["host3"])
 
@@ -326,8 +385,11 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_host_list(g_name,["host1","host2","host3"])
+            g = self.refresh_backend(g)
             g.remove_host_list(g_name,["host1","host2"])
+            g = self.refresh_backend(g)
             hosts = g.get_hosts(group=g_name)
             assert hosts == ["host3"]
     
@@ -338,23 +400,30 @@ class TestGroupApi(BaseGroupT,BaseMinions):
         g_name = "group1"
         for g in self.groups:
             g.add_group(g_name)
+            g = self.refresh_backend(g)
             g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            g = self.refresh_backend(g)
             
             g.remove_host_glob("group1","*")
+            g = self.refresh_backend(g)
             hosts = g.get_hosts_glob("@group1")
             assert hosts==[]
             
             g.add_hosts_to_group_glob(g_name,"*") #add all of them
+            g = self.refresh_backend(g)
             #try subgroupping thing on the fly
             g.remove_host_glob("group1","[0-9][0-9]")
+            g = self.refresh_backend(g)
             hosts = g.get_hosts_glob("@group1:*")
             assert self._t_compare_arrays(hosts,list(range(10))) == True
             #try the exclude string
             g.remove_host_glob("group1","*",exclude_string="[0-9][0-9]")
+            g = self.refresh_backend(g)
             hosts = g.get_hosts_glob("@group1:*")
             assert self._t_compare_arrays(hosts,list(range(10))) == True
 
     def _t_compare_arrays(self,one,two):
+        two = [str(i) for i in two]
         for o in one:
             if not o in two:
                 return False
