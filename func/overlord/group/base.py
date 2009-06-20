@@ -49,10 +49,9 @@ class BaseBackend(object):
         """
         raise NotImplementedError
     
-
-CONF_FILE = "/etc/certmaster/certmaster.conf"
+from func.commonconfig import OVERLORD_CONFIG_FILE,OverlordConfig
 from certmaster.config import read_config
-from certmaster.commonconfig import CMConfig
+CONF_FILE = OVERLORD_CONFIG_FILE
 
 def choose_backend(backend=None,conf_file=None,db_file=None):
     """
@@ -60,7 +59,7 @@ def choose_backend(backend=None,conf_file=None,db_file=None):
     supplied ...
     """
 
-    config = read_config(CONF_FILE,CMConfig)
+    config = read_config(CONF_FILE,OverlordConfig)
     backend = backend or config.backend or "conf"
 
     if backend == "sqlite":

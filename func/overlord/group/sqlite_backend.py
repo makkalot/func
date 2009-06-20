@@ -43,10 +43,10 @@ class Host(Base):
         return "<Host('%s')>" % self.name
 
 
-CONF_FILE = "/etc/certmaster/certmaster.conf"
+from func.commonconfig import OVERLORD_CONFIG_FILE,OverlordConfig
+CONF_FILE = OVERLORD_CONFIG_FILE
 DB_PATH = "/var/lib/certmaster/groups.db"
 from certmaster.config import read_config
-from certmaster.commonconfig import CMConfig
 from func.overlord.group.base import BaseBackend
 import os
 
@@ -64,7 +64,7 @@ class SqliteBackend(BaseBackend):
         @param db_file   : Place of the database file override if needed
         """
         self.config = conf_file or CONF_FILE
-        self.config = read_config(self.config,CMConfig)
+        self.config = read_config(self.config,OverlordConfig)
         self.db_path = db_file or self.config.group_db or DB_PATH
 
         self._recreate_session()
