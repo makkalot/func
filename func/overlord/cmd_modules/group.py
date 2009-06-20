@@ -58,7 +58,8 @@ class Group(base_command.BaseCommand):
 
         self.parser.add_option("--e", "--exclude", 
                                dest="exclude",
-                               action="store_true")
+                               action="store",
+                               type="string")
 
 
     def handleOptions(self, options):
@@ -143,11 +144,10 @@ class Group(base_command.BaseCommand):
         if self.options.exclude:
             exclude = self._parse_args_list(self.options.exclude)
             exclude = self._match_group_host(exclude)
-
-            for g_i,h_i,g_e,h_e in zip(args.iteritems(),exclude.iteritems()):
-                for host_include,host_exclude in zip(h_i,h_e):
-                    self.group.add_hosts_to_group_glob(g_i[1:],host_include,exclude_string=host_exclude)
-        
+            
+            for g_i,g_e in zip(args.iteritems(),exclude.iteritems()):
+                for host_include,host_exclude in zip(g_i[1],g_e[1]):
+                    self.group.add_hosts_to_group_glob(g_i[0][1:],host_include,exclude_string=host_exclude)
         #user didnt enter the exclude option so go on normally
         else:
             for group,hosts in args.iteritems():
@@ -163,10 +163,9 @@ class Group(base_command.BaseCommand):
         if self.options.exclude:
             exclude = self._parse_args_list(self.options.exclude)
             exclude = self._match_group_host(exclude)
-            for g_i,h_i,g_e,h_e in zip(args.iteritems(),exclude.iteritems()):
-                for host_include,host_exclude in zip(h_i,h_e):
-                    self.group.remove_host_glob(g_i[1:],host_include,exclude_string=host_exclude)
-        
+            for g_i,g_e in zip(args.iteritems(),exclude.iteritems()):
+                for host_include,host_exclude in zip(g_i[1],g_e[1]):
+                    self.group.remove_host_glob(g_i[0][1:],host_include,exclude_string=host_exclude)
         #user didnt enter the exclude option so go on normally
         else:
             for group,hosts in args.iteritems():
