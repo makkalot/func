@@ -235,7 +235,7 @@ class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
-        delegate=False, mapfile=DEFAULT_MAPLOC, timeout=None):
+        delegate=False, mapfile=DEFAULT_MAPLOC, timeout=None,exclude_spec=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -255,7 +255,7 @@ class Overlord(object):
 
 
         self.server_spec = server_spec
-
+        self.exclude_spec = exclude_spec
         # we could make this settable in overlord.conf as well
         self.port        = port
         if self.config.listen_port:
@@ -284,7 +284,7 @@ class Overlord(object):
         self.mapfile     = mapfile
         
 
-        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose)
+        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose,exclude_spec=self.exclude_spec)
         self.minions = self.minions_class.get_urls()
         if len(self.minions) == 0:
             raise Func_Client_Exception, 'Can\'t find any minions matching \"%s\". ' % self.server_spec
