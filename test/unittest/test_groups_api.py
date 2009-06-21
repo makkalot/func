@@ -307,7 +307,7 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             hosts = g.get_hosts_glob("@group1",exclude_string="@group1:[0-9][0-9]")
             assert self._t_compare_arrays(hosts,list(range(10))) == True
             hosts = g.get_hosts_glob("@group1:[1-5][0-9];@group1:[6-9][0-9]",exclude_string="@group1:[1-8][0-9];@group1:[9][0-9]")
-            assert self._t_compare_arrays(hosts,list(range(10))) == True
+            assert self._t_compare_arrays(hosts,[]) == True
 
     def test_remove_group(self):
         """
@@ -420,14 +420,96 @@ class TestGroupApi(BaseGroupT,BaseMinions):
             g.remove_host_glob("group1","*",exclude_string="[0-9][0-9]")
             g = self.refresh_backend(g)
             hosts = g.get_hosts_glob("@group1:*")
-            assert self._t_compare_arrays(hosts,list(range(10))) == True
+            assert self._t_compare_arrays(hosts,[]) == True
 
     def _t_compare_arrays(self,one,two):
-        two = [str(i) for i in two]
-        for o in one:
-            if not o in two:
-                return False
+        return compare_arrays(one,two)
+
+def compare_arrays(one,two):
+    if not one == two:
+        if not one or not two:
+            return False
+    else:
         return True
+
+    two = [str(i) for i in two]
+    for o in one:
+        if not o in two:
+            return False
+    return True
+
+
+from func.overlord.client import Minions
+class TestMinionGroups(BaseMinions):
+    """
+    Test the minion methods that wraps the group classes
+    """
+    
+    backends = [
+                {'groups_backend':'sqlite','db_file':TEST_DB_FILE},
+                {'groups_backend':'conf','conf_file':TEST_CONF_FILE}
+                ]
+    
+    def teardown(self):
+        for path in [TEST_DB_FILE,TEST_CONF_FILE]:
+            if os.path.exists(path):
+                os.remove(path)
+    
+        self.clean_dummy_minions()
+    
+    def setUp(self):
+        #destroy and create minions
+        self.clean_dummy_minions()
+        self.current_minions = self.create_dummy_minions()
+        #get groups
+
+    def test_get_urls(self):
+        pass
+
+    def test_get_hosts_for_spec(self):
+        """
+        Testing the minions just to pull things for a spec
+        """
+        spec = "*"
+        m = Minions(spec)
+        minions = m.get_hosts_for_spec(spec)
+        assert compare_arrays(minions,self.current_minions) == True
+
+    
+    def test_get_all_hosts(self):
+        """
+        Getting all hosts
+        """
+        for backend_dict in self.backends:
+            #create a minion with relevant backens
+            m = Minions("*",**backend_dict)
+            #create some groups and hosts into that Minion
+            m.group_class.add_group("group1")
+            m.group_class.add_hosts_to_group_glob("group1","[0-9]")
+            
+            hosts = m.get_all_hosts()
+            assert compare_arrays(hosts,self.current_minions) == True
+            
+            #now test with grouping
+            m = Minions("[1][0-9];@group1:*",**backend_dict)
+            hosts = m.get_all_hosts()
+            assert compare_arrays(hosts,range(20)) == True
+
+            m = Minions("[1][0-5];@group1:[5-9]",**backend_dict)
+            hosts = m.get_all_hosts()
+            assert compare_arrays(hosts,range(5,16)) == True
+            
+            #do some testing about exclude string
+            m = Minions("*",exclude_spec="[1-9][0-9]",**backend_dict)
+            hosts = m.get_all_hosts()
+            assert compare_arrays(hosts,range(10)) == True
+
+            m = Minions("[1][0-5];@group1:[5-9]",exclude_spec="[1][3-5];@group1:[5-7]",**backend_dict)
+            hosts = m.get_all_hosts()
+            assert compare_arrays(hosts,range(8,13)) == True
+
+
+
 
 if __name__ == "__main__":
     b = BaseMinions()
