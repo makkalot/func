@@ -84,7 +84,7 @@ class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
                  just_fqdns=False, groups_backend="conf",
-                 delegate=False, minionmap={},exclude_spec=None):
+                 delegate=False, minionmap={},exclude_spec=None,**kwargs):
 
         self.spec = spec
         self.port = port
@@ -96,7 +96,7 @@ class Minions(object):
         self.exclude_spec = exclude_spec
 
         self.cm_config = read_config(CONFIG_FILE, CMConfig)
-        self.group_class = groups.Groups(backend=groups_backend)
+        self.group_class = groups.Groups(backend=groups_backend,**kwargs)
         
         #lets make them sets so we dont loop again and again
         self.all_hosts = set()
@@ -120,8 +120,8 @@ class Minions(object):
             if each_gloob.startswith('@'):
                 continue
             h,c = self._get_hosts_for_spec(each_gloob)
-            tmp_hosts.union(h)
-            tmp_certs.union(c)
+            tmp_hosts = tmp_hosts.union(h)
+            tmp_certs = tmp_certs.union(c)
 
         return tmp_hosts,tmp_certs
 
@@ -172,7 +172,6 @@ class Minions(object):
         included_part = self._get_hosts_for_specs(self.spec.split(";")+self.new_hosts)
         self.all_certs=self.all_certs.union(included_part[1])
         self.all_hosts=self.all_hosts.union(included_part[0])
-        
         #excluded ones
         if self.exclude_spec:
             #get first groups ypu dont want to run :
