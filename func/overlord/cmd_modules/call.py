@@ -73,6 +73,11 @@ class Call(base_command.BaseCommand):
                                help="use delegation to make function call",
                                default=self.delegate,
                                action="store_true")
+        self.parser.add_option('-e', '--exclude', dest="exclude",
+                               help="exclude some of minions",
+                               action="store",
+                               type="string")
+
 
     def handleOptions(self, options):
         self.options = options
@@ -160,6 +165,12 @@ class Call(base_command.BaseCommand):
         self.delegate = self.options.delegate
         
         self.server_spec = self.parentCommand.server_spec
+        
+        #do we have exclude option activated ?
+        if self.options.exclude:
+            self.exclude_spec = self.options.exclude
+
+        
         self.getOverlord()
 
         if not self.options.jobstatus:
