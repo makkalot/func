@@ -464,7 +464,12 @@ class TestMinionGroups(BaseMinions):
         #get groups
 
     def test_get_urls(self):
-        pass
+        for backend_dict in self.backends:
+            #create a minion with relevant backens
+            m = Minions("[0-9]",**backend_dict)
+            hosts = m.get_urls()
+            print hosts
+
 
     def test_get_hosts_for_spec(self):
         """
