@@ -1,0 +1,11 @@
+#!/usr/bin/python
+import sys
+from func.overlord.cmd_modules.group import Group
+
+file_name, argv = sys.argv[0], sys.argv[1:]
+cli = Group()
+try:
+    cli.parse(argv)
+except Exception, e:
+    print "ERROR:", e
+    sys.exit(1)

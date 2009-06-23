@@ -31,6 +31,7 @@ if __name__ == "__main__":
 		scripts = [
                      "scripts/funcd",
 		     "scripts/func", 
+		     "scripts/func-group", 
                      "scripts/func-inventory",
                      "scripts/func-create-module",
 		     "scripts/func-transmit",
