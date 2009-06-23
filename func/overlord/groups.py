@@ -280,13 +280,18 @@ class Groups(object):
     
     
     def remove_host_glob(self,group_name,host_str,exclude_string=None):
+        copy_host_str = host_str
         host_str = get_hosts_spec(host_str)
         if exclude_string:
             e_s = get_hosts_spec(exclude_string)
             host_str = host_str.difference(e_s)
 
         #remove the list completely
-        self.remove_host_list(group_name,host_str)    
+        if not host_str: #sometimes we may have some old entries into db so 
+            #that will not make a match in that case
+            self.remove_host_list(group_name,[copy_host_str])    
+        else:
+            self.remove_host_list(group_name,host_str)    
 
     def remove_host_list(self,group,host_list):
         """
