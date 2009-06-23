@@ -153,7 +153,13 @@ class Group(base_command.BaseCommand):
             for group,hosts in args.iteritems():
                 for h in hosts:
                     #adding here
-                    self.group.add_hosts_to_group_glob(group[1:],h)
+                    #sometimes we may have formats like that :
+                    #@group1:one,two,three
+                    if h.find(",") != -1:
+                        for sub_host in h.split(","):
+                            self.group.add_hosts_to_group_glob(group[1:],sub_host)
+                    else:
+                        self.group.add_hosts_to_group_glob(group[1:],h)
 
 
 
@@ -171,7 +177,11 @@ class Group(base_command.BaseCommand):
             for group,hosts in args.iteritems():
                 for h in hosts:
                     #adding here
-                    self.group.remove_host_glob(group[1:],h)
+                    if h.find(",") != -1:
+                        for sub_host in h.split(","):
+                            self.group.remove_host_glob(group[1:],sub_host)
+                    else:
+                        self.group.remove_host_glob(group[1:],h)
 
 
     def _ls_host(self,args):
