@@ -33,8 +33,7 @@ class BaseCommand(command.Command):
     forks=1
     delegate=False
     mapfile=DEFAULT_MAPLOC
-    exclude_spec = None
-
+    
     # temporary work around FIXME 
     # we really need a way to store what port each minion is
     # listening on, though this is probably workable for most
