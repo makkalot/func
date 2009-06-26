@@ -15,3 +15,4 @@ test/unittest/data/
 test/unittest/.coverage
 test/unittest/html/
 funcweb/funcweb.egg-info
+version
