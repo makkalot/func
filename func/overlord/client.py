@@ -692,13 +692,14 @@ class Overlord(object):
                   port=copy(self.port),
                   verbose=copy(self.verbose),
                   interactive=copy(self.interactive),
-                  config = copy(self.config),
                   noglobs = copy(self.noglobs),
                   nforks = copy(self.nforks),
                   async = copy(self.async),
                   delegate=copy(self.delegate),
                   mapfile = copy(self.mapfile)
                 )
+        
+        c.cm_config = copy(self.cm_config)
         return c
 
 class Client(Overlord):
