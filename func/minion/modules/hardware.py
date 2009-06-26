@@ -64,6 +64,36 @@ class HardwareModule(func_module.FuncModule):
             del data["bogomips"]
         return data
 
+    
+    def find(self,word):
+        """
+        Find something in hardware info 
+        """
+        result = {self.hw_info:[]}
+        hw_info = self.hw_info()
+
+        for hw_k,hw_v in result.iteritems():
+            if hw_k.find(word)!=-1:
+                result[self.hw_info].append(hw_info[hw_k])
+            #we should see if the value is 
+            elif type(hw_v)==str and hw_v.find(work)!=-1:
+                result[self.hw_info].append(hw_info[hw_k])
+            elif type(hw_v)==list:
+                #as it si known the hw_info has a devices 
+                #in its final data and it is in format of:
+                #[{key:val}] so should check it also
+                for device in hw_v:
+                    for d_k,d_v in device.iteritems():
+                        if d_k.find(word)!=-1:
+                            result[self.hw_info].append(device[d_k])
+                        elif d_v.find(word)!=-1:
+                            result[self.hw_info].append(device[d_k])
+        
+        #get the final result
+        return result
+
+
+
     def info(self,with_devices=True):
         """
         Returns a struct of hardware information.  By default, this pulls down
