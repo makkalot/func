@@ -88,6 +88,7 @@ class XmlRpcInterface(object):
         self.handlers["system.list_methods"] = self.list_methods
         self.handlers["system.list_modules"] = self.list_modules
         self.handlers["system.inventory"] = self.inventory
+        self.handlers["system.find"] = self.find
 
     def list_modules(self):
         modules = self.modules.keys()
@@ -98,6 +99,31 @@ class XmlRpcInterface(object):
         methods = self.handlers.keys()
         methods.sort()
         return methods
+    
+    import func.minion.modules.func_module as fm
+    @fm.findout
+    def find(self,word):
+        """
+        Finding the wanted word
+        """
+
+        word = word.strip()
+        modules = self.modules.keys()
+        methods = self.handlers.keys()
+        
+        return_dict = {}
+        
+        #find modules
+        for m in modules:
+            if m.find(word)!=-1:
+                return_dict[self.list_modules]=m
+
+        #find methods
+        for m in methods:
+            if m.find(word)!=-1:
+                return_dict[self.list_methods]=m
+
+        return return_dict
 
 
     def inventory(self):
@@ -118,6 +144,8 @@ class XmlRpcInterface(object):
                     inventory[module].append(method_name)
 
         return inventory
+
+
 
     def get_dispatch_method(self, method):
 

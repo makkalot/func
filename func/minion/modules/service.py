@@ -55,6 +55,30 @@ class Service(func_module.FuncModule):
             "enabled" : self.get_enabled()
         }
 
+    @func_module.findout
+    def find(self,word):
+        """
+        Dig for some useful info in that module ...
+        """
+        final_dict = {self.get_running:[],
+                      self.get_enabled:[]      
+                }
+        running = self.get_running()
+        enabled = self.get_enabled()
+        
+        for e in enabled:
+            if e[0].find(word)!=-1:
+                final_dict[self.get_enabled].append(e)
+         
+        for e in running:
+            if e[0].find(word)!=-1:
+                final_dict[self.get_running].append(e)
+
+        return final_dict
+        
+
+
+
     def get_enabled(self):
         """
         Get the list of services that are enabled at the various runlevels.  Xinetd services
