@@ -45,6 +45,21 @@ class RpmModule(func_module.FuncModule):
                 results.append([name, epoch, version, release, arch])
         return results
 
+    @func_module.findout
+    def grep(self, word):
+        """
+        Grep some info from packages we got from
+        inventory especially 
+        """
+        results = {self.inventory:[]}
+        inventory_res = self.inventory()
+        
+        for res in inventory_res:
+            if res.lower().find(word)!= -1:
+                results[self.inventory].append(res)
+        
+        return results
+
     def verify(self, pattern='', flatten=True):
         """
         Returns information on the verified package(s).

@@ -56,7 +56,7 @@ class Service(func_module.FuncModule):
         }
 
     @func_module.findout
-    def find(self,word):
+    def grep(self,word):
         """
         Dig for some useful info in that module ...
         """
@@ -66,12 +66,14 @@ class Service(func_module.FuncModule):
         running = self.get_running()
         enabled = self.get_enabled()
         
+        #get enabled ones
         for e in enabled:
-            if e[0].find(word)!=-1:
+            if e[0].lower().find(word)!=-1:
                 final_dict[self.get_enabled].append(e)
          
+        #get running ones
         for e in running:
-            if e[0].find(word)!=-1:
+            if e[0].lower().find(word)!=-1:
                 final_dict[self.get_running].append(e)
 
         return final_dict

@@ -31,6 +31,21 @@ class SysctlModule(func_module.FuncModule):
     def set(self, name, value):
         return self.__run("/sbin/sysctl -w %s=%s" % (name, value))
 
+    @func_module.findout
+    def grep(self, word):
+        """
+        Grep info from sysctl
+        """
+        results = {self.list:[]}
+        sys_res = self.list()#the ist fo sysctl
+        
+        for res in sys_res:
+            if res.lower().find(word)!=-1:
+                results[self.list].append(res)
+        
+        return results
+
+            
     def register_method_args(self):
         """
         Implementing the method argument getter

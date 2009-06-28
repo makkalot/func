@@ -70,7 +70,18 @@ class Yum(func_module.FuncModule):
             pkg_list = exactmatch + matched
 
         return map(str, pkg_list)
-
+    
+    @func_module.findout
+    def grep(self, word):
+        """
+        Grep info from module
+        """
+        results = {self.check_update:[]}
+        update_res = self.check_update()
+        results[self.check_update].extend([res for res in update_res if res.lower().find(word)!=-1])
+        
+        return results
+    
     def register_method_args(self):
         """
         Implementing the argument getter

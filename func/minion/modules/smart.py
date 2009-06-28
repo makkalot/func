@@ -46,6 +46,20 @@ class SmartModule(func_module.FuncModule):
 
         return (cmd.returncode, results)
 
+    @func_module.findout
+    def grep(self, word):
+        """
+        grep some info from grep
+        """
+        results = {self.info:[]}
+        info_res = self.info()[1]
+        
+        if info_res:
+            for res in info_res:
+                if res.lower().find(word)!=-1:
+                    results[self.info].append(res)
+        return results
+
     def register_method_args(self):
         """
         Implementing method argument getter
