@@ -200,7 +200,7 @@ def minion_async_run(retriever, method, args,minion_query=None):
 
         try:
             fact_result = None
-            if type(args[0]) == dict and args[0].has_key('__fact__'):
+            if args and type(args[0]) == dict and args[0].has_key('__fact__'):
                 fact_result = minion_query.exec_query(args[0]['__fact__'],True)
             else:
                 function_ref = retriever(method)
