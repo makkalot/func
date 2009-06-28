@@ -84,6 +84,23 @@ class MountModule(func_module.FuncModule):
     def inventory(self, flatten=True):
         return self.list()
 
+    
+    @func_module.findout
+    def grep(self,word):
+        """
+        Get some info about mounted devices
+        """
+        results = {self.list:[]}
+        list_res = self.list()
+        
+        if list_res:
+            for list_dict in list_res:
+                for m_k,m_v in list_dict.iteritems():
+                    if m_k.lower().find(word)!=-1 or m_v.lower().find(word)!=-1:
+                        results[self.list].append({m_k:m_v})
+        return results
+                    
+        
 
     def register_method_args(self):
         """

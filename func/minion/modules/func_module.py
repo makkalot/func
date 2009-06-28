@@ -136,11 +136,11 @@ class FuncModule(object):
         # to know they didnt implement it
         return {}
     
-    def find(self,word):
+    def grep(self,word):
         """
         An useful utility for searching a specified
         word in a bunch of methods the module specifies
-        @param word : Word to be serched in method calls
+        @param word : Word to be searched in method calls
         """
         return {}
 
@@ -152,7 +152,8 @@ def findout(fn):
     find modules ...
     """
     def fn_arg(*args):
-        find_result = fn(*args)
+        word = args[1].strip().lower()
+        find_result = fn(args[0],word)
         structured_result = {}
         if find_result:
             for k,v in find_result.iteritems():

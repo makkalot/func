@@ -64,30 +64,30 @@ class HardwareModule(func_module.FuncModule):
             del data["bogomips"]
         return data
 
-    
-    def find(self,word):
+    @func_module.findout
+    def grep(self,word):
         """
         Find something in hardware info 
         """
-        result = {self.hw_info:[]}
-        hw_info = self.hw_info()
+        result = {self.info:[]}
+        hw_info = self.info()
 
-        for hw_k,hw_v in result.iteritems():
-            if hw_k.find(word)!=-1:
-                result[self.hw_info].append(hw_info[hw_k])
+        for hw_k,hw_v in hw_info.iteritems():
+            if hw_k.lower().find(word)!=-1:
+                result[self.info].append({hw_k:hw_v})
             #we should see if the value is 
-            elif type(hw_v)==str and hw_v.find(work)!=-1:
-                result[self.hw_info].append(hw_info[hw_k])
+            elif type(hw_v)==str and hw_v.lower().find(word)!=-1:
+                result[self.info].append({hw_k:hw_v})
             elif type(hw_v)==list:
                 #as it si known the hw_info has a devices 
                 #in its final data and it is in format of:
                 #[{key:val}] so should check it also
                 for device in hw_v:
                     for d_k,d_v in device.iteritems():
-                        if d_k.find(word)!=-1:
-                            result[self.hw_info].append(device[d_k])
-                        elif d_v.find(word)!=-1:
-                            result[self.hw_info].append(device[d_k])
+                        if d_k.lower().find(word)!=-1:
+                            result[self.info].append({d_k:d_v})
+                        elif d_v.lower().find(word)!=-1:
+                            result[self.info].append({d_k:d_v})
         
         #get the final result
         return result

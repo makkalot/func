@@ -61,6 +61,27 @@ class FactsModule(func_module.FuncModule):
             if name == method_name:
                 return method() 
         return {}
-
-
-
+    
+    @func_module.findout
+    def grep(self, word):
+        """
+        Get some info about facts
+        """
+        result = {
+                  self.list_fact_modules:[],
+                  self.list_fact_methods:[]
+                  }
+        
+        #search in modules
+        for m in self.list_fact_modules():
+            if m.lower().find(word)!=-1:
+                result[self.list_fact_modules].append(m)
+                
+        #search in methods
+        for m in self.list_fact_methods():
+            if m.lower().find(word)!=-1:
+                result[self.list_fact_methods].append(m)
+        
+        #the final collected stuff here
+        return result
+        

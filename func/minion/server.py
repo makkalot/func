@@ -88,7 +88,7 @@ class XmlRpcInterface(object):
         self.handlers["system.list_methods"] = self.list_methods
         self.handlers["system.list_modules"] = self.list_modules
         self.handlers["system.inventory"] = self.inventory
-        self.handlers["system.find"] = self.find
+        self.handlers["system.grep"] = self.grep
 
     def list_modules(self):
         modules = self.modules.keys()
@@ -100,9 +100,10 @@ class XmlRpcInterface(object):
         methods.sort()
         return methods
     
+    
     import func.minion.modules.func_module as fm
     @fm.findout
-    def find(self,word):
+    def grep(self,word):
         """
         Finding the wanted word
         """

@@ -9,6 +9,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+
 """
 Abitrary command execution module for func.
 """
@@ -42,6 +43,16 @@ class Command(func_module.FuncModule):
         if os.access(command, os.X_OK):
             return True
         return False
+    
+    @func_module.findout
+    def grep(self,word):
+        """
+        Serach utility will check here for a specified
+        word if it is a command maybe useful for some systems
+        to check if some comamnd exists for troubleshoting
+        """
+        return {self.exists:[self.exists(word)]}
+        
 
     def register_method_args(self):
         """

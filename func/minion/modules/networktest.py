@@ -54,6 +54,23 @@ class NetworkTest(func_module.FuncModule):
         sock.close()
         return [0, "connection to %s:%s succeeded" % (host, port)]
 
+    @func_module.findout
+    def grep(self, word):
+        """
+        Grep some info from grep test
+        especially netstat is very suitable 
+        for that purpose ...
+        """
+        results = {
+                   self.netstat:[]
+                   }
+        netstat_result = self.netstat()
+        for res in netstat_result:
+            if res.lower().find(word)!=-1:
+                results[self.netstat].append(res)
+        
+        return results
+
     def __args_to_list(self, args):
         return [arg for arg in args]
 

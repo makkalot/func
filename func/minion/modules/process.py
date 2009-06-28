@@ -224,6 +224,34 @@ class ProcessModule(func_module.FuncModule):
     def loadavg(self):
         return open("/proc/loadavg", "r").readline().strip().split(" ")
 
+    @func_module.findout
+    def grep(self, word):
+        """
+        Some grep info about :
+        info and mem methods it may be
+        useful for troubleshooting ...
+        """
+        results = {
+                   self.info:[],
+                   self.mem:[]
+                   }
+        #info result comes here 
+        info_result = self.info()
+        for process_pack in info_result:
+            tmp_str = " ".join(process_pack)
+            if tmp_str.lower().find(word)!= -1 :
+                results[self.info].append(tmp_str)
+        
+        #mem results will come here
+        mem_result = self.mem()
+        for m in mem_result:
+            tmp_str = " ".join(m)
+            if tmp_str.lower().find(word)!= -1 :
+                results[self.mem].append(tmp_str)
+        
+        
+        return results
+    
 
     def register_method_args(self):
         """

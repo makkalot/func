@@ -197,7 +197,26 @@ class FileTracker(func_module.FuncModule):
         return results
 
     #==========================================================
-
+    
+    @func_module.findout
+    def grep(self, word):
+        """
+        Some search utility about tracked files
+        """
+        results = {self.inventory:[]}
+        tracked_files = self.inventory()
+        
+        if type(tracked_files) == str and tracked_files.lower().find(word)!=-1:
+            results[self.inventory].append(tracked_files)
+             
+        else:
+            for res in tracked_files:
+                if res.lower().find(word)!=-1:
+                    results[self.inventory].append(res)
+            
+        return results
+    
+    
     def __sumfile(self, fobj):
         """
         Returns an md5 hash for an object with read() method.
