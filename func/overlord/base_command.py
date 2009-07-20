@@ -33,7 +33,7 @@ class BaseCommand(command.Command):
     forks=1
     delegate=False
     mapfile=DEFAULT_MAPLOC
-
+    
     # temporary work around FIXME 
     # we really need a way to store what port each minion is
     # listening on, though this is probably workable for most
@@ -47,4 +47,7 @@ class BaseCommand(command.Command):
                                             nforks=self.forks,
                                             delegate=self.delegate,
                                             mapfile=self.mapfile,
-                                            timeout=self.parentCommand.socket_timeout)
+                                            timeout=self.parentCommand.socket_timeout,
+                                            exclude_spec=self.exclude_spec)
+
+

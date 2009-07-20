@@ -290,6 +290,9 @@ class Call(base_command.BaseCommand):
         self.delegate = self.options.delegate
         
         self.server_spec = self.parentCommand.server_spec
+        #do we have exclude option activated ?
+        self.exclude_spec = self.parentCommand.exclude_spec
+        
         self.getOverlord()
         
         #the facts part inserted here

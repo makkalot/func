@@ -89,8 +89,8 @@ class CommandAutomagic(object):
 class Minions(object):
     def __init__(self, spec, port=51234, 
                  noglobs=None, verbose=None,
-                 just_fqdns=False, groups_file=None,
-                 delegate=False, minionmap={}):
+                 just_fqdns=False, groups_backend="conf",
+                 delegate=False, minionmap={},exclude_spec=None,**kwargs):
 
         self.spec = spec
         self.port = port
@@ -99,50 +99,104 @@ class Minions(object):
         self.just_fqdns = just_fqdns
         self.delegate = delegate
         self.minionmap = minionmap
+        self.exclude_spec = exclude_spec
 
         self.cm_config = read_config(CONFIG_FILE, CMConfig)
-        self.group_class = groups.Groups(filename=groups_file)
+        self.group_class = groups.Groups(backend=groups_backend,**kwargs)
         
-        self.all_hosts = []
-        self.all_certs = []
+        #lets make them sets so we dont loop again and again
+        self.all_hosts = set()
+        self.all_certs = set()
         self.all_urls = []
 
     def _get_new_hosts(self):
-        self.new_hosts = self.group_class.get_hosts_by_group_glob(self.spec)
+        self.new_hosts = self._get_group_hosts(self.spec)
         return self.new_hosts
 
-    def _get_all_hosts(self):
-        seperate_gloobs = self.spec.split(";")
-        seperate_gloobs = seperate_gloobs + self.new_hosts
+    def _get_group_hosts(self,spec):
+        return self.group_class.get_hosts_by_group_glob(spec)
+
+    def _get_hosts_for_specs(self,seperate_gloobs):
+        """
+        Gets the hosts and certs for proper spec
+        """
+        tmp_hosts = set()
+        tmp_certs = set()
         for each_gloob in seperate_gloobs:
-            #if there is some string from group glob just skip it
             if each_gloob.startswith('@'):
                 continue
-            actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
-            certs = glob.glob(actual_gloob)
-            # pull in peers if enabled for minion-to-minion
-            if self.cm_config.peering:
-                peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
-                certs += glob.glob(peer_gloob)
+            h,c = self._get_hosts_for_spec(each_gloob)
+            tmp_hosts = tmp_hosts.union(h)
+            tmp_certs = tmp_certs.union(c)
 
-            for cert in certs:
-                #if the spec includes some groups and also it includes some *
-                #may cause some duplicates so should check that
-                #For example spec = "@home_group;*" will give lots of duplicates as a result
-                if not cert in self.all_certs:
-                    self.all_certs.append(cert)
-		    # use basename to trim off any excess /'s, fix
-		    # ticket #53 "Trailing slash in certmaster.conf confuses glob function
-                    certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
-                    if self.cm_config.peering:
-                        certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
-                    host = certname[:-(len(self.cm_config.cert_extension) + 1)]
-                    self.all_hosts.append(host)
+        return tmp_hosts,tmp_certs
+
+    def _get_hosts_for_spec(self,each_gloob):
+        """
+        Pull only for specified spec
+        """
+        #these will be returned
+        tmp_certs = set()
+        tmp_hosts = set()
+
+        actual_gloob = "%s/%s.%s" % (self.cm_config.certroot, each_gloob, self.cm_config.cert_extension)
+        certs = glob.glob(actual_gloob)
+        
+        # pull in peers if enabled for minion-to-minion
+        if self.cm_config.peering:
+            peer_gloob = "%s/%s.%s" % (self.cm_config.peerroot, each_gloob, self.cm_config.cert_extension)
+            certs += glob.glob(peer_gloob)
+            
+        for cert in certs:
+            tmp_certs.add(cert)
+            # use basename to trim off any excess /'s, fix
+            # ticket #53 "Trailing slash in certmaster.conf confuses glob function
+            certname = os.path.basename(cert.replace(self.cm_config.certroot, ""))
+            if self.cm_config.peering:
+                certname = os.path.basename(certname.replace(self.cm_config.peerroot, ""))
+            host = certname[:-(len(self.cm_config.cert_extension) + 1)]
+            tmp_hosts.add(host)
+
+        return tmp_hosts,tmp_certs
+
+    def get_hosts_for_spec(self,spec):
+        """
+        Be careful when editting that method it will be used
+        also by groups api to pull machines to have better
+        glob control there ...
+        """
+        return self._get_hosts_for_spec(spec)[0]
+
+
+
+    def _get_all_hosts(self):
+        """
+        Gets hosts that are included and excluded by user
+        a better orm like spec so user may say 
+        func "*" --exclude "www.*;@mygroup" ...
+        """
+        included_part = self._get_hosts_for_specs(self.spec.split(";")+self.new_hosts)
+        self.all_certs=self.all_certs.union(included_part[1])
+        self.all_hosts=self.all_hosts.union(included_part[0])
+        #excluded ones
+        if self.exclude_spec:
+            #get first groups ypu dont want to run :
+            group_exclude = self._get_group_hosts(self.exclude_spec)
+            excluded_part = self._get_hosts_for_specs(self.exclude_spec.split(";")+group_exclude)
+            self.all_certs = self.all_certs.difference(excluded_part[1])
+            self.all_hosts = self.all_hosts.difference(excluded_part[0])
+
+
 
     def get_all_hosts(self):
+        """
+        Get current host list
+        """
         self._get_new_hosts()
         self._get_all_hosts()
-        return self.all_hosts
+
+        #we keep it all the time as a set so 
+        return list(self.all_hosts)
 
     def get_urls(self):
         self._get_new_hosts()
@@ -187,7 +241,7 @@ class Overlord(object):
 
     def __init__(self, server_spec, port=DEFAULT_PORT, interactive=False,
         verbose=False, noglobs=False, nforks=1, config=None, async=False, init_ssl=True,
-        delegate=False, mapfile=DEFAULT_MAPLOC, timeout=None):
+        delegate=False, mapfile=DEFAULT_MAPLOC, timeout=None,exclude_spec=None):
         """
         Constructor.
         @server_spec -- something like "*.example.org" or "foosball"
@@ -207,7 +261,7 @@ class Overlord(object):
 
 
         self.server_spec = server_spec
-
+        self.exclude_spec = exclude_spec
         # we could make this settable in overlord.conf as well
         self.port        = port
         if self.config.listen_port:
@@ -238,7 +292,7 @@ class Overlord(object):
         #overlord_query stuff
         self.overlord_query = OverlordQuery()
 
-        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose)
+        self.minions_class = Minions(self.server_spec, port=self.port, noglobs=self.noglobs, verbose=self.verbose,exclude_spec=self.exclude_spec)
         self.minions = self.minions_class.get_urls()
         if len(self.minions) == 0:
             raise Func_Client_Exception, 'Can\'t find any minions matching \"%s\". ' % self.server_spec

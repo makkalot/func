@@ -25,6 +25,7 @@ class FuncCommandLine(command.Command):
 
     socket_timeout = None
     subCommandClasses = []
+    exclude_spec = None
 
     def __init__(self):
         modules = module_loader.load_modules('func/overlord/cmd_modules/', base_command.BaseCommand)
@@ -38,6 +39,11 @@ class FuncCommandLine(command.Command):
     def addOptions(self):
         self.parser.add_option('-t', '--timeout', dest="timeout", type="float",
                                help="Set default socket timeout in seconds")
+        self.parser.add_option('-e', '--exclude', dest="exclude",
+                               help="exclude some of minions",
+                               action="store",
+                               type="string")
+
 
     # just some ugly goo to try to guess if arg[1] is hostnamegoo or
     # a command name
@@ -63,3 +69,6 @@ class FuncCommandLine(command.Command):
     def handleOptions(self, options):
         if options.timeout:
             self.socket_timeout = options.timeout
+
+        if options.exclude:
+            self.exclude_spec = options.exclude

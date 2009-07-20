@@ -31,6 +31,7 @@ if __name__ == "__main__":
 		scripts = [
                      "scripts/funcd",
 		     "scripts/func", 
+		     "scripts/func-group", 
                      "scripts/func-inventory",
                      "scripts/func-create-module",
 		     "scripts/func-transmit",
@@ -43,6 +44,7 @@ if __name__ == "__main__":
 			    "%s/overlord" % NAME,
 			    "%s/overlord/cmd_modules" % NAME,
                             "%s/overlord/modules" % NAME,
+                            "%s/overlord/group" % NAME,
                             "%s/minion/modules" % NAME,
                             "%s/minion/facts" % NAME,
                             "%s/minion/facts/modules/" % NAME,
