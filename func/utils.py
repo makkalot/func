@@ -134,4 +134,24 @@ def get_hostname_by_route():
     # all else has failed to get a good hostname, so just return
     # an ip address
     return socket.gethostbyname(socket.gethostname())
-    
+
+
+def get_fresh_method_instance(function_ref):
+    """
+    That method is kind of workaround to not break the
+    current api in order to add logging capabilities per
+    method level. When methods are executed during xmlrpc
+    calls we have a pool of references with module methods
+    and overlord call them. If we want to pass those methods
+    different logger instances in order to have log call per
+    job_ids we shouldnt have the same method reference to be 
+    called,we need fresh ones so that is how we solve that
+    kind of hacky ...
+    """
+    fresh_instance = function_ref.im_self.__class__()
+    return getattr(fresh_instance,function_ref.__name__)
+
+def should_log(args):
+    if args and type(args[len(args)-1]) == dict and args[len(args)-1].has_key('__logger__') and args[len(args)-1]['__logger__'] == True:
+        return True
+    return False
