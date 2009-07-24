@@ -176,14 +176,13 @@ def batch_run(pool, callback, nforks,**extra_args):
         # we now have a list of job id's for each minion, kill the task
         os._exit(0)
 
+
 def minion_async_run(retriever, method, args,minion_query=None):
     """
     This is a simpler invocation for minion side async usage.
     """
     # to avoid confusion of job id's (we use the same job database)
     # minion jobs contain the string "minion".  
-
-
     job_id = "%s-minion" % pprint.pformat(time.time())
     __update_status(job_id, JOB_ID_RUNNING, -1)
     pid = os.fork()
@@ -199,15 +198,34 @@ def minion_async_run(retriever, method, args,minion_query=None):
             os._exit(0)
 
         try:
+            
             fact_result = None
             if args and type(args[0]) == dict and args[0].has_key('__fact__'):
                 fact_result = minion_query.exec_query(args[0]['__fact__'],True)
             else:
                 function_ref = retriever(method)
+                #here we will append the job_id at the end of the args list
+                #so we can pull it via some decorator and use it for other
+                #purposes like logginng and output tracking per method which
+                #will be useful for lots of applications ...
+                #if you are doing something useful with decorators per methods
+                #be aware of that please ...
+                args = list(args)
+                args.append({'__logger__':True,'job_id':job_id})
+                args = tuple(args)
                 rc = function_ref(*args)
                 
             if fact_result and fact_result[0]: #that means we have True from query so can go on
                 function_ref = retriever(method)
+                #here we will append the job_id at the end of the args list
+                #so we can pull it via some decorator and use it for other
+                #purposes like logginng and output tracking per method which
+                #will be useful for lots of applications ...
+                #if you are doing something useful with decorators per methods
+                #be aware of that please ...
+                args = list(args)
+                args.append({'__logger__':True,'job_id':job_id})
+                args = tuple(args)
                 rc = function_ref(*args[1:])
                 rc = [{'__fact__':fact_result},rc]
             elif fact_result and not fact_result[0]:
