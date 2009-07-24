@@ -12,15 +12,60 @@
 
 import inspect
 import os
-
 from func import logger
 from certmaster.config import read_config, BaseConfig
 from func.commonconfig import FuncdConfig
 from func.utils import is_public_valid_method
 from func.minion.func_arg import * #the arg getter stuff
+from types import FunctionType
+from func.logger import LogFactory
+from func import utils
+
+
+def log_all(fn):
+    """
+    That decorator will set a logger to a method
+    which will be associated with its job_id so 
+    will log only during when it is running,cool:)
+    """
+    def wrapper(*args):
+        
+        if utils.should_log(args):
+            logger = LogFactory.get_instance(app_name=args[len(args)-1]['job_id'])
+            
+            #remove job_id from it
+            args = list(args)
+            args.pop()
+        else:#it seems it is not a async call so will use direct logger
+            logger = LogFactory.get_instance()
+
+        setattr(wrapper,"logger",logger)
+        return fn(*args)
+    wrapper.__name__ = fn.__name__
+    return wrapper
+
+
+class DecorateLogMeta(type):
+    """
+    A metaclass which simply wrapps all of the public
+    methods in a minion module class,the main purpose
+    is without breaking api adding logging capabilites
+    to methods ...
+    """
+    def __new__(meta, classname, bases, classDict):
+        newClassDict = {}
+        for attributeName, attribute in classDict.items():
+            if type(attribute) == FunctionType and not attributeName.startswith("_"):
+                attribute = log_all(attribute)
+            newClassDict[attributeName] = attribute
+        
+        return type.__new__(meta, classname, bases, newClassDict)
+
+
 
 class FuncModule(object):
-
+    
+    __metaclass__ = DecorateLogMeta
     # the version is meant to
     version = "0.0.0"
     api_version = "0.0.0"
