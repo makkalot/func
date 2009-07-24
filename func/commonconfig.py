@@ -27,6 +27,8 @@ class FuncdConfig(BaseConfig):
     listen_addr = Option('')
     listen_port = IntOption('51234')
     minion_name = Option('')
+    
+    method_log_dir = Option("/var/log/func/methods/")
 
 class OverlordConfig(BaseConfig):
     socket_timeout = FloatOption(0)
