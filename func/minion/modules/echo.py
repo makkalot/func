@@ -63,6 +63,17 @@ class EchoTest(func_module.FuncModule):
         Run boolean
         """
         return command
+    
+    def run_str_log(self,command):
+        import time
+
+        self.run_str_log.logger.info("Starting counting logger ...")
+        time.sleep(60)
+        for i in range(100):
+            time.sleep(5)
+            self.run_str_log.logger.info("Calling method with counter is %d"%i)
+        
+        return command
 
     def register_method_args(self):
         """
