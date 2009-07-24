@@ -83,3 +83,90 @@ class AuditLogger(Singleton):
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         self._no_handlers = False
+
+#some more dynamic logger handlers here
+config_file = '/etc/func/minion.conf'
+config = read_config(config_file, FuncdConfig)
+GLOBAL_LOG_DIR = config.method_log_dir 
+class StandartLogger(object):
+    """
+    It is just a proxy like object to the logging
+    module so we control here the stuff
+    """
+
+    def __init__(self,handlers,app_name,**kwargs):
+        self.logger = logging.getLogger(app_name)
+        self.logger.setLevel(logging.DEBUG)
+
+        self.handlers = handlers
+        self.__setup_handlers()
+
+    def __setup_handlers(self):
+        # a default case is to have a FileHandler for all that is what we want
+        for handler in self.handlers:
+            self.logger.addHandler(handler)
+    
+    def debug(self,msg):
+        self.logger.debug(msg)
+    def info(self,msg):
+        self.logger.info(msg)
+    def critical(self,msg):
+        self.logger.critical(msg)
+    def error(self,msg):
+        self.logger.error(msg)
+    def exception(self,msg):
+        self.logger.exception(msg)
+    def warn(self,msg):
+        self.logger.warn(msg)
+
+#----------------------------------HANDLERS------------------------------------------------
+class AbstarctHandler(object):
+    pass
+
+class StandartHandler(AbstarctHandler):
+    """
+    Standart one just has a filehandler in it
+    """
+    def __init__(self,formatter,**kwargs):
+        if kwargs.has_key('log_place'):
+            self.log_place = "".join([kwargs['log_place']])
+        log_f = os.path.join(GLOBAL_LOG_DIR,self.log_place)
+        if not os.path.exists(os.path.split(log_f)[0]):
+            os.mkdir(os.path.split(log_f)[0])
+
+        self.handler = logging.FileHandler((log_f), "a")
+        self.handler.setFormatter(formatter)
+
+    def __getattr__(self,name):
+        return getattr(self.handler,name)
+
+#--- some formatters here ---
+def standart_formatter():
+    return logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+
+def exception_formatter():
+    return logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(lineno)d - %(message)s")
+
+#----------------------------------HANDLERS------------------------------------------------
+STANDART_LOGGER = 0
+EXCEPTION_LOGGER = 1
+
+class LogFactory(object):
+    
+    @staticmethod
+    def get_instance(type=STANDART_LOGGER,app_name="direct_log",log_place=None):
+        if type == STANDART_LOGGER:
+            if not log_place:
+                log_place = "".join([app_name.strip()])
+            sh = StandartHandler(standart_formatter(),log_place=log_place)
+            logger = StandartLogger([sh.handler],app_name=app_name)
+            return logger
+        elif type == EXCEPTION_LOGGER:
+            #we will add the prefixes here ok
+            if not log_place:
+                log_place = "".join([app_name.strip()])
+            sh = StandartHandler(exception_formatter(),log_place=log_place)
+            logger = StandartLogger([sh],app_name=app_name)
+            return logger
+        else:
+            return None
