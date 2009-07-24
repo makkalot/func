@@ -186,6 +186,7 @@ class FuncApiMethod:
         self.logger.debug("(X) -------------------------------------------")
 
         try:
+            self.__method = futils.get_fresh_method_instance(self.__method)
             rc = self.__method(*args)
         except codes.FuncException, e:
             self.__log_exc()
