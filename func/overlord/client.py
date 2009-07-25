@@ -383,6 +383,19 @@ class Overlord(object):
         """
         return jobthing.get_open_ids()
     
+    def tail_log(self,job_id):
+        """
+        Method will read from minion the log file
+        which matches the job_id and gives back the
+        output of it ,pretty easy ...
+        """
+        from func.index_db import get_index_data
+        index_data = get_index_data()
+        if index_data.has_key(job_id):
+            print Overlord(self.spec).jobs.tail_output(index_data[job_id])
+        else:
+            print "No log files to match sorry ..."
+
     def list_minions(self, format='list'):
         """
         Returns a flat list containing the minions this Overlord object currently
