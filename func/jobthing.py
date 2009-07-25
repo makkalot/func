@@ -276,10 +276,10 @@ def job_status(jobid, client_class=None):
             #in minon site as minion job_id named log files the only way
             #to track them is having them in dicts {overlord_job_id : minion_job_id}
             if match_dict.has_key(jobid):
-                match_dict[jobid].append(minion_job)
+                match_dict[jobid].append((minion_job,host))
             else:
                 match_dict={jobid:[]}
-                match_dict[jobid].append(minion_job)
+                match_dict[jobid].append((minion_job,host))
 
             client = client_class(host, noglobs=True, async=False)
             minion_result = client.jobs.job_status(minion_job)
