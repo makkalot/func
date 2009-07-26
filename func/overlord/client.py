@@ -390,25 +390,26 @@ class Overlord(object):
         output of it ,pretty easy ...
         """
         from func.index_db import get_index_data
-        from func.jobthing import JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR 
+        from func.jobthing import JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR,JOB_ID_RUNNING 
 
         code,result = Overlord(self.server_spec).job_status(job_id)
+        if code == JOB_ID_RUNNING:
+            return (None,False)
         index_data = get_index_data()
-        print "The ,index_data is like ",index_data
         host_output = {}
         if index_data.has_key(job_id):
             host_tuple = index_data[job_id]
-            print "The host tuple is ",host_tuple
             #h_t is a tuple of (minion_id,host)
             for h_t in host_tuple:
                 tmp_res = Overlord(h_t[1]).jobs.tail_output(h_t[0])
-                host_output[h_t[1]]=tmp_res
+                host_output.update(tmp_res)
         else:
-            print "No log files to match sorry ..."
+            return (None,True)
         
         if code in [JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR]:
-            print "The code is also like ",code
+            #means that job isfinished there is no need to wait for more
             return (host_output,True)
+            #means that job is NOT finished there is more data to come
         else:
             return (host_output,False)
 
