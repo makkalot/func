@@ -16,7 +16,7 @@
 
 from func import jobthing
 import func_module
-
+NUM_OF_LINES = 50
 # =================================
 
 class JobsModule(func_module.FuncModule):
@@ -46,7 +46,7 @@ class JobsModule(func_module.FuncModule):
         import os
         import subprocess
 
-        NUM_OF_LINES = 50
+        
         
         config = read_config(config_file, FuncdConfig)
         method_log_dir = config.method_log_dir
