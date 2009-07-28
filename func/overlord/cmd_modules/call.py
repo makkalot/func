@@ -200,6 +200,10 @@ class Call(base_command.BaseCommand):
         self.parser.add_option('-l', '--logpoll', dest="logpoll",
                                help="Polls for that call for minion side to get some useful output info.",
                                action="store_true")
+        self.parser.add_option('-o', '--logone', dest="logone",
+                               help="Polls for that call for minion side to get some useful output info,for only one host,must suply job_id;host as parameter",
+                               action="store")
+
         self.parser.add_option("", "--filter", dest="filter",
                                help="use filter to and minion facts",
                                action="store")
@@ -326,6 +330,12 @@ class Call(base_command.BaseCommand):
             print res
             return async_results
 
+        #log for only one machine which is more reasonable instead
+        #of doing it for thousands ... 
+        if self.options.logone:
+            self._poll_logs(self.module,self.options.logone)
+            return #terminate no need for more
+
         if self.options.async:
             self.partial = {}
             if self.options.nopoll:
@@ -347,26 +357,31 @@ class Call(base_command.BaseCommand):
             print self.format_return(i)
 
     #do it only for some of the hosts if needed !
-    def _poll_logs(self,job_id):
+    def _poll_logs(self,job_id,host=None):
         """
         Here the method polls for log and prints some
         logs on the screen,which is kind of informative
         action for other apps and users also !
         """
         import time
-        
+        from func.minion.modules.jobs import NUM_OF_LINES
         #a constant that will tell us from how many same 
         # logs we will accept that the rest of logs is the
         #same we should stop somewhere !
         print_result = {}
         to_print = {}
         poll_res = (None,False)#initial state
+        print_first_time = True
         while not poll_res[1]:#while the job_id is not finished
-            poll_res = self.overlord_obj.tail_log(job_id)
+            if print_first_time and host:
+                poll_res = self.overlord_obj.tail_log(job_id,host,True)
+            else:
+                poll_res = self.overlord_obj.tail_log(job_id,host)
+                
             if not poll_res[0]:
                 print "Logging data is initializing ..."
                 time.sleep(0.5)
-                poll_res = self.overlord_obj.tail_log(job_id)
+                poll_res = self.overlord_obj.tail_log(job_id,host)
                 continue
             
             #print the stuff you collected
@@ -379,25 +394,35 @@ class Call(base_command.BaseCommand):
 
                 else:
                     #print "---------------------------------------------"
-                    #print "print_result ",print_result
-                    #print "log ",log
-
+                    #print "PRINT_RESULT :  ",print_result[minion]
+                    #print "LOG IS ",log
+                    
                     to_print[minion]=list(set(log).difference(set(print_result[minion])))
                     print_result[minion]=list(set(print_result[minion]).union(set(to_print[minion])))
-
+                    #should empty the buffer a little bit
+                    #think if you have a file which is 1 GB :)
+                    #print_result[minion] = print_result[minion][-NUM_OF_LINES:]
+                    #print "PRINT_RESULT :  ",print_result[minion]
+                    
                     #print "to_print ",to_print
                     #print "---------------------------------------------"
-            self._print_dict_result(to_print)
+                    #raw_input()
+                    
+            self._print_dict_result(to_print,print_first_time)
+            if print_first_time and host:
+                print_first_time = False
+                
             time.sleep(0.5)
 
-    def _print_dict_result(self,result):
+    def _print_dict_result(self,result,print_host=True):
         """
         An util method that just prints info 
         in a result dictionary ...
         """
         for minion,logs in result.iteritems():
             if logs:
-                print "------HOST : %s -------"%minion
+                if print_host:
+                    print "------HOST : %s -------"%minion
                 print "\n".join(logs)
     
     def _convert_log_to_list(self,log):
