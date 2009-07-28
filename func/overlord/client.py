@@ -12,6 +12,7 @@
 ## along with this program; if not, write to the Free Software
 ## Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ##
+from func.jobthing import RETAIN_INTERVAL
 
 import sys
 import glob
@@ -383,26 +384,51 @@ class Overlord(object):
         """
         return jobthing.get_open_ids()
     
-    def tail_log(self,job_id):
+    
+    def tail_log(self,job_id,host=None,remove_old=None):
         """
         Method will read from minion the log file
         which matches the job_id and gives back the
         output of it ,pretty easy ...
         """
-        from func.index_db import get_index_data
+        from func.index_db import get_index_data,delete_index_data
         from func.jobthing import JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR,JOB_ID_RUNNING 
-
+        RETAIN_INTERVAL = 60 * 60 
+        import time
+        
         code,result = Overlord(self.server_spec).job_status(job_id)
         if code == JOB_ID_RUNNING:
             return (None,False)
         index_data = get_index_data()
+        
+        #if we should remove old ones
+        if remove_old:
+            rm_list = []
+            now = time.time()
+            for job_id,minion_tuple in index_data.iteritems():
+                job_key = job_id.split("-")
+                job_key = job_key[len(job_key)-1]
+                if (now - float(job_key)) > RETAIN_INTERVAL:
+                    rm_list.append(job_id)
+            #deleting the old ones
+            print "I will delete those : ",rm_list
+            delete_index_data(rm_list)
+            
         host_output = {}
         if index_data.has_key(job_id):
             host_tuple = index_data[job_id]
             #h_t is a tuple of (minion_id,host)
-            for h_t in host_tuple:
-                tmp_res = Overlord(h_t[1]).jobs.tail_output(h_t[0])
-                host_output.update(tmp_res)
+            if not host:
+                for h_t in host_tuple:
+                    tmp_res = Overlord(h_t[1]).jobs.tail_output(h_t[0])
+                    host_output.update(tmp_res)
+            else:#we want only a host
+                for h_t in host_tuple:
+                    if h_t[1] == host:
+                        tmp_res = Overlord(h_t[1]).jobs.tail_output(h_t[0])
+                        host_output.update(tmp_res)
+                if not host_output:
+                    return (None,True)
         else:
             return (None,True)
         
