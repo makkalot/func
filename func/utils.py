@@ -148,8 +148,20 @@ def get_fresh_method_instance(function_ref):
     called,we need fresh ones so that is how we solve that
     kind of hacky ...
     """
-    fresh_instance = function_ref.im_self.__class__()
-    return getattr(fresh_instance,function_ref.__name__)
+    
+    #CAUTION HACKY IF STATEMNETS AROUND :)
+    # we dont want private methods and system
+    #modules around ,we should change system
+    #module though ....
+    if function_ref.__name__.startswith("_"):
+        return function_ref
+    else:
+        try:
+            fresh_instance = function_ref.im_self.__class__()
+        except Exception,e:
+            #something went wrong so we return the normal reference value
+            return function_ref
+        return getattr(fresh_instance,function_ref.__name__)
 
 def should_log(args):
     if args and type(args[len(args)-1]) == dict and args[len(args)-1].has_key('__logger__') and args[len(args)-1]['__logger__'] == True:
