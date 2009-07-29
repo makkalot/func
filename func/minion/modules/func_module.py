@@ -41,6 +41,9 @@ def log_all(fn):
 
         setattr(wrapper,"logger",logger)
         return fn(*args)
+    
+    #a hack for get_arg_methods
+    wrapper.overriden_args = inspect.getargspec(fn)
     wrapper.__name__ = fn.__name__
     return wrapper
 

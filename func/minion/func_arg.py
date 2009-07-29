@@ -133,8 +133,12 @@ class ArgCompatibility(object):
         import inspect
         from itertools import chain
         #get the arguments from real object we have [args],*arg,**kwarg,[defaults]
-        tmp_arguments=inspect.getargspec(getattr(cls,method_name))
+        #tmp_arguments=inspect.getargspec(getattr(cls,method_name))
+        
+        #overriden args is something i created it is a hack !
+        tmp_arguments = getattr(cls, method_name).overriden_args
         check_args=[arg for arg in chain(tmp_arguments[0],tmp_arguments[1:3]) if arg and arg!='self']
+        #raise Exception("The check_args are like %s"%str(check_args))
         #print "The arguments taken from the inspect are :",check_args 
         #the size may change of the hash so should a copy of it 
         copy_arguments = arguments.copy()
