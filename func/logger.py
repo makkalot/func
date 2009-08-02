@@ -106,6 +106,13 @@ class StandartLogger(object):
         for handler in self.handlers:
             self.logger.addHandler(handler)
     
+    def progress(self,current,all):
+        """
+        A method to log the progress of the 
+        running method ...
+        """
+        self.logger.debug("Progress report %d/%d completed"%(current,all))
+    
     def debug(self,msg):
         self.logger.debug(msg)
     def info(self,msg):
