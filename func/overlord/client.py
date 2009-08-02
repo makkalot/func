@@ -427,6 +427,7 @@ class Overlord(object):
                     if h_t[1] == host:
                         tmp_res = Overlord(h_t[1]).jobs.tail_output(h_t[0])
                         host_output.update(tmp_res)
+                        break
                 if not host_output:
                     return (None,True)
         else:
@@ -438,6 +439,49 @@ class Overlord(object):
             #means that job is NOT finished there is more data to come
         else:
             return (host_output,False)
+
+    def check_progress(self,job_id,host):
+        """
+        Method will get from minion side
+        the progress which is (current,all)
+        formatted.
+        """
+
+        from func.index_db import get_index_data
+        from func.jobthing import JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR,JOB_ID_RUNNING 
+        
+        code,result = Overlord(self.server_spec).job_status(job_id)
+        if code == JOB_ID_RUNNING:
+            return (None,False)
+        index_data = get_index_data()
+        
+        host_output = {}
+        if index_data.has_key(job_id):
+            host_tuple = index_data[job_id]
+            #h_t is a tuple of (minion_id,host)
+            for h_t in host_tuple:
+                if h_t[1] == host:
+                    tmp_res = Overlord(h_t[1]).jobs.get_progress(h_t[0])
+                    host_output.update(tmp_res)
+                    break
+            if not host_output:
+                return (None,True)
+        else:
+            return (None,True)
+        
+        if code in [JOB_ID_FINISHED,JOB_ID_LOST_IN_SPACE,JOB_ID_REMOTE_ERROR]:
+            #means that job isfinished there is no need to wait for more
+            if host_output[host] == [0,0]:
+                return (None,True)
+            else:
+                return (host_output,True)
+            #means that job is NOT finished there is more data to come
+        else:
+            if host_output[host] == [0,0]:
+                return (None,False)
+            else:
+                return (host_output,False)
+
 
 
     def list_minions(self, format='list'):
