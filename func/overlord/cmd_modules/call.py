@@ -203,7 +203,10 @@ class Call(base_command.BaseCommand):
         self.parser.add_option('-o', '--logone', dest="logone",
                                help="Polls for that call for minion side to get some useful output info,for only one host,must suply job_id;host as parameter",
                                action="store")
-
+        
+        self.parser.add_option('-r', '--progress', dest="progress",
+                               help="Polls for that call for minion side to get the progress.",
+                               action="store")
         self.parser.add_option("", "--filter", dest="filter",
                                help="use filter to and minion facts",
                                action="store")
@@ -335,6 +338,10 @@ class Call(base_command.BaseCommand):
         if self.options.logone:
             self._poll_logs(self.module,self.options.logone)
             return #terminate no need for more
+        
+        if self.options.progress:
+            self._print_progress(self.module,self.options.progress)
+            return #terminate no need for more
 
         if self.options.async:
             self.partial = {}
@@ -413,6 +420,41 @@ class Call(base_command.BaseCommand):
                 print_first_time = False
                 
             time.sleep(0.5)
+    
+    def _print_progress(self,job_id,host):
+        """
+        Gets the progress for job_id and host
+        """
+        import time
+        from func.utils import ProgressBar,TerminalController 
+        
+        poll_res = (None,False)#initial state
+        first_time = True
+        while not poll_res[1]:#while the job_id is not finished
+            poll_res = self.overlord_obj.check_progress(job_id,host)
+            #print poll_res    
+            if not poll_res[0]:
+                time.sleep(0.5)
+                continue
+            
+            if first_time:
+                
+                term = TerminalController()
+                progress = ProgressBar(term, 'Progress Status',minValue=poll_res[0][host][0],maxValue=poll_res[0][host][1])
+                first_time = False
+            
+            #update the progress bar
+            progress.update(poll_res[0][host][0])
+            #sleep a little bit
+            time.sleep(0.5)
+
+        if first_time:
+            print "Method has no progress ability or some remote error occured"
+        else:
+            #clear the progress bar and say it is done
+            progress.clear()
+            print "JOB FINISHED : ",job_id
+    
 
     def _print_dict_result(self,result,print_host=True):
         """
@@ -424,7 +466,8 @@ class Call(base_command.BaseCommand):
                 if print_host:
                     print "------HOST : %s -------"%minion
                 print "\n".join(logs)
-    
+        
+
     def _convert_log_to_list(self,log):
         res = []
         for l in log:
